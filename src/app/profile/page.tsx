@@ -19,6 +19,8 @@ import {
   Shield,
   HelpCircle,
   LogOut,
+  Bookmark,
+  List,
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 
@@ -120,7 +122,7 @@ export default function ProfilePage() {
             <ChevronLeft className="w-5 h-5" />
           </Link>
           <h1 className="font-semibold text-night-100 text-lg">Profile</h1>
-          <Link href="/profile/settings" className="liquid-icon-btn">
+          <Link href="/settings" className="liquid-icon-btn">
             <Settings className="w-5 h-5" />
           </Link>
         </div>
@@ -271,13 +273,22 @@ export default function ProfilePage() {
             </div>
           </motion.div>
 
+          {/* Quick Links */}
+          <motion.div variants={fadeInUp}>
+            <h3 className="text-sm font-medium text-night-400 mb-3 px-1">Quick Access</h3>
+            <div className="liquid-card overflow-hidden">
+              <SettingsRow icon={Bookmark} label="Bookmarks" href="/bookmarks" />
+              <SettingsRow icon={List} label="Surah Index" href="/surahs" />
+            </div>
+          </motion.div>
+
           {/* Settings Sections */}
           <motion.div variants={fadeInUp}>
-            <h3 className="text-sm font-medium text-night-400 mb-3 px-1">Preferences</h3>
+            <h3 className="text-sm font-medium text-night-400 mb-3 px-1">Settings</h3>
             <div className="liquid-card overflow-hidden">
-              <SettingsRow icon={Bell} label="Notifications" />
-              <SettingsRow icon={Volume2} label="Audio & Reciter" />
-              <SettingsRow icon={Palette} label="Appearance" />
+              <SettingsRow icon={Volume2} label="Audio & Reciter" href="/settings" />
+              <SettingsRow icon={Target} label="Daily Goal" href="/settings" />
+              <SettingsRow icon={Palette} label="Preferences" href="/settings" />
             </div>
           </motion.div>
 

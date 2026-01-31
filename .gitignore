@@ -45,3 +45,6 @@ coverage/
 *.log
 *.local
 .env*.local
+
+# clerk configuration (can include secrets)
+/.clerk/

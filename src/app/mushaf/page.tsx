@@ -22,6 +22,7 @@ import {
   BookOpen,
   Star,
   Brain,
+  BookmarkPlus,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { 
@@ -37,9 +38,11 @@ import {
 import BottomNav from '@/components/BottomNav';
 import QuranSearch from '@/components/QuranSearch';
 import TafsirDrawer from '@/components/TafsirDrawer';
+import { useBookmarks } from '@/lib/bookmarks';
 
 export default function MushafPage() {
   const router = useRouter();
+  const { toggle: toggleBookmark, check: isBookmarked } = useBookmarks();
   
   // State
   const [currentSurah, setCurrentSurah] = useState<Surah | null>(null);
@@ -213,9 +216,9 @@ export default function MushafPage() {
             <button onClick={() => setShowSearch(true)} className="btn-icon">
               <Search className="w-5 h-5" />
             </button>
-            <button className="btn-icon">
+            <Link href="/bookmarks" className="btn-icon">
               <Bookmark className="w-5 h-5" />
-            </button>
+            </Link>
             <button onClick={() => setShowSettings(true)} className="btn-icon">
               <Settings className="w-5 h-5" />
             </button>
@@ -319,6 +322,27 @@ export default function MushafPage() {
                       {ayah.sajda && <span className="text-gold-400">۩ Sajda</span>}
                     </div>
                     <div className="flex items-center gap-3">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleBookmark({
+                            surah: surahNumber,
+                            surahName: currentSurah.englishName,
+                            surahArabicName: currentSurah.name,
+                            ayah: ayah.numberInSurah,
+                            text: ayah.text.arabic.slice(0, 100),
+                            translation: ayah.text.translations[translationEdition].slice(0, 100),
+                          });
+                        }}
+                        className={`text-xs transition-colors flex items-center gap-1 px-2 py-1 rounded-lg ${
+                          isBookmarked(surahNumber, ayah.numberInSurah)
+                            ? 'text-gold-400 bg-gold-500/20'
+                            : 'text-night-500 hover:text-gold-400 bg-night-800/50'
+                        }`}
+                      >
+                        <Bookmark className={`w-3.5 h-3.5 ${isBookmarked(surahNumber, ayah.numberInSurah) ? 'fill-gold-400' : ''}`} />
+                        {isBookmarked(surahNumber, ayah.numberInSurah) ? 'Saved' : 'Save'}
+                      </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
