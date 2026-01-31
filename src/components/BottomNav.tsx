@@ -34,6 +34,16 @@ function LearnIcon({ className = "", strokeWidth = 2 }: { className?: string; st
   );
 }
 
+function PracticeIcon({ className = "", strokeWidth = 2 }: { className?: string; strokeWidth?: number }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} strokeWidth={strokeWidth} stroke="currentColor">
+      <circle cx="12" cy="12" r="10" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 6v6l4 2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 14l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
+    </svg>
+  );
+}
+
 function ProfileIcon({ className = "", strokeWidth = 2 }: { className?: string; strokeWidth?: number }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} strokeWidth={strokeWidth} stroke="currentColor">
@@ -68,6 +78,7 @@ export default function BottomNav() {
 
   const navItems = [
     { href: '/', Icon: HomeIcon, label: 'Home' },
+    { href: '/practice', Icon: PracticeIcon, label: 'Practice' },
     { href: '/mushaf', Icon: QuranIcon, label: 'Quran' },
     { href: '/lessons', Icon: LearnIcon, label: 'Learn' },
     { href: '/profile', Icon: ProfileIcon, label: 'Profile' },

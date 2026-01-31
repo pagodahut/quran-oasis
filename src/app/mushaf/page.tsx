@@ -20,8 +20,10 @@ import {
   X,
   Search,
   BookOpen,
-  Star
+  Star,
+  Brain,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { 
   getSurah, 
   getAllSurahs, 
@@ -37,6 +39,8 @@ import QuranSearch from '@/components/QuranSearch';
 import TafsirDrawer from '@/components/TafsirDrawer';
 
 export default function MushafPage() {
+  const router = useRouter();
+  
   // State
   const [currentSurah, setCurrentSurah] = useState<Surah | null>(null);
   const [surahNumber, setSurahNumber] = useState(1);
@@ -314,17 +318,29 @@ export default function MushafPage() {
                       <span>Ruku {ayah.ruku}</span>
                       {ayah.sajda && <span className="text-gold-400">۩ Sajda</span>}
                     </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setTafsirAyah(ayah.numberInSurah);
-                        setShowTafsir(true);
-                      }}
-                      className="text-xs text-night-500 hover:text-gold-400 transition-colors flex items-center gap-1"
-                    >
-                      <BookOpen className="w-3.5 h-3.5" />
-                      Tafsir
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/memorize/${surahNumber}/${ayah.numberInSurah}`);
+                        }}
+                        className="text-xs text-gold-500 hover:text-gold-400 transition-colors flex items-center gap-1 bg-gold-500/10 px-2 py-1 rounded-lg"
+                      >
+                        <Brain className="w-3.5 h-3.5" />
+                        Memorize
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setTafsirAyah(ayah.numberInSurah);
+                          setShowTafsir(true);
+                        }}
+                        className="text-xs text-night-500 hover:text-gold-400 transition-colors flex items-center gap-1"
+                      >
+                        <BookOpen className="w-3.5 h-3.5" />
+                        Tafsir
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
               ))}
