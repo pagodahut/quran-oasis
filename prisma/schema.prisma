@@ -1,0 +1,150 @@
+// Quran Oasis Database Schema
+// Based on Manus build - 9 core tables
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User account
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  preferences    UserPreferences?
+  onboarding     Onboarding?
+  studyPlan      StudyPlan?
+  progress       MemorizationProgress[]
+  bookmarks      Bookmark[]
+  dailyActivity  DailyActivity[]
+  achievements   UserAchievement[]
+}
+
+// User preferences
+model UserPreferences {
+  id           String  @id @default(cuid())
+  userId       String  @unique
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  reciter      String  @default("alafasy")  // mishary_alafasy, husary, sudais, abdul_basit, ghamadi
+  translation  String  @default("sahih")    // sahih, asad
+  theme        String  @default("dark")     // dark, light
+  fontSize     Int     @default(24)         // Arabic text size
+  showTranslation Boolean @default(true)
+  autoPlayNext Boolean @default(false)
+  repeatCount  Int     @default(3)          // Default repeat for memorization
+}
+
+// Onboarding responses
+model Onboarding {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  arabicLevel        String   // none, letters, basic, intermediate, fluent
+  memorizedBefore    Boolean
+  currentMemorized   String?  // e.g., "Juz Amma", "10 surahs"
+  dailyTimeMinutes   Int      // 10, 20, 30, 45, 60
+  goal               String   // full_hifz, selected_surahs, daily_recitation
+  selectedReciter    String
+  
+  completedAt DateTime @default(now())
+}
+
+// Generated study plan
+model StudyPlan {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  currentLevel       String   // beginner, intermediate, advanced
+  dailyNewVerses     Int      // Verses to learn per day
+  dailyReviewVerses  Int      // Verses to review per day
+  currentSurah       Int      @default(1)
+  currentAyah        Int      @default(1)
+  
+  // Lesson sequence
+  lessonsCompleted   String   @default("[]") // JSON array of lesson IDs
+  currentLesson      String?  // Current lesson ID
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Per-verse memorization progress with spaced repetition
+model MemorizationProgress {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  surahNumber Int
+  ayahNumber  Int
+  
+  // SM-2 Spaced Repetition fields
+  easeFactor    Float    @default(2.5)  // Difficulty multiplier
+  interval      Int      @default(1)    // Days until next review
+  repetitions   Int      @default(0)    // Successful reviews in a row
+  nextReview    DateTime @default(now())
+  lastReview    DateTime?
+  
+  // Quality tracking (0-5 scale)
+  lastQuality   Int?
+  
+  // Status
+  status        String   @default("not_started") // not_started, learning, reviewing, memorized
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, surahNumber, ayahNumber])
+}
+
+// Bookmarks
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  surahNumber Int
+  ayahNumber  Int
+  note        String?
+  
+  createdAt DateTime @default(now())
+
+  @@unique([userId, surahNumber, ayahNumber])
+}
+
+// Daily activity for streaks
+model DailyActivity {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  date              DateTime @default(now()) @db.Date
+  minutesStudied    Int      @default(0)
+  versesLearned     Int      @default(0)
+  versesReviewed    Int      @default(0)
+  lessonsCompleted  Int      @default(0)
+  
+  @@unique([userId, date])
+}
+
+// User achievements
+model UserAchievement {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  achievementId String
+  unlockedAt    DateTime @default(now())
+
+  @@unique([userId, achievementId])
+}
