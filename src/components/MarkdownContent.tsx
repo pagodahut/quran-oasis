@@ -10,10 +10,10 @@ interface MarkdownContentProps {
 
 export function MarkdownContent({ content, className = '' }: MarkdownContentProps) {
   return (
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      className={`markdown-content ${className}`}
-      components={{
+    <div className={`markdown-content ${className}`}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
         // Style strong/bold text
         strong: ({ children }) => (
           <strong className="text-gold-400 font-semibold">{children}</strong>
@@ -58,9 +58,10 @@ export function MarkdownContent({ content, className = '' }: MarkdownContentProp
             {children}
           </blockquote>
         ),
-      }}
-    >
-      {content}
-    </ReactMarkdown>
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -16,6 +16,17 @@
   /* Safe Areas */
   --safe-area-top: env(safe-area-inset-top);
   --safe-area-bottom: env(safe-area-inset-bottom);
+  
+  /* Gold Leaf Colors - Inspired by manuscript gilding */
+  --gold-leaf-light: #f4d47c;
+  --gold-leaf: #c9a227;
+  --gold-leaf-dark: #8b6914;
+  --gold-leaf-shadow: #5a4410;
+  
+  /* Islamic Illumination Colors */
+  --illumination-blue: #1e3a5f;
+  --illumination-green: #2d4a3e;
+  --illumination-red: #8b3a3a;
 }
 
 /* ============================================
@@ -105,6 +116,188 @@
   
   .gold-accent {
     @apply text-gold-400;
+  }
+  
+  /* Gold Gradient Text - Manuscript inspired */
+  .text-gold-gradient {
+    background: linear-gradient(
+      135deg,
+      var(--gold-leaf-light) 0%,
+      var(--gold-leaf) 50%,
+      var(--gold-leaf-dark) 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 2px 20px rgba(201, 162, 39, 0.3);
+  }
+  
+  /* Display heading with illumination style */
+  .heading-illuminated {
+    @apply font-display text-night-100;
+    text-shadow: 
+      0 0 40px rgba(201, 162, 39, 0.15),
+      0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* ============================================
+   Noise & Grain Textures
+   ============================================ */
+@layer components {
+  /* SVG noise texture - adds depth to glass surfaces */
+  .noise-texture {
+    position: relative;
+  }
+  
+  .noise-texture::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+  
+  /* Fine grain texture */
+  .grain-texture::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)'/%3E%3C/svg%3E");
+    opacity: 0.015;
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+}
+
+/* ============================================
+   Islamic Patterns & Illumination
+   ============================================ */
+@layer components {
+  /* 8-pointed star pattern (Rub el Hizb inspired) */
+  .pattern-stars {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23c9a227' stroke-width='0.5' opacity='0.15'%3E%3Cpath d='M30 5L35 25L55 30L35 35L30 55L25 35L5 30L25 25Z'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  
+  /* Arabesque scroll pattern */
+  .pattern-arabesque {
+    background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23c9a227' stroke-width='0.4' opacity='0.08'%3E%3Ccircle cx='40' cy='40' r='30'/%3E%3Ccircle cx='40' cy='40' r='20'/%3E%3Ccircle cx='40' cy='40' r='10'/%3E%3Cpath d='M10 40 Q25 25 40 40 Q55 55 70 40'/%3E%3Cpath d='M40 10 Q25 25 40 40 Q55 55 40 70'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  
+  /* Geometric interlace pattern */
+  .pattern-interlace {
+    background-image: url("data:image/svg+xml,%3Csvg width='48' height='48' viewBox='0 0 48 48' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23c9a227' stroke-width='0.5' opacity='0.1'%3E%3Cpath d='M0 24h48M24 0v48M0 0l48 48M48 0L0 48'/%3E%3Crect x='12' y='12' width='24' height='24' rx='2'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  
+  /* Cross pattern overlay (very subtle) */
+  .pattern-overlay {
+    @apply absolute inset-0 opacity-[0.02] pointer-events-none;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a227' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  
+  /* Illumination border frame - manuscript inspired */
+  .illumination-frame {
+    position: relative;
+    padding: 2rem;
+  }
+  
+  .illumination-frame::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 2px solid transparent;
+    border-image: linear-gradient(
+      135deg,
+      var(--gold-leaf-light) 0%,
+      var(--gold-leaf) 25%,
+      var(--gold-leaf-dark) 50%,
+      var(--gold-leaf) 75%,
+      var(--gold-leaf-light) 100%
+    ) 1;
+    opacity: 0.6;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  
+  /* Corner ornaments for frames */
+  .illumination-corners {
+    position: relative;
+  }
+  
+  .illumination-corners::before,
+  .illumination-corners::after {
+    content: '❋';
+    position: absolute;
+    color: var(--gold-leaf);
+    font-size: 1.5rem;
+    opacity: 0.5;
+    text-shadow: 0 0 10px rgba(201, 162, 39, 0.5);
+  }
+  
+  .illumination-corners::before {
+    top: -0.5rem;
+    left: -0.5rem;
+  }
+  
+  .illumination-corners::after {
+    bottom: -0.5rem;
+    right: -0.5rem;
+  }
+  
+  /* Shamsa (sun medallion) style badge */
+  .shamsa {
+    @apply relative inline-flex items-center justify-center;
+    background: radial-gradient(
+      circle at center,
+      rgba(201, 162, 39, 0.2) 0%,
+      rgba(201, 162, 39, 0.05) 50%,
+      transparent 70%
+    );
+  }
+  
+  .shamsa::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      rgba(201, 162, 39, 0.3) 10deg,
+      transparent 20deg,
+      transparent 45deg,
+      rgba(201, 162, 39, 0.3) 55deg,
+      transparent 65deg,
+      transparent 90deg,
+      rgba(201, 162, 39, 0.3) 100deg,
+      transparent 110deg,
+      transparent 135deg,
+      rgba(201, 162, 39, 0.3) 145deg,
+      transparent 155deg,
+      transparent 180deg,
+      rgba(201, 162, 39, 0.3) 190deg,
+      transparent 200deg,
+      transparent 225deg,
+      rgba(201, 162, 39, 0.3) 235deg,
+      transparent 245deg,
+      transparent 270deg,
+      rgba(201, 162, 39, 0.3) 280deg,
+      transparent 290deg,
+      transparent 315deg,
+      rgba(201, 162, 39, 0.3) 325deg,
+      transparent 335deg
+    );
+    border-radius: 50%;
+    animation: shamsa-rotate 30s linear infinite;
+    pointer-events: none;
+  }
+  
+  @keyframes shamsa-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
 }
 
@@ -292,7 +485,7 @@
 }
 
 /* ============================================
-   Liquid Glass UI (iOS 26 / visionOS Style)
+   Liquid Glass UI - Enhanced with Textures
    ============================================ */
 
 /* Shimmer animation for glass surfaces */
@@ -312,8 +505,14 @@
   100% { background-position: 0% 50%; }
 }
 
+@keyframes aurora {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 @layer components {
-  /* Primary liquid glass - for nav bars, headers */
+  /* Primary liquid glass - for nav bars, headers - WITH TEXTURE */
   .liquid-glass {
     @apply relative overflow-hidden;
     background: linear-gradient(
@@ -350,24 +549,28 @@
     pointer-events: none;
   }
   
-  /* Breathing glow effect */
+  /* Breathing glow + noise texture */
   .liquid-glass::after {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 50%;
-    background: radial-gradient(
-      ellipse at 50% 0%,
-      rgba(255, 255, 255, 0.08) 0%,
-      transparent 70%
-    );
+    bottom: 0;
+    background: 
+      radial-gradient(
+        ellipse at 50% 0%,
+        rgba(255, 255, 255, 0.08) 0%,
+        transparent 70%
+      ),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-blend-mode: overlay;
+    opacity: 0.4;
     animation: glass-breathe 4s ease-in-out infinite;
     pointer-events: none;
   }
   
-  /* Subtle variant for cards */
+  /* Subtle variant for cards - with grain */
   .liquid-glass-subtle {
     @apply relative overflow-hidden;
     background: linear-gradient(
@@ -381,6 +584,17 @@
     box-shadow: 
       0 2px 16px rgba(0, 0, 0, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+  
+  .liquid-glass-subtle::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)'/%3E%3C/svg%3E");
+    opacity: 0.02;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    border-radius: inherit;
   }
   
   /* Strong variant for modals, floating elements */
@@ -417,21 +631,70 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
   
-  /* Gold tinted glass for special elements */
+  /* Gold tinted glass for special elements - with shimmer */
   .liquid-glass-gold {
     @apply relative overflow-hidden;
     background: linear-gradient(
       135deg,
-      rgba(201, 162, 39, 0.08) 0%,
-      rgba(201, 162, 39, 0.02) 50%,
-      rgba(201, 162, 39, 0.06) 100%
+      rgba(201, 162, 39, 0.12) 0%,
+      rgba(201, 162, 39, 0.04) 50%,
+      rgba(201, 162, 39, 0.08) 100%
     );
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(201, 162, 39, 0.15);
+    border: 1px solid rgba(201, 162, 39, 0.2);
     box-shadow: 
       0 4px 24px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(201, 162, 39, 0.2);
+      0 0 40px rgba(201, 162, 39, 0.1),
+      inset 0 1px 0 rgba(201, 162, 39, 0.3),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  }
+  
+  .liquid-glass-gold::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      transparent 0%,
+      rgba(244, 212, 124, 0.1) 50%,
+      transparent 100%
+    );
+    animation: liquid-shimmer 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+  
+  .liquid-glass-gold::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+  
+  /* Premium gold glass with stronger illumination effect */
+  .liquid-glass-gold-premium {
+    @apply relative overflow-hidden;
+    background: 
+      radial-gradient(ellipse at 30% 0%, rgba(244, 212, 124, 0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 100%, rgba(201, 162, 39, 0.1) 0%, transparent 50%),
+      linear-gradient(
+        135deg,
+        rgba(201, 162, 39, 0.15) 0%,
+        rgba(139, 105, 20, 0.08) 50%,
+        rgba(201, 162, 39, 0.12) 100%
+      );
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border: 1px solid rgba(201, 162, 39, 0.25);
+    box-shadow: 
+      0 8px 40px rgba(0, 0, 0, 0.25),
+      0 0 60px rgba(201, 162, 39, 0.15),
+      inset 0 1px 0 rgba(244, 212, 124, 0.4),
+      inset 0 -1px 0 rgba(90, 68, 16, 0.3);
   }
   
   /* Floating pill button (like iOS action buttons) */
@@ -500,7 +763,7 @@
   
   /* Liquid card for content */
   .liquid-card {
-    @apply rounded-2xl p-4;
+    @apply rounded-2xl p-4 relative;
     background: linear-gradient(
       135deg,
       rgba(255, 255, 255, 0.04) 0%,
@@ -559,23 +822,24 @@
     transition-duration: 0.1s;
   }
   
-  /* Liquid Glass Button (Primary) */
+  /* Liquid Glass Button (Primary) - Enhanced gold leaf effect */
   .liquid-btn {
     @apply relative inline-flex items-center justify-center gap-2 
            px-6 py-3 rounded-2xl font-semibold text-sm
-           transition-all duration-300 cursor-pointer;
+           transition-all duration-300 cursor-pointer overflow-hidden;
     background: linear-gradient(
       135deg,
-      rgba(201, 162, 39, 0.9) 0%,
-      rgba(180, 140, 30, 0.95) 100%
+      var(--gold-leaf-light) 0%,
+      var(--gold-leaf) 50%,
+      var(--gold-leaf-dark) 100%
     );
     color: #0a0a0f;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 
       0 4px 20px rgba(201, 162, 39, 0.4),
       0 2px 8px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.1);
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
   }
   
@@ -583,14 +847,24 @@
     content: '';
     position: absolute;
     inset: 0;
-    border-radius: inherit;
     background: linear-gradient(
       135deg,
-      rgba(255, 255, 255, 0.3) 0%,
-      transparent 50%
+      rgba(255, 255, 255, 0.4) 0%,
+      transparent 50%,
+      rgba(255, 255, 255, 0.1) 100%
     );
     opacity: 0;
     transition: opacity 0.3s ease;
+  }
+  
+  .liquid-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.1;
+    mix-blend-mode: overlay;
+    pointer-events: none;
   }
   
   .liquid-btn:hover::before {
@@ -602,7 +876,7 @@
     box-shadow: 
       0 8px 32px rgba(201, 162, 39, 0.5),
       0 4px 12px rgba(0, 0, 0, 0.25),
-      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
   }
   
   .liquid-btn:active {
@@ -731,6 +1005,31 @@
     );
   }
   
+  /* Gold divider with ornament style */
+  .liquid-divider-gold {
+    @apply w-full h-px relative;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(201, 162, 39, 0.3) 20%,
+      rgba(201, 162, 39, 0.5) 50%,
+      rgba(201, 162, 39, 0.3) 80%,
+      transparent 100%
+    );
+  }
+  
+  .liquid-divider-gold::before {
+    content: '◆';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: rgba(201, 162, 39, 0.6);
+    font-size: 0.5rem;
+    background: var(--night-950, #0f1419);
+    padding: 0 0.5rem;
+  }
+  
   /* Liquid Glass Modal/Drawer */
   .liquid-modal {
     @apply rounded-3xl overflow-hidden;
@@ -845,21 +1144,45 @@
 }
 
 /* ============================================
-   Backgrounds
+   Backgrounds - Enhanced with depth
    ============================================ */
 @layer components {
   .bg-gradient-divine {
-    background: linear-gradient(
-      180deg,
-      theme('colors.night.950') 0%,
-      theme('colors.night.900') 50%,
-      theme('colors.night.950') 100%
-    );
+    background: 
+      radial-gradient(ellipse at 20% 0%, rgba(30, 58, 95, 0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(45, 74, 62, 0.1) 0%, transparent 50%),
+      linear-gradient(
+        180deg,
+        #0a0e14 0%,
+        #0f1419 30%,
+        #121820 50%,
+        #0f1419 70%,
+        #0a0e14 100%
+      );
   }
   
-  .pattern-overlay {
-    @apply absolute inset-0 opacity-[0.02] pointer-events-none;
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a227' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  /* Warm divine background with gold undertones */
+  .bg-gradient-divine-warm {
+    background: 
+      radial-gradient(ellipse at 30% 0%, rgba(201, 162, 39, 0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 100%, rgba(78, 122, 81, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(30, 58, 95, 0.08) 0%, transparent 70%),
+      linear-gradient(
+        180deg,
+        #0a0e14 0%,
+        #0f1419 100%
+      );
+  }
+  
+  /* Aurora-like animated background */
+  .bg-aurora {
+    background: 
+      radial-gradient(ellipse at 20% 30%, rgba(201, 162, 39, 0.08) 0%, transparent 40%),
+      radial-gradient(ellipse at 80% 70%, rgba(78, 122, 81, 0.06) 0%, transparent 40%),
+      radial-gradient(ellipse at 50% 50%, rgba(30, 58, 95, 0.1) 0%, transparent 60%),
+      linear-gradient(180deg, #0a0e14 0%, #0f1419 100%);
+    background-size: 200% 200%;
+    animation: aurora 15s ease infinite;
   }
 }
 
@@ -1132,16 +1455,31 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ============================================
-   Glow Effects
+   Glow Effects - Enhanced
    ============================================ */
 @layer utilities {
   .text-glow-gold {
-    text-shadow: 0 0 20px rgba(201, 162, 39, 0.5),
-                 0 0 40px rgba(201, 162, 39, 0.3);
+    text-shadow: 
+      0 0 10px rgba(201, 162, 39, 0.4),
+      0 0 30px rgba(201, 162, 39, 0.3),
+      0 0 50px rgba(201, 162, 39, 0.2);
   }
   
   .text-glow-soft {
-    text-shadow: 0 0 10px rgba(201, 162, 39, 0.3);
+    text-shadow: 0 0 20px rgba(201, 162, 39, 0.25);
+  }
+  
+  .box-glow-gold {
+    box-shadow: 
+      0 0 20px rgba(201, 162, 39, 0.2),
+      0 0 40px rgba(201, 162, 39, 0.1);
+  }
+  
+  .box-glow-gold-strong {
+    box-shadow: 
+      0 0 30px rgba(201, 162, 39, 0.3),
+      0 0 60px rgba(201, 162, 39, 0.15),
+      0 0 100px rgba(201, 162, 39, 0.08);
   }
 }
 
@@ -1180,6 +1518,12 @@ input[type="range"]::-moz-range-thumb {
   100% { background-position: 200% center; }
 }
 
+/* Star twinkle animation */
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
 @layer components {
   /* Floating card effect */
   .liquid-float {
@@ -1195,17 +1539,17 @@ input[type="range"]::-moz-range-thumb {
   .liquid-shimmer-text {
     background: linear-gradient(
       90deg,
-      rgba(201, 162, 39, 1) 0%,
-      rgba(255, 215, 100, 1) 25%,
-      rgba(201, 162, 39, 1) 50%,
-      rgba(255, 215, 100, 1) 75%,
-      rgba(201, 162, 39, 1) 100%
+      var(--gold-leaf-dark) 0%,
+      var(--gold-leaf-light) 25%,
+      var(--gold-leaf) 50%,
+      var(--gold-leaf-light) 75%,
+      var(--gold-leaf-dark) 100%
     );
     background-size: 200% auto;
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: premium-shimmer 3s linear infinite;
+    animation: premium-shimmer 4s linear infinite;
   }
   
   /* Sage glass variant */
@@ -1362,7 +1706,7 @@ input[type="range"]::-moz-range-thumb {
   
   /* Stat card optimized for hifz tracking */
   .liquid-stat {
-    @apply text-center p-4 rounded-2xl;
+    @apply text-center p-4 rounded-2xl relative overflow-hidden;
     background: linear-gradient(
       135deg,
       rgba(255, 255, 255, 0.04) 0%,
@@ -1393,7 +1737,9 @@ input[type="range"]::-moz-range-thumb {
   .liquid-glass::after,
   .liquid-shimmer,
   .liquid-float,
-  .liquid-glow-pulse {
+  .liquid-glow-pulse,
+  .liquid-shimmer-text,
+  .shamsa::before {
     animation: none;
   }
   
