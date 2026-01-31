@@ -256,8 +256,18 @@ export default function MushafPage() {
           <div className="px-4 py-6 max-w-3xl mx-auto">
             {/* Surah Header */}
             <div className="text-center mb-8">
-              <h2 className="surah-header">{currentSurah.name}</h2>
-              <p className="text-night-400">
+              <h2 
+                className="surah-header"
+                style={{
+                  direction: 'rtl',
+                  textAlign: 'center',
+                  width: '100%',
+                  display: 'block',
+                }}
+              >
+                {currentSurah.name}
+              </h2>
+              <p className="text-night-400 text-center">
                 {currentSurah.englishName} — {currentSurah.englishNameTranslation}
               </p>
             </div>

@@ -488,11 +488,12 @@
    Liquid Glass UI - Enhanced with Textures
    ============================================ */
 
-/* Shimmer animation for glass surfaces */
+/* Shimmer animation DISABLED - distraction-free reading
 @keyframes liquid-shimmer {
   0% { transform: translateX(-100%) rotate(12deg); }
   100% { transform: translateX(200%) rotate(12deg); }
 }
+*/
 
 @keyframes glass-breathe {
   0%, 100% { opacity: 0.03; }
@@ -531,25 +532,24 @@
       inset 0 -1px 0 rgba(0, 0, 0, 0.05);
   }
   
-  /* Shimmer overlay for liquid glass */
+  /* Static highlight for liquid glass - no animation for distraction-free reading */
   .liquid-glass::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
+    height: 1px;
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(255, 255, 255, 0.03) 50%,
+      rgba(255, 255, 255, 0.08) 50%,
       transparent 100%
     );
-    animation: liquid-shimmer 8s ease-in-out infinite;
     pointer-events: none;
   }
   
-  /* Breathing glow + noise texture */
+  /* Static noise texture - no breathing animation for distraction-free reading */
   .liquid-glass::after {
     content: '';
     position: absolute;
@@ -560,13 +560,12 @@
     background: 
       radial-gradient(
         ellipse at 50% 0%,
-        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.05) 0%,
         transparent 70%
       ),
       url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
     background-blend-mode: overlay;
-    opacity: 0.4;
-    animation: glass-breathe 4s ease-in-out infinite;
+    opacity: 0.3;
     pointer-events: none;
   }
   
@@ -653,14 +652,16 @@
   .liquid-glass-gold::before {
     content: '';
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
     background: linear-gradient(
-      135deg,
+      90deg,
       transparent 0%,
-      rgba(244, 212, 124, 0.1) 50%,
+      rgba(244, 212, 124, 0.2) 50%,
       transparent 100%
     );
-    animation: liquid-shimmer 6s ease-in-out infinite;
     pointer-events: none;
   }
   

@@ -6,21 +6,14 @@ import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'fra
 import { 
   BookOpen, 
   Sparkles, 
-  Play, 
   ChevronRight,
   Moon,
-  Star,
   Heart,
   Headphones,
   Brain,
-  Trophy,
   Flame,
   ArrowRight,
   Quote,
-  Users,
-  Clock,
-  Target,
-  Zap
 } from 'lucide-react';
 
 // Animation variants
@@ -53,126 +46,128 @@ const scaleIn = {
   }
 };
 
-// Islamic 8-pointed star SVG component
-function IslamicStar({ className = "", size = 24 }: { className?: string; size?: number }) {
+// Geometric diamond accent - subtle Islamic-inspired motif
+function GeometricAccent({ className = "", size = 8 }: { className?: string; size?: number }) {
   return (
     <svg 
-      viewBox="0 0 24 24" 
+      viewBox="0 0 12 12" 
       width={size} 
       height={size} 
       className={className}
       fill="currentColor"
     >
-      <path d="M12 0L14 8L22 8L16 12.5L18.5 20L12 16L5.5 20L8 12.5L2 8L10 8Z" />
+      <path d="M6 0L12 6L6 12L0 6Z" />
     </svg>
   );
 }
 
-// Floating Islamic star particles
-function FloatingStars() {
-  const stars = useMemo(() => 
-    Array.from({ length: 25 }, (_, i) => ({
+// Interlocking geometric pattern - for section dividers
+function GeometricDivider({ className = "" }: { className?: string }) {
+  return (
+    <svg 
+      viewBox="0 0 120 12" 
+      width={120} 
+      height={12} 
+      className={className}
+    >
+      <path 
+        d="M0 6h45 M60 6h60 M52 2l4 4-4 4 M68 2l-4 4 4 4" 
+        stroke="currentColor" 
+        strokeWidth="1" 
+        fill="none"
+        opacity="0.4"
+      />
+      <circle cx="60" cy="6" r="2" fill="currentColor" opacity="0.5" />
+    </svg>
+  );
+}
+
+// Subtle floating geometric particles - minimal, elegant
+function FloatingParticles() {
+  const particles = useMemo(() => 
+    Array.from({ length: 15 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
-      size: 4 + Math.random() * 8,
-      duration: 6 + Math.random() * 8,
+      size: 3 + Math.random() * 4,
+      duration: 8 + Math.random() * 6,
       delay: Math.random() * 4,
-      type: Math.random() > 0.6 ? 'star' : 'dot'
     })), []
   );
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {stars.map((star) => (
+      {particles.map((particle) => (
         <motion.div
-          key={star.id}
+          key={particle.id}
           className="absolute"
           style={{
-            left: `${star.x}%`,
-            top: `${star.y}%`,
+            left: `${particle.x}%`,
+            top: `${particle.y}%`,
           }}
           animate={{
-            y: [-20, 20, -20],
-            x: [-15, 15, -15],
-            opacity: [0.15, 0.5, 0.15],
-            scale: [1, 1.3, 1],
-            rotate: star.type === 'star' ? [0, 180, 360] : 0,
+            y: [-15, 15, -15],
+            opacity: [0.1, 0.3, 0.1],
           }}
           transition={{
-            duration: star.duration,
+            duration: particle.duration,
             repeat: Infinity,
-            delay: star.delay,
+            delay: particle.delay,
             ease: "easeInOut"
           }}
         >
-          {star.type === 'star' ? (
-            <IslamicStar size={star.size} className="text-gold-500/40" />
-          ) : (
-            <div 
-              className="rounded-full bg-gold-400/30"
-              style={{ width: star.size / 2, height: star.size / 2 }}
-            />
-          )}
+          <div 
+            className="rounded-full bg-gold-400/20"
+            style={{ width: particle.size, height: particle.size }}
+          />
         </motion.div>
       ))}
     </div>
   );
 }
 
-// Illuminated Bismillah component with ornate frame
-function IlluminatedBismillah() {
+// Traditional door plaque style Bismillah - simple, elegant, authoritative
+function BismillahPlacard() {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: 0.2, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="relative mb-12"
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      className="relative mb-10 inline-block"
     >
-      {/* Outer glow */}
-      <motion.div
-        className="absolute inset-0 -m-8 blur-3xl"
+      {/* Subtle glow */}
+      <div 
+        className="absolute inset-0 -m-4 blur-2xl opacity-30"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(201, 162, 39, 0.2) 0%, transparent 70%)'
+          background: 'radial-gradient(ellipse at center, rgba(201, 162, 39, 0.4) 0%, transparent 70%)'
         }}
-        animate={{ 
-          scale: [1, 1.1, 1], 
-          opacity: [0.4, 0.6, 0.4] 
-        }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
       />
       
-      {/* Ornate frame container */}
-      <div className="relative liquid-glass-gold-premium rounded-2xl px-8 py-6 md:px-12 md:py-8">
-        {/* Corner ornaments */}
-        <div className="absolute top-2 left-2 text-gold-500/50 text-lg">✦</div>
-        <div className="absolute top-2 right-2 text-gold-500/50 text-lg">✦</div>
-        <div className="absolute bottom-2 left-2 text-gold-500/50 text-lg">✦</div>
-        <div className="absolute bottom-2 right-2 text-gold-500/50 text-lg">✦</div>
+      {/* Door plaque style frame - minimal and elegant */}
+      <div 
+        className="relative px-8 py-3 rounded-lg"
+        style={{
+          background: 'linear-gradient(135deg, rgba(201, 162, 39, 0.08) 0%, rgba(201, 162, 39, 0.03) 100%)',
+          border: '1px solid rgba(201, 162, 39, 0.25)',
+          boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 8px rgba(0, 0, 0, 0.2)',
+        }}
+      >
+        {/* Simple line accents at edges */}
+        <div className="absolute top-1/2 left-2 -translate-y-1/2 w-3 h-px bg-gold-500/40" />
+        <div className="absolute top-1/2 right-2 -translate-y-1/2 w-3 h-px bg-gold-500/40" />
         
-        {/* Top decorative border */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <motion.div 
-            className="shamsa w-8 h-8 flex items-center justify-center"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-          >
-            <IslamicStar size={16} className="text-gold-500" />
-          </motion.div>
-        </div>
-        
-        {/* Bismillah text */}
-        <p className="bismillah relative text-3xl md:text-5xl text-glow-gold text-center font-quran">
+        {/* Bismillah text - Arabic only */}
+        <p 
+          className="relative text-xl md:text-2xl text-gold-400 text-center"
+          style={{ 
+            fontFamily: 'var(--font-quran)',
+            direction: 'rtl',
+            textShadow: '0 0 20px rgba(201, 162, 39, 0.3)',
+            letterSpacing: '0.02em',
+          }}
+        >
           بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
         </p>
-        
-        {/* Translation */}
-        <p className="text-center text-night-400 text-sm mt-3 tracking-wide">
-          In the name of Allah, the Most Gracious, the Most Merciful
-        </p>
-        
-        {/* Bottom decorative line */}
-        <div className="liquid-divider-gold mt-4" />
       </div>
     </motion.div>
   );
@@ -214,36 +209,68 @@ function AnimatedCounter({ value, suffix = '' }: { value: number; suffix?: strin
   return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
 }
 
-// Feature card with Islamic design elements
+// Custom feature icons - cohesive geometric design
+function PersonalizedIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" fill="none" className={className}>
+      <circle cx="16" cy="16" r="8" stroke="currentColor" strokeWidth="2" />
+      <path d="M16 4v4M16 24v4M4 16h4M24 16h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="16" cy="16" r="3" fill="currentColor" opacity="0.5" />
+    </svg>
+  );
+}
+
+function SpacedRepIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" fill="none" className={className}>
+      <path d="M6 16h20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="10" cy="16" r="3" fill="currentColor" />
+      <circle cx="18" cy="16" r="2" fill="currentColor" opacity="0.6" />
+      <circle cx="24" cy="16" r="1.5" fill="currentColor" opacity="0.3" />
+      <path d="M8 22c4-2 8-2 12-2 4 0 6 1 6 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
+    </svg>
+  );
+}
+
+function ProgressIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" fill="none" className={className}>
+      <path d="M4 26l6-8 6 4 6-10 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="10" cy="18" r="2" fill="currentColor" />
+      <circle cx="16" cy="22" r="2" fill="currentColor" opacity="0.7" />
+      <circle cx="22" cy="12" r="2" fill="currentColor" opacity="0.5" />
+    </svg>
+  );
+}
+
+// Feature card with custom icon
 function FeatureCard({ 
-  icon: Icon, 
+  iconComponent: IconComponent,
   title, 
   description, 
   gradient,
-  delay = 0 
 }: { 
-  icon: React.ElementType;
+  iconComponent: React.ComponentType<{ className?: string }>;
   title: string;
   description: string;
   gradient: string;
-  delay?: number;
 }) {
   return (
     <motion.div
       variants={scaleIn}
-      whileHover={{ y: -8, scale: 1.02 }}
+      whileHover={{ y: -6, scale: 1.01 }}
       transition={{ type: "spring", stiffness: 300 }}
       className="liquid-card-interactive p-6 group"
     >
       {/* Icon with gradient background */}
-      <div className={`relative w-16 h-16 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-5 shadow-lg group-hover:shadow-xl transition-shadow`}>
-        <Icon className="w-8 h-8 text-white" />
+      <div className={`relative w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-5 shadow-lg group-hover:shadow-xl transition-shadow`}>
+        <IconComponent className="w-7 h-7 text-white" />
         {/* Subtle glow on hover */}
-        <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${gradient} blur-xl opacity-0 group-hover:opacity-40 transition-opacity`} />
+        <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${gradient} blur-lg opacity-0 group-hover:opacity-30 transition-opacity`} />
       </div>
       
-      <h3 className="font-semibold text-night-100 text-xl mb-3">{title}</h3>
-      <p className="text-night-400 leading-relaxed">{description}</p>
+      <h3 className="font-semibold text-night-100 text-lg mb-2">{title}</h3>
+      <p className="text-night-400 leading-relaxed text-sm">{description}</p>
     </motion.div>
   );
 }
@@ -307,8 +334,8 @@ export default function HomePage() {
       <div className="fixed inset-0 pattern-arabesque opacity-30" />
       <div className="fixed inset-0 pattern-overlay" />
       
-      {/* Floating Islamic stars */}
-      <FloatingStars />
+      {/* Subtle floating particles */}
+      <FloatingParticles />
       
       {/* Decorative orbs with parallax */}
       <motion.div 
@@ -386,8 +413,8 @@ export default function HomePage() {
             style={{ y: smoothY, opacity: heroOpacity }}
             className="text-center max-w-4xl"
           >
-            {/* Illuminated Bismillah */}
-            <IlluminatedBismillah />
+            {/* Bismillah - door plaque style */}
+            <BismillahPlacard />
             
             {/* Main Headline */}
             <motion.h1 
@@ -471,7 +498,7 @@ export default function HomePage() {
                     <span>{stat.label}</span>
                   </div>
                   {i < arr.length - 1 && (
-                    <IslamicStar size={8} className="text-gold-500/40 ml-4 hidden md:block" />
+                    <GeometricAccent size={6} className="text-gold-500/40 ml-4 hidden md:block" />
                   )}
                 </motion.div>
               ))}
@@ -508,10 +535,8 @@ export default function HomePage() {
             className="max-w-6xl mx-auto"
           >
             <motion.div variants={fadeInUp} className="text-center mb-16">
-              <div className="flex items-center justify-center gap-4 mb-4">
-                <div className="liquid-divider-gold w-16" />
-                <IslamicStar size={12} className="text-gold-500" />
-                <div className="liquid-divider-gold w-16" />
+              <div className="flex items-center justify-center mb-4">
+                <GeometricDivider className="text-gold-500" />
               </div>
               <h2 className="font-display text-3xl md:text-5xl text-night-100 mb-4 heading-illuminated">
                 The Path to Memorization
@@ -523,19 +548,19 @@ export default function HomePage() {
 
             <div className="grid md:grid-cols-3 gap-6">
               <FeatureCard
-                icon={Star}
+                iconComponent={PersonalizedIcon}
                 title="Personalized Learning"
                 description="AI creates a custom study plan based on your level, goals, and available time"
                 gradient="from-gold-500 to-amber-600"
               />
               <FeatureCard
-                icon={Zap}
+                iconComponent={SpacedRepIcon}
                 title="Spaced Repetition"
                 description="Science-backed review system ensures you never forget what you've memorized"
                 gradient="from-purple-500 to-pink-500"
               />
               <FeatureCard
-                icon={Trophy}
+                iconComponent={ProgressIcon}
                 title="Track Progress"
                 description="Beautiful visualizations show your journey from first verse to full Hifz"
                 gradient="from-sage-500 to-emerald-500"
@@ -557,10 +582,8 @@ export default function HomePage() {
             className="max-w-5xl mx-auto relative"
           >
             <motion.div variants={fadeInUp} className="text-center mb-16">
-              <div className="flex items-center justify-center gap-4 mb-4">
-                <div className="liquid-divider-gold w-16" />
-                <IslamicStar size={12} className="text-gold-500" />
-                <div className="liquid-divider-gold w-16" />
+              <div className="flex items-center justify-center mb-4">
+                <GeometricDivider className="text-gold-500" />
               </div>
               <h2 className="font-display text-3xl md:text-5xl text-night-100 mb-4 heading-illuminated">
                 Traditional Methods, Modern Tools
@@ -606,18 +629,18 @@ export default function HomePage() {
             className="max-w-3xl mx-auto"
           >
             <div className="liquid-glass-gold-premium rounded-3xl p-8 md:p-12 text-center relative overflow-hidden">
-              {/* Decorative stars in corners */}
+              {/* Subtle corner accents */}
               <div className="absolute top-4 left-4">
-                <IslamicStar size={16} className="text-gold-500/30" />
+                <GeometricAccent size={8} className="text-gold-500/25" />
               </div>
               <div className="absolute top-4 right-4">
-                <IslamicStar size={16} className="text-gold-500/30" />
+                <GeometricAccent size={8} className="text-gold-500/25" />
               </div>
               <div className="absolute bottom-4 left-4">
-                <IslamicStar size={16} className="text-gold-500/30" />
+                <GeometricAccent size={8} className="text-gold-500/25" />
               </div>
               <div className="absolute bottom-4 right-4">
-                <IslamicStar size={16} className="text-gold-500/30" />
+                <GeometricAccent size={8} className="text-gold-500/25" />
               </div>
               
               <Quote className="w-12 h-12 text-gold-500/40 mx-auto mb-6" />
@@ -673,14 +696,10 @@ export default function HomePage() {
             className="max-w-2xl mx-auto text-center"
           >
             <div className="liquid-glass-gold-premium rounded-3xl p-10 md:p-16 relative overflow-hidden">
-              {/* Animated decorative star */}
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-                className="absolute top-6 right-6 opacity-20"
-              >
-                <IslamicStar size={40} className="text-gold-400" />
-              </motion.div>
+              {/* Subtle corner accent */}
+              <div className="absolute top-6 right-6 opacity-15">
+                <GeometricAccent size={20} className="text-gold-400" />
+              </div>
               
               {/* Flame icon with glow */}
               <motion.div
