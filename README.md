@@ -50,3 +50,4 @@ For high-quality Arabic pronunciation, see `scripts/setup-letter-audio.md`.
 ## License
 
 Private - All rights reserved.
+
