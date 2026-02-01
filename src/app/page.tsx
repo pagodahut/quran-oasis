@@ -379,7 +379,7 @@ export default function HomePage() {
                       {/* Subtle glow */}
                       <div className="absolute inset-0 w-10 h-10 rounded-xl bg-gold-500 blur-md opacity-30" />
                     </div>
-                    <span className="font-display text-xl text-night-100 font-semibold">Quran Oasis</span>
+                    <span className="font-display text-xl text-night-100 font-semibold">Hifz</span>
                   </motion.div>
                   
                   <motion.nav
@@ -744,7 +744,7 @@ export default function HomePage() {
               <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center">
                 <Moon className="w-3.5 h-3.5 text-night-950" />
               </div>
-              <span>Quran Oasis</span>
+              <span>Hifz</span>
             </div>
             <p className="text-night-500 text-sm flex items-center gap-2">
               Made with <Heart className="w-4 h-4 text-rose-500 fill-rose-500" /> for the Ummah

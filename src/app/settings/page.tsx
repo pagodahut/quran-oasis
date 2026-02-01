@@ -343,11 +343,11 @@ export default function SettingsPage() {
         <div className="space-y-4">
           <h2 className="font-semibold text-night-100 flex items-center gap-2">
             <Moon className="w-5 h-5 text-gold-400" />
-            About Quran Oasis
+            About Hifz
           </h2>
           <div className="liquid-card p-4 space-y-4">
             <p className="text-night-400 text-sm leading-relaxed">
-              Quran Oasis is a free, open-source Quran memorization app built with love for the Ummah. 
+              Hifz is a free, open-source Quran memorization app built with love for the Ummah. 
               It combines traditional Tahfiz methods with modern technology to help you on your journey to becoming a Hafiz.
             </p>
             

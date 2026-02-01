@@ -1,6 +1,6 @@
 {
-  "name": "Quran Oasis",
-  "short_name": "Quran Oasis",
+  "name": "Hifz",
+  "short_name": "Hifz",
   "description": "AI-powered Quran memorization app with personalized lessons, spaced repetition, and beautiful recitations.",
   "start_url": "/",
   "display": "standalone",

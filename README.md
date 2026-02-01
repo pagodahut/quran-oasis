@@ -1,4 +1,4 @@
-# Quran Oasis 🌴
+# Hifz 🌴
 
 AI-powered Quran memorization app with personalized lessons and spaced repetition.
 

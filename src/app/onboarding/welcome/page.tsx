@@ -158,7 +158,7 @@ export default function OnboardingWelcomePage() {
                 </motion.p>
                 
                 <h1 className="text-3xl font-bold text-night-100 mb-2">
-                  Welcome to Quran Oasis
+                  Welcome to Hifz
                 </h1>
                 <p className="text-night-400 max-w-sm mx-auto">
                   Your journey to memorizing the Quran starts with a single letter

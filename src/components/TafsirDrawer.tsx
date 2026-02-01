@@ -10,10 +10,17 @@ import {
   ExternalLink,
   Loader2,
   Sparkles,
-  Volume2
+  Volume2,
+  RefreshCw
 } from 'lucide-react';
 import { getAyah, getSurah, type Ayah } from '@/lib/quranData';
 import { PlayButton } from './AudioPlayer';
+import { 
+  fetchTafsir, 
+  AVAILABLE_TAFSIRS, 
+  getReflectionPrompts,
+  type TafsirContent 
+} from '@/lib/tafsirService';
 
 interface TafsirDrawerProps {
   isOpen: boolean;
@@ -22,28 +29,15 @@ interface TafsirDrawerProps {
   ayahNumber: number;
 }
 
-// Placeholder tafsir content - in a real app, this would come from an API
-const getTafsirContent = (surah: number, ayah: number): {
-  brief: string;
-  detailed: string;
-  context?: string;
-  keyTerms?: { arabic: string; translation: string; explanation: string }[];
-} => {
-  return {
-    brief: "Tafsir content for this ayah will be available in a future update. For now, please reflect on the translation provided.",
-    detailed: "We are working on integrating comprehensive tafsir from reputable sources. In the meantime, we recommend studying with a qualified teacher or referring to established tafsir works like:\n\n• Tafsir Ibn Kathir\n• The Study Quran\n• Tafsir Al-Jalalayn\n• Ma'ariful Quran\n\nThese resources provide deep insights into the meanings, context, and lessons of each verse.",
-    context: "Understanding the context (asbab al-nuzul) of each verse helps in proper interpretation. Many verses were revealed in response to specific events during the Prophet's ﷺ mission.",
-    keyTerms: [
-      { arabic: "تدبر", translation: "Tadabbur", explanation: "Deep reflection and contemplation on the meanings of the Quran" },
-    ]
-  };
-};
-
 export default function TafsirDrawer({ isOpen, onClose, surahNumber, ayahNumber }: TafsirDrawerProps) {
   const [ayahData, setAyahData] = useState<Ayah | null>(null);
   const [surahName, setSurahName] = useState('');
   const [showDetailedTafsir, setShowDetailedTafsir] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [tafsirContent, setTafsirContent] = useState<TafsirContent | null>(null);
+  const [tafsirLoading, setTafsirLoading] = useState(false);
+  const [selectedTafsir, setSelectedTafsir] = useState(169); // Default to Ibn Kathir
+  const [reflectionPrompts] = useState(() => getReflectionPrompts(surahNumber, ayahNumber));
   
   useEffect(() => {
     if (isOpen) {
@@ -53,11 +47,24 @@ export default function TafsirDrawer({ isOpen, onClose, surahNumber, ayahNumber 
       setAyahData(ayah || null);
       setSurahName(surah?.englishName || '');
       setShowDetailedTafsir(false);
-      setTimeout(() => setLoading(false), 300);
+      setLoading(false);
+      
+      // Fetch tafsir
+      loadTafsir(selectedTafsir);
     }
   }, [isOpen, surahNumber, ayahNumber]);
   
-  const tafsir = getTafsirContent(surahNumber, ayahNumber);
+  const loadTafsir = async (tafsirId: number) => {
+    setTafsirLoading(true);
+    const content = await fetchTafsir(surahNumber, ayahNumber, tafsirId);
+    setTafsirContent(content);
+    setTafsirLoading(false);
+  };
+  
+  const handleTafsirChange = (tafsirId: number) => {
+    setSelectedTafsir(tafsirId);
+    loadTafsir(tafsirId);
+  };
   
   return (
     <AnimatePresence>
@@ -181,108 +188,98 @@ export default function TafsirDrawer({ isOpen, onClose, surahNumber, ayahNumber 
                     </p>
                   </motion.div>
                   
-                  {/* Brief Commentary */}
+                  {/* Tafsir Source Selector */}
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
                   >
-                    <h3 className="text-xs uppercase tracking-widest text-night-500 mb-3 font-semibold">Overview</h3>
-                    <div className="liquid-card">
-                      <p className="text-night-300 leading-relaxed">
-                        {tafsir.brief}
-                      </p>
+                    <h3 className="text-xs uppercase tracking-widest text-night-500 mb-3 font-semibold">Tafsir Source</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {AVAILABLE_TAFSIRS.map((tafsir) => (
+                        <button
+                          key={tafsir.id}
+                          onClick={() => handleTafsirChange(tafsir.id)}
+                          className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
+                            selectedTafsir === tafsir.id
+                              ? 'bg-gold-500/20 text-gold-400 border border-gold-500/30'
+                              : 'bg-night-800/50 text-night-400 border border-night-700/50 hover:bg-night-800'
+                          }`}
+                        >
+                          {tafsir.authorName.split(' ').pop()}
+                        </button>
+                      ))}
                     </div>
                   </motion.div>
                   
-                  {/* Detailed Tafsir Toggle */}
+                  {/* Tafsir Content */}
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="liquid-card-interactive overflow-hidden !p-0"
                   >
-                    <button
-                      onClick={() => setShowDetailedTafsir(!showDetailedTafsir)}
-                      className="w-full flex items-center justify-between p-4 text-left"
-                    >
-                      <span className="font-medium text-night-200">Detailed Commentary</span>
-                      <motion.div
-                        animate={{ rotate: showDetailedTafsir ? 180 : 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="liquid-icon-btn !w-8 !h-8"
-                      >
-                        <ChevronDown className="w-4 h-4" />
-                      </motion.div>
-                    </button>
-                    
-                    <AnimatePresence>
-                      {showDetailedTafsir && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="p-4 pt-0">
-                            <div className="liquid-divider mb-4" />
-                            <p className="text-night-400 text-sm leading-relaxed whitespace-pre-line">
-                              {tafsir.detailed}
-                            </p>
-                          </div>
-                        </motion.div>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-xs uppercase tracking-widest text-night-500 font-semibold">Commentary</h3>
+                      {tafsirLoading && (
+                        <RefreshCw className="w-4 h-4 text-gold-400 animate-spin" />
                       )}
-                    </AnimatePresence>
+                    </div>
+                    <div className="liquid-card">
+                      {tafsirLoading ? (
+                        <div className="flex items-center justify-center py-8">
+                          <Loader2 className="w-6 h-6 text-gold-400 animate-spin" />
+                        </div>
+                      ) : tafsirContent ? (
+                        <div>
+                          <p className="text-xs text-gold-400/70 mb-3">{tafsirContent.resourceName}</p>
+                          <p className="text-night-300 leading-relaxed text-sm whitespace-pre-line">
+                            {tafsirContent.text.length > 500 && !showDetailedTafsir
+                              ? tafsirContent.text.slice(0, 500) + '...'
+                              : tafsirContent.text
+                            }
+                          </p>
+                          {tafsirContent.text.length > 500 && (
+                            <button
+                              onClick={() => setShowDetailedTafsir(!showDetailedTafsir)}
+                              className="mt-3 text-gold-400 text-sm flex items-center gap-1 hover:text-gold-300"
+                            >
+                              {showDetailedTafsir ? 'Show less' : 'Read more'}
+                              <ChevronDown className={`w-4 h-4 transition-transform ${showDetailedTafsir ? 'rotate-180' : ''}`} />
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-night-500 text-sm">
+                          Unable to load tafsir. Please check your connection and try again.
+                        </p>
+                      )}
+                    </div>
                   </motion.div>
                   
-                  {/* Context */}
-                  {tafsir.context && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 }}
+                  {/* Reflection Prompts */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <h3 className="text-xs uppercase tracking-widest text-night-500 mb-3 font-semibold">Reflect (Tadabbur)</h3>
+                    <div 
+                      className="rounded-2xl p-4"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(134,169,113,0.1) 0%, rgba(134,169,113,0.05) 100%)',
+                        border: '1px solid rgba(134,169,113,0.2)',
+                      }}
                     >
-                      <h3 className="text-xs uppercase tracking-widest text-night-500 mb-3 font-semibold">Context</h3>
-                      <div 
-                        className="rounded-2xl p-4"
-                        style={{
-                          background: 'linear-gradient(135deg, rgba(134,169,113,0.1) 0%, rgba(134,169,113,0.05) 100%)',
-                          border: '1px solid rgba(134,169,113,0.2)',
-                        }}
-                      >
-                        <p className="text-night-300 text-sm leading-relaxed">
-                          {tafsir.context}
-                        </p>
-                      </div>
-                    </motion.div>
-                  )}
-                  
-                  {/* Key Terms */}
-                  {tafsir.keyTerms && tafsir.keyTerms.length > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 }}
-                    >
-                      <h3 className="text-xs uppercase tracking-widest text-night-500 mb-3 font-semibold">Key Terms</h3>
-                      <div className="space-y-3">
-                        {tafsir.keyTerms.map((term, i) => (
-                          <motion.div 
-                            key={i}
-                            whileHover={{ scale: 1.01 }}
-                            className="liquid-card-interactive"
-                          >
-                            <div className="flex items-center gap-3 mb-2">
-                              <span className="font-arabic text-xl text-gold-400">{term.arabic}</span>
-                              <span className="text-night-200 font-medium">{term.translation}</span>
-                            </div>
-                            <p className="text-night-400 text-sm">{term.explanation}</p>
-                          </motion.div>
+                      <ul className="space-y-2">
+                        {reflectionPrompts.slice(0, 3).map((prompt, i) => (
+                          <li key={i} className="text-night-300 text-sm flex items-start gap-2">
+                            <span className="text-sage-400 mt-0.5">•</span>
+                            {prompt}
+                          </li>
                         ))}
-                      </div>
-                    </motion.div>
-                  )}
+                      </ul>
+                    </div>
+                  </motion.div>
                   
                   {/* Verse Metadata */}
                   <motion.div
