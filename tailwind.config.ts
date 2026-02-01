@@ -76,6 +76,19 @@ const config: Config = {
           400: '#C2B89A',
           500: '#A89F86',
         },
+        // Spiritual Teal - Secondary Accent
+        teal: {
+          50: '#e6f4f4',
+          100: '#cce9e9',
+          200: '#99d3d3',
+          300: '#66bdbd',
+          400: '#33a7a7',
+          500: '#2d9191',
+          600: '#1a6b6b',
+          700: '#0f4545',
+          800: '#0a3333',
+          900: '#052222',
+        },
         // Terracotta - Warm Accent
         terracotta: {
           400: '#C85A3C',

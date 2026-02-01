@@ -88,7 +88,7 @@ export default function MemorizationTechniquesPage() {
               <Brain className="w-6 h-6 text-gold-400" />
             </div>
             <div>
-              <h2 className="font-semibold text-night-100 text-xl mb-2">Your Hifz Toolkit</h2>
+              <h2 className="font-semibold text-night-100 text-xl mb-2">Your <span className="text-gold-400 tracking-wider">HIFZ</span> Toolkit</h2>
               <p className="text-sm text-night-300 leading-relaxed">
                 These proven techniques have helped millions memorize the Quran. 
                 Each method works differently, so try them all and find what clicks for you.

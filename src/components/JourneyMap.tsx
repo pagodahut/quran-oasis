@@ -60,7 +60,7 @@ export function JourneyOverview() {
     {
       id: 'hifz',
       icon: <Trophy className="w-5 h-5" />,
-      title: 'Full Hifz',
+      title: 'Full HIFZ',
       description: 'Complete Quran',
       lessons: '∞',
       color: 'from-amber-500 to-amber-600',
@@ -70,7 +70,7 @@ export function JourneyOverview() {
   return (
     <div className="py-6">
       <h3 className="text-lg font-semibold text-night-100 mb-6 text-center">
-        Your Journey to Hifz
+        Your Journey to <span className="text-gold-400 tracking-wider">HIFZ</span>
       </h3>
       
       <div className="relative">

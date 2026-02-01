@@ -8,30 +8,30 @@ import './globals.css';
 const clerkPubKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 export const metadata: Metadata = {
-  title: 'Hifz — Memorize the Quran',
+  title: 'HIFZ — Memorize the Quran',
   description: 'AI-powered Quran memorization app with personalized lessons, spaced repetition, and beautiful recitations. Start your journey to becoming a Hafiz today.',
   manifest: '/manifest.json',
-  keywords: ['Quran', 'Hifz', 'memorization', 'Islam', 'Muslim', 'Arabic', 'Tajweed', 'spaced repetition'],
-  authors: [{ name: 'Hifz' }],
-  creator: 'Hifz',
-  publisher: 'Hifz',
+  keywords: ['Quran', 'HIFZ', 'Hifz', 'memorization', 'Islam', 'Muslim', 'Arabic', 'Tajweed', 'spaced repetition', 'Hafiz'],
+  authors: [{ name: 'HIFZ' }],
+  creator: 'HIFZ',
+  publisher: 'HIFZ',
   openGraph: {
-    title: 'Hifz — Memorize the Quran',
+    title: 'HIFZ — Memorize the Quran',
     description: 'AI-powered Quran memorization app with personalized lessons and spaced repetition.',
     url: 'https://hifz.app',
-    siteName: 'Hifz',
+    siteName: 'HIFZ',
     locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Hifz — Memorize the Quran',
+    title: 'HIFZ — Memorize the Quran',
     description: 'AI-powered Quran memorization app with personalized lessons and spaced repetition.',
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Hifz',
+    title: 'HIFZ',
   },
   formatDetection: {
     telephone: false,

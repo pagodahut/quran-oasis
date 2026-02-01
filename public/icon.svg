@@ -1,22 +1,101 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#f4d47c"/>
-      <stop offset="50%" style="stop-color:#c9a227"/>
-      <stop offset="100%" style="stop-color:#8b6914"/>
+    <!-- Premium gold gradient - manuscript gilding inspired -->
+    <linearGradient id="hifz-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f4d47c" />
+      <stop offset="35%" stop-color="#c9a227" />
+      <stop offset="65%" stop-color="#d4af37" />
+      <stop offset="100%" stop-color="#8b6914" />
+    </linearGradient>
+    
+    <!-- Inner glow gradient -->
+    <radialGradient id="hifz-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f4d47c" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#c9a227" stop-opacity="0" />
+    </radialGradient>
+    
+    <!-- Dark night gradient -->
+    <linearGradient id="hifz-night" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1f25" />
+      <stop offset="100%" stop-color="#0f1419" />
     </linearGradient>
   </defs>
   
-  <!-- Background -->
-  <rect width="512" height="512" rx="100" fill="#0f1419"/>
+  <!-- Background with rounded corners for app icon -->
+  <rect width="512" height="512" rx="100" fill="url(#hifz-night)" />
   
-  <!-- Crescent Moon -->
-  <path d="M 280 120 
-           A 140 140 0 1 0 280 400 
-           A 100 100 0 1 1 280 120" 
-        fill="url(#gold)"/>
+  <!-- Inner glow -->
+  <circle cx="256" cy="256" r="220" fill="url(#hifz-glow)" />
   
-  <!-- Star -->
-  <polygon points="380,200 390,230 420,230 395,250 405,280 380,260 355,280 365,250 340,230 370,230" 
-           fill="url(#gold)"/>
+  <!-- Outer decorative ring -->
+  <circle 
+    cx="256" 
+    cy="256" 
+    r="230" 
+    fill="none" 
+    stroke="url(#hifz-gold)" 
+    stroke-width="6"
+    opacity="0.6"
+  />
+  
+  <!-- 8-pointed star (Octagram) - Islamic geometric pattern -->
+  <g transform="translate(256, 256)">
+    <!-- First square -->
+    <rect 
+      x="-110" 
+      y="-110" 
+      width="220" 
+      height="220" 
+      fill="none" 
+      stroke="url(#hifz-gold)" 
+      stroke-width="12"
+      rx="15"
+    />
+    <!-- Second square (rotated 45°) -->
+    <rect 
+      x="-110" 
+      y="-110" 
+      width="220" 
+      height="220" 
+      fill="none" 
+      stroke="url(#hifz-gold)" 
+      stroke-width="12"
+      transform="rotate(45)"
+      rx="15"
+    />
+  </g>
+  
+  <!-- Center circle -->
+  <circle 
+    cx="256" 
+    cy="256" 
+    r="80" 
+    fill="url(#hifz-night)"
+    stroke="url(#hifz-gold)"
+    stroke-width="8"
+  />
+  
+  <!-- Stylized ح (Ha) - Arabic letter for Hifz -->
+  <path
+    d="M 220 240
+       Q 220 215, 245 215
+       L 267 215
+       Q 292 215, 292 240
+       Q 292 275, 262 290
+       Q 256 294, 256 310"
+    fill="none"
+    stroke="url(#hifz-gold)"
+    stroke-width="14"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  
+  <!-- Dot below the Ha -->
+  <circle cx="256" cy="325" r="10" fill="url(#hifz-gold)" />
+  
+  <!-- Four corner accent dots -->
+  <circle cx="256" cy="60" r="12" fill="url(#hifz-gold)" />
+  <circle cx="452" cy="256" r="12" fill="url(#hifz-gold)" />
+  <circle cx="256" cy="452" r="12" fill="url(#hifz-gold)" />
+  <circle cx="60" cy="256" r="12" fill="url(#hifz-gold)" />
 </svg>

@@ -27,6 +27,15 @@
   --illumination-blue: #1e3a5f;
   --illumination-green: #2d4a3e;
   --illumination-red: #8b3a3a;
+  
+  /* HIFZ Brand Colors */
+  --hifz-night-deep: #0f1419;
+  --hifz-night: #1a1f25;
+  --hifz-gold: #c9a227;
+  --hifz-gold-light: #d4af37;
+  --hifz-teal: #1a6b6b;
+  --hifz-teal-light: #2d9191;
+  --hifz-cream: #f5f0e1;
 }
 
 /* ============================================
@@ -138,6 +147,41 @@
     text-shadow: 
       0 0 40px rgba(201, 162, 39, 0.15),
       0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* HIFZ Brand Typography */
+  .hifz-brand {
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    background: linear-gradient(
+      135deg,
+      var(--gold-leaf-light) 0%,
+      var(--gold-leaf) 40%,
+      var(--gold-leaf-light) 60%,
+      var(--gold-leaf) 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(201, 162, 39, 0.3);
+  }
+  
+  .hifz-brand-glow {
+    @apply hifz-brand relative;
+  }
+  
+  .hifz-brand-glow::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: -1;
+    background: linear-gradient(135deg, var(--gold-leaf) 0%, var(--gold-leaf-dark) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: blur(12px);
+    opacity: 0.6;
   }
 }
 
@@ -1367,6 +1411,104 @@ input[type="range"]::-moz-range-thumb {
 
 .audio-playing {
   animation: audio-pulse 1s ease-out infinite;
+}
+
+/* ============================================
+   Word-by-Word Highlighting
+   ============================================ */
+@layer components {
+  .word-by-word-container {
+    @apply relative;
+  }
+  
+  .word-item {
+    @apply cursor-pointer select-none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .word-item:active {
+    transform: scale(0.95);
+  }
+  
+  @media (hover: none) {
+    .word-item:hover {
+      background: transparent;
+    }
+  }
+  
+  /* Smooth word highlight transition */
+  .word-highlight-enter {
+    animation: word-highlight-in 0.2s ease-out forwards;
+  }
+  
+  .word-highlight-exit {
+    animation: word-highlight-out 0.15s ease-in forwards;
+  }
+  
+  @keyframes word-highlight-in {
+    from {
+      background-color: transparent;
+      transform: scale(1);
+    }
+    to {
+      background-color: rgba(201, 162, 39, 0.3);
+      transform: scale(1.05);
+    }
+  }
+  
+  @keyframes word-highlight-out {
+    from {
+      background-color: rgba(201, 162, 39, 0.3);
+      transform: scale(1.05);
+    }
+    to {
+      background-color: transparent;
+      transform: scale(1);
+    }
+  }
+}
+
+/* ============================================
+   Tajweed Practice Styles
+   ============================================ */
+@layer components {
+  .tajweed-excellent {
+    @apply bg-gradient-to-r from-gold-500 to-gold-600 text-night-950;
+  }
+  
+  .tajweed-good {
+    @apply bg-gradient-to-r from-sage-500 to-sage-600 text-night-950;
+  }
+  
+  .tajweed-practice {
+    @apply bg-gradient-to-r from-night-600 to-night-700 text-night-200;
+  }
+  
+  /* Recording pulse animation */
+  @keyframes recording-pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
+    }
+  }
+  
+  .recording-active {
+    animation: recording-pulse 1.5s ease-in-out infinite;
+  }
+  
+  /* Audio waveform animation */
+  .audio-bar {
+    @apply w-1 bg-gold-500 rounded-full transition-all duration-75;
+  }
+  
+  /* Sage glow for practice elements */
+  .shadow-glow-sage {
+    box-shadow: 0 0 20px rgba(134, 169, 113, 0.3),
+                0 4px 16px rgba(0, 0, 0, 0.2);
+  }
 }
 
 /* ============================================

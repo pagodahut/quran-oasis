@@ -1,6 +1,6 @@
 {
-  "name": "Hifz",
-  "short_name": "Hifz",
+  "name": "HIFZ — Memorize the Quran",
+  "short_name": "HIFZ",
   "description": "AI-powered Quran memorization app with personalized lessons, spaced repetition, and beautiful recitations.",
   "start_url": "/",
   "display": "standalone",

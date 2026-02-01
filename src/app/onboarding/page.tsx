@@ -282,7 +282,7 @@ export default function OnboardingPage() {
                   { value: 'daily_recitation' as const, label: "Daily Recitation", desc: "Read Quran regularly", icon: <BookOpen className="w-5 h-5" /> },
                   { value: 'selected_surahs' as const, label: "Selected Surahs", desc: "Memorize specific surahs for prayer", icon: <Target className="w-5 h-5" /> },
                   { value: 'juz_amma' as const, label: "Juz Amma", desc: "Memorize the 30th Juz (short surahs)", icon: <Sparkles className="w-5 h-5" /> },
-                  { value: 'full_hifz' as const, label: "Full Hifz", desc: "Memorize the entire Quran", icon: <BookOpen className="w-5 h-5" /> },
+                  { value: 'full_hifz' as const, label: "Full HIFZ", desc: "Memorize the entire Quran", icon: <BookOpen className="w-5 h-5" /> },
                 ]).map((option) => (
                   <OptionCard
                     key={option.value}

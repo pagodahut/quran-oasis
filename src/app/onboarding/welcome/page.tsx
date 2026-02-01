@@ -65,7 +65,7 @@ const JOURNEY_STAGES = [
   {
     id: 'hifz',
     arabic: 'حَافِظ',
-    title: 'Full Hifz',
+    title: 'Full HIFZ',
     description: 'Complete Quran memorization',
     icon: <Trophy className="w-6 h-6" />,
     duration: '2-5 years',
@@ -158,7 +158,7 @@ export default function OnboardingWelcomePage() {
                 </motion.p>
                 
                 <h1 className="text-3xl font-bold text-night-100 mb-2">
-                  Welcome to Hifz
+                  Welcome to <span className="text-gold-400 tracking-wider">HIFZ</span>
                 </h1>
                 <p className="text-night-400 max-w-sm mx-auto">
                   Your journey to memorizing the Quran starts with a single letter
@@ -278,7 +278,7 @@ export default function OnboardingWelcomePage() {
                 className="text-center mb-8"
               >
                 <h2 className="text-2xl font-bold text-night-100 mb-2">
-                  The Path to Hifz
+                  The Path to <span className="text-gold-400 tracking-wider">HIFZ</span>
                 </h2>
                 <p className="text-night-400 text-sm">
                   Your personalized journey, step by step

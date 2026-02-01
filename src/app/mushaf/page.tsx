@@ -23,6 +23,9 @@ import {
   Star,
   Brain,
   BookmarkPlus,
+  Mic,
+  Type,
+  Layers,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { 
@@ -38,6 +41,8 @@ import {
 import BottomNav from '@/components/BottomNav';
 import QuranSearch from '@/components/QuranSearch';
 import TafsirDrawer from '@/components/TafsirDrawer';
+import WordByWord from '@/components/WordByWord';
+import TajweedPractice from '@/components/TajweedPractice';
 import { useBookmarks } from '@/lib/bookmarks';
 
 export default function MushafPage() {
@@ -70,6 +75,11 @@ export default function MushafPage() {
   const [showSearch, setShowSearch] = useState(false);
   const [showTafsir, setShowTafsir] = useState(false);
   const [tafsirAyah, setTafsirAyah] = useState(1);
+  
+  // Word-by-word & Tajweed state
+  const [wordByWordMode, setWordByWordMode] = useState(false);
+  const [showTajweedPractice, setShowTajweedPractice] = useState(false);
+  const [tajweedPracticeAyah, setTajweedPracticeAyah] = useState(1);
   
   // Refs
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -288,86 +298,117 @@ export default function MushafPage() {
 
             {/* Verses */}
             <div className="space-y-4">
-              {currentSurah.ayahs.map((ayah) => (
-                <motion.div
-                  key={ayah.numberInSurah}
-                  ref={(el) => { verseRefs.current[ayah.numberInSurah] = el; }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className={`verse-card ${currentAyah === ayah.numberInSurah && isPlaying ? 'active' : ''}`}
-                  onClick={() => playAyah(ayah.numberInSurah)}
-                >
-                  {/* Arabic Text */}
-                  <p 
-                    className="quran-text text-night-100 mb-4"
-                    style={{ fontSize }}
+              {currentSurah.ayahs.map((ayah) => {
+                const isCurrentVerse = currentAyah === ayah.numberInSurah && isPlaying;
+                
+                return (
+                  <motion.div
+                    key={ayah.numberInSurah}
+                    ref={(el) => { verseRefs.current[ayah.numberInSurah] = el; }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className={`verse-card ${isCurrentVerse ? 'active' : ''}`}
+                    onClick={() => playAyah(ayah.numberInSurah)}
                   >
-                    {ayah.text.arabic}
-                    <span className="verse-number">{ayah.numberInSurah}</span>
-                  </p>
+                    {/* Arabic Text - Word by Word or Regular */}
+                    {wordByWordMode && isCurrentVerse ? (
+                      <div className="mb-4">
+                        <WordByWord
+                          surah={surahNumber}
+                          ayah={ayah.numberInSurah}
+                          arabicText={ayah.text.arabic}
+                          reciterId={selectedReciter}
+                          isPlaying={isPlaying}
+                          audioRef={audioRef}
+                          fontSize={fontSize}
+                          showWordTranslation={true}
+                        />
+                      </div>
+                    ) : (
+                      <p 
+                        className="quran-text text-night-100 mb-4"
+                        style={{ fontSize }}
+                      >
+                        {ayah.text.arabic}
+                        <span className="verse-number">{ayah.numberInSurah}</span>
+                      </p>
+                    )}
 
-                  {/* Translation */}
-                  {showTranslation && (
-                    <p className="text-night-400 text-sm leading-relaxed border-t border-night-800/30 pt-4">
-                      {ayah.text.translations[translationEdition]}
-                    </p>
-                  )}
+                    {/* Translation */}
+                    {showTranslation && (
+                      <p className="text-night-400 text-sm leading-relaxed border-t border-night-800/30 pt-4">
+                        {ayah.text.translations[translationEdition]}
+                      </p>
+                    )}
 
-                  {/* Verse Meta */}
-                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-night-800/20">
-                    <div className="flex items-center gap-4 text-xs text-night-500">
-                      <span>Juz {ayah.juz}</span>
-                      <span>Page {ayah.page}</span>
-                      <span>Ruku {ayah.ruku}</span>
-                      {ayah.sajda && <span className="text-gold-400">۩ Sajda</span>}
+                    {/* Verse Meta */}
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-night-800/20">
+                      <div className="flex items-center gap-4 text-xs text-night-500">
+                        <span>Juz {ayah.juz}</span>
+                        <span>Page {ayah.page}</span>
+                        <span>Ruku {ayah.ruku}</span>
+                        {ayah.sajda && <span className="text-gold-400">۩ Sajda</span>}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {/* Practice Tajweed Button */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setTajweedPracticeAyah(ayah.numberInSurah);
+                            setShowTajweedPractice(true);
+                          }}
+                          className="text-xs text-sage-500 hover:text-sage-400 transition-colors flex items-center gap-1 bg-sage-500/10 px-2 py-1 rounded-lg"
+                        >
+                          <Mic className="w-3.5 h-3.5" />
+                          Practice
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleBookmark({
+                              surah: surahNumber,
+                              surahName: currentSurah.englishName,
+                              surahArabicName: currentSurah.name,
+                              ayah: ayah.numberInSurah,
+                              text: ayah.text.arabic.slice(0, 100),
+                              translation: ayah.text.translations[translationEdition].slice(0, 100),
+                            });
+                          }}
+                          className={`text-xs transition-colors flex items-center gap-1 px-2 py-1 rounded-lg ${
+                            isBookmarked(surahNumber, ayah.numberInSurah)
+                              ? 'text-gold-400 bg-gold-500/20'
+                              : 'text-night-500 hover:text-gold-400 bg-night-800/50'
+                          }`}
+                        >
+                          <Bookmark className={`w-3.5 h-3.5 ${isBookmarked(surahNumber, ayah.numberInSurah) ? 'fill-gold-400' : ''}`} />
+                          {isBookmarked(surahNumber, ayah.numberInSurah) ? 'Saved' : 'Save'}
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/memorize/${surahNumber}/${ayah.numberInSurah}`);
+                          }}
+                          className="text-xs text-gold-500 hover:text-gold-400 transition-colors flex items-center gap-1 bg-gold-500/10 px-2 py-1 rounded-lg"
+                        >
+                          <Brain className="w-3.5 h-3.5" />
+                          Memorize
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setTafsirAyah(ayah.numberInSurah);
+                            setShowTafsir(true);
+                          }}
+                          className="text-xs text-night-500 hover:text-gold-400 transition-colors flex items-center gap-1"
+                        >
+                          <BookOpen className="w-3.5 h-3.5" />
+                          Tafsir
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleBookmark({
-                            surah: surahNumber,
-                            surahName: currentSurah.englishName,
-                            surahArabicName: currentSurah.name,
-                            ayah: ayah.numberInSurah,
-                            text: ayah.text.arabic.slice(0, 100),
-                            translation: ayah.text.translations[translationEdition].slice(0, 100),
-                          });
-                        }}
-                        className={`text-xs transition-colors flex items-center gap-1 px-2 py-1 rounded-lg ${
-                          isBookmarked(surahNumber, ayah.numberInSurah)
-                            ? 'text-gold-400 bg-gold-500/20'
-                            : 'text-night-500 hover:text-gold-400 bg-night-800/50'
-                        }`}
-                      >
-                        <Bookmark className={`w-3.5 h-3.5 ${isBookmarked(surahNumber, ayah.numberInSurah) ? 'fill-gold-400' : ''}`} />
-                        {isBookmarked(surahNumber, ayah.numberInSurah) ? 'Saved' : 'Save'}
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          router.push(`/memorize/${surahNumber}/${ayah.numberInSurah}`);
-                        }}
-                        className="text-xs text-gold-500 hover:text-gold-400 transition-colors flex items-center gap-1 bg-gold-500/10 px-2 py-1 rounded-lg"
-                      >
-                        <Brain className="w-3.5 h-3.5" />
-                        Memorize
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setTafsirAyah(ayah.numberInSurah);
-                          setShowTafsir(true);
-                        }}
-                        className="text-xs text-night-500 hover:text-gold-400 transition-colors flex items-center gap-1"
-                      >
-                        <BookOpen className="w-3.5 h-3.5" />
-                        Tafsir
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         ) : (
@@ -394,6 +435,19 @@ export default function MushafPage() {
               )}
             </div>
             <div className="flex items-center gap-2">
+              {/* Word-by-word toggle */}
+              <button
+                onClick={() => setWordByWordMode(!wordByWordMode)}
+                className={`text-xs px-2 py-1 rounded-lg transition-colors flex items-center gap-1 ${
+                  wordByWordMode 
+                    ? 'bg-sage-500/20 text-sage-400 border border-sage-500/50' 
+                    : 'bg-night-800 text-night-400 hover:bg-night-700'
+                }`}
+                title="Word-by-word highlighting"
+              >
+                <Type className="w-3 h-3" />
+                Word
+              </button>
               {/* Multi-ayah loop button */}
               <button
                 onClick={() => setShowLoopPicker(!showLoopPicker)}
@@ -731,6 +785,20 @@ export default function MushafPage() {
         surahNumber={surahNumber}
         ayahNumber={tafsirAyah}
       />
+      
+      {/* Tajweed Practice Modal */}
+      <AnimatePresence>
+        {showTajweedPractice && currentSurah && (
+          <TajweedPractice
+            surah={surahNumber}
+            ayah={tajweedPracticeAyah}
+            arabicText={currentSurah.ayahs.find(a => a.numberInSurah === tajweedPracticeAyah)?.text.arabic || ''}
+            translation={currentSurah.ayahs.find(a => a.numberInSurah === tajweedPracticeAyah)?.text.translations[translationEdition]}
+            audioUrl={getAudioUrl(surahNumber, tajweedPracticeAyah, selectedReciter)}
+            onClose={() => setShowTajweedPractice(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

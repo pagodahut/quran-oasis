@@ -7,7 +7,6 @@ import {
   BookOpen, 
   Sparkles, 
   ChevronRight,
-  Moon,
   Heart,
   Headphones,
   Brain,
@@ -16,6 +15,7 @@ import {
   Quote,
   User,
 } from 'lucide-react';
+import { HifzLogo, HifzIcon, HifzIconSimple } from '@/components/brand/HifzLogo';
 import { SignInButton, SignUpButton, UserButton, SignedIn, SignedOut } from '@clerk/nextjs';
 
 // Animation variants
@@ -369,20 +369,7 @@ export default function HomePage() {
             <div className="liquid-glass rounded-2xl">
               <div className="px-6 py-4 max-w-7xl mx-auto">
                 <div className="flex items-center justify-between">
-                  <motion.div 
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="flex items-center gap-3"
-                  >
-                    <div className="relative">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 flex items-center justify-center shadow-lg">
-                        <Moon className="w-5 h-5 text-night-950" />
-                      </div>
-                      {/* Subtle glow */}
-                      <div className="absolute inset-0 w-10 h-10 rounded-xl bg-gold-500 blur-md opacity-30" />
-                    </div>
-                    <span className="font-display text-xl text-night-100 font-semibold">Hifz</span>
-                  </motion.div>
+                  <HifzLogo size={36} animated={true} />
                   
                   <motion.nav
                     initial={{ opacity: 0, x: 20 }}
@@ -448,7 +435,7 @@ export default function HomePage() {
               <motion.span variants={fadeInUp} className="block">Your Journey to</motion.span>
               <motion.span variants={fadeInUp} className="block mt-2">
                 <span className="relative inline-block">
-                  <span className="liquid-shimmer-text">Hifz</span>
+                  <span className="liquid-shimmer-text tracking-wider font-bold">HIFZ</span>
                   <motion.span
                     className="absolute -inset-4 bg-gold-500/10 rounded-2xl -z-10 blur-sm"
                     animate={{ scale: [1, 1.05, 1], opacity: [0.5, 0.8, 0.5] }}
@@ -564,7 +551,7 @@ export default function HomePage() {
                 The Path to Memorization
               </h2>
               <p className="text-night-400 max-w-xl mx-auto text-lg">
-                Everything you need for a successful Hifz journey
+                Everything you need for a successful <span className="text-gold-400 font-semibold">HIFZ</span> journey
               </p>
             </motion.div>
 
@@ -584,7 +571,7 @@ export default function HomePage() {
               <FeatureCard
                 iconComponent={ProgressIcon}
                 title="Track Progress"
-                description="Beautiful visualizations show your journey from first verse to full Hifz"
+                description="Beautiful visualizations show your journey from first verse to full HIFZ"
                 gradient="from-sage-500 to-emerald-500"
               />
             </div>
@@ -763,10 +750,8 @@ export default function HomePage() {
         <footer className="p-6 border-t border-night-800/30 safe-area-bottom">
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-night-500 text-sm">
-              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center">
-                <Moon className="w-3.5 h-3.5 text-night-950" />
-              </div>
-              <span>Hifz</span>
+              <HifzIconSimple size={24} />
+              <span className="font-semibold tracking-wider">HIFZ</span>
             </div>
             <p className="text-night-500 text-sm flex items-center gap-2">
               Made with <Heart className="w-4 h-4 text-rose-500 fill-rose-500" /> for the Ummah
