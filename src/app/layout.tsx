@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
+import { SyncProvider, SyncIndicator } from '@/components/SyncProvider';
 import './globals.css';
 
 // Check if Clerk is configured
@@ -90,8 +91,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://everyayah.com" />
       </head>
       <body className="bg-night-950 text-night-100 antialiased">
-        <ServiceWorkerRegistration />
-        {children}
+        <SyncProvider>
+          <ServiceWorkerRegistration />
+          {children}
+          <SyncIndicator />
+        </SyncProvider>
       </body>
     </html>
   );

@@ -10,10 +10,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User account
+// User account - linked to Clerk
 model User {
   id        String   @id @default(cuid())
-  email     String   @unique
+  clerkId   String   @unique  // Clerk user ID
+  email     String?
   name      String?
   avatar    String?
   createdAt DateTime @default(now())
@@ -128,7 +129,7 @@ model DailyActivity {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  date              DateTime @default(now()) @db.Date
+  date              DateTime @default(now())
   minutesStudied    Int      @default(0)
   versesLearned     Int      @default(0)
   versesReviewed    Int      @default(0)

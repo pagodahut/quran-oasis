@@ -98,6 +98,9 @@ export function saveProgress(progress: UserProgress): void {
   
   progress.updatedAt = new Date().toISOString();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+  
+  // Dispatch event for sync
+  window.dispatchEvent(new CustomEvent('progress-updated', { detail: progress }));
 }
 
 /**

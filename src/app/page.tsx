@@ -14,7 +14,9 @@ import {
   Flame,
   ArrowRight,
   Quote,
+  User,
 } from 'lucide-react';
+import { SignInButton, SignUpButton, UserButton, SignedIn, SignedOut } from '@clerk/nextjs';
 
 // Animation variants
 const fadeInUp = {
@@ -400,6 +402,26 @@ export default function HomePage() {
                       <Sparkles className="w-4 h-4 text-gold-400" />
                       My Lessons
                     </Link>
+                    
+                    {/* Auth Buttons */}
+                    <SignedOut>
+                      <SignInButton mode="modal">
+                        <button className="text-night-400 hover:text-gold-400 transition-colors text-sm font-medium flex items-center gap-1.5">
+                          <User className="w-4 h-4" />
+                          Sign In
+                        </button>
+                      </SignInButton>
+                    </SignedOut>
+                    <SignedIn>
+                      <UserButton 
+                        afterSignOutUrl="/"
+                        appearance={{
+                          elements: {
+                            avatarBox: "w-8 h-8"
+                          }
+                        }}
+                      />
+                    </SignedIn>
                   </motion.nav>
                 </div>
               </div>
