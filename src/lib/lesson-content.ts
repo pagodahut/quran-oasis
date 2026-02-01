@@ -4574,7 +4574,10 @@ This powerful ending establishes:
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
-// Combine all lessons
+import { ALL_INTERMEDIATE_LESSONS, INTERMEDIATE_UNITS } from './intermediate-lessons';
+import { ALL_ADVANCED_LESSONS, ADVANCED_UNITS } from './advanced-lessons';
+
+// Combine all beginner lessons
 export const ALL_BEGINNER_LESSONS: Lesson[] = [
   ...UNIT_1_LESSONS,
   ...UNIT_2_LESSONS,
@@ -4583,25 +4586,41 @@ export const ALL_BEGINNER_LESSONS: Lesson[] = [
   ...UNIT_5_LESSONS
 ];
 
+// Combined lessons from all paths
+export const ALL_LESSONS: Lesson[] = [
+  ...ALL_BEGINNER_LESSONS,
+  ...ALL_INTERMEDIATE_LESSONS,
+  ...ALL_ADVANCED_LESSONS
+];
+
 /**
- * Get lesson by ID
+ * Get lesson by ID - searches all paths
  */
 export function getLessonById(id: string): Lesson | undefined {
-  return ALL_BEGINNER_LESSONS.find(l => l.id === id);
+  return ALL_LESSONS.find(l => l.id === id);
 }
 
 /**
  * Get lessons by path
  */
 export function getLessonsByPath(path: "beginner" | "intermediate" | "advanced"): Lesson[] {
-  return ALL_BEGINNER_LESSONS.filter(l => l.path === path);
+  switch (path) {
+    case "beginner":
+      return ALL_BEGINNER_LESSONS;
+    case "intermediate":
+      return ALL_INTERMEDIATE_LESSONS;
+    case "advanced":
+      return ALL_ADVANCED_LESSONS;
+    default:
+      return [];
+  }
 }
 
 /**
  * Get lessons by unit
  */
 export function getLessonsByUnit(unit: number): Lesson[] {
-  return ALL_BEGINNER_LESSONS.filter(l => l.unit === unit);
+  return ALL_LESSONS.filter(l => l.unit === unit);
 }
 
 /**
@@ -4619,19 +4638,77 @@ export function isLessonUnlocked(lessonId: string, completedLessonIds: string[])
 }
 
 /**
- * Get all lessons for display
+ * Get all lessons for display (from all paths)
  */
 export function getAllLessons(): Lesson[] {
-  return ALL_BEGINNER_LESSONS;
+  return ALL_LESSONS;
 }
 
 /**
- * Get unit information
+ * Get the recommended starting lesson based on user's profile
  */
-export const UNITS = [
-  { number: 1, title: "Arabic Foundations", lessons: 5, description: "Learn the Arabic alphabet from scratch" },
-  { number: 2, title: "Reading Skills", lessons: 3, description: "Master vowels and reading" },
-  { number: 3, title: "Your First Surah - Al-Fatiha", lessons: 4, description: "Memorize the Opening Chapter" },
-  { number: 4, title: "Short Surahs", lessons: 3, description: "Build your memorization repertoire" },
-  { number: 5, title: "More Juz Amma", lessons: 4, description: "Al-Kawthar, Al-Asr, An-Nasr, Al-Kafirun" }
+export function getRecommendedStartLesson(
+  arabicLevel: 'none' | 'letters' | 'basic' | 'intermediate' | 'fluent',
+  priorMemorization: 'none' | 'juz_amma' | 'multiple_juz' | 'significant'
+): Lesson {
+  // If they're fluent and have significant memorization, start with advanced
+  if ((arabicLevel === 'fluent' || arabicLevel === 'intermediate') && 
+      (priorMemorization === 'multiple_juz' || priorMemorization === 'significant')) {
+    return ALL_ADVANCED_LESSONS[0];
+  }
+  
+  // If they can read Arabic well, skip to intermediate
+  if (arabicLevel === 'intermediate' || arabicLevel === 'fluent' || 
+      (arabicLevel === 'basic' && priorMemorization !== 'none')) {
+    return ALL_INTERMEDIATE_LESSONS[0];
+  }
+  
+  // If they know letters but can't read well, start from reading skills
+  if (arabicLevel === 'letters') {
+    // Start from Unit 2 (Reading Skills)
+    return ALL_BEGINNER_LESSONS.find(l => l.unit === 2) || ALL_BEGINNER_LESSONS[0];
+  }
+  
+  // Complete beginner - start from the very beginning
+  return ALL_BEGINNER_LESSONS[0];
+}
+
+/**
+ * Get unit information for all paths
+ */
+export const BEGINNER_UNITS = [
+  { number: 1, title: "Arabic Foundations", lessons: 5, description: "Learn the Arabic alphabet from scratch", path: "beginner" as const },
+  { number: 2, title: "Reading Skills", lessons: 3, description: "Master vowels and reading", path: "beginner" as const },
+  { number: 3, title: "Your First Surah - Al-Fatiha", lessons: 4, description: "Memorize the Opening Chapter", path: "beginner" as const },
+  { number: 4, title: "Short Surahs", lessons: 3, description: "Build your memorization repertoire", path: "beginner" as const },
+  { number: 5, title: "More Juz Amma", lessons: 4, description: "Al-Kawthar, Al-Asr, An-Nasr, Al-Kafirun", path: "beginner" as const }
 ];
+
+// Legacy export for backwards compatibility
+export const UNITS = BEGINNER_UNITS;
+
+// All units across all paths
+export const ALL_UNITS = [
+  ...BEGINNER_UNITS,
+  ...INTERMEDIATE_UNITS.map(u => ({ ...u, path: "intermediate" as const })),
+  ...ADVANCED_UNITS.map(u => ({ ...u, path: "advanced" as const }))
+];
+
+/**
+ * Get units for a specific path
+ */
+export function getUnitsForPath(path: "beginner" | "intermediate" | "advanced") {
+  switch (path) {
+    case "beginner":
+      return BEGINNER_UNITS;
+    case "intermediate":
+      return INTERMEDIATE_UNITS;
+    case "advanced":
+      return ADVANCED_UNITS;
+    default:
+      return [];
+  }
+}
+
+// Re-export intermediate and advanced lessons for direct access
+export { ALL_INTERMEDIATE_LESSONS, ALL_ADVANCED_LESSONS, INTERMEDIATE_UNITS, ADVANCED_UNITS };

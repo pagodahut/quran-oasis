@@ -12,27 +12,68 @@ import {
   BookOpen,
   Clock,
   Target,
-  Sparkles
+  Sparkles,
+  GraduationCap,
+  Brain,
+  Heart,
+  Star,
+  Loader2
 } from 'lucide-react';
 import { RECITERS, getAudioUrl } from '@/lib/quranData';
 
-type Step = 'arabic' | 'experience' | 'goal' | 'time' | 'reciter' | 'complete';
+type Step = 'arabic' | 'memorization' | 'goal' | 'time' | 'reciter' | 'complete';
 
 const ARABIC_LEVELS = [
-  { value: 'none' as const, label: "I can't read Arabic yet", desc: "Starting from scratch" },
-  { value: 'letters' as const, label: "I know the alphabet", desc: "Can recognize letters but slow at reading" },
-  { value: 'basic' as const, label: "I can read slowly", desc: "Can read with some hesitation" },
-  { value: 'intermediate' as const, label: "I read fairly well", desc: "Comfortable reading most text" },
-  { value: 'fluent' as const, label: "I'm fluent in Arabic", desc: "Can read quickly and accurately" },
+  { value: 'none' as const, label: "I can't read Arabic yet", desc: "Starting from scratch", icon: <BookOpen className="w-5 h-5" /> },
+  { value: 'letters' as const, label: "I know the letters", desc: "Can recognize letters but reading is slow", icon: <GraduationCap className="w-5 h-5" /> },
+  { value: 'basic' as const, label: "I can read slowly", desc: "Can read with some hesitation", icon: <Brain className="w-5 h-5" /> },
+  { value: 'intermediate' as const, label: "I read fairly well", desc: "Comfortable reading most text", icon: <Star className="w-5 h-5" /> },
+  { value: 'fluent' as const, label: "I'm fluent in Arabic", desc: "Can read quickly and accurately", icon: <Sparkles className="w-5 h-5" /> },
+];
+
+const MEMORIZATION_LEVELS = [
+  { value: 'none' as const, label: "This is my first time", desc: "I haven't memorized any Quran yet", icon: <Heart className="w-5 h-5" /> },
+  { value: 'juz_amma' as const, label: "I know Juz Amma", desc: "Memorized the 30th Juz (short surahs)", icon: <BookOpen className="w-5 h-5" /> },
+  { value: 'multiple_juz' as const, label: "I know multiple Juz", desc: "Memorized 2-10 Juz", icon: <Star className="w-5 h-5" /> },
+  { value: 'significant' as const, label: "Significant portion", desc: "Memorized more than 10 Juz", icon: <Sparkles className="w-5 h-5" /> },
+];
+
+const GOALS = [
+  { value: 'daily_connection' as const, label: "Daily Connection", desc: "Read Quran regularly and build a habit", icon: <Heart className="w-5 h-5" /> },
+  { value: 'selected_surahs' as const, label: "Selected Surahs", desc: "Memorize specific surahs for prayer", icon: <Target className="w-5 h-5" /> },
+  { value: 'juz_amma' as const, label: "Juz Amma", desc: "Memorize the 30th Juz (short surahs)", icon: <Sparkles className="w-5 h-5" /> },
+  { value: 'full_hifz' as const, label: "Full Hifz", desc: "Memorize the entire Quran", icon: <GraduationCap className="w-5 h-5" /> },
+];
+
+const TIME_OPTIONS = [
+  { value: 10, label: "10 minutes", desc: "Quick daily practice" },
+  { value: 15, label: "15 minutes", desc: "Light but consistent" },
+  { value: 20, label: "20 minutes", desc: "Recommended for beginners" },
+  { value: 30, label: "30 minutes", desc: "Steady progress" },
+  { value: 45, label: "45 minutes", desc: "Serious commitment" },
+  { value: 60, label: "60+ minutes", desc: "Intensive learning" },
 ];
 
 interface OnboardingData {
   arabicLevel: 'none' | 'letters' | 'basic' | 'intermediate' | 'fluent';
-  memorizedBefore: boolean;
-  currentMemorized: string;
-  goal: 'full_hifz' | 'juz_amma' | 'selected_surahs' | 'daily_recitation';
-  dailyMinutes: number;
+  priorMemorization: 'none' | 'juz_amma' | 'multiple_juz' | 'significant';
+  goal: 'full_hifz' | 'juz_amma' | 'selected_surahs' | 'daily_connection';
+  dailyTimeMinutes: number;
   preferredReciter: string;
+}
+
+interface StudyPlanRecommendation {
+  level: 'beginner' | 'intermediate' | 'advanced';
+  startingLesson: {
+    id: string;
+    title: string;
+    description: string;
+  };
+  totalLessonsInPath: number;
+  dailyGoal: {
+    newVerses: number;
+    reviewVerses: number;
+  };
 }
 
 export default function OnboardingPage() {
@@ -40,22 +81,27 @@ export default function OnboardingPage() {
   const [step, setStep] = useState<Step>('arabic');
   const [data, setData] = useState<OnboardingData>({
     arabicLevel: 'none',
-    memorizedBefore: false,
-    currentMemorized: '',
-    goal: 'juz_amma',
-    dailyMinutes: 20,
+    priorMemorization: 'none',
+    goal: 'daily_connection',
+    dailyTimeMinutes: 20,
     preferredReciter: 'alafasy',
   });
   const [playingReciter, setPlayingReciter] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [recommendation, setRecommendation] = useState<StudyPlanRecommendation | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const steps: Step[] = ['arabic', 'experience', 'goal', 'time', 'reciter', 'complete'];
+  const steps: Step[] = ['arabic', 'memorization', 'goal', 'time', 'reciter', 'complete'];
   const currentIndex = steps.indexOf(step);
   const progress = ((currentIndex) / (steps.length - 1)) * 100;
 
-  const goNext = () => {
+  const goNext = async () => {
     const nextIndex = currentIndex + 1;
     if (nextIndex < steps.length) {
+      // If moving to complete step, submit the data
+      if (steps[nextIndex] === 'complete') {
+        await submitOnboarding();
+      }
       setStep(steps[nextIndex]);
     }
   };
@@ -82,13 +128,49 @@ export default function OnboardingPage() {
     }
   };
 
+  const submitOnboarding = async () => {
+    setIsSubmitting(true);
+    try {
+      const response = await fetch('/api/onboarding', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setRecommendation(result.recommendation);
+        
+        // Also store in localStorage for offline access
+        localStorage.setItem('quranOasis_onboarding', JSON.stringify(data));
+        localStorage.setItem('quranOasis_preferences', JSON.stringify({
+          reciter: data.preferredReciter,
+          dailyMinutes: data.dailyTimeMinutes,
+        }));
+        localStorage.setItem('quranOasis_studyPlan', JSON.stringify(result.studyPlan));
+      } else {
+        // Fallback to localStorage-only if API fails
+        localStorage.setItem('quranOasis_onboarding', JSON.stringify(data));
+        localStorage.setItem('quranOasis_preferences', JSON.stringify({
+          reciter: data.preferredReciter,
+          dailyMinutes: data.dailyTimeMinutes,
+        }));
+      }
+    } catch (error) {
+      console.error('Onboarding submission error:', error);
+      // Fallback to localStorage
+      localStorage.setItem('quranOasis_onboarding', JSON.stringify(data));
+      localStorage.setItem('quranOasis_preferences', JSON.stringify({
+        reciter: data.preferredReciter,
+        dailyMinutes: data.dailyTimeMinutes,
+      }));
+    }
+    setIsSubmitting(false);
+  };
+
   const completeOnboarding = () => {
-    localStorage.setItem('quranOasis_onboarding', JSON.stringify(data));
-    localStorage.setItem('quranOasis_preferences', JSON.stringify({
-      reciter: data.preferredReciter,
-      dailyMinutes: data.dailyMinutes,
-    }));
-    
     router.push('/lessons');
   };
 
@@ -157,6 +239,36 @@ export default function OnboardingPage() {
     </motion.button>
   );
 
+  // Get level badge color
+  const getLevelBadgeStyle = (level: string) => {
+    switch (level) {
+      case 'beginner':
+        return {
+          background: 'linear-gradient(135deg, rgba(134,169,113,0.2) 0%, rgba(134,169,113,0.1) 100%)',
+          border: '1px solid rgba(134,169,113,0.3)',
+          color: '#86A971',
+        };
+      case 'intermediate':
+        return {
+          background: 'linear-gradient(135deg, rgba(201,162,39,0.2) 0%, rgba(201,162,39,0.1) 100%)',
+          border: '1px solid rgba(201,162,39,0.3)',
+          color: '#c9a227',
+        };
+      case 'advanced':
+        return {
+          background: 'linear-gradient(135deg, rgba(147,112,219,0.2) 0%, rgba(147,112,219,0.1) 100%)',
+          border: '1px solid rgba(147,112,219,0.3)',
+          color: '#9370DB',
+        };
+      default:
+        return {
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          color: '#a0a0a0',
+        };
+    }
+  };
+
   return (
     <div className="min-h-screen bg-night-950 flex flex-col">
       <audio ref={audioRef} onEnded={() => setPlayingReciter(null)} />
@@ -171,7 +283,7 @@ export default function OnboardingPage() {
         }}
       >
         <div className="flex items-center justify-between">
-          {step !== 'arabic' ? (
+          {step !== 'arabic' && step !== 'complete' ? (
             <motion.button 
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
@@ -196,12 +308,14 @@ export default function OnboardingPage() {
             </div>
           )}
           
-          <button 
-            onClick={() => router.push('/lessons')}
-            className="text-sm text-night-500 hover:text-night-300 transition-colors px-2 py-1"
-          >
-            Skip
-          </button>
+          {step !== 'complete' && (
+            <button 
+              onClick={() => router.push('/lessons')}
+              className="text-sm text-night-500 hover:text-night-300 transition-colors px-2 py-1"
+            >
+              Skip
+            </button>
+          )}
         </div>
       </header>
 
@@ -224,6 +338,7 @@ export default function OnboardingPage() {
                     key={option.value}
                     selected={data.arabicLevel === option.value}
                     onClick={() => setData({ ...data, arabicLevel: option.value })}
+                    icon={option.icon}
                     label={option.label}
                     desc={option.desc}
                   />
@@ -236,29 +351,27 @@ export default function OnboardingPage() {
             </StepContainer>
           )}
 
-          {/* Experience */}
-          {step === 'experience' && (
-            <StepContainer key="experience">
+          {/* Memorization Experience */}
+          {step === 'memorization' && (
+            <StepContainer key="memorization">
               <h2 className="text-2xl font-semibold text-night-100 mb-2">
-                Have you memorized Quran before?
+                How much Quran have you memorized?
               </h2>
               <p className="text-night-400 mb-8">
-                Any amount counts - even a few verses
+                Any amount counts - this helps us personalize your journey
               </p>
               
               <div className="space-y-3 mb-8">
-                <OptionCard
-                  selected={!data.memorizedBefore}
-                  onClick={() => setData({ ...data, memorizedBefore: false })}
-                  label="This is my first time"
-                  desc="I haven't memorized any Quran yet"
-                />
-                <OptionCard
-                  selected={data.memorizedBefore}
-                  onClick={() => setData({ ...data, memorizedBefore: true })}
-                  label="Yes, I've memorized some"
-                  desc="I have existing memorization"
-                />
+                {MEMORIZATION_LEVELS.map((option) => (
+                  <OptionCard
+                    key={option.value}
+                    selected={data.priorMemorization === option.value}
+                    onClick={() => setData({ ...data, priorMemorization: option.value })}
+                    icon={option.icon}
+                    label={option.label}
+                    desc={option.desc}
+                  />
+                ))}
               </div>
               
               <div className="mt-auto">
@@ -278,12 +391,7 @@ export default function OnboardingPage() {
               </p>
               
               <div className="space-y-3 mb-8">
-                {([
-                  { value: 'daily_recitation' as const, label: "Daily Recitation", desc: "Read Quran regularly", icon: <BookOpen className="w-5 h-5" /> },
-                  { value: 'selected_surahs' as const, label: "Selected Surahs", desc: "Memorize specific surahs for prayer", icon: <Target className="w-5 h-5" /> },
-                  { value: 'juz_amma' as const, label: "Juz Amma", desc: "Memorize the 30th Juz (short surahs)", icon: <Sparkles className="w-5 h-5" /> },
-                  { value: 'full_hifz' as const, label: "Full HIFZ", desc: "Memorize the entire Quran", icon: <BookOpen className="w-5 h-5" /> },
-                ]).map((option) => (
+                {GOALS.map((option) => (
                   <OptionCard
                     key={option.value}
                     selected={data.goal === option.value}
@@ -312,17 +420,11 @@ export default function OnboardingPage() {
               </p>
               
               <div className="space-y-3 mb-8">
-                {[
-                  { value: 10, label: "10 minutes", desc: "Quick daily practice" },
-                  { value: 20, label: "20 minutes", desc: "Recommended for beginners" },
-                  { value: 30, label: "30 minutes", desc: "Steady progress" },
-                  { value: 45, label: "45 minutes", desc: "Serious commitment" },
-                  { value: 60, label: "60+ minutes", desc: "Intensive learning" },
-                ].map((option) => (
+                {TIME_OPTIONS.map((option) => (
                   <OptionCard
                     key={option.value}
-                    selected={data.dailyMinutes === option.value}
-                    onClick={() => setData({ ...data, dailyMinutes: option.value })}
+                    selected={data.dailyTimeMinutes === option.value}
+                    onClick={() => setData({ ...data, dailyTimeMinutes: option.value })}
                     icon={<Clock className="w-5 h-5" />}
                     label={option.label}
                     desc={option.desc}
@@ -390,7 +492,19 @@ export default function OnboardingPage() {
               </div>
               
               <div className="mt-auto">
-                <ContinueButton onClick={goNext} />
+                <ContinueButton onClick={goNext} disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Creating your plan...
+                    </>
+                  ) : (
+                    <>
+                      Continue
+                      <ChevronRight className="w-5 h-5" />
+                    </>
+                  )}
+                </ContinueButton>
               </div>
             </StepContainer>
           )}
@@ -413,18 +527,72 @@ export default function OnboardingPage() {
                   <Check className="w-10 h-10 text-white" />
                 </motion.div>
                 <h1 className="text-3xl font-display text-night-100 mb-4">
-                  You're All Set!
+                  Your Plan is Ready!
                 </h1>
                 <p className="text-night-400 max-w-sm mx-auto">
-                  Your personalized learning path is ready. May Allah make this journey easy and blessed for you.
+                  May Allah make this journey easy and blessed for you.
                 </p>
               </div>
+
+              {/* Personalized Recommendation */}
+              {recommendation && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="p-5 mb-6 rounded-2xl"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(201,162,39,0.1) 0%, rgba(201,162,39,0.02) 100%)',
+                    border: '1px solid rgba(201,162,39,0.2)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                  }}
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <Sparkles className="w-5 h-5 text-gold-400" />
+                    <h3 className="font-semibold text-night-100">Your Personalized Path</h3>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-night-400">Starting Level</span>
+                      <span 
+                        className="capitalize px-3 py-1 rounded-lg text-sm font-medium"
+                        style={getLevelBadgeStyle(recommendation.level)}
+                      >
+                        {recommendation.level}
+                      </span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-night-400">First Lesson</span>
+                      <span className="text-night-200 text-sm text-right max-w-[60%]">
+                        {recommendation.startingLesson.title}
+                      </span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-night-400">Daily Goal</span>
+                      <span className="text-night-200 text-sm">
+                        {recommendation.dailyGoal.newVerses} new + {recommendation.dailyGoal.reviewVerses} review verses
+                      </span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-night-400">Lessons Available</span>
+                      <span className="text-night-200 text-sm">
+                        {recommendation.totalLessonsInPath} lessons in {recommendation.level} path
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
 
               {/* Summary - Liquid Glass */}
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.4 }}
                 className="p-5 mb-8 space-y-4 rounded-2xl"
                 style={{
                   background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
@@ -433,20 +601,22 @@ export default function OnboardingPage() {
                   WebkitBackdropFilter: 'blur(12px)',
                 }}
               >
+                <h3 className="font-semibold text-night-100 mb-3">Your Preferences</h3>
                 {[
                   { label: 'Arabic Level', value: data.arabicLevel.replace('_', ' ') },
+                  { label: 'Prior Memorization', value: data.priorMemorization.replace(/_/g, ' ') },
                   { label: 'Goal', value: data.goal.replace(/_/g, ' ') },
-                  { label: 'Daily Time', value: `${data.dailyMinutes} minutes` },
+                  { label: 'Daily Time', value: `${data.dailyTimeMinutes} minutes` },
                   { label: 'Reciter', value: RECITERS.find(r => r.id === data.preferredReciter)?.name.split(' ').slice(-1)[0] || '' },
-                ].map((item, i) => (
+                ].map((item) => (
                   <div key={item.label} className="flex justify-between items-center text-sm">
                     <span className="text-night-400">{item.label}</span>
                     <span 
                       className="capitalize px-3 py-1 rounded-lg"
                       style={{
-                        background: 'linear-gradient(135deg, rgba(201,162,39,0.15) 0%, rgba(201,162,39,0.05) 100%)',
-                        color: '#c9a227',
-                        border: '1px solid rgba(201,162,39,0.2)',
+                        background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+                        color: '#d0d0d0',
+                        border: '1px solid rgba(255,255,255,0.08)',
                       }}
                     >
                       {item.value}
@@ -493,13 +663,22 @@ function StepContainer({ children }: { children: React.ReactNode }) {
   );
 }
 
-function ContinueButton({ onClick }: { onClick: () => void }) {
+function ContinueButton({ 
+  onClick, 
+  disabled = false,
+  children 
+}: { 
+  onClick: () => void;
+  disabled?: boolean;
+  children?: React.ReactNode;
+}) {
   return (
     <motion.button 
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      onClick={onClick} 
-      className="w-full py-4 rounded-2xl flex items-center justify-center gap-2 text-base font-semibold"
+      whileHover={disabled ? {} : { scale: 1.02 }}
+      whileTap={disabled ? {} : { scale: 0.98 }}
+      onClick={onClick}
+      disabled={disabled}
+      className="w-full py-4 rounded-2xl flex items-center justify-center gap-2 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
       style={{
         background: 'linear-gradient(135deg, rgba(201,162,39,0.95) 0%, rgba(180,140,30,1) 100%)',
         color: '#0a0a0f',
@@ -507,8 +686,12 @@ function ContinueButton({ onClick }: { onClick: () => void }) {
         border: '1px solid rgba(255,255,255,0.2)',
       }}
     >
-      Continue
-      <ChevronRight className="w-5 h-5" />
+      {children || (
+        <>
+          Continue
+          <ChevronRight className="w-5 h-5" />
+        </>
+      )}
     </motion.button>
   );
 }
