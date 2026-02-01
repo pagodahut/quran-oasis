@@ -4065,6 +4065,511 @@ When you remember Allah, Satan retreats. When you forget, he returns to whisper.
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
+ * UNIT 5: MORE JUZ AMMA SURAHS (Lessons 16-19)
+ * Expanding your memorization with more short surahs
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+const UNIT_5_LESSONS: Lesson[] = [
+  // LESSON 16: Al-Kawthar (Surah 108) - 3 verses
+  {
+    id: "lesson-16",
+    unit: 5,
+    unitTitle: "More Short Surahs",
+    path: "beginner",
+    number: 16,
+    title: "Al-Kawthar - The Abundance",
+    description: "Memorize one of the shortest and most beautiful surahs about Allah's blessings",
+    surah: 108,
+    ayahStart: 1,
+    ayahEnd: 3,
+    estimatedMinutes: 15,
+    xpReward: 40,
+    steps: [
+      {
+        id: "l16-intro",
+        type: "instruction",
+        title: "The Shortest Surah 🌟",
+        content: `**Bismillah! Al-Kawthar is tied for the shortest surah in the Quran!**
+
+With only **3 verses and 10 words**, this is the perfect surah to add to your collection.
+
+**Background:** This surah was revealed to comfort the Prophet ﷺ when his enemies mocked him for having no sons. Allah responded with this powerful message.
+
+**Key meaning:** Allah has given the Prophet ﷺ "Al-Kawthar" - a river in Paradise, but also abundance in followers, blessings, and eternal remembrance.
+
+**The beautiful irony:** The enemies who mocked him are forgotten, while the Prophet ﷺ is remembered billions of times daily!`
+      },
+      {
+        id: "l16-listen",
+        type: "audio",
+        title: "Listen to Al-Kawthar",
+        content: "Listen carefully to this short but powerful surah:",
+        audioSegment: { surah: 108, ayahStart: 1, ayahEnd: 3, repeat: 5 }
+      },
+      {
+        id: "l16-verse1",
+        type: "instruction",
+        title: "Verse 1: The Gift",
+        content: `**إِنَّآ أَعْطَيْنَـٰكَ ٱلْكَوْثَرَ**
+*"Inna a'tayna-kal-kawthar"*
+
+**"Indeed, We have given you Al-Kawthar"**
+
+Notice how Allah says "We" (inna) - this is the majestic "We" showing the greatness of the Giver.
+
+**Al-Kawthar means:**
+• A river in Paradise
+• Abundance and plenty
+• The Prophet's ﷺ followers
+• All forms of goodness`,
+        arabicContent: "إِنَّآ أَعْطَيْنَـٰكَ ٱلْكَوْثَرَ"
+      },
+      {
+        id: "l16-verse2",
+        type: "instruction",
+        title: "Verse 2: The Response",
+        content: `**فَصَلِّ لِرَبِّكَ وَٱنْحَرْ**
+*"Fa-salli li-rabbika wan-har"*
+
+**"So pray to your Lord and sacrifice"**
+
+This is the gratitude Allah asks for - pray and sacrifice. This refers to Eid Al-Adha prayers and sacrifice.
+
+**Connection:** When Allah gives you abundantly, respond with worship and generosity.`,
+        arabicContent: "فَصَلِّ لِرَبِّكَ وَٱنْحَرْ"
+      },
+      {
+        id: "l16-verse3",
+        type: "instruction",
+        title: "Verse 3: The Promise",
+        content: `**إِنَّ شَانِئَكَ هُوَ ٱلْأَبْتَرُ**
+*"Inna shani-aka huwal-abtar"*
+
+**"Indeed, your enemy - he is the one cut off"**
+
+**Abtar** means "cut off" - without legacy, without remembrance.
+
+The enemies who mocked the Prophet ﷺ for having no sons? They are the ones forgotten. The Prophet ﷺ has billions of followers who send salawat upon him daily!`,
+        arabicContent: "إِنَّ شَانِئَكَ هُوَ ٱلْأَبْتَرُ"
+      },
+      {
+        id: "l16-practice",
+        type: "practice",
+        title: "Memorize Al-Kawthar",
+        content: "Only 3 verses! Use the 10-3 method:\n1. Read each verse 10 times while looking\n2. Recite 3 times from memory\n3. Connect all three verses together",
+        audioSegment: { surah: 108, ayahStart: 1, ayahEnd: 3, repeat: 10 }
+      },
+      {
+        id: "l16-complete",
+        type: "instruction",
+        title: "Al-Kawthar Memorized! 🎉",
+        content: `**Masha'Allah! You've memorized Al-Kawthar!**
+
+**Your Hifz Progress:**
+5 surahs memorized:
+• Al-Fatiha (7 verses)
+• Al-Ikhlas (4 verses)
+• Al-Falaq (5 verses)
+• An-Nas (6 verses)
+• Al-Kawthar (3 verses)
+
+**Total: 25 verses!**
+
+**Tip:** Recite Al-Kawthar after every prayer - it's short but full of meaning!`
+      }
+    ],
+    memorizationTechniques: [
+      "Only 10 words total - perfect for quick memorization",
+      "Three rhyming endings: kawthar, wan-har, abtar",
+      "Think: Gift → Gratitude → Promise"
+    ],
+    keyVocabulary: [
+      { arabic: "ٱلْكَوْثَرَ", transliteration: "Al-Kawthar", meaning: "Abundance / River in Paradise" },
+      { arabic: "فَصَلِّ", transliteration: "Fa-salli", meaning: "So pray" },
+      { arabic: "وَٱنْحَرْ", transliteration: "Wan-har", meaning: "And sacrifice" },
+      { arabic: "شَانِئَكَ", transliteration: "Shani-aka", meaning: "Your enemy/hater" },
+      { arabic: "ٱلْأَبْتَرُ", transliteration: "Al-Abtar", meaning: "The one cut off" }
+    ]
+  },
+
+  // LESSON 17: Al-Asr (Surah 103) - 3 verses
+  {
+    id: "lesson-17",
+    unit: 5,
+    unitTitle: "More Short Surahs",
+    path: "beginner",
+    number: 17,
+    title: "Al-Asr - The Time",
+    description: "Learn the surah that Imam Shafi'i said contains all of Islam's guidance",
+    surah: 103,
+    ayahStart: 1,
+    ayahEnd: 3,
+    estimatedMinutes: 15,
+    xpReward: 40,
+    steps: [
+      {
+        id: "l17-intro",
+        type: "instruction",
+        title: "The Surah That Contains All of Islam",
+        content: `**Imam Shafi'i said:** "If only this surah was revealed, it would have been enough for guidance."
+
+**Why?** In just 3 verses, Al-Asr tells us:
+1. What we're losing (Time)
+2. Who's succeeding (Believers who do good)
+3. How to succeed (Faith + Good deeds + Truth + Patience)
+
+This is the formula for a successful life!
+
+**Did you know?** The Sahabah would not part ways without reciting this surah to each other!`
+      },
+      {
+        id: "l17-listen",
+        type: "audio",
+        title: "Listen to Al-Asr",
+        content: "Listen to this profound surah:",
+        audioSegment: { surah: 103, ayahStart: 1, ayahEnd: 3, repeat: 5 }
+      },
+      {
+        id: "l17-verse1",
+        type: "instruction",
+        title: "Verse 1: The Oath",
+        content: `**وَٱلْعَصْرِ**
+*"Wal-'Asr"*
+
+**"By Time"**
+
+Allah swears by Time itself! When Allah swears by something, pay attention - it's important.
+
+**Why Time?** Because time is our most precious resource. Every moment that passes never returns. We are all in a race against time.`,
+        arabicContent: "وَٱلْعَصْرِ"
+      },
+      {
+        id: "l17-verse2",
+        type: "instruction",
+        title: "Verse 2: The Reality",
+        content: `**إِنَّ ٱلْإِنسَـٰنَ لَفِى خُسْرٍ**
+*"Innal-insana la-fee khusr"*
+
+**"Indeed, mankind is in loss"**
+
+Without exception, every human is losing... their time, their life, heading toward regret.
+
+**Khusr** comes from "khasara" - to lose in business. We're all in a transaction with time, and most are losing!`,
+        arabicContent: "إِنَّ ٱلْإِنسَـٰنَ لَفِى خُسْرٍ"
+      },
+      {
+        id: "l17-verse3",
+        type: "instruction",
+        title: "Verse 3: The Exception",
+        content: `**إِلَّا ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ وَتَوَاصَوْا۟ بِٱلْحَقِّ وَتَوَاصَوْا۟ بِٱلصَّبْرِ**
+*"Illal-ladheena amanu wa 'amilus-salihati, wa tawasau bil-haqqi wa tawasau bis-sabr"*
+
+**"Except those who believe, do good deeds, advise each other to truth, and advise each other to patience"**
+
+**The 4 requirements to escape loss:**
+1. **Faith** (Iman)
+2. **Good deeds** (Action)
+3. **Advising truth** (Community)
+4. **Advising patience** (Perseverance)
+
+You need ALL FOUR!`,
+        arabicContent: "إِلَّا ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ وَتَوَاصَوْا۟ بِٱلْحَقِّ وَتَوَاصَوْا۟ بِٱلصَّبْرِ"
+      },
+      {
+        id: "l17-practice",
+        type: "practice",
+        title: "Memorize Al-Asr",
+        content: "The third verse is longer but it follows a beautiful pattern. Use the 10-3 method.",
+        audioSegment: { surah: 103, ayahStart: 1, ayahEnd: 3, repeat: 10 }
+      },
+      {
+        id: "l17-complete",
+        type: "instruction",
+        title: "Al-Asr Memorized! 🎉",
+        content: `**Masha'Allah! You've memorized Al-Asr!**
+
+**Your Hifz Progress:**
+6 surahs memorized:
+• Al-Fatiha (7 verses)
+• Al-Ikhlas (4 verses)
+• Al-Falaq (5 verses)
+• An-Nas (6 verses)
+• Al-Kawthar (3 verses)
+• Al-Asr (3 verses)
+
+**Total: 28 verses!**
+
+**Life tip:** The Sahabah would recite Al-Asr when parting. Start doing this with your friends and family!`
+      }
+    ],
+    memorizationTechniques: [
+      "Verse 3 has four 'wa' connections - Faith AND deeds AND truth AND patience",
+      "The rhyme: 'Asr - khusr - sabr",
+      "Think: Problem (loss) → Solution (4 things)"
+    ],
+    keyVocabulary: [
+      { arabic: "ٱلْعَصْرِ", transliteration: "Al-'Asr", meaning: "The Time / The Declining Day" },
+      { arabic: "خُسْرٍ", transliteration: "Khusr", meaning: "Loss" },
+      { arabic: "ءَامَنُوا۟", transliteration: "Amanu", meaning: "They believed" },
+      { arabic: "تَوَاصَوْا۟", transliteration: "Tawasau", meaning: "They advised each other" },
+      { arabic: "ٱلصَّبْرِ", transliteration: "As-Sabr", meaning: "Patience" }
+    ]
+  },
+
+  // LESSON 18: An-Nasr (Surah 110) - 3 verses
+  {
+    id: "lesson-18",
+    unit: 5,
+    unitTitle: "More Short Surahs",
+    path: "beginner",
+    number: 18,
+    title: "An-Nasr - The Victory",
+    description: "Memorize the last surah revealed to the Prophet ﷺ",
+    surah: 110,
+    ayahStart: 1,
+    ayahEnd: 3,
+    estimatedMinutes: 15,
+    xpReward: 40,
+    steps: [
+      {
+        id: "l18-intro",
+        type: "instruction",
+        title: "The Final Revelation",
+        content: `**This is one of the last surahs revealed to the Prophet ﷺ.**
+
+When it was revealed, the Prophet ﷺ understood it as a sign that his mission was complete and his time was near.
+
+**Historical context:** Revealed after the conquest of Makkah, when people embraced Islam in crowds.
+
+**A beautiful ending:** After years of struggle, the Prophet ﷺ witnessed his life's work succeed. But his response? Humble gratitude and seeking forgiveness.`
+      },
+      {
+        id: "l18-listen",
+        type: "audio",
+        title: "Listen to An-Nasr",
+        content: "Listen to this historic surah:",
+        audioSegment: { surah: 110, ayahStart: 1, ayahEnd: 3, repeat: 5 }
+      },
+      {
+        id: "l18-verse1",
+        type: "instruction",
+        title: "Verse 1: The Victory",
+        content: `**إِذَا جَآءَ نَصْرُ ٱللَّهِ وَٱلْفَتْحُ**
+*"Idha ja-a nasrullahi wal-fath"*
+
+**"When the victory of Allah comes and the conquest"**
+
+**An-Nasr** = Victory, Help from Allah
+**Al-Fath** = The Opening/Conquest (refers to Makkah)
+
+This refers to the conquest of Makkah - the city that persecuted Muslims for 21 years opened its doors to Islam.`,
+        arabicContent: "إِذَا جَآءَ نَصْرُ ٱللَّهِ وَٱلْفَتْحُ"
+      },
+      {
+        id: "l18-verse2",
+        type: "instruction",
+        title: "Verse 2: The Result",
+        content: `**وَرَأَيْتَ ٱلنَّاسَ يَدْخُلُونَ فِى دِينِ ٱللَّهِ أَفْوَاجًا**
+*"Wa ra-aytan-nasa yadkhuloona fee dinil-lahi afwaja"*
+
+**"And you see the people entering into the religion of Allah in multitudes"**
+
+**Afwaj** = Groups, waves, crowds
+
+Before this, people accepted Islam one by one. Now entire tribes entered together!`,
+        arabicContent: "وَرَأَيْتَ ٱلنَّاسَ يَدْخُلُونَ فِى دِينِ ٱللَّهِ أَفْوَاجًا"
+      },
+      {
+        id: "l18-verse3",
+        type: "instruction",
+        title: "Verse 3: The Response",
+        content: `**فَسَبِّحْ بِحَمْدِ رَبِّكَ وَٱسْتَغْفِرْهُ ۚ إِنَّهُۥ كَانَ تَوَّابًا**
+*"Fa-sabbih bi-hamdi rabbika was-taghfirhu, innahu kana tawwaba"*
+
+**"Then glorify the praises of your Lord and seek His forgiveness. Indeed, He is ever Accepting of repentance."**
+
+**The Prophet's ﷺ response to success:** Not pride, but humility. Not celebration, but worship and istighfar.
+
+This is the model for us: When Allah gives you success, increase in worship and humility.`,
+        arabicContent: "فَسَبِّحْ بِحَمْدِ رَبِّكَ وَٱسْتَغْفِرْهُ ۚ إِنَّهُۥ كَانَ تَوَّابًا"
+      },
+      {
+        id: "l18-practice",
+        type: "practice",
+        title: "Memorize An-Nasr",
+        content: "Three verses about the greatest victory in Islamic history. Use the 10-3 method.",
+        audioSegment: { surah: 110, ayahStart: 1, ayahEnd: 3, repeat: 10 }
+      },
+      {
+        id: "l18-complete",
+        type: "instruction",
+        title: "An-Nasr Memorized! 🎉",
+        content: `**Masha'Allah! You've memorized An-Nasr!**
+
+**Your Hifz Progress:**
+7 surahs memorized:
+• Al-Fatiha (7 verses)
+• Al-Ikhlas (4 verses)
+• Al-Falaq (5 verses)
+• An-Nas (6 verses)
+• Al-Kawthar (3 verses)
+• Al-Asr (3 verses)
+• An-Nasr (3 verses)
+
+**Total: 31 verses!**
+
+**Life lesson:** When you succeed, don't celebrate with arrogance - celebrate with gratitude and humility.`
+      }
+    ],
+    memorizationTechniques: [
+      "Three verses about three things: Victory, People entering, Your response",
+      "End rhyme: fath, afwaja, tawwaba",
+      "Think: Event → Observation → Action"
+    ],
+    keyVocabulary: [
+      { arabic: "نَصْرُ", transliteration: "Nasr", meaning: "Victory/Help" },
+      { arabic: "ٱلْفَتْحُ", transliteration: "Al-Fath", meaning: "The Conquest/Opening" },
+      { arabic: "أَفْوَاجًا", transliteration: "Afwaja", meaning: "In multitudes/groups" },
+      { arabic: "سَبِّحْ", transliteration: "Sabbih", meaning: "Glorify" },
+      { arabic: "ٱسْتَغْفِرْهُ", transliteration: "Istaghfirhu", meaning: "Seek His forgiveness" },
+      { arabic: "تَوَّابًا", transliteration: "Tawwaba", meaning: "Accepting of repentance" }
+    ]
+  },
+
+  // LESSON 19: Al-Kafirun (Surah 109) - 6 verses
+  {
+    id: "lesson-19",
+    unit: 5,
+    unitTitle: "More Short Surahs",
+    path: "beginner",
+    number: 19,
+    title: "Al-Kafirun - The Disbelievers",
+    description: "Learn the surah of religious freedom and clear distinction",
+    surah: 109,
+    ayahStart: 1,
+    ayahEnd: 6,
+    estimatedMinutes: 20,
+    xpReward: 50,
+    steps: [
+      {
+        id: "l19-intro",
+        type: "instruction",
+        title: "The Surah of Clear Distinction",
+        content: `**Al-Kafirun is called "Al-Muqashqisha" - The Separator**
+
+**Background:** The Quraysh offered the Prophet ﷺ a deal: "Worship our gods for a year, we'll worship yours for a year."
+
+This surah was the answer: a clear, uncompromising NO.
+
+**But notice:** It's not hostile or violent. It simply states: "You have your way, I have mine."
+
+This is the foundation of religious freedom in Islam - no compulsion, but also no compromise.`
+      },
+      {
+        id: "l19-listen",
+        type: "audio",
+        title: "Listen to Al-Kafirun",
+        content: "Listen to this powerful declaration:",
+        audioSegment: { surah: 109, ayahStart: 1, ayahEnd: 6, repeat: 5 }
+      },
+      {
+        id: "l19-verse1",
+        type: "instruction",
+        title: "Verse 1: The Address",
+        content: `**قُلْ يَـٰٓأَيُّهَا ٱلْكَـٰفِرُونَ**
+*"Qul ya ayyuhal-kafirun"*
+
+**"Say: O disbelievers"**
+
+Allah commands the Prophet ﷺ to address them directly and clearly. No ambiguity.`,
+        arabicContent: "قُلْ يَـٰٓأَيُّهَا ٱلْكَـٰفِرُونَ"
+      },
+      {
+        id: "l19-verse2-3",
+        type: "instruction",
+        title: "Verses 2-3: The Declaration",
+        content: `**لَآ أَعْبُدُ مَا تَعْبُدُونَ • وَلَآ أَنتُمْ عَـٰبِدُونَ مَآ أَعْبُدُ**
+*"La a'budu ma ta'budun. Wa la antum 'abiduna ma a'bud"*
+
+**"I do not worship what you worship. Nor are you worshippers of what I worship."**
+
+Present tense - "I do not worship" (right now). Clear statement of current reality.`,
+        arabicContent: "لَآ أَعْبُدُ مَا تَعْبُدُونَ • وَلَآ أَنتُمْ عَـٰبِدُونَ مَآ أَعْبُدُ"
+      },
+      {
+        id: "l19-verse4-5",
+        type: "instruction",
+        title: "Verses 4-5: The Confirmation",
+        content: `**وَلَآ أَنَا۠ عَابِدٌ مَّا عَبَدتُّمْ • وَلَآ أَنتُمْ عَـٰبِدُونَ مَآ أَعْبُدُ**
+*"Wa la ana 'abidun ma 'abadtum. Wa la antum 'abiduna ma a'bud"*
+
+**"Nor will I be a worshipper of what you worship. Nor will you be worshippers of what I worship."**
+
+Why the repetition? Some say verses 2-3 are about the present, verses 4-5 are about the future (I will NEVER worship what you worship).`,
+        arabicContent: "وَلَآ أَنَا۠ عَابِدٌ مَّا عَبَدتُّمْ • وَلَآ أَنتُمْ عَـٰبِدُونَ مَآ أَعْبُدُ"
+      },
+      {
+        id: "l19-verse6",
+        type: "instruction",
+        title: "Verse 6: The Conclusion",
+        content: `**لَكُمْ دِينُكُمْ وَلِىَ دِينِ**
+*"Lakum dinukum wa li-ya din"*
+
+**"For you is your religion, and for me is mine."**
+
+This powerful ending establishes:
+• Clear boundaries
+• No compromise in faith
+• Mutual coexistence without mixing beliefs`,
+        arabicContent: "لَكُمْ دِينُكُمْ وَلِىَ دِينِ"
+      },
+      {
+        id: "l19-practice",
+        type: "practice",
+        title: "Memorize Al-Kafirun",
+        content: "Six verses with beautiful repetition. The pattern makes it easier to memorize!",
+        audioSegment: { surah: 109, ayahStart: 1, ayahEnd: 6, repeat: 10 }
+      },
+      {
+        id: "l19-complete",
+        type: "instruction",
+        title: "Al-Kafirun Memorized! 🎉",
+        content: `**Masha'Allah! You've memorized Al-Kafirun!**
+
+**Your Hifz Progress:**
+8 surahs memorized:
+• Al-Fatiha (7 verses)
+• Al-Ikhlas (4 verses)
+• Al-Falaq (5 verses)
+• An-Nas (6 verses)
+• Al-Kawthar (3 verses)
+• Al-Asr (3 verses)
+• An-Nasr (3 verses)
+• Al-Kafirun (6 verses)
+
+**Total: 37 verses!**
+
+**Sunnah:** Recite Al-Kafirun in the first rak'ah of Sunnah before Fajr and in Witr prayer!`
+      }
+    ],
+    memorizationTechniques: [
+      "Verses 2-3 and 4-5 are almost identical - memorize them as pairs",
+      "The repetition reinforces the message",
+      "Final verse is the summary: 'your way, my way'"
+    ],
+    keyVocabulary: [
+      { arabic: "ٱلْكَـٰفِرُونَ", transliteration: "Al-Kafirun", meaning: "The Disbelievers" },
+      { arabic: "أَعْبُدُ", transliteration: "A'budu", meaning: "I worship" },
+      { arabic: "عَـٰبِدُونَ", transliteration: "'Abidun", meaning: "Worshippers" },
+      { arabic: "دِينُكُمْ", transliteration: "Dinukum", meaning: "Your religion" },
+      { arabic: "دِينِ", transliteration: "Din", meaning: "My religion" }
+    ]
+  }
+];
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
  * EXPORTS AND UTILITY FUNCTIONS
  * ═══════════════════════════════════════════════════════════════════════════
  */
@@ -4074,7 +4579,8 @@ export const ALL_BEGINNER_LESSONS: Lesson[] = [
   ...UNIT_1_LESSONS,
   ...UNIT_2_LESSONS,
   ...UNIT_3_LESSONS,
-  ...UNIT_4_LESSONS
+  ...UNIT_4_LESSONS,
+  ...UNIT_5_LESSONS
 ];
 
 /**
@@ -4126,5 +4632,6 @@ export const UNITS = [
   { number: 1, title: "Arabic Foundations", lessons: 5, description: "Learn the Arabic alphabet from scratch" },
   { number: 2, title: "Reading Skills", lessons: 3, description: "Master vowels and reading" },
   { number: 3, title: "Your First Surah - Al-Fatiha", lessons: 4, description: "Memorize the Opening Chapter" },
-  { number: 4, title: "Short Surahs", lessons: 3, description: "Build your memorization repertoire" }
+  { number: 4, title: "Short Surahs", lessons: 3, description: "Build your memorization repertoire" },
+  { number: 5, title: "More Juz Amma", lessons: 4, description: "Al-Kawthar, Al-Asr, An-Nasr, Al-Kafirun" }
 ];
