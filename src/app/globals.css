@@ -1903,3 +1903,353 @@ input[type="range"]::-moz-range-thumb {
     transform: scale(0.98);
   }
 }
+
+/* ============================================
+   Accessibility Enhancements
+   ============================================ */
+@layer utilities {
+  /* Skip link for keyboard navigation */
+  .skip-link {
+    @apply absolute -top-10 left-4 z-[100] px-4 py-2 
+           bg-gold-500 text-night-950 font-semibold rounded-lg
+           transition-all duration-200;
+  }
+  
+  .skip-link:focus {
+    @apply top-4;
+  }
+  
+  /* Enhanced focus indicators */
+  .focus-visible-ring {
+    @apply focus:outline-none focus-visible:ring-2 
+           focus-visible:ring-gold-500/70 focus-visible:ring-offset-2 
+           focus-visible:ring-offset-night-950;
+  }
+  
+  /* High contrast focus for buttons */
+  .btn:focus-visible,
+  .liquid-btn:focus-visible,
+  .liquid-btn-outline:focus-visible {
+    @apply ring-2 ring-gold-400 ring-offset-2 ring-offset-night-950 outline-none;
+  }
+  
+  /* Keyboard navigation indicators */
+  [data-focus-visible-added] {
+    @apply ring-2 ring-gold-500/70 ring-offset-2 ring-offset-night-950;
+  }
+}
+
+/* ============================================
+   Mobile-First Polish
+   ============================================ */
+@layer utilities {
+  /* Minimum touch target size (44x44px per WCAG) */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Safe touch target with padding */
+  .touch-target-safe {
+    @apply min-h-[48px] min-w-[48px] p-2;
+  }
+  
+  /* Responsive text scaling */
+  .text-responsive-sm {
+    @apply text-xs sm:text-sm;
+  }
+  
+  .text-responsive-base {
+    @apply text-sm sm:text-base;
+  }
+  
+  .text-responsive-lg {
+    @apply text-base sm:text-lg md:text-xl;
+  }
+  
+  .text-responsive-xl {
+    @apply text-lg sm:text-xl md:text-2xl;
+  }
+  
+  /* Mobile-friendly spacing */
+  .mobile-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+  
+  .mobile-section {
+    @apply py-12 sm:py-16 md:py-20;
+  }
+}
+
+/* ============================================
+   Smooth Scroll & Page Transitions
+   ============================================ */
+@layer base {
+  /* Smooth scrolling with reduced motion support */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Page transition wrapper */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 200ms ease-in, transform 200ms ease-in;
+}
+
+/* ============================================
+   Improved Button States
+   ============================================ */
+@layer components {
+  /* Button press feedback */
+  .btn,
+  .liquid-btn,
+  .liquid-btn-outline,
+  .liquid-icon-btn {
+    @apply transition-all duration-150;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .btn:active,
+  .liquid-btn:active,
+  .liquid-btn-outline:active,
+  .liquid-icon-btn:active {
+    transform: scale(0.97);
+  }
+  
+  /* Disabled states */
+  .btn:disabled,
+  .liquid-btn:disabled,
+  .liquid-btn-outline:disabled {
+    @apply opacity-50 cursor-not-allowed;
+    transform: none;
+  }
+}
+
+/* ============================================
+   Mobile Recording UI Polish
+   ============================================ */
+@layer components {
+  /* Large record button for mobile */
+  .record-btn-large {
+    @apply w-20 h-20 sm:w-24 sm:h-24 rounded-full 
+           flex items-center justify-center
+           transition-all duration-200
+           shadow-lg;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .record-btn-large:active {
+    transform: scale(0.95);
+  }
+  
+  .record-btn-large.recording {
+    @apply animate-pulse bg-red-500;
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    animation: recording-ring 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes recording-ring {
+    0% {
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+  }
+  
+  /* Audio level bars animation */
+  .audio-level-bar {
+    @apply w-1 sm:w-1.5 bg-gold-500 rounded-full transition-all duration-75;
+  }
+}
+
+/* ============================================
+   Modal & Sheet Mobile Optimization
+   ============================================ */
+@layer components {
+  /* Full-height modal on mobile */
+  .modal-mobile-full {
+    @apply fixed inset-0 sm:inset-auto sm:relative;
+    @apply sm:max-w-lg sm:mx-auto sm:my-8;
+    @apply sm:rounded-3xl;
+  }
+  
+  /* Bottom sheet handle */
+  .sheet-handle {
+    @apply w-10 h-1 bg-night-600 rounded-full mx-auto mt-3 mb-2;
+  }
+  
+  /* Swipeable sheet */
+  .swipeable-sheet {
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+  }
+}
+
+/* ============================================
+   Improved Card Interactions
+   ============================================ */
+@layer components {
+  /* Interactive card with better mobile feedback */
+  .card-interactive {
+    @apply transition-all duration-200 cursor-pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .card-interactive:active {
+    @apply scale-[0.98] opacity-90;
+  }
+  
+  @media (hover: hover) {
+    .card-interactive:hover {
+      @apply scale-[1.01] shadow-lg;
+    }
+  }
+}
+
+/* ============================================
+   Safe Area Helpers
+   ============================================ */
+@layer utilities {
+  /* iOS notch-aware spacing */
+  .pt-safe-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+  
+  .pb-safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  
+  /* Bottom nav clearance */
+  .mb-nav {
+    margin-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  }
+  
+  .pb-nav {
+    padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* ============================================
+   Lazy Loading Images
+   ============================================ */
+@layer utilities {
+  /* Placeholder for loading images */
+  .img-loading {
+    @apply bg-night-800 animate-pulse;
+  }
+  
+  /* Fade in when loaded */
+  .img-loaded {
+    animation: img-fade-in 0.3s ease-out;
+  }
+  
+  @keyframes img-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+/* ============================================
+   Arabic Text Mobile Optimization
+   ============================================ */
+@layer components {
+  /* Responsive Arabic text */
+  .quran-text-responsive {
+    font-family: var(--font-quran);
+    direction: rtl;
+    @apply text-xl sm:text-2xl md:text-3xl leading-[2.2] sm:leading-[2.5];
+  }
+  
+  /* Word-by-word mobile optimization */
+  .word-tap-target {
+    @apply min-h-[44px] min-w-[32px] flex items-center justify-center
+           px-1.5 sm:px-2 py-1 rounded-lg
+           transition-colors duration-150;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .word-tap-target:active {
+    @apply bg-gold-500/20;
+  }
+}
+
+/* ============================================
+   Onboarding Flow Polish
+   ============================================ */
+@layer components {
+  /* Onboarding option cards */
+  .onboarding-option {
+    @apply w-full text-left p-4 rounded-2xl 
+           transition-all duration-200
+           min-h-[72px]
+           border border-night-800/50
+           bg-night-900/30;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .onboarding-option:active {
+    @apply scale-[0.98];
+  }
+  
+  .onboarding-option.selected {
+    @apply border-gold-500/40 bg-gold-500/10;
+    box-shadow: 0 0 20px rgba(201, 162, 39, 0.1);
+  }
+  
+  /* Progress dots */
+  .progress-dot {
+    @apply w-2 h-2 rounded-full transition-all duration-300;
+  }
+  
+  .progress-dot.active {
+    @apply w-6 bg-gold-500;
+  }
+  
+  .progress-dot.complete {
+    @apply bg-sage-500;
+  }
+  
+  .progress-dot.pending {
+    @apply bg-night-700;
+  }
+}

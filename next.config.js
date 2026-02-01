@@ -7,7 +7,12 @@ const nextConfig = {
     },
   },
   images: {
-    domains: ['everyayah.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'everyayah.com',
+      },
+    ],
     unoptimized: true, // For static export
   },
   // PWA headers

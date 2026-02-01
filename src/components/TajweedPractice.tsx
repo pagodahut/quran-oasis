@@ -239,23 +239,35 @@ export default function TajweedPractice({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-night-950/95 backdrop-blur-sm flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-night-950/95 backdrop-blur-sm flex items-end sm:items-center justify-center"
       onClick={(e) => e.target === e.currentTarget && onClose()}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="tajweed-practice-title"
     >
       <motion.div
-        initial={{ scale: 0.9, y: 20 }}
+        initial={{ scale: 0.95, y: 100 }}
         animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.9, y: 20 }}
-        className="liquid-modal w-full max-w-lg max-h-[90vh] overflow-y-auto"
+        exit={{ scale: 0.95, y: 100 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        className="liquid-modal w-full sm:max-w-lg max-h-[95vh] sm:max-h-[90vh] overflow-y-auto 
+                   rounded-t-3xl sm:rounded-3xl sm:mx-4"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Sheet handle for mobile */}
+        <div className="sm:hidden sheet-handle" />
+        
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-night-800/50">
+        <div className="flex items-center justify-between p-4 border-b border-night-800/50 sticky top-0 bg-night-900/95 backdrop-blur-sm z-10">
           <div>
-            <h2 className="font-semibold text-night-100">Tajweed Practice</h2>
+            <h2 id="tajweed-practice-title" className="font-semibold text-night-100">Tajweed Practice</h2>
             <p className="text-xs text-night-500">Surah {surah}, Ayah {ayah}</p>
           </div>
-          <button onClick={onClose} className="btn-icon">
+          <button 
+            onClick={onClose} 
+            className="btn-icon touch-target focus-visible-ring"
+            aria-label="Close practice session"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -437,13 +449,13 @@ export default function TajweedPractice({
 
                 {/* Recording controls */}
                 <div className="flex flex-col items-center gap-4">
-                  {/* Audio level visualizer */}
+                  {/* Audio level visualizer - mobile optimized */}
                   {isRecording && (
-                    <div className="flex items-center gap-1 h-12">
-                      {Array.from({ length: 20 }).map((_, i) => (
+                    <div className="flex items-center gap-1 h-12 px-4" role="status" aria-label="Audio level indicator">
+                      {Array.from({ length: 15 }).map((_, i) => (
                         <motion.div
                           key={i}
-                          className="w-1.5 bg-gold-500 rounded-full"
+                          className="audio-level-bar"
                           animate={{
                             height: Math.max(8, audioLevel * 100 * Math.random()),
                           }}
@@ -455,28 +467,26 @@ export default function TajweedPractice({
 
                   {/* Duration */}
                   {isRecording && (
-                    <p className="text-gold-400 font-mono text-xl">
+                    <p className="text-gold-400 font-mono text-xl sm:text-2xl" aria-live="polite">
                       {formatDuration(recordingDuration)}
                     </p>
                   )}
 
-                  {/* Record button */}
+                  {/* Record button - larger touch target */}
                   <button
                     onClick={isRecording ? handleStopRecording : handleStartRecording}
-                    className={`w-24 h-24 rounded-full flex items-center justify-center transition-all ${
-                      isRecording
-                        ? 'bg-red-500 text-white animate-pulse'
-                        : 'bg-gold-500 text-night-950 hover:bg-gold-400'
-                    }`}
+                    aria-label={isRecording ? 'Stop recording' : 'Start recording'}
+                    aria-pressed={isRecording}
+                    className={`record-btn-large ${isRecording ? 'recording' : 'bg-gold-500 text-night-950 hover:bg-gold-400'}`}
                   >
                     {isRecording ? (
-                      <Square className="w-10 h-10" />
+                      <Square className="w-8 h-8 sm:w-10 sm:h-10" />
                     ) : (
-                      <Mic className="w-12 h-12" />
+                      <Mic className="w-10 h-10 sm:w-12 sm:h-12" />
                     )}
                   </button>
                   
-                  <p className="text-night-400 text-sm">
+                  <p className="text-night-400 text-sm text-center px-4">
                     {isRecording ? 'Tap to stop' : 'Tap to start recording'}
                   </p>
 

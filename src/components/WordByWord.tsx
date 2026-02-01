@@ -189,12 +189,12 @@ export default function WordByWord({
               onClick={() => handleWordTap(index, word)}
               onMouseEnter={() => setHoveredWordIndex(index)}
               onMouseLeave={() => setHoveredWordIndex(-1)}
-              className={`word-item relative px-2 py-1 rounded-lg transition-all duration-200 ${
+              className={`word-tap-target relative rounded-lg transition-all duration-200 focus-visible-ring ${
                 isCurrentWord || isPlayingWord
-                  ? 'bg-gold-500/30 text-gold-300 scale-105 shadow-glow-gold'
+                  ? 'bg-gold-500/30 text-gold-300 shadow-glow-gold'
                   : isHovered
                     ? 'bg-night-800/60 text-night-100'
-                    : 'text-night-200 hover:text-night-100'
+                    : 'text-night-200'
               }`}
               style={{
                 fontFamily: 'var(--font-quran)',
@@ -204,7 +204,8 @@ export default function WordByWord({
                 scale: isCurrentWord ? 1.08 : isPlayingWord ? 1.05 : 1,
               }}
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-              aria-label={`Word ${index + 1}: ${word.text}`}
+              aria-label={`Word ${index + 1}: ${word.text}. Tap to hear pronunciation.`}
+              aria-pressed={isPlayingWord}
             >
               {/* Word text */}
               <span className="relative z-10">{word.text}</span>
