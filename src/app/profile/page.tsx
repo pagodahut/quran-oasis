@@ -1,7 +1,9 @@
 'use client';
 
+import { useUser, SignOutButton, useClerk } from '@clerk/nextjs';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 import { 
   ChevronLeft, 
   Settings,
@@ -13,7 +15,6 @@ import {
   Clock,
   Target,
   ChevronRight,
-  Bell,
   Volume2,
   Palette,
   Shield,
@@ -21,8 +22,13 @@ import {
   LogOut,
   Bookmark,
   List,
+  User,
+  Mail,
+  Edit3,
+  Loader2,
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
+import { getProgressStats, getSurahProgressList } from '@/lib/progressStore';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
@@ -39,27 +45,6 @@ const stagger = {
       staggerChildren: 0.08
     }
   }
-};
-
-// Mock user data - would come from auth/database in real app
-const userData = {
-  name: 'Abdullah',
-  email: 'abdullah@example.com',
-  joinedDate: 'Ramadan 1445',
-  stats: {
-    versesMemorized: 142,
-    surahsCompleted: 4,
-    currentStreak: 12,
-    totalDaysActive: 45,
-    averageSessionMinutes: 18,
-    totalMinutesLearned: 810,
-  },
-  recentSurahs: [
-    { number: 1, name: 'Al-Fatihah', progress: 100 },
-    { number: 112, name: 'Al-Ikhlas', progress: 100 },
-    { number: 113, name: 'Al-Falaq', progress: 100 },
-    { number: 114, name: 'An-Nas', progress: 75 },
-  ],
 };
 
 function StatCard({ icon: Icon, value, label, color }: { 
@@ -111,6 +96,68 @@ function SettingsRow({ icon: Icon, label, href, onClick }: {
 }
 
 export default function ProfilePage() {
+  const { user, isLoaded, isSignedIn } = useUser();
+  const { openUserProfile } = useClerk();
+  const [stats, setStats] = useState({
+    versesMemorized: 0,
+    surahsCompleted: 0,
+    currentStreak: 0,
+    totalDaysActive: 0,
+    averageSessionMinutes: 0,
+    totalMinutesLearned: 0,
+  });
+  const [recentSurahs, setRecentSurahs] = useState<Array<{
+    number: number;
+    name: string;
+    progress: number;
+  }>>([]);
+
+  // Load progress from local storage
+  useEffect(() => {
+    const progressStats = getProgressStats();
+    const surahProgress = getSurahProgressList();
+    
+    // Convert surah progress to recent surahs
+    const surahs = Object.entries(surahProgress)
+      .map(([num, data]) => ({
+        number: parseInt(num),
+        name: data.name || `Surah ${num}`,
+        progress: data.progress || 0
+      }))
+      .filter(s => s.progress > 0)
+      .sort((a, b) => b.progress - a.progress)
+      .slice(0, 4);
+
+    setRecentSurahs(surahs.length > 0 ? surahs : [
+      { number: 1, name: 'Al-Fatihah', progress: 0 },
+    ]);
+
+    setStats({
+      versesMemorized: progressStats.versesMemorized || 0,
+      surahsCompleted: progressStats.surahsCompleted || 0,
+      currentStreak: progressStats.currentStreak || 0,
+      totalDaysActive: progressStats.totalDaysActive || 1,
+      averageSessionMinutes: progressStats.averageSessionMinutes || 0,
+      totalMinutesLearned: progressStats.totalMinutesLearned || 0,
+    });
+  }, []);
+
+  // Get user info
+  const displayName = user?.firstName || user?.username || 'Student of Quran';
+  const email = user?.primaryEmailAddress?.emailAddress;
+  const avatarUrl = user?.imageUrl;
+  const joinedDate = user?.createdAt 
+    ? new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(user.createdAt)
+    : 'Just started';
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-night-950 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-gold-400 animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-night-950">
       {/* Header */}
@@ -143,36 +190,89 @@ export default function ProfilePage() {
           >
             {/* Avatar */}
             <div className="relative w-20 h-20 mx-auto mb-4">
-              <div 
-                className="w-full h-full rounded-2xl flex items-center justify-center"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(201, 162, 39, 0.3) 0%, rgba(201, 162, 39, 0.1) 100%)',
-                  border: '2px solid rgba(201, 162, 39, 0.3)',
-                }}
-              >
-                <Moon className="w-10 h-10 text-gold-400" />
-              </div>
+              {isSignedIn && avatarUrl ? (
+                <img 
+                  src={avatarUrl} 
+                  alt={displayName}
+                  className="w-full h-full rounded-2xl object-cover"
+                  style={{
+                    border: '2px solid rgba(201, 162, 39, 0.3)',
+                  }}
+                />
+              ) : (
+                <div 
+                  className="w-full h-full rounded-2xl flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(201, 162, 39, 0.3) 0%, rgba(201, 162, 39, 0.1) 100%)',
+                    border: '2px solid rgba(201, 162, 39, 0.3)',
+                  }}
+                >
+                  <Moon className="w-10 h-10 text-gold-400" />
+                </div>
+              )}
               {/* Streak badge */}
-              <div 
-                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
-                style={{
-                  background: 'linear-gradient(135deg, #c9a227 0%, #8b6914 100%)',
-                  color: '#0a0a0f',
-                  boxShadow: '0 2px 8px rgba(201, 162, 39, 0.4)',
-                }}
-              >
-                {userData.stats.currentStreak}
-              </div>
+              {stats.currentStreak > 0 && (
+                <div 
+                  className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
+                  style={{
+                    background: 'linear-gradient(135deg, #c9a227 0%, #8b6914 100%)',
+                    color: '#0a0a0f',
+                    boxShadow: '0 2px 8px rgba(201, 162, 39, 0.4)',
+                  }}
+                >
+                  {stats.currentStreak}
+                </div>
+              )}
             </div>
             
-            <h2 className="text-xl font-semibold text-night-100 mb-1">{userData.name}</h2>
-            <p className="text-sm text-night-400 mb-3">Joined {userData.joinedDate}</p>
+            <h2 className="text-xl font-semibold text-night-100 mb-1">{displayName}</h2>
+            {email && (
+              <p className="text-sm text-night-400 mb-1 flex items-center justify-center gap-1">
+                <Mail className="w-3 h-3" />
+                {email}
+              </p>
+            )}
+            <p className="text-sm text-night-500 mb-3">Joined {joinedDate}</p>
+            
+            {/* Edit Profile Button (Clerk) */}
+            {isSignedIn && (
+              <button 
+                onClick={() => openUserProfile()}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-night-800/50 text-night-300 text-sm hover:bg-night-800 transition-colors mb-3"
+              >
+                <Edit3 className="w-3 h-3" />
+                Edit Profile
+              </button>
+            )}
             
             {/* Streak info */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold-500/10 text-gold-400 text-sm">
-              <Flame className="w-4 h-4" />
-              <span>{userData.stats.currentStreak} day streak! Keep it up!</span>
-            </div>
+            {stats.currentStreak > 0 ? (
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold-500/10 text-gold-400 text-sm">
+                <Flame className="w-4 h-4" />
+                <span>{stats.currentStreak} day streak! Keep it up!</span>
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-night-800/50 text-night-400 text-sm">
+                <Flame className="w-4 h-4" />
+                <span>Start your streak today!</span>
+              </div>
+            )}
+
+            {/* Sign in prompt for guests */}
+            {!isSignedIn && (
+              <div className="mt-4 pt-4 border-t border-night-800/50">
+                <p className="text-night-400 text-sm mb-3">
+                  Sign in to save your progress across devices
+                </p>
+                <Link 
+                  href="/sign-in"
+                  className="liquid-btn text-sm px-6 py-2 inline-flex items-center gap-2"
+                >
+                  <User className="w-4 h-4" />
+                  Sign In
+                </Link>
+              </div>
+            )}
           </motion.div>
 
           {/* Stats Grid - 2 columns, responsive */}
@@ -181,25 +281,25 @@ export default function ProfilePage() {
             <div className="grid grid-cols-2 gap-3">
               <StatCard 
                 icon={BookOpen} 
-                value={userData.stats.versesMemorized} 
+                value={stats.versesMemorized} 
                 label="Verses Memorized" 
                 color="text-gold-400"
               />
               <StatCard 
                 icon={Award} 
-                value={userData.stats.surahsCompleted} 
+                value={stats.surahsCompleted} 
                 label="Surahs Complete" 
                 color="text-sage-400"
               />
               <StatCard 
                 icon={Calendar} 
-                value={userData.stats.totalDaysActive} 
+                value={stats.totalDaysActive} 
                 label="Days Active" 
                 color="text-indigo-400"
               />
               <StatCard 
                 icon={Clock} 
-                value={`${Math.floor(userData.stats.totalMinutesLearned / 60)}h`} 
+                value={stats.totalMinutesLearned > 0 ? `${Math.floor(stats.totalMinutesLearned / 60)}h` : '0h'} 
                 label="Time Learning" 
                 color="text-rose-400"
               />
@@ -215,7 +315,7 @@ export default function ProfilePage() {
               </Link>
             </div>
             <div className="liquid-card divide-y divide-white/5">
-              {userData.recentSurahs.map((surah) => (
+              {recentSurahs.map((surah) => (
                 <div key={surah.number} className="flex items-center justify-between p-4">
                   <div className="flex items-center gap-3">
                     <div 
@@ -259,13 +359,13 @@ export default function ProfilePage() {
                   <Target className="w-5 h-5 text-gold-400" />
                   <span className="text-night-200">15 minutes / day</span>
                 </div>
-                <span className="text-sm text-night-500">{userData.stats.averageSessionMinutes} min avg</span>
+                <span className="text-sm text-night-500">{stats.averageSessionMinutes} min avg</span>
               </div>
               <div className="h-2 rounded-full bg-night-800 overflow-hidden">
                 <div 
                   className="h-full rounded-full"
                   style={{
-                    width: `${Math.min(100, (userData.stats.averageSessionMinutes / 15) * 100)}%`,
+                    width: `${Math.min(100, (stats.averageSessionMinutes / 15) * 100)}%`,
                     background: 'linear-gradient(90deg, #c9a227 0%, #f4d47c 100%)',
                   }}
                 />
@@ -301,12 +401,16 @@ export default function ProfilePage() {
           </motion.div>
 
           {/* Sign Out - visible at bottom */}
-          <motion.div variants={fadeInUp} className="pt-4">
-            <button className="w-full py-3 px-4 rounded-xl text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2">
-              <LogOut className="w-5 h-5" />
-              <span>Sign Out</span>
-            </button>
-          </motion.div>
+          {isSignedIn && (
+            <motion.div variants={fadeInUp} className="pt-4">
+              <SignOutButton>
+                <button className="w-full py-3 px-4 rounded-xl text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2">
+                  <LogOut className="w-5 h-5" />
+                  <span>Sign Out</span>
+                </button>
+              </SignOutButton>
+            </motion.div>
+          )}
 
           {/* Footer space to ensure content isn't cut off */}
           <div className="h-8" />

@@ -55,6 +55,8 @@ import {
   PracticePrompt,
   ContentBlock,
 } from '@/components/LessonContentRenderer';
+import MemorizationPractice from '@/components/MemorizationPractice';
+import { playAyah, stopPlayback } from '@/lib/quranAudioService';
 
 // ============================================
 // Audio Speaker Button Component
@@ -525,12 +527,16 @@ export default function LessonDetailPage() {
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   
+  // Memorization module state
+  const [showMemorizationModule, setShowMemorizationModule] = useState(false);
+  
   // UI state
   const [showCelebration, setShowCelebration] = useState(false);
   const [showXP, setShowXP] = useState(false);
   
   // Audio state
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlayingReciter, setIsPlayingReciter] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   // Load lesson data
@@ -804,6 +810,23 @@ export default function LessonDetailPage() {
         <CelebrationBurst show={showCelebration} />
         <XPGain amount={lesson.xpReward} show={showXP} />
       </AnimatePresence>
+      
+      {/* Memorization Module Modal */}
+      <AnimatePresence>
+        {showMemorizationModule && currentStep?.audioSegment && (
+          <MemorizationPractice
+            surah={currentStep.audioSegment.surah}
+            ayah={currentStep.audioSegment.ayahStart}
+            arabicText={currentStep.arabicContent || ''}
+            reciterId="alafasy"
+            onComplete={() => {
+              setShowCelebration(true);
+              setTimeout(() => setShowCelebration(false), 800);
+            }}
+            onClose={() => setShowMemorizationModule(false)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Header */}
       <header className="glass sticky top-0 z-40 safe-area-top">
@@ -880,10 +903,91 @@ export default function LessonDetailPage() {
                   />
                 )}
 
-                {/* Main Content */}
-                <div className="prose prose-invert max-w-none">
-                  {renderContent(currentStep.content)}
-                </div>
+                {/* Main Content - check for memorization module */}
+                {currentStep.content === 'MEMORIZATION_MODULE' && currentStep.audioSegment ? (
+                  <div className="space-y-6">
+                    <div className="bg-gold-900/20 rounded-2xl p-6 border border-gold-500/20 text-center">
+                      <h3 className="text-xl font-semibold text-gold-400 mb-2">
+                        🎯 Memorization Practice
+                      </h3>
+                      <p className="text-night-300 mb-4">
+                        Use the 10-3 method to memorize this verse
+                      </p>
+                      <button
+                        onClick={() => setShowMemorizationModule(true)}
+                        className="liquid-btn py-3 px-8 text-lg"
+                      >
+                        <Play className="w-5 h-5 mr-2" />
+                        Start Practice
+                      </button>
+                    </div>
+                    
+                    {/* Show Arabic text as preview */}
+                    {currentStep.arabicContent && (
+                      <div className="bg-night-900/50 rounded-xl p-6">
+                        <p 
+                          className="font-arabic text-2xl text-gold-300 leading-[2] text-center"
+                          style={{ direction: 'rtl' }}
+                        >
+                          {currentStep.arabicContent}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="prose prose-invert max-w-none">
+                    {renderContent(currentStep.content)}
+                  </div>
+                )}
+                
+                {/* Reciter Audio Button - for audio steps */}
+                {currentStep.audioSegment && currentStep.content !== 'MEMORIZATION_MODULE' && (
+                  <div className="mt-6 p-4 bg-night-900/50 rounded-xl border border-night-800/50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Volume2 className="w-5 h-5 text-gold-400" />
+                        <div>
+                          <p className="text-sm font-medium text-night-200">Listen to Reciter</p>
+                          <p className="text-xs text-night-500">Mishary Rashid Alafasy</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={async () => {
+                          if (isPlayingReciter) {
+                            stopPlayback();
+                            setIsPlayingReciter(false);
+                          } else {
+                            setIsPlayingReciter(true);
+                            try {
+                              await playAyah(
+                                currentStep.audioSegment!.surah,
+                                currentStep.audioSegment!.ayahStart,
+                                'alafasy',
+                                {
+                                  onEnd: () => setIsPlayingReciter(false),
+                                  onError: () => setIsPlayingReciter(false),
+                                }
+                              );
+                            } catch {
+                              setIsPlayingReciter(false);
+                            }
+                          }
+                        }}
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
+                          isPlayingReciter 
+                            ? 'bg-gold-500 text-night-950' 
+                            : 'bg-gold-500/20 text-gold-400 hover:bg-gold-500/30'
+                        }`}
+                      >
+                        {isPlayingReciter ? (
+                          <Pause className="w-5 h-5" />
+                        ) : (
+                          <Play className="w-5 h-5 ml-0.5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Exercise Section */}
                 {currentStep.exercise && (

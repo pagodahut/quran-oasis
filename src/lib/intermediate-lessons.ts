@@ -1507,6 +1507,14 @@ Listen and repeat:`,
         audioSegment: { surah: 111, ayahStart: 1, ayahEnd: 5, repeat: 10 }
       },
       {
+        id: "int7-memorization",
+        type: "practice",
+        title: "🎯 Memorization Practice",
+        content: "MEMORIZATION_MODULE",
+        arabicContent: "تَبَّتْ يَدَآ أَبِى لَهَبٍ وَتَبَّ ﴿١﴾ مَآ أَغْنَىٰ عَنْهُ مَالُهُۥ وَمَا كَسَبَ ﴿٢﴾ سَيَصْلَىٰ نَارًا ذَاتَ لَهَبٍ ﴿٣﴾ وَٱمْرَأَتُهُۥ حَمَّالَةَ ٱلْحَطَبِ ﴿٤﴾ فِى جِيدِهَا حَبْلٌ مِّن مَّسَدٍۭ ﴿٥﴾",
+        audioSegment: { surah: 111, ayahStart: 1, ayahEnd: 5 }
+      },
+      {
         id: "int7-review",
         type: "instruction",
         title: "Al-Masad Memorized! 🌟",
@@ -1769,6 +1777,14 @@ Listen and repeat:`,
         audioSegment: { surah: 105, ayahStart: 1, ayahEnd: 5, repeat: 10 }
       },
       {
+        id: "int8-memorization",
+        type: "practice",
+        title: "🎯 Memorization Practice",
+        content: "MEMORIZATION_MODULE",
+        arabicContent: "أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِأَصْحَـٰبِ ٱلْفِيلِ ﴿١﴾ أَلَمْ يَجْعَلْ كَيْدَهُمْ فِى تَضْلِيلٍ ﴿٢﴾ وَأَرْسَلَ عَلَيْهِمْ طَيْرًا أَبَابِيلَ ﴿٣﴾ تَرْمِيهِم بِحِجَارَةٍ مِّن سِجِّيلٍ ﴿٤﴾ فَجَعَلَهُمْ كَعَصْفٍ مَّأْكُولٍۭ ﴿٥﴾",
+        audioSegment: { surah: 105, ayahStart: 1, ayahEnd: 5 }
+      },
+      {
         id: "int8-review",
         type: "instruction",
         title: "Al-Fil Memorized! 🌟",
@@ -1996,6 +2012,14 @@ Allah gave them BOTH. What more do they need to worship Him?`
 
 Listen and repeat:`,
         audioSegment: { surah: 106, ayahStart: 1, ayahEnd: 4, repeat: 10 }
+      },
+      {
+        id: "int9-memorization",
+        type: "practice",
+        title: "🎯 Memorization Practice",
+        content: "MEMORIZATION_MODULE",
+        arabicContent: "لِإِيلَـٰفِ قُرَيْشٍ ﴿١﴾ إِۦلَـٰفِهِمْ رِحْلَةَ ٱلشِّتَآءِ وَٱلصَّيْفِ ﴿٢﴾ فَلْيَعْبُدُوا۟ رَبَّ هَـٰذَا ٱلْبَيْتِ ﴿٣﴾ ٱلَّذِىٓ أَطْعَمَهُم مِّن جُوعٍ وَءَامَنَهُم مِّنْ خَوْفٍۭ ﴿٤﴾",
+        audioSegment: { surah: 106, ayahStart: 1, ayahEnd: 4 }
       },
       {
         id: "int9-review",

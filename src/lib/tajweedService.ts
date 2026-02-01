@@ -218,7 +218,8 @@ export function cleanupRecording(): void {
 
 /**
  * Analyze recitation using AI
- * Sends audio to OpenAI Whisper for transcription and compares with expected text
+ * Sends audio to OpenAI Whisper for transcription, then Claude for tajweed analysis
+ * This is a PREMIUM feature
  */
 export async function analyzeRecitation(
   audioBlob: Blob,
@@ -227,12 +228,23 @@ export async function analyzeRecitation(
   ayah: number
 ): Promise<TajweedFeedback> {
   try {
-    // Check for OpenAI API key
+    // Check for OpenAI API key (for Whisper transcription)
     const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
     
     if (apiKey) {
       // Use OpenAI Whisper for transcription
       const transcription = await transcribeWithWhisper(audioBlob, apiKey);
+      
+      // Try Claude API for advanced tajweed analysis
+      try {
+        const claudeAnalysis = await analyzeWithClaude(transcription, expectedText, surah, ayah);
+        if (claudeAnalysis) {
+          return claudeAnalysis;
+        }
+      } catch (e) {
+        console.log('Claude analysis unavailable, using basic analysis');
+      }
+      
       return generateAIFeedback(transcription, expectedText, surah, ayah);
     } else {
       // Fallback to basic analysis without AI
@@ -242,6 +254,83 @@ export async function analyzeRecitation(
     console.error('Error analyzing recitation:', error);
     return generateBasicFeedback(expectedText, surah, ayah);
   }
+}
+
+/**
+ * Send transcription to Claude API for detailed tajweed analysis
+ */
+async function analyzeWithClaude(
+  transcription: string,
+  expectedText: string,
+  surah: number,
+  ayah: number
+): Promise<TajweedFeedback | null> {
+  try {
+    const response = await fetch('/api/tajweed/analyze', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        transcription,
+        expectedText,
+        surah,
+        ayah,
+      }),
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    
+    // Convert Claude analysis to TajweedFeedback format
+    return {
+      overall: data.overall,
+      accuracy: data.accuracy,
+      transcription,
+      rulesAnalysis: (data.pronunciationFeedback || []).map((pf: any) => ({
+        rule: mapRuleToKey(pf.rule),
+        status: pf.issue ? 'needs_work' : 'correct',
+        feedback: pf.correction || pf.issue || 'Good pronunciation',
+      })),
+      encouragement: data.encouragement,
+      specificTips: data.specificTips,
+    };
+  } catch (error) {
+    console.error('Claude API error:', error);
+    return null;
+  }
+}
+
+/**
+ * Map rule name to rule key
+ */
+function mapRuleToKey(ruleName?: string): TajweedRule {
+  if (!ruleName) return 'noon_sakinah';
+  
+  const lowerRule = ruleName.toLowerCase();
+  if (lowerRule.includes('noon') || lowerRule.includes('ikhfa') || lowerRule.includes('idgham')) {
+    return 'noon_sakinah';
+  }
+  if (lowerRule.includes('madd') || lowerRule.includes('elongat')) {
+    return 'madd';
+  }
+  if (lowerRule.includes('qalqalah')) {
+    return 'qalqalah';
+  }
+  if (lowerRule.includes('ghunnah') || lowerRule.includes('nasal')) {
+    return 'ghunnah';
+  }
+  if (lowerRule.includes('tafkheem') || lowerRule.includes('heavy')) {
+    return 'tafkheem';
+  }
+  if (lowerRule.includes('tarqeeq') || lowerRule.includes('light')) {
+    return 'tarqeeq';
+  }
+  
+  return 'noon_sakinah';
 }
 
 /**

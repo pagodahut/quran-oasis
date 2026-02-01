@@ -485,6 +485,76 @@ export function getSettings(): UserProgress['settings'] {
 }
 
 /**
+ * Get stats formatted for profile display
+ */
+export function getProgressStats() {
+  const progress = getProgress();
+  const stats = getStats();
+  const activity = getRecentActivity(30);
+  
+  // Calculate total minutes
+  const totalMinutes = activity.reduce((sum, d) => sum + d.minutesPracticed, 0);
+  const avgMinutes = activity.length > 0 
+    ? Math.round(totalMinutes / activity.length) 
+    : 0;
+  
+  // Calculate unique active days
+  const uniqueDays = new Set(activity.filter(d => d.versesMemorized > 0 || d.versesReviewed > 0).map(d => d.date)).size;
+  
+  return {
+    versesMemorized: stats.memorized + stats.learning + stats.reviewing,
+    surahsCompleted: Object.keys(
+      Object.entries(progress.verses).reduce((acc, [key, v]) => {
+        if (v.status === 'memorized' || v.status === 'reviewing') {
+          const surah = key.split(':')[0];
+          acc[surah] = (acc[surah] || 0) + 1;
+        }
+        return acc;
+      }, {} as Record<string, number>)
+    ).length,
+    currentStreak: progress.streak.current,
+    totalDaysActive: uniqueDays || 1,
+    averageSessionMinutes: avgMinutes,
+    totalMinutesLearned: totalMinutes,
+  };
+}
+
+/**
+ * Get all surah progress for profile display
+ */
+export function getSurahProgressList(): Record<string, { name: string; progress: number }> {
+  const progress = getProgress();
+  const surahNames: Record<number, string> = {
+    1: 'Al-Fatihah',
+    2: 'Al-Baqarah',
+    112: 'Al-Ikhlas',
+    113: 'Al-Falaq',
+    114: 'An-Nas',
+    103: 'Al-Asr',
+    108: 'Al-Kawthar',
+    110: 'An-Nasr',
+    111: 'Al-Masad',
+  };
+  
+  const surahProgress: Record<string, { name: string; progress: number }> = {};
+  
+  Object.entries(progress.verses).forEach(([key, verse]) => {
+    const surah = parseInt(key.split(':')[0]);
+    if (!surahProgress[surah]) {
+      surahProgress[surah] = {
+        name: surahNames[surah] || `Surah ${surah}`,
+        progress: 0,
+      };
+    }
+    if (verse.status === 'memorized' || verse.status === 'reviewing') {
+      surahProgress[surah].progress = Math.min(100, surahProgress[surah].progress + 10);
+    }
+  });
+  
+  return surahProgress;
+}
+
+/**
  * Check if a surah is started
  */
 export function isSurahStarted(surah: number): boolean {

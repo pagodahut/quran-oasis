@@ -4227,7 +4227,8 @@ This is the formula for a successful life!
         id: "l17-listen",
         type: "audio",
         title: "Listen to Al-Asr",
-        content: "Listen to this profound surah:",
+        content: "Listen to this profound surah being recited. Pay attention to the rhythm and pronunciation:",
+        arabicContent: "وَٱلْعَصْرِ ۝ إِنَّ ٱلْإِنسَـٰنَ لَفِى خُسْرٍ ۝ إِلَّا ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ وَتَوَاصَوْا۟ بِٱلْحَقِّ وَتَوَاصَوْا۟ بِٱلصَّبْرِ",
         audioSegment: { surah: 103, ayahStart: 1, ayahEnd: 3, repeat: 5 }
       },
       {
@@ -4279,9 +4280,39 @@ You need ALL FOUR!`,
       {
         id: "l17-practice",
         type: "practice",
-        title: "Memorize Al-Asr",
-        content: "The third verse is longer but it follows a beautiful pattern. Use the 10-3 method.",
+        title: "Memorize Al-Asr Using the 10-3 Method",
+        content: `**Now it's time to memorize!**
+
+Using the **10-3 Method**:
+
+**Step 1: Listen and Read (10 times)**
+- Play the audio
+- Read along with the Arabic text
+- Do this 10 times
+
+**Step 2: Recite from Memory (3 times)**
+- Hide the text
+- Try to recite from memory
+- Check yourself if needed
+
+The third verse is longer, but it follows a beautiful pattern - four things connected with "wa" (and):
+إِلَّا ٱلَّذِينَ (Except those who...)
+- ءَامَنُوا۟ (believe)
+- وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ (AND do good deeds)
+- وَتَوَاصَوْا۟ بِٱلْحَقِّ (AND advise truth)
+- وَتَوَاصَوْا۟ بِٱلصَّبْرِ (AND advise patience)
+
+**Click "Start Memorization Practice" below to begin!**`,
+        arabicContent: "وَٱلْعَصْرِ ۝ إِنَّ ٱلْإِنسَـٰنَ لَفِى خُسْرٍ ۝ إِلَّا ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ وَتَوَاصَوْا۟ بِٱلْحَقِّ وَتَوَاصَوْا۟ بِٱلصَّبْرِ",
         audioSegment: { surah: 103, ayahStart: 1, ayahEnd: 3, repeat: 10 }
+      },
+      {
+        id: "l17-memorization",
+        type: "practice",
+        title: "🎯 Memorization Practice",
+        content: "MEMORIZATION_MODULE",
+        arabicContent: "وَٱلْعَصْرِ ۝ إِنَّ ٱلْإِنسَـٰنَ لَفِى خُسْرٍ ۝ إِلَّا ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ وَتَوَاصَوْا۟ بِٱلْحَقِّ وَتَوَاصَوْا۟ بِٱلصَّبْرِ",
+        audioSegment: { surah: 103, ayahStart: 1, ayahEnd: 3 }
       },
       {
         id: "l17-complete",

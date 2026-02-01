@@ -63,24 +63,37 @@ function GeometricAccent({ className = "", size = 8 }: { className?: string; siz
   );
 }
 
-// Interlocking geometric pattern - for section dividers
+// Elegant gold divider with Islamic-inspired center ornament
 function GeometricDivider({ className = "" }: { className?: string }) {
   return (
-    <svg 
-      viewBox="0 0 120 12" 
-      width={120} 
-      height={12} 
-      className={className}
-    >
-      <path 
-        d="M0 6h45 M60 6h60 M52 2l4 4-4 4 M68 2l-4 4 4 4" 
-        stroke="currentColor" 
-        strokeWidth="1" 
-        fill="none"
-        opacity="0.4"
+    <div className={`flex items-center gap-4 ${className}`}>
+      <div 
+        className="flex-1 h-px"
+        style={{
+          background: 'linear-gradient(90deg, transparent 0%, rgba(201, 162, 39, 0.4) 100%)'
+        }}
       />
-      <circle cx="60" cy="6" r="2" fill="currentColor" opacity="0.5" />
-    </svg>
+      <svg 
+        viewBox="0 0 24 24" 
+        width={20} 
+        height={20} 
+        className="text-gold-500"
+      >
+        {/* 8-pointed star (Islamic geometric motif) */}
+        <path 
+          d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z" 
+          fill="currentColor" 
+          opacity="0.6"
+        />
+        <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.8" />
+      </svg>
+      <div 
+        className="flex-1 h-px"
+        style={{
+          background: 'linear-gradient(90deg, rgba(201, 162, 39, 0.4) 0%, transparent 100%)'
+        }}
+      />
+    </div>
   );
 }
 
@@ -230,37 +243,46 @@ function AnimatedCounter({ value, suffix = '' }: { value: number; suffix?: strin
   return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
 }
 
-// Custom feature icons - cohesive geometric design
+// Arabic calligraphy icons for Path to Memorization - golden, authentic
 function PersonalizedIcon({ className = "" }: { className?: string }) {
+  // Arabic: تَعَلُّم (ta'allum - learning/personalized learning)
   return (
-    <svg viewBox="0 0 32 32" fill="none" className={className}>
-      <circle cx="16" cy="16" r="8" stroke="currentColor" strokeWidth="2" />
-      <path d="M16 4v4M16 24v4M4 16h4M24 16h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="16" cy="16" r="3" fill="currentColor" opacity="0.5" />
-    </svg>
+    <div className={`${className} flex items-center justify-center`}>
+      <span 
+        className="text-white font-arabic text-lg leading-none"
+        style={{ fontFamily: 'var(--font-arabic)', direction: 'rtl' }}
+      >
+        تَعَلُّم
+      </span>
+    </div>
   );
 }
 
 function SpacedRepIcon({ className = "" }: { className?: string }) {
+  // Arabic: تَكرار (takraar - repetition)
   return (
-    <svg viewBox="0 0 32 32" fill="none" className={className}>
-      <path d="M6 16h20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="10" cy="16" r="3" fill="currentColor" />
-      <circle cx="18" cy="16" r="2" fill="currentColor" opacity="0.6" />
-      <circle cx="24" cy="16" r="1.5" fill="currentColor" opacity="0.3" />
-      <path d="M8 22c4-2 8-2 12-2 4 0 6 1 6 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
-    </svg>
+    <div className={`${className} flex items-center justify-center`}>
+      <span 
+        className="text-white font-arabic text-lg leading-none"
+        style={{ fontFamily: 'var(--font-arabic)', direction: 'rtl' }}
+      >
+        تَكرار
+      </span>
+    </div>
   );
 }
 
 function ProgressIcon({ className = "" }: { className?: string }) {
+  // Arabic: تَقَدُّم (taqaddum - progress)
   return (
-    <svg viewBox="0 0 32 32" fill="none" className={className}>
-      <path d="M4 26l6-8 6 4 6-10 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="10" cy="18" r="2" fill="currentColor" />
-      <circle cx="16" cy="22" r="2" fill="currentColor" opacity="0.7" />
-      <circle cx="22" cy="12" r="2" fill="currentColor" opacity="0.5" />
-    </svg>
+    <div className={`${className} flex items-center justify-center`}>
+      <span 
+        className="text-white font-arabic text-lg leading-none"
+        style={{ fontFamily: 'var(--font-arabic)', direction: 'rtl' }}
+      >
+        تَقَدُّم
+      </span>
+    </div>
   );
 }
 
@@ -672,8 +694,8 @@ export default function HomePage() {
               </div>
               
               <Quote className="w-12 h-12 text-gold-500/40 mx-auto mb-6" />
-              <p className="text-xl md:text-2xl text-night-100 italic leading-relaxed mb-6">
-                "The best among you are those who learn the Quran and teach it."
+              <p className="text-xl md:text-2xl text-night-100 italic leading-relaxed mb-6 max-w-lg mx-auto">
+                "The best among you are those who<br className="hidden sm:inline" /> learn the Quran and teach it."
               </p>
               <p className="text-gold-400 font-medium">— Prophet Muhammad ﷺ (Bukhari)</p>
               
