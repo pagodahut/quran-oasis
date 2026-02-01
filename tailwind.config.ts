@@ -67,11 +67,35 @@ const config: Config = {
           900: '#243676',
           950: '#1a2449',
         },
+        // Cream - Warm Light Tones
+        cream: {
+          50: '#FEFDFB',
+          100: '#E8DCCA',
+          200: '#E6DEC6',
+          300: '#D4C8B0',
+          400: '#C2B89A',
+          500: '#A89F86',
+        },
+        // Terracotta - Warm Accent
+        terracotta: {
+          400: '#C85A3C',
+          500: '#9E4F44',
+          600: '#7A3D35',
+        },
+        // Olive - Earth Tones
+        olive: {
+          500: '#6B705C',
+          600: '#4F5448',
+          700: '#3F4F28',
+          800: '#2F3C1E',
+        },
       },
       // Typography
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
         display: ['var(--font-display)', 'system-ui', 'sans-serif'],
+        serif: ['DM Serif Display', 'Cormorant Garamond', 'Georgia', 'serif'],
+        script: ['Pinyon Script', 'cursive'],
         arabic: ['Amiri', 'Traditional Arabic', 'serif'],
         quran: ['KFGQPC Hafs Uthmani', 'Amiri Quran', 'Amiri', 'serif'],
       },
