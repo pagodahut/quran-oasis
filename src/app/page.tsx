@@ -85,17 +85,36 @@ function GeometricDivider({ className = "" }: { className?: string }) {
 }
 
 // Subtle floating geometric particles - minimal, elegant
+// Uses seeded positions to avoid hydration mismatch
 function FloatingParticles() {
-  const particles = useMemo(() => 
-    Array.from({ length: 15 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: 3 + Math.random() * 4,
-      duration: 8 + Math.random() * 6,
-      delay: Math.random() * 4,
-    })), []
-  );
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Fixed positions to avoid hydration mismatch (server/client must match)
+  const particles = useMemo(() => [
+    { id: 0, x: 12, y: 18, size: 4, duration: 10, delay: 0 },
+    { id: 1, x: 85, y: 25, size: 5, duration: 12, delay: 1 },
+    { id: 2, x: 45, y: 72, size: 3.5, duration: 9, delay: 2 },
+    { id: 3, x: 28, y: 45, size: 6, duration: 11, delay: 0.5 },
+    { id: 4, x: 72, y: 88, size: 4.5, duration: 13, delay: 1.5 },
+    { id: 5, x: 92, y: 55, size: 3, duration: 8, delay: 3 },
+    { id: 6, x: 18, y: 82, size: 5.5, duration: 10, delay: 2.5 },
+    { id: 7, x: 55, y: 12, size: 4, duration: 14, delay: 0.8 },
+    { id: 8, x: 38, y: 92, size: 6.5, duration: 9, delay: 1.2 },
+    { id: 9, x: 78, y: 38, size: 3.5, duration: 11, delay: 3.5 },
+    { id: 10, x: 8, y: 62, size: 5, duration: 12, delay: 0.3 },
+    { id: 11, x: 62, y: 48, size: 4.5, duration: 10, delay: 2.8 },
+    { id: 12, x: 95, y: 15, size: 3, duration: 8, delay: 1.8 },
+    { id: 13, x: 32, y: 28, size: 5.5, duration: 13, delay: 0.6 },
+    { id: 14, x: 48, y: 65, size: 4, duration: 11, delay: 2.2 },
+  ], []);
+
+  if (!mounted) {
+    return <div className="absolute inset-0 overflow-hidden pointer-events-none" />;
+  }
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">

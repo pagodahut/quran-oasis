@@ -18,9 +18,11 @@ function HomeIcon({ className = "", strokeWidth = 2 }: { className?: string; str
 function QuranIcon({ className = "", strokeWidth = 2 }: { className?: string; strokeWidth?: number }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} strokeWidth={strokeWidth} stroke="currentColor" aria-hidden="true">
+      {/* Open book shape */}
       <path d="M4 19.5A2.5 2.5 0 016.5 17H20" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M12 6v6m-3-3h6" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
+      {/* Decorative lines suggesting Arabic text */}
+      <path d="M8 7h8M8 10h6M8 13h7" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
     </svg>
   );
 }
@@ -101,7 +103,7 @@ export default function BottomNav() {
         layout
         className={`liquid-glass mx-auto transition-all duration-300 ease-out overflow-hidden ${
           isCollapsed 
-            ? 'max-w-[240px] rounded-full' 
+            ? 'max-w-[280px] rounded-full' 
             : 'max-w-md rounded-2xl'
         }`}
       >
