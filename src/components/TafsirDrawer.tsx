@@ -166,7 +166,7 @@ export default function TafsirDrawer({ isOpen, onClose, surahNumber, ayahNumber 
                   <BookOpen className="w-5 h-5 text-gold-400" />
                 </motion.div>
                 <div>
-                  <h2 className="font-semibold text-night-100 text-lg">Tafsir & Commentary</h2>
+                  <h2 id="tafsir-drawer-title" className="font-semibold text-night-100 text-lg">Tafsir & Commentary</h2>
                   <p className="text-sm text-night-500">
                     {surahName} {surahNumber}:{ayahNumber}
                   </p>
@@ -174,12 +174,14 @@ export default function TafsirDrawer({ isOpen, onClose, surahNumber, ayahNumber 
               </div>
               
               <motion.button 
+                ref={closeButtonRef}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onClose} 
-                className="liquid-icon-btn"
+                className="liquid-icon-btn focus-visible-ring"
+                aria-label="Close tafsir drawer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5" aria-hidden="true" />
               </motion.button>
             </div>
             
@@ -208,6 +210,8 @@ export default function TafsirDrawer({ isOpen, onClose, surahNumber, ayahNumber 
                     <p 
                       className="font-arabic text-2xl text-night-100 leading-[2.5] mb-5"
                       style={{ direction: 'rtl' }}
+                      lang="ar"
+                      dir="rtl"
                     >
                       {ayahData.text.arabic}
                     </p>

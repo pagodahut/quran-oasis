@@ -203,6 +203,11 @@ export function AudioPlayer({
                 value={currentTime}
                 onChange={handleSeek}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                aria-label="Audio progress"
+                aria-valuemin={0}
+                aria-valuemax={duration || 0}
+                aria-valuenow={currentTime}
+                aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
               />
             </div>
             
@@ -298,11 +303,13 @@ export function AudioPlayer({
                   ? 'liquid-glass-gold text-gold-300' 
                   : 'liquid-glass-subtle text-night-400 hover:text-night-200'
               }`}
+              aria-label={`Repeat mode: ${repeatMode === 'infinite' ? 'infinite' : repeatMode + ' times'}. Click to change.`}
+              aria-pressed={repeatMode !== 1}
             >
-              <Repeat className="w-4 h-4" />
+              <Repeat className="w-4 h-4" aria-hidden="true" />
               <span>{repeatMode === 'infinite' ? '∞' : `${repeatMode}x`}</span>
               {repeatMode !== 1 && repeatCount > 0 && (
-                <span className="text-xs opacity-70 ml-1">
+                <span className="text-xs opacity-70 ml-1" aria-live="polite">
                   ({repeatCount + 1}/{repeatMode === 'infinite' ? '∞' : repeatMode})
                 </span>
               )}
@@ -318,8 +325,9 @@ export function AudioPlayer({
                   ? 'liquid-glass-gold text-gold-300' 
                   : 'liquid-glass-subtle text-night-400 hover:text-night-200'
               }`}
+              aria-label={`Playback speed: ${playbackRate}x. Click to change.`}
             >
-              <Gauge className="w-4 h-4" />
+              <Gauge className="w-4 h-4" aria-hidden="true" />
               <span>{playbackRate}x</span>
             </motion.button>
 
