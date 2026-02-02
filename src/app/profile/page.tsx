@@ -228,13 +228,16 @@ export default function ProfilePage() {
             {/* Avatar */}
             <div className="relative w-20 h-20 mx-auto mb-4">
               {isSignedIn && avatarUrl ? (
-                <img 
+                <Image 
                   src={avatarUrl} 
                   alt={displayName}
+                  width={80}
+                  height={80}
                   className="w-full h-full rounded-2xl object-cover"
                   style={{
                     border: '2px solid rgba(201, 162, 39, 0.3)',
                   }}
+                  priority
                 />
               ) : (
                 <div 

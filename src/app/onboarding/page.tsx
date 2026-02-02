@@ -146,15 +146,28 @@ export default function OnboardingPage() {
     goal: 'daily_connection',
     dailyTimeMinutes: 20,
     preferredReciter: 'alafasy',
+    startingPoint: '',
+    startingSurah: 1,
   });
   const [playingReciter, setPlayingReciter] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [recommendation, setRecommendation] = useState<StudyPlanRecommendation | null>(null);
+  const [surahSearch, setSurahSearch] = useState('');
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const steps: Step[] = ['arabic', 'memorization', 'goal', 'time', 'reciter', 'complete'];
+  // Build steps dynamically - include 'starting' step for all goals
+  const steps: Step[] = useMemo(() => {
+    return ['arabic', 'memorization', 'goal', 'time', 'starting', 'reciter', 'complete'];
+  }, []);
+  
   const currentIndex = steps.indexOf(step);
   const progress = ((currentIndex) / (steps.length - 1)) * 100;
+  
+  // Get starting point config based on goal
+  const startingConfig = STARTING_POINTS[data.goal] || STARTING_POINTS.daily_connection;
+  
+  // Show surah picker for users with prior memorization
+  const showContinuePicker = data.priorMemorization !== 'none';
 
   const goNext = async () => {
     const nextIndex = currentIndex + 1;
@@ -499,6 +512,132 @@ export default function OnboardingPage() {
             </StepContainer>
           )}
 
+          {/* Starting Point - Conditional based on goal and prior memorization */}
+          {step === 'starting' && (
+            <StepContainer key="starting">
+              <div className="flex items-center gap-3 mb-2">
+                <div 
+                  className="p-2 rounded-xl"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(201,162,39,0.2) 0%, rgba(201,162,39,0.1) 100%)',
+                    border: '1px solid rgba(201,162,39,0.2)',
+                  }}
+                >
+                  <MapPin className="w-5 h-5 text-gold-400" />
+                </div>
+                <h2 className="text-2xl font-semibold text-night-100">
+                  {startingConfig.title}
+                </h2>
+              </div>
+              <p className="text-night-400 mb-6">
+                {startingConfig.subtitle}
+              </p>
+              
+              {/* Show continue picker if user has prior memorization */}
+              {showContinuePicker && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-6 p-4 rounded-2xl"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(134,169,113,0.1) 0%, rgba(134,169,113,0.04) 100%)',
+                    border: '1px solid rgba(134,169,113,0.2)',
+                  }}
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <RefreshCw className="w-4 h-4 text-sage-400" />
+                    <p className="text-sm font-medium text-sage-300">Continue where you left off?</p>
+                  </div>
+                  
+                  {/* Surah Search */}
+                  <div className="relative mb-3">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-night-500" />
+                    <input
+                      type="text"
+                      placeholder="Search for a surah..."
+                      value={surahSearch}
+                      onChange={(e) => setSurahSearch(e.target.value)}
+                      className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm text-night-100 placeholder-night-500"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Popular Surahs */}
+                  <div className="space-y-2 max-h-40 overflow-y-auto">
+                    {POPULAR_SURAHS.filter(s => 
+                      s.name.toLowerCase().includes(surahSearch.toLowerCase()) ||
+                      s.arabic.includes(surahSearch)
+                    ).map((surah) => (
+                      <motion.button
+                        key={surah.number}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setData({ 
+                          ...data, 
+                          startingPoint: 'continue',
+                          startingSurah: surah.number,
+                          continueSurah: surah.number 
+                        })}
+                        className="w-full flex items-center justify-between p-2.5 rounded-lg text-left"
+                        style={{
+                          background: data.continueSurah === surah.number
+                            ? 'linear-gradient(135deg, rgba(201,162,39,0.15) 0%, rgba(201,162,39,0.05) 100%)'
+                            : 'transparent',
+                          border: data.continueSurah === surah.number
+                            ? '1px solid rgba(201,162,39,0.3)'
+                            : '1px solid transparent',
+                        }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-night-500 text-xs w-6">{surah.number}</span>
+                          <span className="text-night-200 text-sm">{surah.name}</span>
+                        </div>
+                        <span className="font-arabic text-night-400 text-sm">{surah.arabic}</span>
+                      </motion.button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+              
+              {/* Divider if showing both */}
+              {showContinuePicker && (
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex-1 h-px bg-night-800" />
+                  <span className="text-night-500 text-xs">or start fresh</span>
+                  <div className="flex-1 h-px bg-night-800" />
+                </div>
+              )}
+              
+              {/* Goal-specific starting options */}
+              <div className="space-y-3 mb-8">
+                {startingConfig.options.map((option) => (
+                  <OptionCard
+                    key={option.value}
+                    selected={data.startingPoint === option.value && !data.continueSurah}
+                    onClick={() => setData({ 
+                      ...data, 
+                      startingPoint: option.value,
+                      startingSurah: option.surah,
+                      continueSurah: undefined 
+                    })}
+                    icon={option.icon}
+                    label={option.label}
+                    desc={option.desc}
+                  />
+                ))}
+              </div>
+              
+              <div className="mt-auto">
+                <ContinueButton 
+                  onClick={goNext} 
+                  disabled={!data.startingPoint && !data.continueSurah}
+                />
+              </div>
+            </StepContainer>
+          )}
+
           {/* Reciter */}
           {step === 'reciter' && (
             <StepContainer key="reciter">
@@ -667,6 +806,9 @@ export default function OnboardingPage() {
                   { label: 'Arabic Level', value: data.arabicLevel.replace('_', ' ') },
                   { label: 'Prior Memorization', value: data.priorMemorization.replace(/_/g, ' ') },
                   { label: 'Goal', value: data.goal.replace(/_/g, ' ') },
+                  { label: 'Starting Point', value: data.continueSurah 
+                    ? `Surah ${data.continueSurah}` 
+                    : data.startingPoint.replace(/_/g, ' ') || 'Not selected' },
                   { label: 'Daily Time', value: `${data.dailyTimeMinutes} minutes` },
                   { label: 'Reciter', value: RECITERS.find(r => r.id === data.preferredReciter)?.name.split(' ').slice(-1)[0] || '' },
                 ].map((item) => (

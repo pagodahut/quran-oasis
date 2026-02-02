@@ -2,41 +2,81 @@ import type { Metadata, Viewport } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import { SyncProvider, SyncIndicator } from '@/components/SyncProvider';
+import InstallPrompt from '@/components/InstallPrompt';
+import OfflineIndicator from '@/components/OfflineIndicator';
 import { fontVariables } from '@/lib/fonts';
+import JsonLd from '@/components/JsonLd';
+import { 
+  SITE_URL, 
+  SITE_NAME, 
+  defaultMeta, 
+  organizationSchema, 
+  webApplicationSchema, 
+  courseSchema 
+} from '@/lib/seo';
 import './globals.css';
 
 // Check if Clerk is configured
 const clerkPubKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 export const metadata: Metadata = {
-  title: 'HIFZ — Memorize the Quran',
-  description: 'AI-powered Quran memorization app with personalized lessons, spaced repetition, and beautiful recitations. Start your journey to becoming a Hafiz today.',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: defaultMeta.title,
+    template: '%s | HIFZ',
+  },
+  description: defaultMeta.description,
   manifest: '/manifest.json',
-  keywords: ['Quran', 'HIFZ', 'Hifz', 'memorization', 'Islam', 'Muslim', 'Arabic', 'Tajweed', 'spaced repetition', 'Hafiz'],
-  authors: [{ name: 'HIFZ' }],
-  creator: 'HIFZ',
-  publisher: 'HIFZ',
+  keywords: defaultMeta.keywords,
+  authors: [{ name: SITE_NAME, url: SITE_URL }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   openGraph: {
-    title: 'HIFZ — Memorize the Quran',
-    description: 'AI-powered Quran memorization app with personalized lessons and spaced repetition.',
-    url: 'https://hifz.app',
-    siteName: 'HIFZ',
-    locale: 'en_US',
     type: 'website',
+    locale: 'en_US',
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: defaultMeta.title,
+    description: defaultMeta.description,
+    images: [
+      {
+        url: '/opengraph-image',
+        width: 1200,
+        height: 630,
+        alt: 'HIFZ - Memorize the Quran with AI',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'HIFZ — Memorize the Quran',
-    description: 'AI-powered Quran memorization app with personalized lessons and spaced repetition.',
+    title: defaultMeta.title,
+    description: defaultMeta.description,
+    images: ['/twitter-image'],
+    creator: '@hifzapp',
+  },
+  alternates: {
+    canonical: SITE_URL,
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'HIFZ',
+    title: SITE_NAME,
   },
   formatDetection: {
     telephone: false,
   },
+  category: 'education',
 };
 
 export const viewport: Viewport = {
@@ -73,6 +113,9 @@ const clerkAppearance = {
   },
 };
 
+// Structured data for the site
+const structuredData = [organizationSchema, webApplicationSchema, courseSchema];
+
 export default function RootLayout({
   children,
 }: {
@@ -90,11 +133,16 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://everyayah.com" />
+        
+        {/* Structured Data (JSON-LD) */}
+        <JsonLd data={structuredData} />
       </head>
-      <body className="bg-night-950 text-night-100 antialiased">
+      <body className="bg-night-950 text-night-100 antialiased standalone-tweaks">
         <SyncProvider>
           <ServiceWorkerRegistration />
+          <OfflineIndicator />
           {children}
+          <InstallPrompt />
           <SyncIndicator />
         </SyncProvider>
       </body>

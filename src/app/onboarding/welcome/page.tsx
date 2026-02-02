@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronRight,
@@ -14,6 +15,7 @@ import {
   Clock,
   Trophy,
   ArrowRight,
+  LogIn,
 } from 'lucide-react';
 
 const JOURNEY_STAGES = [
@@ -262,6 +264,22 @@ export default function OnboardingWelcomePage() {
                 >
                   Skip to setup
                 </motion.button>
+                
+                {/* Sign In Link */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1 }}
+                  className="mt-6 text-center"
+                >
+                  <Link 
+                    href="/sign-in"
+                    className="inline-flex items-center gap-2 text-sm text-night-500 hover:text-gold-400 transition-colors"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    Already have an account? Sign in
+                  </Link>
+                </motion.div>
               </motion.div>
             </motion.div>
           ) : (

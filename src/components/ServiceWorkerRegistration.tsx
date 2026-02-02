@@ -1,38 +1,168 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { RefreshCw, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ServiceWorkerRegistration() {
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
+
   useEffect(() => {
-    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker
-          .register('/sw.js')
-          .then((registration) => {
-            console.log('[App] Service Worker registered:', registration.scope);
-            
-            // Check for updates periodically
-            setInterval(() => {
-              registration.update();
-            }, 1000 * 60 * 60); // Every hour
-          })
-          .catch((error) => {
-            console.error('[App] Service Worker registration failed:', error);
-          });
-      });
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+      return;
     }
+
+    // Register service worker
+    const registerSW = async () => {
+      try {
+        const reg = await navigator.serviceWorker.register('/sw.js', {
+          scope: '/',
+        });
+        
+        console.log('[App] Service Worker registered:', reg.scope);
+        setRegistration(reg);
+
+        // Check for updates on registration
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          if (!newWorker) return;
+
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New update available
+              console.log('[App] New Service Worker available');
+              setUpdateAvailable(true);
+            }
+          });
+        });
+
+        // Check for updates periodically (every hour)
+        setInterval(() => {
+          reg.update().catch(console.error);
+        }, 60 * 60 * 1000);
+
+        // Check for updates when coming back online
+        window.addEventListener('online', () => {
+          reg.update().catch(console.error);
+        });
+
+      } catch (error) {
+        console.error('[App] Service Worker registration failed:', error);
+      }
+    };
+
+    // Listen for controller change (means SW took over)
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      // Reload to get new version
+      window.location.reload();
+    });
+
+    registerSW();
   }, []);
 
-  return null;
+  const handleUpdate = useCallback(() => {
+    if (!registration?.waiting) return;
+
+    // Tell the waiting service worker to skip waiting
+    registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+  }, [registration]);
+
+  const handleDismiss = () => {
+    setUpdateAvailable(false);
+  };
+
+  return (
+    <AnimatePresence>
+      {updateAvailable && (
+        <motion.div
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 100, opacity: 0 }}
+          className="fixed bottom-20 left-4 right-4 z-50 safe-area-bottom"
+        >
+          <div className="bg-gold-500/20 backdrop-blur-xl border border-gold-500/30 rounded-xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <RefreshCw className="w-5 h-5 text-gold-400" />
+              <div>
+                <p className="text-gold-300 text-sm font-medium">
+                  Update available
+                </p>
+                <p className="text-gold-400/70 text-xs">
+                  Tap to refresh with new features
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleDismiss}
+                className="p-2 text-gold-400/60 hover:text-gold-400"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <button
+                onClick={handleUpdate}
+                className="px-4 py-2 bg-gold-500 hover:bg-gold-400 text-night-950 text-sm font-medium rounded-lg transition-colors"
+              >
+                Update
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 }
 
-// Utility function to pre-cache a surah's audio
-export function cacheSurahAudio(surah: number, reciter: string) {
+// Utility: Pre-cache audio files
+export function cacheAudioFiles(urls: string[]) {
   if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
     navigator.serviceWorker.controller.postMessage({
-      type: 'CACHE_SURAH_AUDIO',
-      surah,
-      reciter,
+      type: 'CACHE_AUDIO',
+      data: { urls },
     });
   }
+}
+
+// Utility: Clear audio cache
+export function clearAudioCache() {
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({
+      type: 'CLEAR_AUDIO_CACHE',
+    });
+  }
+}
+
+// Utility: Get cache size
+export async function getCacheSize(): Promise<{ total: number; caches: Record<string, number> } | null> {
+  if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) {
+    return null;
+  }
+
+  return new Promise((resolve) => {
+    const timeout = setTimeout(() => resolve(null), 5000);
+
+    const handler = (event: MessageEvent) => {
+      if (event.data?.type === 'CACHE_SIZE') {
+        clearTimeout(timeout);
+        navigator.serviceWorker.removeEventListener('message', handler);
+        resolve(event.data.data);
+      }
+    };
+
+    navigator.serviceWorker.addEventListener('message', handler);
+    navigator.serviceWorker.controller?.postMessage({ type: 'GET_CACHE_SIZE' });
+  });
+}
+
+// Utility: Check if running as installed PWA
+export function isInstalledPWA(): boolean {
+  if (typeof window === 'undefined') return false;
+  
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    (window.navigator as any).standalone === true ||
+    document.referrer.includes('android-app://')
+  );
 }

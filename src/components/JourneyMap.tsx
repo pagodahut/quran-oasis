@@ -579,3 +579,6 @@ export function AchievementUnlock({
     </AnimatePresence>
   );
 }
+
+// Default export for dynamic import
+export default JourneyOverview;

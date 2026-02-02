@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -28,6 +29,7 @@ import {
   getLessonsByUnit,
   isLessonUnlocked 
 } from '@/lib/lesson-content';
+import LessonCompletionOverlay from '@/components/LessonCompletionOverlay';
 import BottomNav from '@/components/BottomNav';
 import { DailyWisdom } from '@/components/JourneyMap';
 
@@ -261,10 +263,17 @@ function UnitSection({ unit, lessons, completedLessons, isActive, nextLessonId }
   );
 }
 
-export default function LessonsPage() {
+// Wrapper component to handle search params with Suspense
+function LessonsContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const [currentStreak, setCurrentStreak] = useState(0);
   const [totalXP, setTotalXP] = useState(0);
+  
+  // Handle completion query param
+  const completedLessonId = searchParams.get('completed');
+  const completedLesson = completedLessonId ? getLessonById(completedLessonId) : null;
 
   useEffect(() => {
     const saved = localStorage.getItem('quranOasis_completedLessons');
@@ -285,6 +294,11 @@ export default function LessonsPage() {
     }
   }, []);
 
+  const handleCloseCompletion = () => {
+    // Remove the query param
+    router.replace('/lessons', { scroll: false });
+  };
+
   const totalLessons = ALL_BEGINNER_LESSONS.length;
   const progressPercent = (completedLessons.length / totalLessons) * 100;
 
@@ -293,6 +307,13 @@ export default function LessonsPage() {
   );
 
   return (
+    <>
+      {/* Lesson Completion Overlay */}
+      <LessonCompletionOverlay
+        lessonId={completedLessonId}
+        lessonTitle={completedLesson?.title}
+        onClose={handleCloseCompletion}
+      />
     <div className="min-h-screen bg-night-950">
       {/* Header - Premium Frosted Glass */}
       <header 
@@ -484,5 +505,15 @@ export default function LessonsPage() {
       
       <BottomNav />
     </div>
+    </>
+  );
+}
+
+// Export with Suspense wrapper for useSearchParams
+export default function LessonsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-night-950" />}>
+      <LessonsContent />
+    </Suspense>
   );
 }

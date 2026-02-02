@@ -2385,3 +2385,153 @@ input[type="range"]::-moz-range-thumb {
     @apply bg-night-700;
   }
 }
+
+/* ============================================
+   PWA Standalone Mode Tweaks
+   ============================================ */
+@layer utilities {
+  /* Disable pull-to-refresh in standalone mode */
+  @media all and (display-mode: standalone) {
+    html, body {
+      overscroll-behavior-y: none;
+    }
+  }
+  
+  /* iOS standalone mode */
+  @supports (-webkit-touch-callout: none) {
+    .standalone-tweaks {
+      /* Disable text selection on UI elements */
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    
+    .standalone-tweaks .quran-text,
+    .standalone-tweaks .arabic-text,
+    .standalone-tweaks [lang="ar"] {
+      /* Allow text selection for Quran content */
+      -webkit-user-select: text;
+      user-select: text;
+    }
+  }
+  
+  /* Safe area utilities for notched phones */
+  .safe-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+  
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  
+  .safe-left {
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+  
+  .safe-right {
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+  
+  .safe-all {
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+  
+  /* Fixed elements with safe areas */
+  .fixed-safe-top {
+    top: env(safe-area-inset-top);
+  }
+  
+  .fixed-safe-bottom {
+    bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Splash screen loading state */
+  .splash-screen {
+    position: fixed;
+    inset: 0;
+    background: #0f1419;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+  
+  .splash-logo {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% {
+      opacity: 1;
+      filter: drop-shadow(0 0 10px rgba(201, 162, 39, 0.3));
+    }
+    50% {
+      opacity: 0.8;
+      filter: drop-shadow(0 0 20px rgba(201, 162, 39, 0.6));
+    }
+  }
+}
+
+/* ============================================
+   Offline Mode Styles
+   ============================================ */
+@layer components {
+  /* Cached content indicator */
+  .cached-content::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 8px;
+    height: 8px;
+    background: #22c55e;
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(34, 197, 94, 0.5);
+  }
+  
+  /* Offline badge */
+  .offline-badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 
+           bg-amber-500/20 text-amber-400 
+           text-xs font-medium rounded-full;
+  }
+  
+  /* Connection status dot */
+  .status-dot {
+    @apply w-2 h-2 rounded-full;
+  }
+  
+  .status-dot.online {
+    @apply bg-green-400;
+    animation: pulse-online 2s ease-in-out infinite;
+  }
+  
+  .status-dot.offline {
+    @apply bg-amber-400;
+  }
+  
+  .status-dot.syncing {
+    @apply bg-blue-400;
+    animation: pulse-sync 1s ease-in-out infinite;
+  }
+  
+  @keyframes pulse-online {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 4px rgba(74, 222, 128, 0);
+    }
+  }
+  
+  @keyframes pulse-sync {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+}
