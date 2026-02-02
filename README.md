@@ -57,16 +57,29 @@ npm run dev
 Create `.env.local` with:
 
 ```env
-# Clerk Authentication (required)
+# Clerk Authentication (required for auth features, app works without)
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
 CLERK_SECRET_KEY=sk_...
 
 # Deepgram - Real-time speech recognition (optional, for tajweed)
+# Get free credits at https://console.deepgram.com
 NEXT_PUBLIC_DEEPGRAM_API_KEY=...
 
 # Anthropic - Claude AI for tajweed analysis (optional)
+# Get key at https://console.anthropic.com
 ANTHROPIC_API_KEY=sk-ant-...
+
+# Site URL (required for production)
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
 ```
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NEXT_PUBLIC_CLERK_*` | No | Authentication (app works in guest mode without) |
+| `CLERK_SECRET_KEY` | No | Server-side Clerk auth |
+| `NEXT_PUBLIC_DEEPGRAM_API_KEY` | No | Real-time tajweed feedback |
+| `ANTHROPIC_API_KEY` | No | AI-powered tajweed analysis |
+| `NEXT_PUBLIC_SITE_URL` | Prod | Canonical URL for SEO |
 
 ## 🛠 Tech Stack
 
@@ -112,6 +125,46 @@ src/
     ├── realtimeTajweedService.ts  # Deepgram service
     └── motivationStore.ts         # Streaks & progress
 ```
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel
+```
+
+Set environment variables in Vercel dashboard:
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+- `CLERK_SECRET_KEY`
+- `NEXT_PUBLIC_DEEPGRAM_API_KEY` (optional)
+- `ANTHROPIC_API_KEY` (optional)
+
+### Docker
+
+```bash
+# Build
+docker build -t hifz .
+
+# Run
+docker run -p 3000:3000 --env-file .env.local hifz
+```
+
+### Self-Hosted
+
+```bash
+# Build for production
+npm run build
+
+# Start production server
+npm start
+```
+
+The app runs on port 3000 by default. Use a reverse proxy (nginx, Caddy) for SSL.
 
 ## 📖 Documentation
 
