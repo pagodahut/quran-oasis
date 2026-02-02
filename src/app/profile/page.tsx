@@ -40,6 +40,7 @@ import {
   getAchievements,
   updateStreak,
 } from '@/lib/motivationStore';
+import { useLearningPreferences } from '@/lib/preferencesStore';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
@@ -109,6 +110,7 @@ function SettingsRow({ icon: Icon, label, href, onClick }: {
 export default function ProfilePage() {
   const { user, isLoaded, isSignedIn } = useUser();
   const { openUserProfile } = useClerk();
+  const { learning: learningPrefs } = useLearningPreferences();
   const [stats, setStats] = useState({
     versesMemorized: 0,
     surahsCompleted: 0,
