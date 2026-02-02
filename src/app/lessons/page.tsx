@@ -294,18 +294,11 @@ export default function LessonsPage() {
 
   return (
     <div className="min-h-screen bg-night-950">
-      {/* Header - Liquid Glass */}
+      {/* Header - Premium Frosted Glass */}
       <header 
-        className="sticky top-0 z-40 safe-area-top"
-        style={{
-          background: 'linear-gradient(180deg, rgba(15,15,20,0.95) 0%, rgba(15,15,20,0.85) 100%)',
-          backdropFilter: 'blur(24px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.2)',
-        }}
+        className="sticky top-0 z-40 safe-area-top liquid-glass mx-2 mt-2 rounded-2xl"
       >
-        <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center justify-between px-3 py-3">
           <Link href="/" className="liquid-icon-btn">
             <ChevronLeft className="w-5 h-5" />
           </Link>

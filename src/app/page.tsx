@@ -416,23 +416,29 @@ export default function HomePage() {
       
       {/* Content */}
       <div className="relative z-10">
-        {/* Header */}
-        <header className="fixed top-0 left-0 right-0 z-50">
-          <div className="mx-4 mt-4">
+        {/* Header - Premium Frosted Glass */}
+        <header className="fixed top-0 left-0 right-0 z-50 safe-area-top">
+          <div className="mx-3 mt-3">
             <div className="liquid-glass rounded-2xl">
-              <div className="px-6 py-4 max-w-7xl mx-auto">
+              <div className="px-4 sm:px-6 py-3 sm:py-4 max-w-7xl mx-auto">
                 <div className="flex items-center justify-between">
-                  <HifzLogo size={36} animated={true} />
+                  <HifzLogo size={32} animated={true} />
                   
                   <motion.nav
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="flex items-center gap-4"
+                    className="flex items-center gap-2 sm:gap-4"
                   >
-                    <Link href="/mushaf" className="text-night-400 hover:text-gold-400 transition-colors text-sm font-medium hidden sm:block">
+                    <Link 
+                      href="/mushaf" 
+                      className="text-night-400 hover:text-gold-400 transition-colors text-sm font-medium hidden sm:block px-2 py-1.5 rounded-lg hover:bg-white/5"
+                    >
                       Quran
                     </Link>
-                    <Link href="/techniques" className="text-night-400 hover:text-gold-400 transition-colors text-sm font-medium hidden sm:block">
+                    <Link 
+                      href="/techniques" 
+                      className="text-night-400 hover:text-gold-400 transition-colors text-sm font-medium hidden sm:block px-2 py-1.5 rounded-lg hover:bg-white/5"
+                    >
                       Methods
                     </Link>
                     <Link 
@@ -440,15 +446,16 @@ export default function HomePage() {
                       className="liquid-pill text-sm font-medium text-night-100 flex items-center gap-2"
                     >
                       <Sparkles className="w-4 h-4 text-gold-400" />
-                      My Lessons
+                      <span className="hidden sm:inline">My Lessons</span>
+                      <span className="sm:hidden">Lessons</span>
                     </Link>
                     
                     {/* Auth Buttons */}
                     <SignedOut>
                       <SignInButton mode="modal">
-                        <button className="text-night-400 hover:text-gold-400 transition-colors text-sm font-medium flex items-center gap-1.5">
+                        <button className="text-night-400 hover:text-gold-400 transition-colors text-sm font-medium flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-white/5 min-h-[36px]">
                           <User className="w-4 h-4" />
-                          Sign In
+                          <span className="hidden sm:inline">Sign In</span>
                         </button>
                       </SignInButton>
                     </SignedOut>
@@ -457,7 +464,7 @@ export default function HomePage() {
                         afterSignOutUrl="/"
                         appearance={{
                           elements: {
-                            avatarBox: "w-8 h-8"
+                            avatarBox: "w-9 h-9"
                           }
                         }}
                       />

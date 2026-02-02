@@ -9,8 +9,18 @@ interface LogoProps {
   showWordmark?: boolean;
 }
 
-// The HIFZ icon - An octagram (8-pointed star) with stylized Arabic ح (Ha)
-// Represents: Islamic geometry + Hifz (preservation) + memorization
+/**
+ * HIFZ Logo - The Open Quran
+ * 
+ * Design Philosophy:
+ * - Ultra-simple open book shape = instant Quran recognition
+ * - Works at ALL sizes (even 16px favicon)
+ * - Gold/night color palette matches the app
+ * - No complex geometry that breaks at small sizes
+ * 
+ * The simplicity is intentional: like Apple's logo, 
+ * one shape that's instantly recognizable.
+ */
 export function HifzIcon({ size = 40, className = '', animated = true }: LogoProps) {
   const Icon = animated ? motion.svg : 'svg';
   
@@ -21,146 +31,123 @@ export function HifzIcon({ size = 40, className = '', animated = true }: LogoPro
       height={size}
       className={className}
       {...(animated && {
-        initial: { opacity: 0, scale: 0.8 },
+        initial: { opacity: 0, scale: 0.9 },
         animate: { opacity: 1, scale: 1 },
-        transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
+        transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] }
       })}
     >
       <defs>
-        {/* Premium gold gradient - manuscript gilding inspired */}
+        {/* Premium gold gradient */}
         <linearGradient id="hifz-gold" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#f4d47c" />
-          <stop offset="35%" stopColor="#c9a227" />
-          <stop offset="65%" stopColor="#d4af37" />
+          <stop offset="50%" stopColor="#c9a227" />
           <stop offset="100%" stopColor="#8b6914" />
         </linearGradient>
         
-        {/* Inner glow gradient */}
-        <radialGradient id="hifz-glow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#f4d47c" stopOpacity="0.4" />
-          <stop offset="100%" stopColor="#c9a227" stopOpacity="0" />
-        </radialGradient>
-        
-        {/* Dark night gradient for contrast elements */}
+        {/* Dark night background */}
         <linearGradient id="hifz-night" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#1a1f25" />
           <stop offset="100%" stopColor="#0f1419" />
         </linearGradient>
-        
-        {/* Subtle shimmer for animation */}
-        <linearGradient id="hifz-shimmer" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#f4d47c" stopOpacity="0">
-            <animate attributeName="offset" values="-1;2" dur="3s" repeatCount="indefinite" />
-          </stop>
-          <stop offset="50%" stopColor="#fff" stopOpacity="0.3">
-            <animate attributeName="offset" values="-0.5;2.5" dur="3s" repeatCount="indefinite" />
-          </stop>
-          <stop offset="100%" stopColor="#f4d47c" stopOpacity="0">
-            <animate attributeName="offset" values="0;3" dur="3s" repeatCount="indefinite" />
-          </stop>
-        </linearGradient>
       </defs>
       
-      {/* Background circle - deep night */}
+      {/* Background circle */}
       <circle cx="50" cy="50" r="48" fill="url(#hifz-night)" />
       
-      {/* Inner glow effect */}
-      <circle cx="50" cy="50" r="44" fill="url(#hifz-glow)" />
-      
-      {/* Outer ring - thin gold border */}
+      {/* Subtle border */}
       <circle 
-        cx="50" 
-        cy="50" 
-        r="46" 
+        cx="50" cy="50" r="46" 
         fill="none" 
         stroke="url(#hifz-gold)" 
         strokeWidth="1.5"
-        opacity="0.8"
+        opacity="0.4"
       />
       
-      {/* 8-pointed star (Octagram) - Islamic geometric pattern */}
-      <g transform="translate(50, 50)">
-        {/* First square (rotated 0°) */}
-        <rect 
-          x="-22" 
-          y="-22" 
-          width="44" 
-          height="44" 
-          fill="none" 
-          stroke="url(#hifz-gold)" 
-          strokeWidth="2"
-          transform="rotate(0)"
-          rx="3"
-        />
-        {/* Second square (rotated 45°) */}
-        <rect 
-          x="-22" 
-          y="-22" 
-          width="44" 
-          height="44" 
-          fill="none" 
-          stroke="url(#hifz-gold)" 
-          strokeWidth="2"
-          transform="rotate(45)"
-          rx="3"
-        />
-      </g>
-      
-      {/* Center circle - represents the heart/core of memorization */}
-      <circle 
-        cx="50" 
-        cy="50" 
-        r="16" 
-        fill="url(#hifz-night)"
-        stroke="url(#hifz-gold)"
-        strokeWidth="1.5"
-      />
-      
-      {/* Stylized ح (Ha) - Arabic letter for Hifz */}
-      {/* This is a simplified, geometric interpretation */}
+      {/* THE BOOK - Open Quran silhouette */}
+      {/* Left page */}
       <path
-        d="M 43 46
-           Q 43 42, 47 42
-           L 53 42
-           Q 57 42, 57 46
-           Q 57 52, 52 54
-           Q 50 55, 50 58"
-        fill="none"
-        stroke="url(#hifz-gold)"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        d="M 50 28
+           Q 38 30, 22 35
+           L 22 72
+           Q 38 68, 50 65
+           Z"
+        fill="url(#hifz-gold)"
       />
       
-      {/* Dot below the Ha (characteristic of ح) */}
-      <circle cx="50" cy="61" r="1.5" fill="url(#hifz-gold)" />
+      {/* Right page */}
+      <path
+        d="M 50 28
+           Q 62 30, 78 35
+           L 78 72
+           Q 62 68, 50 65
+           Z"
+        fill="url(#hifz-gold)"
+      />
       
-      {/* Four corner accents - like compass points */}
-      {[0, 90, 180, 270].map((angle) => (
-        <circle
-          key={angle}
-          cx={50 + 38 * Math.cos((angle - 90) * Math.PI / 180)}
-          cy={50 + 38 * Math.sin((angle - 90) * Math.PI / 180)}
-          r="2"
-          fill="url(#hifz-gold)"
-        />
-      ))}
-      
-      {/* Subtle shimmer overlay */}
-      {animated && (
-        <circle 
-          cx="50" 
-          cy="50" 
-          r="44" 
-          fill="url(#hifz-shimmer)" 
-          opacity="0.5"
-        />
-      )}
+      {/* Dark spine separating the pages */}
+      <path
+        d="M 50 28 L 50 65"
+        stroke="url(#hifz-night)"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
     </Icon>
   );
 }
 
-// The HIFZ wordmark - strong, modern typography
+// Simple icon for small contexts (nav, tabs)
+export function HifzIconSimple({ 
+  size = 24, 
+  className = '' 
+}: { 
+  size?: number; 
+  className?: string;
+}) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      className={className}
+      fill="none"
+    >
+      <defs>
+        <linearGradient id="simple-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#f4d47c" />
+          <stop offset="50%" stopColor="#c9a227" />
+          <stop offset="100%" stopColor="#8b6914" />
+        </linearGradient>
+      </defs>
+      
+      {/* Simplified book shape */}
+      <path
+        d="M 12 5
+           Q 8 6, 4 7
+           L 4 19
+           Q 8 18, 12 17
+           Z"
+        fill="url(#simple-gold)"
+      />
+      <path
+        d="M 12 5
+           Q 16 6, 20 7
+           L 20 19
+           Q 16 18, 12 17
+           Z"
+        fill="url(#simple-gold)"
+      />
+      <line
+        x1="12" y1="5"
+        x2="12" y2="17"
+        stroke="#0f1419"
+        strokeWidth="1"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+// The HIFZ wordmark
 export function HifzWordmark({ 
   size = 24, 
   className = '',
@@ -170,7 +157,6 @@ export function HifzWordmark({
   className?: string;
   color?: string;
 }) {
-  // Height-based sizing, width is proportional (roughly 3:1 for "HIFZ")
   const height = size;
   const width = size * 2.8;
   
@@ -190,7 +176,6 @@ export function HifzWordmark({
         </linearGradient>
       </defs>
       
-      {/* HIFZ letters - clean, modern, slightly geometric sans-serif */}
       <text
         x="70"
         y="38"
@@ -246,14 +231,7 @@ export function HifzLogo({
         transition: { duration: 0.5 }
       })}
     >
-      <div className="relative">
-        <HifzIcon size={size} animated={animated} />
-        {/* Subtle glow behind icon */}
-        <div 
-          className="absolute inset-0 rounded-full bg-gold-500 blur-md opacity-30 -z-10"
-          style={{ width: size, height: size }}
-        />
-      </div>
+      <HifzIcon size={size} animated={animated} />
       <span 
         className="font-display text-xl font-bold tracking-wider"
         style={{
@@ -280,74 +258,17 @@ export function HifzLogoAnimated({ size = 80 }: { size?: number }) {
     >
       <motion.div
         animate={{ 
-          rotate: 360,
+          scale: [1, 1.05, 1],
         }}
         transition={{ 
-          duration: 20, 
+          duration: 2, 
           repeat: Infinity, 
-          ease: "linear" 
+          ease: "easeInOut" 
         }}
-        className="absolute inset-0 rounded-full"
-        style={{
-          background: 'conic-gradient(from 0deg, transparent 0deg, rgba(201, 162, 39, 0.2) 60deg, transparent 120deg)',
-          filter: 'blur(8px)',
-        }}
+        className="absolute inset-0 rounded-full bg-gold-500/20 blur-xl"
       />
       <HifzIcon size={size} animated={true} />
     </motion.div>
-  );
-}
-
-// Simple icon for navigation/small contexts
-export function HifzIconSimple({ 
-  size = 24, 
-  className = '' 
-}: { 
-  size?: number; 
-  className?: string;
-}) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      width={size}
-      height={size}
-      className={className}
-      fill="none"
-    >
-      <defs>
-        <linearGradient id="simple-gold" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#f4d47c" />
-          <stop offset="50%" stopColor="#c9a227" />
-          <stop offset="100%" stopColor="#8b6914" />
-        </linearGradient>
-      </defs>
-      
-      {/* Simplified octagram */}
-      <rect
-        x="6"
-        y="6"
-        width="12"
-        height="12"
-        fill="none"
-        stroke="url(#simple-gold)"
-        strokeWidth="1.5"
-        rx="1"
-      />
-      <rect
-        x="6"
-        y="6"
-        width="12"
-        height="12"
-        fill="none"
-        stroke="url(#simple-gold)"
-        strokeWidth="1.5"
-        rx="1"
-        transform="rotate(45 12 12)"
-      />
-      
-      {/* Center dot */}
-      <circle cx="12" cy="12" r="2" fill="url(#simple-gold)" />
-    </svg>
   );
 }
 

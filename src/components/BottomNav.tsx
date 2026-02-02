@@ -98,18 +98,30 @@ export default function BottomNav() {
       }`}
       style={{ paddingBottom: `max(${isCollapsed ? '0.5rem' : '0.75rem'}, env(safe-area-inset-bottom))` }}
     >
-      {/* Liquid glass floating pill nav */}
+      {/* Premium frosted glass floating nav */}
       <motion.div 
         layout
-        className={`liquid-glass mx-auto transition-all duration-300 ease-out overflow-hidden ${
+        className={`mx-auto overflow-hidden ${
           isCollapsed 
-            ? 'max-w-[280px] rounded-full' 
+            ? 'max-w-[300px] rounded-full' 
             : 'max-w-md rounded-2xl'
         }`}
+        style={{
+          background: 'rgba(22, 27, 34, 0.8)',
+          backdropFilter: 'blur(48px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(48px) saturate(180%)',
+          border: '1px solid rgba(255, 255, 255, 0.06)',
+          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.2), 0 8px 32px rgba(0, 0, 0, 0.12)',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        }}
       >
-        <div className={`relative flex items-center justify-around transition-all duration-300 ${
-          isCollapsed ? 'px-4 py-2' : 'px-2 sm:px-4 py-2 sm:py-3'
-        }`}>
+        <div className={`relative flex items-center justify-around ${
+          isCollapsed ? 'px-4 py-2' : 'px-2 sm:px-4 py-2.5 sm:py-3'
+        }`}
+        style={{
+          transition: 'padding 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        }}
+        >
           {navItems.map((item) => {
             const isActive = pathname === item.href || 
               (item.href !== '/' && pathname.startsWith(item.href));
@@ -122,64 +134,64 @@ export default function BottomNav() {
                 aria-current={isActive ? 'page' : undefined}
                 className={`
                   relative flex flex-col items-center gap-0.5 sm:gap-1 
-                  transition-all duration-200 
-                  min-w-[48px] min-h-[44px]
-                  ${isCollapsed ? 'px-2 py-1' : 'px-3 sm:px-4 py-1'}
+                  min-w-[52px] min-h-[48px]
+                  ${isCollapsed ? 'px-2 py-1.5' : 'px-3 sm:px-4 py-1.5'}
                   touch-manipulation
                   focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/50 
                   focus-visible:ring-offset-2 focus-visible:ring-offset-night-950
                   rounded-xl
-                  active:scale-95
                 `}
+                style={{
+                  WebkitTapHighlightColor: 'transparent',
+                  transition: 'transform 0.15s ease',
+                }}
               >
-                {/* Active indicator - subtle liquid glass glow */}
+                {/* Active indicator - smooth gradient glow */}
                 {isActive && (
                   <motion.div 
                     layoutId="nav-indicator"
                     className="absolute inset-0 -z-10 rounded-xl"
                     style={{
-                      background: 'radial-gradient(ellipse at center, rgba(201, 162, 39, 0.15) 0%, transparent 70%)',
+                      background: 'radial-gradient(ellipse 80% 60% at 50% 40%, rgba(201, 162, 39, 0.12) 0%, transparent 70%)',
                     }}
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   />
                 )}
                 
-                {/* Icon container with liquid glass effect when active */}
-                <div className={`relative p-1.5 sm:p-2 rounded-xl transition-all duration-200 ${
-                  isActive 
-                    ? 'bg-gold-500/10' 
-                    : 'hover:bg-white/5 active:bg-white/10'
-                }`}
-                style={isActive ? {
-                  boxShadow: 'inset 0 1px 0 rgba(201, 162, 39, 0.1)',
-                } : {}}
+                {/* Icon container with smooth glass effect */}
+                <motion.div 
+                  className="relative p-2 rounded-xl"
+                  style={{
+                    background: isActive 
+                      ? 'linear-gradient(135deg, rgba(201, 162, 39, 0.12) 0%, rgba(201, 162, 39, 0.06) 100%)'
+                      : 'transparent',
+                    border: isActive 
+                      ? '1px solid rgba(201, 162, 39, 0.15)'
+                      : '1px solid transparent',
+                    transition: 'all 0.2s ease',
+                  }}
+                  whileTap={{ scale: 0.92 }}
                 >
                   <item.Icon 
-                    className={`w-5 h-5 sm:w-6 sm:h-6 transition-all duration-200 ${
+                    className={`w-5 h-5 sm:w-[22px] sm:h-[22px] transition-colors duration-200 ${
                       isActive 
                         ? 'text-gold-400' 
                         : 'text-night-400'
                     }`}
-                    strokeWidth={isActive ? 2.5 : 2}
+                    strokeWidth={isActive ? 2.25 : 1.75}
                   />
-                  {/* Glow effect for active state */}
-                  {isActive && (
-                    <div 
-                      className="absolute inset-0 rounded-xl opacity-50 blur-sm -z-10"
-                      style={{
-                        background: 'radial-gradient(circle, rgba(201, 162, 39, 0.4) 0%, transparent 70%)',
-                      }}
-                    />
-                  )}
-                </div>
+                </motion.div>
                 
                 {/* Label - hidden when collapsed */}
                 <span 
-                  className={`text-[10px] sm:text-xs font-medium transition-all duration-200 ${
+                  className={`text-[10px] sm:text-xs font-medium ${
                     isCollapsed ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100'
                   } ${
                     isActive ? 'text-gold-400' : 'text-night-500'
                   }`}
+                  style={{
+                    transition: 'opacity 0.2s ease, color 0.2s ease',
+                  }}
                 >
                   {item.label}
                 </span>

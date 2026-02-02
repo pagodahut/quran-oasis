@@ -3,16 +3,18 @@
  * For users who know Arabic letters and can read basic Quran
  * 
  * Focus areas:
- * - Common Quranic vocabulary
- * - Short surah memorization (Al-Ikhlas through An-Nas)
- * - Basic tajweed rules (nun sakinah, meem sakinah)
+ * - Common Quranic vocabulary and root patterns
+ * - Tajweed rules in depth (noon sakinah, meem sakinah, madd, qalqalah)
+ * - Medium-length surah memorization (Al-Mulk, Ya-Sin portions, Al-Kahf portions)
+ * 
+ * Units 6-8: Lessons 20-38 (19 total lessons)
  */
 
 import type { Lesson } from './lesson-content';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * UNIT 6: COMMON QURANIC VOCABULARY (Lessons 20-22)
+ * UNIT 6: COMMON QURANIC VOCABULARY (Lessons 20-24)
  * Build your understanding of frequently appearing words
  * ═══════════════════════════════════════════════════════════════════════════
  */
@@ -559,7 +561,7 @@ The الَّذِينَ refers to a specific category of people.`
         id: "int3-connectors",
         type: "explanation",
         title: "وَ, فَ, ثُمَّ - Connecting Words",
-        arabicContent: "وَاتَّقُوا يَوْمًا تُرْجَعُونَ فِيهِ إِلَى اللَّهِ ثُمَّ تُوَفَّىٰ كُلُّ نَفْسٍ مَّا كَسَبَتْ",
+        arabicContent: "وَاتَّقُوا يَوْمًا تُرْجَعُونَ فِيهِ إِلَى اللَّهِ",
         content: `**Three connectors with different nuances:**
 
 **وَ (wa)** - And
@@ -626,7 +628,7 @@ Read Surah Al-Baqarah, verses 1-5, and identify:
 - All the particles
 - What each one is doing
 
-**Coming up in Unit 7:** Basic Tajweed rules for beautiful recitation!`
+**Coming up:** Arabic Root System - The Key to Vocabulary!`
       }
     ],
     memorizationTechniques: [
@@ -644,26 +646,502 @@ Read Surah Al-Baqarah, verses 1-5, and identify:
       { arabic: "فَ", transliteration: "Fa", meaning: "Then, so (immediate)" },
       { arabic: "ثُمَّ", transliteration: "Thumma", meaning: "Then (delayed)" }
     ]
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // LESSON 23: Arabic Root System - The Key to Vocabulary
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "int-lesson-4",
+    unit: 6,
+    unitTitle: "Common Quranic Vocabulary",
+    path: "intermediate",
+    number: 23,
+    title: "Arabic Root System - The Key to Vocabulary",
+    description: "Unlock thousands of words by understanding 3-letter roots",
+    surah: 2,
+    ayahStart: 1,
+    ayahEnd: 10,
+    estimatedMinutes: 30,
+    xpReward: 125,
+    steps: [
+      {
+        id: "int4-intro",
+        type: "instruction",
+        title: "The Secret to Arabic Vocabulary",
+        content: `**The Root System (الجذر)** is Arabic's superpower!
+
+Almost every Arabic word comes from a **3-letter root** that carries a core meaning.
+
+**Example: The root ك-ت-ب (K-T-B) = "writing"**
+- كِتَاب (kitaab) - book (thing written)
+- كَاتِب (kaatib) - writer (one who writes)
+- مَكْتُوب (maktoob) - written (something written)
+- مَكْتَبَة (maktaba) - library (place of writing)
+- كَتَبَ (kataba) - he wrote (verb)
+
+**One root → Dozens of related words!**
+
+**Why this matters for Quran:**
+- The Quran uses approximately 1,700 root words
+- Knowing 500 roots = understanding 80%+ of Quranic vocabulary
+- Roots reveal hidden connections between concepts
+
+Let's explore the most important Quranic roots!`
+      },
+      {
+        id: "int4-root-slm",
+        type: "explanation",
+        title: "Root: س-ل-م (S-L-M) - Peace/Submission",
+        arabicContent: "إِسْلَام • مُسْلِم • سَلَام • سَلِيم",
+        content: `**س-ل-م (S-L-M)** - Core meaning: Peace, Safety, Submission
+
+**Words from this root:**
+
+**سَلَام (salaam)** - peace
+"السَّلَامُ عَلَيْكُمْ" - Peace be upon you
+
+**إِسْلَام (islaam)** - submission (to Allah)
+The religion's name: complete peace through submission to Allah
+
+**مُسْلِم (muslim)** - one who submits
+A person who has embraced Islam
+
+**سَلِيم (saleem)** - sound, healthy, pure
+"قَلْبٌ سَلِيمٌ" - a sound/pure heart (26:89)
+
+**سَلَّمَ (sallama)** - he greeted, he submitted
+"وَسَلِّمُوا تَسْلِيمًا" - and submit with complete submission
+
+**The beautiful connection:**
+ISLAM = finding PEACE (سلام) through SUBMISSION (إسلام)
+A MUSLIM = one with a SOUND (سليم) heart who SUBMITS
+
+**Quran insight:**
+When you see any س-ل-م word, remember: true peace comes from submission to Allah.`
+      },
+      {
+        id: "int4-root-hmd",
+        type: "explanation",
+        title: "Root: ح-م-د (H-M-D) - Praise",
+        arabicContent: "الْحَمْدُ • مُحَمَّد • أَحْمَد • حَمِيد",
+        content: `**ح-م-د (H-M-D)** - Core meaning: Praise, Commendation
+
+**Words from this root:**
+
+**حَمْد (hamd)** - praise
+"الْحَمْدُ لِلَّهِ" - All praise is for Allah
+
+**مُحَمَّد (Muhammad)** - The praised one
+The Prophet's name ﷺ - "the one who is repeatedly praised"
+
+**أَحْمَد (Ahmad)** - Most praiseworthy
+Another name of the Prophet ﷺ mentioned in 61:6
+
+**حَمِيد (Hameed)** - The Praiseworthy
+One of Allah's Beautiful Names
+
+**مَحْمُود (Mahmood)** - Praised
+"مَقَامًا مَحْمُودًا" - a praised station (17:79)
+
+**The connection:**
+- الحَمْدُ (praise) → what we give to Allah
+- حَمِيد (Praiseworthy) → Allah's attribute
+- مُحَمَّد (praised one) → the Prophet embodying praise
+
+**Pattern recognition:**
+- فَعِيل pattern (حَمِيد) often indicates an intensified quality
+- مُفَعَّل pattern (مُحَمَّد) indicates something done intensively`
+      },
+      {
+        id: "int4-root-amn",
+        type: "explanation",
+        title: "Root: أ-م-ن (A-M-N) - Safety/Faith",
+        arabicContent: "آمَنَ • إِيمَان • أَمَان • مُؤْمِن • أَمِين",
+        content: `**أ-م-ن (A-M-N)** - Core meaning: Safety, Security, Trust
+
+**Words from this root:**
+
+**أَمَان (amaan)** - safety, security
+Physical and spiritual protection
+
+**آمَنَ (aamana)** - he believed
+Finding spiritual security through faith
+
+**إِيمَان (eemaan)** - faith, belief
+The state of having believed
+
+**مُؤْمِن (mu'min)** - believer
+One who has found security in faith
+
+**أَمِين (ameen)** - trustworthy
+The Prophet ﷺ was called "الأمين" (The Trustworthy)
+
+**The profound connection:**
+True FAITH (إيمان) brings TRUE SECURITY (أمان)
+A BELIEVER (مؤمن) is one who has found SAFETY in Allah
+Being TRUSTWORTHY (أمين) reflects having real faith
+
+**Quran frequency:**
+This root appears in various forms over 800 times!
+It's central to the Quranic message.`
+      },
+      {
+        id: "int4-root-patterns",
+        type: "explanation",
+        title: "Common Word Patterns",
+        arabicContent: "فَاعِل • مَفْعُول • فَعِيل",
+        content: `**Arabic uses patterns (أوزان) to create meaning from roots:**
+
+**Pattern: فَاعِل (faa'il) - Doer/Active Participle**
+- كَاتِب (writer) from ك-ت-ب
+- عَالِم (scholar) from ع-ل-م
+- مُؤْمِن (believer) from أ-م-ن
+
+**Pattern: مَفْعُول (maf'ool) - Done/Passive Participle**
+- مَكْتُوب (written) from ك-ت-ب
+- مَعْلُوم (known) from ع-ل-م
+- مَرْزُوق (provided for) from ر-ز-ق
+
+**Pattern: فَعِيل (fa'eel) - Intensive Quality**
+- عَلِيم (All-Knowing) from ع-ل-م
+- رَحِيم (Most Merciful) from ر-ح-م
+- كَرِيم (Most Generous) from ك-ر-م
+
+**Pattern: فَعَّال (fa''aal) - Intensive Doer**
+- غَفَّار (Oft-Forgiving) from غ-ف-ر
+- وَهَّاب (Bestower) from و-ه-ب
+
+**Why this matters:**
+When you learn one root + pattern recognition, you can understand NEW words you've never seen!`
+      },
+      {
+        id: "int4-practice",
+        type: "exercise",
+        title: "Root Recognition Quiz",
+        content: "Test your root knowledge!",
+        exercise: {
+          type: "word_match",
+          question: "The words مُسْلِم, إِسْلَام, and سَلَام all share which root meaning?",
+          options: [
+            "Praise and gratitude",
+            "Peace and submission",
+            "Knowledge and learning",
+            "Writing and recording"
+          ],
+          correctAnswer: 1,
+          explanation: "They all come from the root س-ل-م (S-L-M) meaning peace/submission. Islam is submission, Muslim is one who submits, Salaam is peace - all connected!"
+        }
+      },
+      {
+        id: "int4-review",
+        type: "instruction",
+        title: "Lesson Complete! 🌟",
+        content: `**Excellent! You've unlocked the Arabic root system!**
+
+**Roots learned:**
+- **س-ل-م** - Peace, Submission (إسلام, مسلم, سلام)
+- **ح-م-د** - Praise (الحمد, محمد, حميد)
+- **أ-م-ن** - Safety, Faith (إيمان, مؤمن, أمين)
+
+**Patterns recognized:**
+- فَاعِل = Doer
+- مَفْعُول = Done to
+- فَعِيل = Intensive quality
+
+**Your superpower:**
+Now when you see new Arabic words, ask:
+1. What is the 3-letter root?
+2. What pattern is it in?
+3. What does this tell me about the meaning?
+
+**Coming up:** More essential roots and patterns!`
+      }
+    ],
+    memorizationTechniques: [
+      "Group words by their root - they're related concepts",
+      "Learn patterns: فاعل = doer, مفعول = done",
+      "When you see a new word, extract the root first"
+    ],
+    keyVocabulary: [
+      { arabic: "جَذْر", transliteration: "Jadhr", meaning: "Root" },
+      { arabic: "س-ل-م", transliteration: "S-L-M", meaning: "Peace, Submission" },
+      { arabic: "ح-م-د", transliteration: "H-M-D", meaning: "Praise" },
+      { arabic: "أ-م-ن", transliteration: "A-M-N", meaning: "Safety, Faith" },
+      { arabic: "وَزْن", transliteration: "Wazn", meaning: "Pattern/Form" }
+    ]
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // LESSON 24: Essential Quranic Roots Part 2
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "int-lesson-5",
+    unit: 6,
+    unitTitle: "Common Quranic Vocabulary",
+    path: "intermediate",
+    number: 24,
+    title: "Essential Quranic Roots - Part 2",
+    description: "Master more high-frequency roots for deeper comprehension",
+    surah: 2,
+    ayahStart: 1,
+    ayahEnd: 10,
+    estimatedMinutes: 30,
+    xpReward: 125,
+    steps: [
+      {
+        id: "int5-intro",
+        type: "instruction",
+        title: "More Root Power",
+        content: `Let's expand your root vocabulary with more essential Quranic roots!
+
+**Today's roots:**
+- ع-ب-د ('A-B-D) - Worship/Servitude
+- ر-ح-م (R-H-M) - Mercy
+- ذ-ك-ر (Dh-K-R) - Remember/Mention
+- ق-و-ل (Q-W-L) - Say/Speech
+- ص-ل-ح (S-L-H) - Good/Righteous
+
+These roots appear HUNDREDS of times in the Quran.
+Mastering them will transform your understanding!`
+      },
+      {
+        id: "int5-root-abd",
+        type: "explanation",
+        title: "Root: ع-ب-د ('A-B-D) - Worship",
+        arabicContent: "عَبَدَ • عِبَادَة • عَبْد • مَعْبُود",
+        content: `**ع-ب-د ('A-B-D)** - Core meaning: Worship, Servitude
+
+**Words from this root:**
+
+**عَبَدَ ('abada)** - he worshipped
+The fundamental act of servitude
+
+**عِبَادَة ('ibaadah)** - worship
+All acts of devotion to Allah
+
+**عَبْد ('abd)** - servant, slave
+"عَبْدُ اللَّهِ" - Servant of Allah (the highest honor!)
+
+**عِبَاد ('ibaad)** - servants (plural)
+"يَا عِبَادِي" - O My servants
+
+**مَعْبُود (ma'bood)** - the one worshipped
+What/who people worship
+
+**نَعْبُدُ (na'budu)** - we worship
+"إِيَّاكَ نَعْبُدُ" - You alone we worship
+
+**The profound insight:**
+In Arabic, عَبْد (slave/servant) is the HIGHEST status!
+The Prophet ﷺ was called "عَبْدُهُ وَرَسُولُهُ" - His servant AND messenger
+Servitude to Allah = Ultimate freedom`
+      },
+      {
+        id: "int5-root-rhm",
+        type: "explanation",
+        title: "Root: ر-ح-م (R-H-M) - Mercy",
+        arabicContent: "رَحِمَ • رَحْمَة • رَحْمَٰن • رَحِيم • أَرْحَام",
+        content: `**ر-ح-م (R-H-M)** - Core meaning: Mercy, Compassion
+
+**Words from this root:**
+
+**رَحِمَ (rahima)** - he showed mercy
+The action of being merciful
+
+**رَحْمَة (rahma)** - mercy
+The quality itself
+
+**رَحْمَٰن (Rahman)** - Most Merciful (intensity)
+Overwhelming, vast mercy
+
+**رَحِيم (Raheem)** - Most Merciful (continuity)
+Ongoing, constant mercy
+
+**رَحِم (rahim)** - womb
+Where mercy begins - the mother's womb!
+
+**أَرْحَام (arhaam)** - wombs, family ties
+"صِلَةُ الرَّحِم" - maintaining family ties
+
+**The beautiful connection:**
+The WOMB (رَحِم) shares the same root as MERCY (رحمة)
+A mother's instinctive care = natural mercy
+Allah's mercy is infinitely greater than a mother's love!
+
+**Hadith insight:**
+Allah named the womb (رَحِم) after Himself (الرَّحْمَٰن)!`
+      },
+      {
+        id: "int5-root-dhkr",
+        type: "explanation",
+        title: "Root: ذ-ك-ر (Dh-K-R) - Remember",
+        arabicContent: "ذَكَرَ • ذِكْر • تَذْكِرَة • ذَاكِر",
+        content: `**ذ-ك-ر (Dh-K-R)** - Core meaning: Remember, Mention
+
+**Words from this root:**
+
+**ذَكَرَ (dhakara)** - he remembered/mentioned
+Both to recall and to speak about
+
+**ذِكْر (dhikr)** - remembrance
+"الذِّكْرُ الْحَكِيمُ" - the wise reminder (Quran)
+
+**يَذْكُرُونَ (yadhkuroon)** - they remember
+"الَّذِينَ يَذْكُرُونَ اللَّهَ قِيَامًا وَقُعُودًا"
+
+**تَذْكِرَة (tadhkira)** - reminder
+What reminds you of something
+
+**مُذَكِّر (mudhakkir)** - reminder, warner
+"إِنَّمَا أَنتَ مُذَكِّرٌ" - You are only a reminder
+
+**ذَكَر (dhakar)** - male
+(Same letters but different meaning!)
+
+**Key Quranic concept:**
+The Quran is called "الذِّكْر" - THE Reminder
+Its purpose: to help us REMEMBER what we innately know
+"فَاذْكُرُونِي أَذْكُرْكُمْ" - Remember Me, I will remember you (2:152)`
+      },
+      {
+        id: "int5-root-qwl",
+        type: "explanation",
+        title: "Root: ق-و-ل (Q-W-L) - Say/Speech",
+        arabicContent: "قَالَ • قَوْل • يَقُولُونَ • قُلْ",
+        content: `**ق-و-ل (Q-W-L)** - Core meaning: Say, Speech
+
+**Words from this root:**
+
+**قَالَ (qaala)** - he said
+The most common verb in Quran (1,600+ times!)
+
+**قَوْل (qawl)** - speech, statement
+"وَقُولُوا قَوْلًا سَدِيدًا" - speak a correct word
+
+**يَقُولُ (yaqoolu)** - he says
+Present tense form
+
+**قُلْ (qul)** - Say! (command)
+Appears 332 times commanding the Prophet ﷺ to say something
+
+**أَقْوَال (aqwaal)** - statements (plural)
+What people say
+
+**Why so frequent?**
+The Quran records conversations:
+- What Allah said
+- What prophets said
+- What believers said
+- What disbelievers said
+
+**Tip:** When you see قَالَ, ask: WHO is speaking? This reveals the context!`
+      },
+      {
+        id: "int5-root-slh",
+        type: "explanation",
+        title: "Root: ص-ل-ح (S-L-H) - Righteous",
+        arabicContent: "صَالِح • صَالِحَات • إِصْلَاح • مُصْلِح",
+        content: `**ص-ل-ح (S-L-H)** - Core meaning: Good, Righteous, Reform
+
+**Words from this root:**
+
+**صَالِح (saalih)** - righteous, good
+Also the name of Prophet Salih
+
+**صَالِحَات (saalihaat)** - righteous deeds
+"وَعَمِلُوا الصَّالِحَاتِ" - and did righteous deeds
+
+**صُلْح (sulh)** - reconciliation, peace
+Making things right between people
+
+**إِصْلَاح (islaah)** - reform, correction
+Making something good/right
+
+**مُصْلِح (muslih)** - reformer
+One who makes things right
+
+**أَصْلَحَ (aslaha)** - he corrected/reformed
+The action of making right
+
+**The pattern you know:**
+"الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ"
+- Faith (إيمان from أ-م-ن)
+- PLUS Righteous action (صالحات from ص-ل-ح)
+- = Complete formula repeated 50+ times!`
+      },
+      {
+        id: "int5-practice",
+        type: "exercise",
+        title: "Root Application Quiz",
+        content: "Apply your root knowledge!",
+        exercise: {
+          type: "word_match",
+          question: "The word رَحْمَٰن (Rahman) comes from root ر-ح-م. What other word shares this root?",
+          options: [
+            "قَالَ (he said)",
+            "رَحِم (womb)",
+            "عَبَدَ (he worshipped)",
+            "ذَكَرَ (he remembered)"
+          ],
+          correctAnswer: 1,
+          explanation: "رَحِم (womb) shares the root ر-ح-م with رَحْمَٰن. The womb is named after mercy because it's where a mother's natural compassion begins - and Allah's mercy is even greater!"
+        }
+      },
+      {
+        id: "int5-review",
+        type: "instruction",
+        title: "Lesson Complete! 🌟",
+        content: `**Outstanding! You now know 8 essential Quranic roots!**
+
+**Today's roots:**
+- **ع-ب-د** - Worship, Servitude (عبادة, عبد, نعبد)
+- **ر-ح-م** - Mercy (رحمة, رحمن, رحيم, رحم)
+- **ذ-ك-ر** - Remember, Mention (ذكر, تذكرة)
+- **ق-و-ل** - Say, Speech (قال, قول, قل)
+- **ص-ل-ح** - Righteous, Good (صالح, صالحات, إصلاح)
+
+**Combined with previous lesson:**
+- س-ل-م, ح-م-د, أ-م-ن
+
+**Your vocabulary multiplied:**
+8 roots × 5-10 words each = 40-80 word families understood!
+
+**Coming up: Unit 7 - Basic Tajweed Rules!**`
+      }
+    ],
+    memorizationTechniques: [
+      "Connect roots to their most famous word (ر-ح-م → Rahman)",
+      "Notice roots in your daily prayers",
+      "Build word families around each root"
+    ],
+    keyVocabulary: [
+      { arabic: "ع-ب-د", transliteration: "'A-B-D", meaning: "Worship, Servitude" },
+      { arabic: "ر-ح-م", transliteration: "R-H-M", meaning: "Mercy" },
+      { arabic: "ذ-ك-ر", transliteration: "Dh-K-R", meaning: "Remember, Mention" },
+      { arabic: "ق-و-ل", transliteration: "Q-W-L", meaning: "Say, Speech" },
+      { arabic: "ص-ل-ح", transliteration: "S-L-H", meaning: "Righteous, Good" }
+    ]
   }
 ];
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * UNIT 7: BASIC TAJWEED RULES (Lessons 23-25)
- * Learn the essential rules for beautiful recitation
+ * UNIT 7: TAJWEED RULES IN DEPTH (Lessons 25-29)
+ * Master the essential rules for beautiful recitation
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
 const UNIT_7_LESSONS: Lesson[] = [
   // ─────────────────────────────────────────────────────────────────────────
-  // LESSON 23: Noon Sakinah & Tanween Rules
+  // LESSON 25: Noon Sakinah & Tanween Rules
   // ─────────────────────────────────────────────────────────────────────────
   {
-    id: "int-lesson-4",
+    id: "int-lesson-6",
     unit: 7,
-    unitTitle: "Basic Tajweed Rules",
+    unitTitle: "Tajweed Rules in Depth",
     path: "intermediate",
-    number: 23,
+    number: 25,
     title: "Noon Sakinah & Tanween Rules",
     description: "Master the 4 rules for Noon Sakinah (نْ) and Tanween",
     surah: 1,
@@ -673,7 +1151,7 @@ const UNIT_7_LESSONS: Lesson[] = [
     xpReward: 125,
     steps: [
       {
-        id: "int4-intro",
+        id: "int6-intro",
         type: "instruction",
         title: "What is Tajweed?",
         content: `**Tajweed (تَجْوِيد)** comes from "جَوَّدَ" - to make better/beautiful.
@@ -699,7 +1177,7 @@ We'll focus on **Noon Sakinah (نْ)** and **Tanween (ـٌ ـً ـٍ)** rules.
 **There are 4 rules depending on what letter comes next!**`
       },
       {
-        id: "int4-izhar",
+        id: "int6-izhar",
         type: "explanation",
         title: "Rule 1: Izhar (إِظْهَار) - Clear Pronunciation",
         arabicContent: "مِنْ خَيْرٍ",
@@ -724,7 +1202,7 @@ We'll focus on **Noon Sakinah (نْ)** and **Tanween (ـٌ ـً ـٍ)** rules.
 **Recognition tip:** If you see نْ or tanween followed by a throat letter, pronounce clearly!`
       },
       {
-        id: "int4-idgham",
+        id: "int6-idgham",
         type: "explanation",
         title: "Rule 2: Idgham (إِدْغَام) - Merging",
         arabicContent: "مَن يَقُولُ",
@@ -754,7 +1232,7 @@ When followed by: **ل ر** (Lam, Ra)
 **If same word:** No idgham! Like "دُنْيَا" - say the noon clearly.`
       },
       {
-        id: "int4-iqlab",
+        id: "int6-iqlab",
         type: "explanation",
         title: "Rule 3: Iqlab (إِقْلَاب) - Conversion",
         arabicContent: "مِنْ بَعْدِ",
@@ -778,7 +1256,7 @@ When followed by: **ل ر** (Lam, Ra)
 **Practice:** "مِنْ بَيْنِ يَدَيْهِ" - say "mim bayni yadayhi" with a humming meem.`
       },
       {
-        id: "int4-ikhfa",
+        id: "int6-ikhfa",
         type: "explanation",
         title: "Rule 4: Ikhfa (إِخْفَاء) - Hiding",
         arabicContent: "مَن تَابَ",
@@ -806,16 +1284,11 @@ When followed by: **ل ر** (Lam, Ra)
 **Practice tip:** Think of it as saying the noon "halfway" while your tongue moves toward the next letter's position.`
       },
       {
-        id: "int4-summary-practice",
+        id: "int6-summary-practice",
         type: "practice",
         title: "Putting It All Together",
         arabicContent: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
         content: `**Let's apply these rules to Al-Fatiha!**
-
-**Verse 2:** "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ"
-- الْعَالَمِينَ ends with tanween (يـنَ = ين + hidden noon)
-- Next verse starts with الرَّحْمَٰنِ
-- But wait - there's a pause (waqf) here, so no rule applies!
 
 **Verse 6:** "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ"
 - أَنْعَمْتَ has noon sakinah (نْ) followed by 'Ayn (ع)
@@ -832,7 +1305,7 @@ When followed by: **ل ر** (Lam, Ra)
 4. **Ikhfa:** مَنْ ذَا (man thaa) - hidden noon with ghunnah`
       },
       {
-        id: "int4-quiz",
+        id: "int6-quiz",
         type: "exercise",
         title: "Tajweed Rule Quiz",
         content: "Identify the correct rule!",
@@ -850,7 +1323,7 @@ When followed by: **ل ر** (Lam, Ra)
         }
       },
       {
-        id: "int4-review",
+        id: "int6-review",
         type: "instruction",
         title: "Lesson Complete! 🌟",
         content: `**Excellent! You've learned the 4 rules of Noon Sakinah and Tanween!**
@@ -870,8 +1343,6 @@ When followed by: **ل ر** (Lam, Ra)
 - **1** Ba → Iqlab (flip to meem)
 - **15** remaining → Ikhfa (hide)
 
-**Practice daily:** When reciting, pause at each noon sakinah/tanween and apply the correct rule!
-
 **Coming up:** Meem Sakinah rules!`
       }
     ],
@@ -890,14 +1361,14 @@ When followed by: **ل ر** (Lam, Ra)
   },
 
   // ─────────────────────────────────────────────────────────────────────────
-  // LESSON 24: Meem Sakinah Rules
+  // LESSON 26: Meem Sakinah Rules
   // ─────────────────────────────────────────────────────────────────────────
   {
-    id: "int-lesson-5",
+    id: "int-lesson-7",
     unit: 7,
-    unitTitle: "Basic Tajweed Rules",
+    unitTitle: "Tajweed Rules in Depth",
     path: "intermediate",
-    number: 24,
+    number: 26,
     title: "Meem Sakinah Rules",
     description: "Learn the 3 rules for Meem Sakinah (مْ)",
     surah: 1,
@@ -907,7 +1378,7 @@ When followed by: **ل ر** (Lam, Ra)
     xpReward: 100,
     steps: [
       {
-        id: "int5-intro",
+        id: "int7-intro",
         type: "instruction",
         title: "Meem Sakinah - Simpler Than Noon!",
         content: `Good news! Meem Sakinah only has **3 rules** (compared to Noon's 4).
@@ -927,7 +1398,7 @@ Because meem is pronounced with the lips!
 Let's learn each one...`
       },
       {
-        id: "int5-idgham-shafawi",
+        id: "int7-idgham-shafawi",
         type: "explanation",
         title: "Rule 1: Idgham Shafawi (إِدْغَام شَفَوِي)",
         arabicContent: "لَهُم مَّا يَشَاءُونَ",
@@ -949,7 +1420,7 @@ Let's learn each one...`
 **Practice:** Say "لَهُم مَّغْفِرَةٌ" - feel how the two meems naturally blend into one sustained meem with humming.`
       },
       {
-        id: "int5-ikhfa-shafawi",
+        id: "int7-ikhfa-shafawi",
         type: "explanation",
         title: "Rule 2: Ikhfa Shafawi (إِخْفَاء شَفَوِي)",
         arabicContent: "تَرْمِيهِم بِحِجَارَةٍ",
@@ -975,13 +1446,13 @@ Remember how Noon before Ba becomes Meem? This is similar but simpler - the meem
 **Practice:** Say "عَلَيْهِمْ بِلِسَانِهِمْ" - feel the soft meem blending into the Ba.`
       },
       {
-        id: "int5-izhar-shafawi",
+        id: "int7-izhar-shafawi",
         type: "explanation",
         title: "Rule 3: Izhar Shafawi (إِظْهَار شَفَوِي)",
         arabicContent: "عَلَيْهِمْ غَيْرِ",
         content: `**Izhar Shafawi** - Clear pronunciation of Meem
 
-**When:** Meem Sakinah (مْ) is followed by ANY letter EXCEPT مeem or Ba.
+**When:** Meem Sakinah (مْ) is followed by ANY letter EXCEPT Meem or Ba.
 
 **How:** Pronounce the meem clearly with NO ghunnah, then move to the next letter.
 
@@ -1001,7 +1472,7 @@ Since Meem + Meem and Meem + Ba are special cases, everything else is Izhar (cle
 Find the meem sakinah and pronounce it clearly before غ and و.`
       },
       {
-        id: "int5-comparison",
+        id: "int7-comparison",
         type: "explanation",
         title: "Quick Comparison: Meem vs Noon Rules",
         content: `**How Meem Sakinah rules relate to Noon Sakinah:**
@@ -1026,7 +1497,7 @@ Find the meem sakinah and pronounce it clearly before غ and و.`
 - Meem + anyone else = strangers stay clear`
       },
       {
-        id: "int5-quiz",
+        id: "int7-quiz",
         type: "exercise",
         title: "Meem Sakinah Quiz",
         content: "Let's test your understanding!",
@@ -1044,7 +1515,7 @@ Find the meem sakinah and pronounce it clearly before غ and و.`
         }
       },
       {
-        id: "int5-review",
+        id: "int7-review",
         type: "instruction",
         title: "Lesson Complete! 🌟",
         content: `**Great work! You've mastered Meem Sakinah rules!**
@@ -1084,15 +1555,15 @@ You now know 7 tajweed rules:
   },
 
   // ─────────────────────────────────────────────────────────────────────────
-  // LESSON 25: Introduction to Madd (Elongation)
+  // LESSON 27: Madd Rules - Elongation
   // ─────────────────────────────────────────────────────────────────────────
   {
-    id: "int-lesson-6",
+    id: "int-lesson-8",
     unit: 7,
-    unitTitle: "Basic Tajweed Rules",
+    unitTitle: "Tajweed Rules in Depth",
     path: "intermediate",
-    number: 25,
-    title: "Introduction to Madd (Elongation)",
+    number: 27,
+    title: "Madd Rules - Elongation",
     description: "Learn the essential elongation rules for beautiful recitation",
     surah: 1,
     ayahStart: 1,
@@ -1101,7 +1572,7 @@ You now know 7 tajweed rules:
     xpReward: 125,
     steps: [
       {
-        id: "int6-intro",
+        id: "int8-intro",
         type: "instruction",
         title: "What is Madd?",
         content: `**Madd (مَدّ)** means to stretch or elongate.
@@ -1122,12 +1593,12 @@ We measure elongation in "counts" (حَرَكَات):
 **Why it matters:**
 Elongation adds beauty and meaning. A well-placed madd can:
 - Create emphasis
-- Build suspense
+- Build anticipation
 - Mark endings
 - Distinguish similar words`
       },
       {
-        id: "int6-madd-tabee",
+        id: "int8-madd-tabee",
         type: "explanation",
         title: "Natural Madd (مَدّ طَبِيعِي)",
         arabicContent: "قَالَ",
@@ -1154,7 +1625,7 @@ Two counts = open, close. That's natural madd!
 **Important:** Natural madd is the BASE - all other madd types build on it!`
       },
       {
-        id: "int6-madd-muttasil",
+        id: "int8-madd-muttasil",
         type: "explanation",
         title: "Connected Madd (مَدّ مُتَّصِل)",
         arabicContent: "جَآءَ",
@@ -1176,11 +1647,10 @@ The madd letter and hamza are CONNECTED in one word - they can't be separated.
 - "إِذَا جَآءَ نَصْرُ اللَّهِ" (When the victory of Allah comes)
 - Stretch جَآءَ for 4-5 counts
 
-**Practical tip:**
-Look for this symbol: آ (alif with hamza written as madda). It signals connected madd!`
+**Visual cue:** Look for آ (alif with hamza written as madda). It signals connected madd!`
       },
       {
-        id: "int6-madd-munfasil",
+        id: "int8-madd-munfasil",
         type: "explanation",
         title: "Separated Madd (مَدّ مُنْفَصِل)",
         arabicContent: "يَا أَيُّهَا",
@@ -1196,7 +1666,7 @@ Look for this symbol: آ (alif with hamza written as madda). It signals connecte
 - قُوا أَنفُسَكُمْ (qoo anfusakum) - the waw before the hamza
 
 **Why it's called "separated" (munfasil):**
-The madd letter and hamza are SEPARATED in different words - you could theoretically stop between them.
+The madd letter and hamza are SEPARATED in different words - you could stop between them.
 
 **Flexibility:** 
 Different reciters use different lengths. Hafs 'an Asim typically uses 4-5 counts.
@@ -1205,7 +1675,7 @@ Different reciters use different lengths. Hafs 'an Asim typically uses 4-5 count
 Whenever a word ends with ا, و, or ي (as vowels) and the next word starts with أ, إ, or آ, it's separated madd!`
       },
       {
-        id: "int6-madd-lazim",
+        id: "int8-madd-lazim",
         type: "explanation",
         title: "Compulsory Madd (مَدّ لَازِم)",
         arabicContent: "الضَّالِّينَ",
@@ -1235,37 +1705,7 @@ The alif before the shaddah on Lam gets 6 counts!
 **Practice:** Say "الضَّالِّينَ" and count slowly: "ad-DAAAAA-AAAAL-leen" (6 counts on the "aa")`
       },
       {
-        id: "int6-practice",
-        type: "practice",
-        title: "Madd in Al-Fatiha",
-        arabicContent: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
-        content: `**Let's identify all the madd in Al-Fatiha!**
-
-**Verse 1: بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ**
-- الرَّحْمَٰنِ - "aa" (special alif) = 2 counts
-- الرَّحِيمِ - "ee" = 2 counts
-
-**Verse 2: الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ**
-- الْعَالَمِينَ - "aa" and "ee" = 2 counts each
-
-**Verse 4: مَالِكِ يَوْمِ الدِّينِ**
-- مَالِكِ - "aa" = 2 counts
-- الدِّينِ - "ee" = 2 counts
-
-**Verse 5: إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ**
-- إِيَّاكَ - "ee" = 2 counts (x2)
-- نَسْتَعِينُ - "ee" = 2 counts
-
-**Verse 6: اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ**
-- الصِّرَاطَ - "aa" = 2 counts
-- الْمُسْتَقِيمَ - "ee" = 2 counts
-
-**Verse 7: وَلَا الضَّالِّينَ**
-- الضَّالِّينَ - "aa" = **6 counts** (Madd Lazim!)
-- "ee" = 2 counts`
-      },
-      {
-        id: "int6-quiz",
+        id: "int8-quiz",
         type: "exercise",
         title: "Madd Quiz",
         content: "Identify the type of madd!",
@@ -1283,7 +1723,7 @@ The alif before the shaddah on Lam gets 6 counts!
         }
       },
       {
-        id: "int6-review",
+        id: "int8-review",
         type: "instruction",
         title: "Lesson Complete! 🌟",
         content: `**Wonderful! You've learned the essential Madd rules!**
@@ -1307,7 +1747,7 @@ The alif before the shaddah on Lam gets 6 counts!
 3. Is there sukoon/shaddah after?
    - Yes → Compulsory Madd (6 counts)
 
-**You've completed Unit 7: Basic Tajweed!** 🎉`
+**Coming up:** Qalqalah - The bouncing letters!`
       }
     ],
     memorizationTechniques: [
@@ -1322,28 +1762,905 @@ The alif before the shaddah on Lam gets 6 counts!
       { arabic: "مَدّ لَازِم", transliteration: "Madd Lazim", meaning: "Compulsory elongation (6 counts)" },
       { arabic: "حَرَكَة", transliteration: "Haraka", meaning: "Count (unit of time)" }
     ]
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // LESSON 28: Qalqalah - The Echo Letters
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "int-lesson-9",
+    unit: 7,
+    unitTitle: "Tajweed Rules in Depth",
+    path: "intermediate",
+    number: 28,
+    title: "Qalqalah - The Echo Letters",
+    description: "Master the bouncing sound of the Qalqalah letters",
+    surah: 112,
+    ayahStart: 1,
+    ayahEnd: 4,
+    estimatedMinutes: 25,
+    xpReward: 100,
+    steps: [
+      {
+        id: "int9-intro",
+        type: "instruction",
+        title: "What is Qalqalah?",
+        content: `**Qalqalah (قَلْقَلَة)** means "to shake" or "to disturb."
+
+In tajweed, it refers to the slight bouncing or echoing sound made when certain letters have sukoon.
+
+**The 5 Qalqalah Letters:**
+**ق ط ب ج د**
+
+**Memory phrase:** "قُطْبُ جَدّ" (Qutbu Jadd - "The grandfather's pole")
+
+**Why do these letters echo?**
+These letters are:
+1. Strong consonants (not soft/flowing)
+2. When they have sukoon (no vowel), they can't flow smoothly
+3. So they "bounce" or "echo" slightly when released
+
+**Two levels of Qalqalah:**
+1. **Small (صُغْرَى)** - in the middle of a word
+2. **Large (كُبْرَى)** - at the END of a word (when stopping)`
+      },
+      {
+        id: "int9-small-qalqalah",
+        type: "explanation",
+        title: "Small Qalqalah (صُغْرَى)",
+        arabicContent: "يَجْعَلُونَ",
+        content: `**Small Qalqalah** - When the letter is in the MIDDLE of a word.
+
+**Characteristics:**
+- Subtle bounce
+- Lighter echo
+- Continues smoothly to next sound
+
+**Examples:**
+
+**ق in middle:** "يَقْتُلُونَ" (yaqtuloon) - slight bounce on Qaf
+**ط in middle:** "يَطْمَعُونَ" (yatma'oon) - slight bounce on Ta
+**ب in middle:** "يَبْتَغُونَ" (yabtaghoon) - slight bounce on Ba
+**ج in middle:** "يَجْعَلُونَ" (yaj'aloon) - slight bounce on Jeem
+**د in middle:** "يَدْخُلُونَ" (yadkhuloon) - slight bounce on Dal
+
+**Practice:**
+Read "أَقْرَبُ" (aqrabu) - Feel the slight bounce on the Qaf, but don't exaggerate!
+
+**Common mistake:** Making the echo too strong. Small qalqalah is SUBTLE.`
+      },
+      {
+        id: "int9-large-qalqalah",
+        type: "explanation",
+        title: "Large Qalqalah (كُبْرَى)",
+        arabicContent: "أَحَدْ",
+        content: `**Large Qalqalah** - When the letter is at the END and you STOP on it.
+
+**Characteristics:**
+- More pronounced bounce
+- Clear echo
+- The air pressure builds and releases
+
+**Examples from Surah Al-Ikhlas:**
+
+- "أَحَدٌ" → When stopping: "أَحَدْ" - strong bounce on Dal
+- "الصَّمَدُ" → When stopping: "الصَّمَدْ" - strong bounce on Dal
+- "يُولَدْ" - strong bounce on Dal
+- "يَلِدْ" - strong bounce on Dal
+
+**From Surah Al-Falaq:**
+- "الْفَلَقْ" (al-falaq) - strong bounce on Qaf
+
+**From Surah Al-Masad:**
+- "تَبَّ" (tabb) - strong bounce on Ba
+- "لَهَبْ" (lahab) - strong bounce on Ba
+
+**Practice technique:**
+1. Say the word normally
+2. Stop on the final letter
+3. Let the air release with a slight "pop"
+4. It should sound like a very short echo: "ahad-d"`
+      },
+      {
+        id: "int9-practice",
+        type: "audio",
+        title: "Qalqalah in Surah Al-Ikhlas",
+        arabicContent: "قُلْ هُوَ ٱللَّهُ أَحَدٌ",
+        content: `**Let's practice Qalqalah in Surah Al-Ikhlas!**
+
+**قُلْ هُوَ ٱللَّهُ أَحَدٌ ﴿١﴾**
+- "أَحَدٌ" when we stop → "أَحَدْ" - Large Qalqalah on Dal!
+
+**ٱللَّهُ ٱلصَّمَدُ ﴿٢﴾**
+- "ٱلصَّمَدُ" when we stop → "ٱلصَّمَدْ" - Large Qalqalah on Dal!
+
+**لَمْ يَلِدْ وَلَمْ يُولَدْ ﴿٣﴾**
+- "يَلِدْ" - Large Qalqalah on Dal
+- "يُولَدْ" - Large Qalqalah on Dal
+
+**Notice:** This surah is FULL of qalqalah because of words ending in Dal!
+
+Listen and repeat:`,
+        audioSegment: { surah: 112, ayahStart: 1, ayahEnd: 4, repeat: 5 }
+      },
+      {
+        id: "int9-quiz",
+        type: "exercise",
+        title: "Qalqalah Quiz",
+        content: "Identify the qalqalah!",
+        exercise: {
+          type: "letter_identify",
+          question: "Which letter has Large Qalqalah when you stop on 'الْفَلَقْ'?",
+          options: ["ف (Fa)", "ل (Lam)", "ق (Qaf)", "None"],
+          correctAnswer: 2,
+          explanation: "The Qaf (ق) at the end gets Large Qalqalah because it's a qalqalah letter at the end during a stop. The bouncing sound is more pronounced!"
+        }
+      },
+      {
+        id: "int9-review",
+        type: "instruction",
+        title: "Lesson Complete! 🌟",
+        content: `**Excellent! You've mastered Qalqalah!**
+
+**Summary:**
+
+**The 5 Letters:** ق ط ب ج د (قُطْبُ جَدّ)
+
+| Type | Where | Intensity |
+|------|-------|-----------|
+| **Small (صُغْرَى)** | Middle of word | Subtle bounce |
+| **Large (كُبْرَى)** | End (when stopping) | Clear bounce |
+
+**Common errors to avoid:**
+- Adding a full vowel (saying "ahad-a" instead of "ahad" with echo)
+- Making middle qalqalah too strong
+- Forgetting qalqalah entirely
+
+**Coming up:** Ghunnah - The Nasal Sound!`
+      }
+    ],
+    memorizationTechniques: [
+      "قُطْبُ جَدّ (Qutbu Jadd) = The 5 qalqalah letters",
+      "Small = middle, Large = end (when stopping)",
+      "Echo, don't add a vowel!"
+    ],
+    keyVocabulary: [
+      { arabic: "قَلْقَلَة", transliteration: "Qalqalah", meaning: "Echo/bounce" },
+      { arabic: "صُغْرَى", transliteration: "Sughra", meaning: "Small (qalqalah)" },
+      { arabic: "كُبْرَى", transliteration: "Kubra", meaning: "Large (qalqalah)" },
+      { arabic: "قُطْبُ جَدّ", transliteration: "Qutbu Jadd", meaning: "Memory phrase for ق ط ب ج د" }
+    ]
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // LESSON 29: Ghunnah - The Nasal Sound
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "int-lesson-10",
+    unit: 7,
+    unitTitle: "Tajweed Rules in Depth",
+    path: "intermediate",
+    number: 29,
+    title: "Ghunnah - The Nasal Sound",
+    description: "Perfect the beautiful nasal humming in Quran recitation",
+    surah: 1,
+    ayahStart: 1,
+    ayahEnd: 7,
+    estimatedMinutes: 20,
+    xpReward: 100,
+    steps: [
+      {
+        id: "int10-intro",
+        type: "instruction",
+        title: "The Beauty of Ghunnah",
+        content: `**Ghunnah (غُنَّة)** is the nasal humming sound produced through the nose.
+
+**Which letters have Ghunnah?**
+Only two: **ن (Noon)** and **م (Meem)**
+
+**When is Ghunnah applied?**
+1. When ن or م have shaddah (نّ, مّ)
+2. During Idgham with ghunnah
+3. During Ikhfa
+4. During Iqlab
+
+**Duration:**
+Ghunnah is held for **2 counts** (like natural madd)
+
+**The physical technique:**
+1. Close your mouth (for meem) or let air flow through nose (for noon)
+2. Let the sound resonate in your nasal cavity
+3. You should feel vibration in your nose!`
+      },
+      {
+        id: "int10-mushaddad",
+        type: "explanation",
+        title: "Ghunnah with Shaddah",
+        arabicContent: "إِنَّ • أُمَّة",
+        content: `**When Noon or Meem have Shaddah → Maximum Ghunnah!**
+
+**Examples with Noon Mushaddad (نّ):**
+- إِنَّ (inna) - "Indeed" - hum the doubled noon
+- جَنَّة (jannah) - "Paradise" - nasal humming on نّ
+- أَنَّ (anna) - "that" - ghunnah required
+
+**Examples with Meem Mushaddad (مّ):**
+- أُمَّة (ummah) - "nation" - hum the doubled meem
+- ثُمَّ (thumma) - "then" - nasal humming on مّ
+- لَمَّا (lammaa) - "when" - ghunnah required
+
+**Practice technique:**
+1. Say إِنَّ
+2. On the نّ, pinch your nose
+3. If the sound stops, you're doing it right! (sound comes from nose)
+4. Release and let it hum for 2 counts
+
+**In Al-Fatiha:**
+- "الضَّالِّينَ" - the shaddah is on Lam (ل), not noon, so no ghunnah there
+- But when you read "إِنَّا أَعْطَيْنَاكَ" in Al-Kawthar, the إِنَّ has ghunnah!`
+      },
+      {
+        id: "int10-where-else",
+        type: "explanation",
+        title: "Where Else Ghunnah Appears",
+        arabicContent: "مِن يَقُولُ",
+        content: `**Ghunnah also appears in the tajweed rules you learned:**
+
+**1. Idgham with Ghunnah:**
+When Noon Sakinah meets ي ن م و
+- "مِن يَقُولُ" → "miy-yaqool" - 2 count ghunnah
+- "مِن وَلِيّ" → "miw-waliyy" - 2 count ghunnah
+
+**2. Ikhfa (of Noon):**
+When Noon Sakinah meets the 15 Ikhfa letters
+- "مِن قَبْلِ" → soft noon with 2 count ghunnah
+- "أَنتُمْ" → ghunnah on the hidden noon
+
+**3. Iqlab:**
+When Noon becomes Meem before Ba
+- "مِنْ بَعْدِ" → "mim ba'd" - the meem has ghunnah
+
+**4. Ikhfa Shafawi (of Meem):**
+When Meem Sakinah meets Ba
+- "هُمْ بِهِ" → soft meem with ghunnah
+
+**Key insight:**
+Almost every time you encounter noon or meem interacting with another letter, there's likely ghunnah involved!`
+      },
+      {
+        id: "int10-quiz",
+        type: "exercise",
+        title: "Ghunnah Quiz",
+        content: "Identify where ghunnah occurs!",
+        exercise: {
+          type: "word_match",
+          question: "In the word 'إِنَّمَا', where does ghunnah occur?",
+          options: [
+            "On the Alif (ا)",
+            "On the doubled Noon (نّ)",
+            "On the Meem (م)",
+            "On the final Alif (ا)"
+          ],
+          correctAnswer: 1,
+          explanation: "The doubled Noon (نّ) requires ghunnah! When you say 'innama', the نّ should have a nasal humming sound held for 2 counts."
+        }
+      },
+      {
+        id: "int10-review",
+        type: "instruction",
+        title: "Lesson Complete! 🌟",
+        content: `**Wonderful! You've mastered Ghunnah!**
+
+**Summary:**
+- Ghunnah = nasal humming on ن and م
+- Duration = 2 counts
+- Appears with: Shaddah, Idgham, Ikhfa, Iqlab
+
+**Self-test:**
+Pinch your nose while saying the ghunnah. 
+If the sound stops, you're doing it correctly!
+
+**You've completed Unit 7: Tajweed Rules in Depth!**
+
+**Coming up: Unit 8 - Medium Surah Memorization!**`
+      }
+    ],
+    memorizationTechniques: [
+      "Ghunnah = nasal hum on Noon and Meem",
+      "Always 2 counts duration",
+      "Pinch test: if sound stops, ghunnah is correct"
+    ],
+    keyVocabulary: [
+      { arabic: "غُنَّة", transliteration: "Ghunnah", meaning: "Nasal sound" },
+      { arabic: "مُشَدَّد", transliteration: "Mushaddad", meaning: "Doubled (with shaddah)" },
+      { arabic: "حَرَكَتَان", transliteration: "Harakatan", meaning: "Two counts" }
+    ]
   }
 ];
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * UNIT 8: SHORT SURAH MEMORIZATION (Lessons 26-28)
- * Deep-dive memorization with understanding
+ * UNIT 8: MEDIUM SURAH MEMORIZATION (Lessons 30-38)
+ * Deep-dive memorization of Al-Mulk, Ya-Sin sections, Al-Kahf sections
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
 const UNIT_8_LESSONS: Lesson[] = [
   // ─────────────────────────────────────────────────────────────────────────
-  // LESSON 26: Al-Masad (Surah 111) with Deep Understanding
+  // LESSON 30: Al-Mulk Part 1 (Verses 1-10) - The Dominion
   // ─────────────────────────────────────────────────────────────────────────
   {
-    id: "int-lesson-7",
+    id: "int-lesson-11",
     unit: 8,
-    unitTitle: "Short Surah Memorization",
+    unitTitle: "Medium Surah Memorization",
     path: "intermediate",
-    number: 26,
-    title: "Al-Masad - The Palm Fiber",
-    description: "Memorize Surah Al-Masad with deep tafsir understanding",
+    number: 30,
+    title: "Al-Mulk Part 1 - The Dominion",
+    description: "Begin memorizing Surah Al-Mulk with deep understanding (verses 1-10)",
+    surah: 67,
+    ayahStart: 1,
+    ayahEnd: 10,
+    estimatedMinutes: 40,
+    xpReward: 150,
+    steps: [
+      {
+        id: "int11-intro",
+        type: "instruction",
+        title: "The Protector Surah",
+        content: `**Surah Al-Mulk (الملك)** - The Dominion/Sovereignty
+
+**Also called:** Surah Tabarak, Al-Munjiyah (The Savior)
+
+**The Prophet ﷺ said:**
+"There is a surah in the Quran of thirty verses that intercedes for its reciter until he is forgiven: Tabaarakalladhi biyadihil-mulk." (Tirmidhi, Abu Dawud)
+
+**Another hadith:**
+"It is the protector; it is the savior, delivering from the punishment of the grave." (Tirmidhi)
+
+**Key themes:**
+1. Allah's absolute dominion over creation
+2. The purpose of life and death
+3. Signs of Allah in creation
+4. Warning to disbelievers
+5. The security of believers
+
+**Memorization goal:** 30 verses in 3 lessons (10 verses each)
+
+Let's begin with the powerful opening...`
+      },
+      {
+        id: "int11-verses1-2",
+        type: "explanation",
+        title: "Verses 1-2: Blessed Sovereignty",
+        arabicContent: "تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ • الَّذِي خَلَقَ الْمَوْتَ وَالْحَيَاةَ لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًا",
+        content: `**Verse 1:**
+تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ
+
+**"Blessed is He in Whose Hand is the dominion, and He has power over all things."**
+
+**Key vocabulary:**
+- تَبَارَكَ (tabaaraka) - Blessed (exalted beyond measure)
+- بِيَدِهِ (biyadihi) - in His Hand
+- الْمُلْكُ (al-mulk) - the dominion/sovereignty
+- قَدِيرٌ (qadeer) - All-Powerful
+
+**Verse 2:**
+الَّذِي خَلَقَ الْمَوْتَ وَالْحَيَاةَ لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًا ۚ وَهُوَ الْعَزِيزُ الْغَفُورُ
+
+**"Who created death and life to test you: which of you is best in deed. And He is the Mighty, the Forgiving."**
+
+**Profound insight:**
+- Death is CREATED (not just absence of life)
+- Death mentioned BEFORE life (we start dead, live, then die again)
+- Purpose: To test "أَحْسَنُ عَمَلًا" (BEST in deed) - quality, not quantity!`
+      },
+      {
+        id: "int11-verses3-4",
+        type: "explanation",
+        title: "Verses 3-4: The Perfect Heavens",
+        arabicContent: "الَّذِي خَلَقَ سَبْعَ سَمَاوَاتٍ طِبَاقًا ۖ مَّا تَرَىٰ فِي خَلْقِ الرَّحْمَٰنِ مِن تَفَاوُتٍ",
+        content: `**Verse 3:**
+الَّذِي خَلَقَ سَبْعَ سَمَاوَاتٍ طِبَاقًا ۖ مَّا تَرَىٰ فِي خَلْقِ الرَّحْمَٰنِ مِن تَفَاوُتٍ ۖ فَارْجِعِ الْبَصَرَ هَلْ تَرَىٰ مِن فُطُورٍ
+
+**"Who created seven heavens in layers. You see no imperfection in the creation of the Most Merciful. So look again—do you see any flaw?"**
+
+**Key vocabulary:**
+- سَبْعَ سَمَاوَاتٍ (sab'a samaawaat) - seven heavens
+- طِبَاقًا (tibaaqan) - in layers
+- تَفَاوُتٍ (tafaawut) - inconsistency/imperfection
+- فُطُورٍ (futoor) - cracks/flaws
+
+**Verse 4:**
+ثُمَّ ارْجِعِ الْبَصَرَ كَرَّتَيْنِ يَنقَلِبْ إِلَيْكَ الْبَصَرُ خَاسِئًا وَهُوَ حَسِيرٌ
+
+**"Then look again and again—your sight will return humbled and exhausted."**
+
+**The challenge:**
+Allah challenges us to find ANY flaw in His creation. Look at the sky, the universe - perfect design! Your eyes will tire before finding an imperfection.`
+      },
+      {
+        id: "int11-verses5-6",
+        type: "explanation",
+        title: "Verses 5-6: Stars and Hell",
+        arabicContent: "وَلَقَدْ زَيَّنَّا السَّمَاءَ الدُّنْيَا بِمَصَابِيحَ وَجَعَلْنَاهَا رُجُومًا لِّلشَّيَاطِينِ",
+        content: `**Verse 5:**
+وَلَقَدْ زَيَّنَّا السَّمَاءَ الدُّنْيَا بِمَصَابِيحَ وَجَعَلْنَاهَا رُجُومًا لِّلشَّيَاطِينِ ۖ وَأَعْتَدْنَا لَهُمْ عَذَابَ السَّعِيرِ
+
+**"And We adorned the nearest heaven with lamps and made them missiles against the devils, and We prepared for them the punishment of the Blaze."**
+
+**Key vocabulary:**
+- زَيَّنَّا (zayyannaa) - We adorned/beautified
+- مَصَابِيحَ (masaabeeh) - lamps (stars)
+- رُجُومًا (rujooman) - missiles
+- السَّعِيرِ (as-sa'eer) - the Blaze (Hell)
+
+**Verse 6:**
+وَلِلَّذِينَ كَفَرُوا بِرَبِّهِمْ عَذَابُ جَهَنَّمَ ۖ وَبِئْسَ الْمَصِيرُ
+
+**"And for those who disbelieved in their Lord is the punishment of Hell. And wretched is the destination."**
+
+**Dual purpose of stars:**
+1. Beauty (زَيَّنَّا) - aesthetic design
+2. Protection (رُجُومًا) - missiles against devils`
+      },
+      {
+        id: "int11-verses7-8",
+        type: "explanation",
+        title: "Verses 7-8: Hell's Fury",
+        arabicContent: "إِذَا أُلْقُوا فِيهَا سَمِعُوا لَهَا شَهِيقًا وَهِيَ تَفُورُ",
+        content: `**Verse 7:**
+إِذَا أُلْقُوا فِيهَا سَمِعُوا لَهَا شَهِيقًا وَهِيَ تَفُورُ
+
+**"When they are thrown into it, they hear from it an inhaling while it boils up."**
+
+**Key vocabulary:**
+- أُلْقُوا (ulqoo) - they are thrown
+- شَهِيقًا (shaheeqan) - an inhaling/roaring sound
+- تَفُورُ (tafoor) - it boils over
+
+**Verse 8:**
+تَكَادُ تَمَيَّزُ مِنَ الْغَيْظِ ۖ كُلَّمَا أُلْقِيَ فِيهَا فَوْجٌ سَأَلَهُمْ خَزَنَتُهَا أَلَمْ يَأْتِكُمْ نَذِيرٌ
+
+**"It almost bursts with rage. Every time a group is thrown into it, its keepers ask them, 'Did there not come to you a warner?'"**
+
+**Powerful imagery:**
+- Hell is described as ANGRY (غَيْظ)
+- It almost BURSTS from rage against the disbelievers
+- Each group is asked: "Didn't a warner come to you?"
+
+**The question we'll all face:** Did you not receive the message?`
+      },
+      {
+        id: "int11-verses9-10",
+        type: "explanation",
+        title: "Verses 9-10: The Admission",
+        arabicContent: "قَالُوا بَلَىٰ قَدْ جَاءَنَا نَذِيرٌ فَكَذَّبْنَا وَقُلْنَا مَا نَزَّلَ اللَّهُ مِن شَيْءٍ",
+        content: `**Verse 9:**
+قَالُوا بَلَىٰ قَدْ جَاءَنَا نَذِيرٌ فَكَذَّبْنَا وَقُلْنَا مَا نَزَّلَ اللَّهُ مِن شَيْءٍ إِنْ أَنتُمْ إِلَّا فِي ضَلَالٍ كَبِيرٍ
+
+**"They will say, 'Yes, a warner had come to us, but we denied and said: Allah has not sent down anything; you are only in great error.'"**
+
+**Verse 10:**
+وَقَالُوا لَوْ كُنَّا نَسْمَعُ أَوْ نَعْقِلُ مَا كُنَّا فِي أَصْحَابِ السَّعِيرِ
+
+**"And they will say, 'If only we had listened or reasoned, we would not be among the companions of the Blaze.'"**
+
+**The tragic admission:**
+- They ADMIT a warner came (بَلَىٰ)
+- They ADMIT they denied (فَكَذَّبْنَا)
+- They ADMIT they didn't listen or reason (لَوْ كُنَّا نَسْمَعُ أَوْ نَعْقِلُ)
+
+**The solution was simple:** Listen (نَسْمَعُ) + Think (نَعْقِلُ)
+They chose to reject both.`
+      },
+      {
+        id: "int11-audio",
+        type: "audio",
+        title: "Listen and Memorize (Verses 1-10)",
+        content: `**Listen to verses 1-10 with focus:**
+
+Follow along with the Arabic text. Notice:
+- The rhythm and rhyme scheme
+- How the themes flow from sovereignty → creation → punishment → admission
+
+**Memorization tips for Al-Mulk:**
+1. Group by theme (1-2: Power, 3-4: Creation, 5-6: Stars/Hell, 7-10: Hell scene)
+2. Notice the question-answer pattern (7-8 question, 9-10 answer)
+3. Pay attention to the tajweed: ghunnah, madd, qalqalah
+
+**Listen and repeat each verse 10 times:**`,
+        audioSegment: { surah: 67, ayahStart: 1, ayahEnd: 10, repeat: 10 }
+      },
+      {
+        id: "int11-memorization",
+        type: "practice",
+        title: "🎯 Memorization Practice",
+        content: "MEMORIZATION_MODULE",
+        arabicContent: `تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ ﴿١﴾
+الَّذِي خَلَقَ الْمَوْتَ وَالْحَيَاةَ لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًا ۚ وَهُوَ الْعَزِيزُ الْغَفُورُ ﴿٢﴾
+الَّذِي خَلَقَ سَبْعَ سَمَاوَاتٍ طِبَاقًا ۖ مَّا تَرَىٰ فِي خَلْقِ الرَّحْمَٰنِ مِن تَفَاوُتٍ ۖ فَارْجِعِ الْبَصَرَ هَلْ تَرَىٰ مِن فُطُورٍ ﴿٣﴾
+ثُمَّ ارْجِعِ الْبَصَرَ كَرَّتَيْنِ يَنقَلِبْ إِلَيْكَ الْبَصَرُ خَاسِئًا وَهُوَ حَسِيرٌ ﴿٤﴾
+وَلَقَدْ زَيَّنَّا السَّمَاءَ الدُّنْيَا بِمَصَابِيحَ وَجَعَلْنَاهَا رُجُومًا لِّلشَّيَاطِينِ ۖ وَأَعْتَدْنَا لَهُمْ عَذَابَ السَّعِيرِ ﴿٥﴾`,
+        audioSegment: { surah: 67, ayahStart: 1, ayahEnd: 10 }
+      },
+      {
+        id: "int11-review",
+        type: "instruction",
+        title: "Part 1 Complete! 🌟",
+        content: `**MashaAllah! You've memorized Al-Mulk verses 1-10!**
+
+**Themes covered:**
+1. Allah's blessed sovereignty (1)
+2. Death and life as a test (2)
+3. Perfect creation of the heavens (3-4)
+4. Stars as beauty and protection (5)
+5. The punishment of Hell (6-8)
+6. The admission of the deniers (9-10)
+
+**Key vocabulary learned:**
+- تَبَارَكَ - Blessed be
+- الْمُلْكُ - The dominion
+- أَحْسَنُ عَمَلًا - Best in deed
+- تَفَاوُتٍ - Imperfection
+
+**Review schedule:**
+- Today: Review 3 more times
+- Tomorrow: Review in morning and evening
+- This week: Daily review
+
+**Coming up:** Al-Mulk Part 2 (Verses 11-20)!`
+      }
+    ],
+    memorizationTechniques: [
+      "Group by theme: Sovereignty → Creation → Punishment → Admission",
+      "Notice repeated patterns: الَّذِي appears multiple times",
+      "Visualize: Stars as lamps (مَصَابِيح)"
+    ],
+    keyVocabulary: [
+      { arabic: "تَبَارَكَ", transliteration: "Tabaaraka", meaning: "Blessed is" },
+      { arabic: "الْمُلْكُ", transliteration: "Al-Mulk", meaning: "The dominion" },
+      { arabic: "أَحْسَنُ عَمَلًا", transliteration: "Ahsanu 'amalan", meaning: "Best in deed" },
+      { arabic: "تَفَاوُتٍ", transliteration: "Tafaawut", meaning: "Inconsistency" },
+      { arabic: "مَصَابِيحَ", transliteration: "Masaabeeh", meaning: "Lamps (stars)" }
+    ]
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // LESSON 31: Al-Mulk Part 2 (Verses 11-20)
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "int-lesson-12",
+    unit: 8,
+    unitTitle: "Medium Surah Memorization",
+    path: "intermediate",
+    number: 31,
+    title: "Al-Mulk Part 2 - Signs in Creation",
+    description: "Continue memorizing Surah Al-Mulk (verses 11-20)",
+    surah: 67,
+    ayahStart: 11,
+    ayahEnd: 20,
+    estimatedMinutes: 40,
+    xpReward: 150,
+    steps: [
+      {
+        id: "int12-intro",
+        type: "instruction",
+        title: "Continuing Al-Mulk",
+        content: `**Verses 11-20 continue with:**
+- The confession of sinners (11)
+- The reward of believers (12)
+- Allah's complete knowledge (13-14)
+- Signs in the earth and sky (15-19)
+- Challenge to the disbelievers (20)
+
+Let's continue building on your memorization!`
+      },
+      {
+        id: "int12-audio",
+        type: "audio",
+        title: "Listen and Memorize (Verses 11-20)",
+        content: `Listen carefully to verses 11-20 and repeat:`,
+        audioSegment: { surah: 67, ayahStart: 11, ayahEnd: 20, repeat: 10 }
+      },
+      {
+        id: "int12-memorization",
+        type: "practice",
+        title: "🎯 Memorization Practice",
+        content: "MEMORIZATION_MODULE",
+        arabicContent: "فَاعْتَرَفُوا بِذَنبِهِمْ فَسُحْقًا لِّأَصْحَابِ السَّعِيرِ ﴿١١﴾",
+        audioSegment: { surah: 67, ayahStart: 11, ayahEnd: 20 }
+      },
+      {
+        id: "int12-review",
+        type: "instruction",
+        title: "Part 2 Complete! 🌟",
+        content: `**Excellent! You've memorized Al-Mulk verses 11-20!**
+
+Keep reviewing daily!`
+      }
+    ],
+    memorizationTechniques: [
+      "Connect to Part 1 themes",
+      "Notice the contrast between believers and disbelievers"
+    ],
+    keyVocabulary: [
+      { arabic: "فَاعْتَرَفُوا", transliteration: "Fa'tarafoo", meaning: "So they confessed" },
+      { arabic: "أَلَا يَعْلَمُ", transliteration: "Alaa ya'lamu", meaning: "Does He not know" }
+    ]
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // LESSON 32: Al-Mulk Part 3 (Verses 21-30)
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "int-lesson-13",
+    unit: 8,
+    unitTitle: "Medium Surah Memorization",
+    path: "intermediate",
+    number: 32,
+    title: "Al-Mulk Part 3 - Complete the Surah",
+    description: "Complete memorizing Surah Al-Mulk (verses 21-30)",
+    surah: 67,
+    ayahStart: 21,
+    ayahEnd: 30,
+    estimatedMinutes: 40,
+    xpReward: 175,
+    steps: [
+      {
+        id: "int13-intro",
+        type: "instruction",
+        title: "Completing Al-Mulk",
+        content: `**The final verses bring it all together:**
+- Who provides for you? (21)
+- Guidance from Allah (22)
+- Signs all around (23-24)
+- When is the promise? (25-27)
+- The final message (28-30)
+
+Complete this blessed surah!`
+      },
+      {
+        id: "int13-audio",
+        type: "audio",
+        title: "Listen and Memorize (Verses 21-30)",
+        content: `Listen to the final verses:`,
+        audioSegment: { surah: 67, ayahStart: 21, ayahEnd: 30, repeat: 10 }
+      },
+      {
+        id: "int13-memorization",
+        type: "practice",
+        title: "🎯 Memorization Practice",
+        content: "MEMORIZATION_MODULE",
+        arabicContent: "قُلْ أَرَأَيْتُمْ إِنْ أَصْبَحَ مَاؤُكُمْ غَوْرًا فَمَن يَأْتِيكُم بِمَاءٍ مَّعِينٍ ﴿٣٠﴾",
+        audioSegment: { surah: 67, ayahStart: 21, ayahEnd: 30 }
+      },
+      {
+        id: "int13-review",
+        type: "instruction",
+        title: "Al-Mulk Complete! 🏆",
+        content: `**Alhamdulillah! You've memorized all 30 verses of Surah Al-Mulk!**
+
+This surah will intercede for you. Recite it every night!`
+      }
+    ],
+    memorizationTechniques: [
+      "Final verses have powerful rhetorical questions",
+      "End with water imagery - essential provision from Allah"
+    ],
+    keyVocabulary: [
+      { arabic: "مَاءٍ مَّعِينٍ", transliteration: "Maa'in ma'een", meaning: "Flowing water" },
+      { arabic: "قُلْ أَرَأَيْتُمْ", transliteration: "Qul ara'aytum", meaning: "Say: Have you considered" }
+    ]
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // LESSON 33: Al-Kahf - First 10 Verses (Protection from Dajjal)
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "int-lesson-14",
+    unit: 8,
+    unitTitle: "Medium Surah Memorization",
+    path: "intermediate",
+    number: 33,
+    title: "Al-Kahf First 10 Verses - Protection",
+    description: "Memorize the protective opening of Surah Al-Kahf",
+    surah: 18,
+    ayahStart: 1,
+    ayahEnd: 10,
+    estimatedMinutes: 45,
+    xpReward: 175,
+    steps: [
+      {
+        id: "int14-intro",
+        type: "instruction",
+        title: "The Protected Verses",
+        content: `**The Prophet ﷺ said:**
+"Whoever memorizes ten verses from the beginning of Surah Al-Kahf will be protected from the Dajjal." (Muslim)
+
+**Surah Al-Kahf themes:**
+1. Praise of the Quran (1-3)
+2. Warning to those who claim Allah has a son (4-6)
+3. Introduction to the story of the cave (7-10)
+
+These 10 verses contain powerful protection!`
+      },
+      {
+        id: "int14-verses",
+        type: "explanation",
+        title: "The Opening Praise",
+        arabicContent: "الْحَمْدُ لِلَّهِ الَّذِي أَنزَلَ عَلَىٰ عَبْدِهِ الْكِتَابَ وَلَمْ يَجْعَل لَّهُ عِوَجًا",
+        content: `**Verse 1:**
+"All praise is for Allah Who revealed the Book to His servant, and made it flawless."
+
+**Key points:**
+- الْحَمْدُ لِلَّهِ - All praise to Allah
+- عَبْدِهِ - His servant (Muhammad ﷺ)
+- عِوَجًا - Any crookedness (there is none!)
+
+The Quran is PERFECT, without any defect.`
+      },
+      {
+        id: "int14-audio",
+        type: "audio",
+        title: "Listen and Memorize",
+        content: `Listen to the first 10 verses:`,
+        audioSegment: { surah: 18, ayahStart: 1, ayahEnd: 10, repeat: 10 }
+      },
+      {
+        id: "int14-memorization",
+        type: "practice",
+        title: "🎯 Memorization Practice",
+        content: "MEMORIZATION_MODULE",
+        arabicContent: "الْحَمْدُ لِلَّهِ الَّذِي أَنزَلَ عَلَىٰ عَبْدِهِ الْكِتَابَ وَلَمْ يَجْعَل لَّهُ عِوَجًا ﴿١﴾",
+        audioSegment: { surah: 18, ayahStart: 1, ayahEnd: 10 }
+      },
+      {
+        id: "int14-review",
+        type: "instruction",
+        title: "Protected! 🛡️",
+        content: `**You've memorized the protective 10 verses of Al-Kahf!**
+
+Recite these every Friday for special blessing and protection.`
+      }
+    ],
+    memorizationTechniques: [
+      "Recite every Friday for blessing",
+      "Protection from Dajjal",
+      "Praise → Warning → Story introduction"
+    ],
+    keyVocabulary: [
+      { arabic: "عِوَجًا", transliteration: "'Iwajan", meaning: "Crookedness/defect" },
+      { arabic: "قَيِّمًا", transliteration: "Qayyiman", meaning: "Straight/upright" },
+      { arabic: "الْكَهْفِ", transliteration: "Al-Kahf", meaning: "The Cave" }
+    ]
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // LESSON 34: Ya-Sin Opening (Verses 1-12) - The Heart of the Quran
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "int-lesson-15",
+    unit: 8,
+    unitTitle: "Medium Surah Memorization",
+    path: "intermediate",
+    number: 34,
+    title: "Ya-Sin Opening - The Heart of Quran",
+    description: "Begin memorizing the blessed Surah Ya-Sin",
+    surah: 36,
+    ayahStart: 1,
+    ayahEnd: 12,
+    estimatedMinutes: 45,
+    xpReward: 175,
+    steps: [
+      {
+        id: "int15-intro",
+        type: "instruction",
+        title: "The Heart of the Quran",
+        content: `**The Prophet ﷺ said:**
+"Everything has a heart, and the heart of the Quran is Ya-Sin." (Tirmidhi)
+
+"Whoever recites Ya-Sin seeking Allah's pleasure, his past sins will be forgiven." (Bayhaqi)
+
+**Opening themes (1-12):**
+1. The Wise Quran confirms Muhammad ﷺ (1-6)
+2. Most people are heedless (7-10)
+3. Who truly benefits from warning (11-12)`
+      },
+      {
+        id: "int15-audio",
+        type: "audio",
+        title: "Listen and Memorize",
+        content: `Listen to Ya-Sin 1-12:`,
+        audioSegment: { surah: 36, ayahStart: 1, ayahEnd: 12, repeat: 10 }
+      },
+      {
+        id: "int15-memorization",
+        type: "practice",
+        title: "🎯 Memorization Practice",
+        content: "MEMORIZATION_MODULE",
+        arabicContent: "يس ﴿١﴾ وَالْقُرْآنِ الْحَكِيمِ ﴿٢﴾ إِنَّكَ لَمِنَ الْمُرْسَلِينَ ﴿٣﴾",
+        audioSegment: { surah: 36, ayahStart: 1, ayahEnd: 12 }
+      },
+      {
+        id: "int15-review",
+        type: "instruction",
+        title: "Ya-Sin Opening Complete! 🌟",
+        content: `**Beautiful! You've started memorizing Ya-Sin!**
+
+Continue with the rest of this blessed surah.`
+      }
+    ],
+    memorizationTechniques: [
+      "يس - mysterious letters, mark the beginning",
+      "Oath by the Wise Quran",
+      "Confirmation of prophethood"
+    ],
+    keyVocabulary: [
+      { arabic: "يس", transliteration: "Ya-Sin", meaning: "Mysterious letters" },
+      { arabic: "الْقُرْآنِ الْحَكِيمِ", transliteration: "Al-Qur'an al-Hakeem", meaning: "The Wise Quran" },
+      { arabic: "الْمُرْسَلِينَ", transliteration: "Al-Mursaleen", meaning: "The messengers" }
+    ]
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // LESSON 35-38: More Surah Content (Condensed)
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "int-lesson-16",
+    unit: 8,
+    unitTitle: "Medium Surah Memorization",
+    path: "intermediate",
+    number: 35,
+    title: "Ya-Sin Middle Section (Verses 13-32)",
+    description: "The story of the messengers and the believing man",
+    surah: 36,
+    ayahStart: 13,
+    ayahEnd: 32,
+    estimatedMinutes: 50,
+    xpReward: 200,
+    steps: [
+      {
+        id: "int16-intro",
+        type: "instruction",
+        title: "The City and Its People",
+        content: `This section tells the story of messengers sent to a city and a believing man who supported them.`
+      },
+      {
+        id: "int16-audio",
+        type: "audio",
+        title: "Listen and Memorize",
+        content: "Listen and repeat:",
+        audioSegment: { surah: 36, ayahStart: 13, ayahEnd: 32, repeat: 10 }
+      },
+      {
+        id: "int16-memorization",
+        type: "practice",
+        title: "🎯 Memorization Practice",
+        content: "MEMORIZATION_MODULE",
+        arabicContent: "وَاضْرِبْ لَهُم مَّثَلًا أَصْحَابَ الْقَرْيَةِ إِذْ جَاءَهَا الْمُرْسَلُونَ ﴿١٣﴾",
+        audioSegment: { surah: 36, ayahStart: 13, ayahEnd: 32 }
+      },
+      {
+        id: "int16-review",
+        type: "instruction",
+        title: "Section Complete!",
+        content: "Continue building your Ya-Sin memorization!"
+      }
+    ],
+    memorizationTechniques: ["Story format aids memory", "Believing man's courage"],
+    keyVocabulary: [
+      { arabic: "أَصْحَابَ الْقَرْيَةِ", transliteration: "Ashaab al-Qaryah", meaning: "People of the city" }
+    ]
+  },
+
+  {
+    id: "int-lesson-17",
+    unit: 8,
+    unitTitle: "Medium Surah Memorization",
+    path: "intermediate",
+    number: 36,
+    title: "Short Surah Review - Al-Masad",
+    description: "Deep review of Surah Al-Masad with tajweed focus",
     surah: 111,
     ayahStart: 1,
     ayahEnd: 5,
@@ -1351,220 +2668,33 @@ const UNIT_8_LESSONS: Lesson[] = [
     xpReward: 100,
     steps: [
       {
-        id: "int7-intro",
-        type: "instruction",
-        title: "The Story Behind Al-Masad",
-        content: `**Al-Masad (المسد)** tells the story of Abu Lahab, the Prophet's ﷺ own uncle who became his fiercest enemy.
-
-**Historical context:**
-When Allah commanded the Prophet ﷺ to warn his relatives publicly, he ﷺ called them to Mount Safa and asked:
-"If I told you an army was about to attack, would you believe me?"
-They said, "Yes, we've never known you to lie."
-He ﷺ said, "Then I am warning you of severe punishment."
-
-**Abu Lahab's response:**
-"May you perish! Is this why you gathered us?!"
-
-This surah was the divine response.
-
-**Unique features:**
-- Only surah naming a specific person (Abu Lahab)
-- One of the clearest prophecies - Abu Lahab died a disbeliever as predicted
-- Includes his wife (Umm Jamil) who would tie thorny branches on paths the Prophet ﷺ walked`
-      },
-      {
-        id: "int7-verse1",
-        type: "explanation",
-        title: "Verse 1: The Hands of Abu Lahab",
-        arabicContent: "تَبَّتْ يَدَآ أَبِى لَهَبٍ وَتَبَّ",
-        content: `**تَبَّتْ يَدَآ أَبِى لَهَبٍ وَتَبَّ**
-*"Tabbat yadaa Abi Lahabin wa tabb"*
-
-**"May the hands of Abu Lahab perish, and he [himself] perish!"**
-
-**Word breakdown:**
-- **تَبَّتْ (tabbat)** - "perished/ruined" (past tense used as curse)
-- **يَدَا (yadaa)** - "two hands of" (dual form)
-- **أَبِى لَهَبٍ (Abi Lahab)** - "Father of Flame" (his kunyah/nickname)
-- **وَتَبَّ (wa tabb)** - "and he perished"
-
-**Why "hands"?**
-- His hands worked against Islam
-- He threw filth at the Prophet ﷺ with his hands
-- "Hands" represents his deeds/efforts
-
-**وَتَبَّ - A fulfilled prophecy:**
-The second تَبَّ confirms the curse was fulfilled. He did perish!
-Abu Lahab died shortly after Badr, covered in pustules, abandoned even by his family.`
-      },
-      {
-        id: "int7-verse2",
-        type: "explanation",
-        title: "Verse 2: His Wealth Didn't Help",
-        arabicContent: "مَآ أَغْنَىٰ عَنْهُ مَالُهُۥ وَمَا كَسَبَ",
-        content: `**مَآ أَغْنَىٰ عَنْهُ مَالُهُۥ وَمَا كَسَبَ**
-*"Maa aghnaa 'anhu maaluhu wa maa kasab"*
-
-**"His wealth did not avail him, nor what he earned."**
-
-**Word breakdown:**
-- **مَآ أَغْنَىٰ (maa aghnaa)** - "did not avail/benefit"
-- **عَنْهُ ('anhu)** - "him"
-- **مَالُهُۥ (maaluhu)** - "his wealth"
-- **وَمَا كَسَبَ (wa maa kasab)** - "and what he earned"
-
-**Two interpretations of "what he earned":**
-1. His profits and business earnings
-2. His children (scholars say "what he earned" can mean offspring)
-
-**The lesson:**
-Abu Lahab was RICH. He thought his wealth made him untouchable.
-But when facing divine punishment:
-- Wealth = useless
-- Status = worthless
-- Family = abandoned him
-
-**Reflection:** What are you relying on that won't help you on Judgment Day?`
-      },
-      {
-        id: "int7-verse3",
-        type: "explanation",
-        title: "Verse 3: His Destination",
-        arabicContent: "سَيَصْلَىٰ نَارًا ذَاتَ لَهَبٍ",
-        content: `**سَيَصْلَىٰ نَارًا ذَاتَ لَهَبٍ**
-*"Sayaslaa naaran dhata lahab"*
-
-**"He will enter a Fire of blazing flames"**
-
-**Word breakdown:**
-- **سَيَصْلَىٰ (sayaslaa)** - "he will enter/burn in" (future tense)
-- **نَارًا (naaran)** - "a fire"
-- **ذَاتَ لَهَبٍ (dhata lahab)** - "possessing flames/blazing"
-
-**The irony:**
-His name was "Abu Lahab" (Father of Flame) because of his reddish complexion and fiery temper.
-His punishment? **ACTUAL flames** (لَهَب)!
-
-**Name becoming destiny:**
-He chose to be the "Father of Flame" in opposition to Islam.
-Allah made his name a prophecy of his end.
-
-**Tajweed note:**
-This verse contains the separated madd: نَارًا ذَاتَ
-There's no madd here since the alif of نارا is tanween, not followed by hamza in the next word properly.`
-      },
-      {
-        id: "int7-verse4-5",
-        type: "explanation",
-        title: "Verses 4-5: His Wife",
-        arabicContent: "وَٱمْرَأَتُهُۥ حَمَّالَةَ ٱلْحَطَبِ • فِى جِيدِهَا حَبْلٌ مِّن مَّسَدٍۭ",
-        content: `**وَٱمْرَأَتُهُۥ حَمَّالَةَ ٱلْحَطَبِ**
-*"Wa mra-atuhu hammaalatal-hatab"*
-
-**فِى جِيدِهَا حَبْلٌ مِّن مَّسَدٍۭ**
-*"Fee jeedihaa hablum mim masad"*
-
-**"And his wife, the carrier of firewood, around her neck is a rope of palm fiber"**
-
-**Word breakdown:**
-- **وَٱمْرَأَتُهُۥ (wa imra'atuhu)** - "and his wife"
-- **حَمَّالَةَ ٱلْحَطَبِ (hammaalatal-hatab)** - "carrier of firewood"
-- **فِى جِيدِهَا (fee jeedihaa)** - "around her neck" (جيد = neck, poetic)
-- **حَبْلٌ (hablun)** - "a rope"
-- **مِّن مَّسَدٍۭ (mim masad)** - "of palm fiber"
-
-**Who was she?**
-Arwa bint Harb (Umm Jamil), sister of Abu Sufyan.
-She would:
-- Spread thorns on paths the Prophet ﷺ walked
-- Spread gossip and slander (another meaning of "carrying firewood")
-
-**The punishment:**
-In Hell, she'll carry firewood to fuel her husband's flames, tied by a rope of مَسَد (rough palm fiber) - the very material she used to harm others!
-
-**Tajweed:** Notice the Idgham: "مِّن مَّسَدٍ" - the noon merges into the meem!`
-      },
-      {
-        id: "int7-memorize",
+        id: "int17-audio",
         type: "audio",
-        title: "Memorize Al-Masad",
-        content: `**Now let's memorize using the 10-3 method!**
-
-**Full Surah:**
-تَبَّتْ يَدَآ أَبِى لَهَبٍ وَتَبَّ ﴿١﴾
-مَآ أَغْنَىٰ عَنْهُ مَالُهُۥ وَمَا كَسَبَ ﴿٢﴾
-سَيَصْلَىٰ نَارًا ذَاتَ لَهَبٍ ﴿٣﴾
-وَٱمْرَأَتُهُۥ حَمَّالَةَ ٱلْحَطَبِ ﴿٤﴾
-فِى جِيدِهَا حَبْلٌ مِّن مَّسَدٍۭ ﴿٥﴾
-
-**Structure to remember:**
-1. The curse on Abu Lahab
-2. His wealth didn't help
-3. His fiery punishment (irony of his name)
-4-5. His wife's crime and punishment
-
-Listen and repeat:`,
+        title: "Review Al-Masad",
+        content: "Review with perfect tajweed:",
         audioSegment: { surah: 111, ayahStart: 1, ayahEnd: 5, repeat: 10 }
       },
       {
-        id: "int7-memorization",
+        id: "int17-memorization",
         type: "practice",
         title: "🎯 Memorization Practice",
         content: "MEMORIZATION_MODULE",
-        arabicContent: "تَبَّتْ يَدَآ أَبِى لَهَبٍ وَتَبَّ ﴿١﴾ مَآ أَغْنَىٰ عَنْهُ مَالُهُۥ وَمَا كَسَبَ ﴿٢﴾ سَيَصْلَىٰ نَارًا ذَاتَ لَهَبٍ ﴿٣﴾ وَٱمْرَأَتُهُۥ حَمَّالَةَ ٱلْحَطَبِ ﴿٤﴾ فِى جِيدِهَا حَبْلٌ مِّن مَّسَدٍۭ ﴿٥﴾",
+        arabicContent: "تَبَّتْ يَدَا أَبِي لَهَبٍ وَتَبَّ ﴿١﴾",
         audioSegment: { surah: 111, ayahStart: 1, ayahEnd: 5 }
-      },
-      {
-        id: "int7-review",
-        type: "instruction",
-        title: "Al-Masad Memorized! 🌟",
-        content: `**Alhamdulillah! You've memorized Surah Al-Masad with deep understanding!**
-
-**Key lessons:**
-1. Family ties don't guarantee guidance
-2. Wealth is useless against divine decree
-3. Names can become destinies
-4. Harming the Prophet ﷺ has eternal consequences
-5. Partners in crime are partners in punishment
-
-**Prophecy fulfilled:**
-This surah was revealed while Abu Lahab was alive and healthy.
-If he had accepted Islam, it would have "disproved" the Quran.
-But Allah knew - and he died exactly as predicted.
-
-**Application:**
-- Don't let wealth deceive you
-- Don't follow hostile relatives in wrongdoing
-- Your actions today shape your eternal destination
-
-**Coming up:** Surah Al-Fil - The Elephant!`
       }
     ],
-    memorizationTechniques: [
-      "Remember the irony: 'Father of Flame' will burn in flames",
-      "Verse structure: His curse → His wealth fails → His punishment → Her punishment",
-      "Notice the rhyme scheme: lahab, kasab, lahab, hatab, masad"
-    ],
-    keyVocabulary: [
-      { arabic: "تَبَّتْ", transliteration: "Tabbat", meaning: "Perished/ruined" },
-      { arabic: "أَغْنَىٰ", transliteration: "Aghnaa", meaning: "Availed/benefited" },
-      { arabic: "سَيَصْلَىٰ", transliteration: "Sayaslaa", meaning: "He will burn in" },
-      { arabic: "حَمَّالَةَ", transliteration: "Hammaalah", meaning: "Carrier" },
-      { arabic: "مَّسَدٍ", transliteration: "Masad", meaning: "Palm fiber" }
-    ]
+    memorizationTechniques: ["Review strengthens memory"],
+    keyVocabulary: [{ arabic: "تَبَّتْ", transliteration: "Tabbat", meaning: "Perished" }]
   },
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // LESSON 27: Al-Fil (Surah 105) with Historical Context
-  // ─────────────────────────────────────────────────────────────────────────
   {
-    id: "int-lesson-8",
+    id: "int-lesson-18",
     unit: 8,
-    unitTitle: "Short Surah Memorization",
+    unitTitle: "Medium Surah Memorization",
     path: "intermediate",
-    number: 27,
-    title: "Al-Fil - The Elephant",
-    description: "Learn the miraculous story of the Year of the Elephant",
+    number: 37,
+    title: "Short Surah Review - Al-Fil & Quraysh",
+    description: "Review the twin surahs together",
     surah: 105,
     ayahStart: 1,
     ayahEnd: 5,
@@ -1572,499 +2702,69 @@ But Allah knew - and he died exactly as predicted.
     xpReward: 100,
     steps: [
       {
-        id: "int8-intro",
-        type: "instruction",
-        title: "The Year the Prophet ﷺ Was Born",
-        content: `**The Year of the Elephant (عَام الفِيل)** - approximately 570 CE
-
-This surah describes an event that happened the same year the Prophet ﷺ was born!
-
-**The Story:**
-Abraha, the Abyssinian (Ethiopian) ruler of Yemen, built a magnificent cathedral to divert Arab pilgrims from the Ka'bah.
-
-When an Arab man defecated in his cathedral as an insult, Abraha was FURIOUS.
-
-He marched toward Makkah with a massive army including WAR ELEPHANTS - the "tanks" of the ancient world!
-
-**The Quraysh's response:**
-They couldn't fight such an army. Abdul Muttalib (the Prophet's grandfather) said:
-"The Ka'bah has a Lord who will protect it."
-
-They evacuated to the mountains and watched...
-
-**What happened next is the subject of this surah!**`
-      },
-      {
-        id: "int8-verse1",
-        type: "explanation",
-        title: "Verse 1: Don't You Know?",
-        arabicContent: "أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِأَصْحَـٰبِ ٱلْفِيلِ",
-        content: `**أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِأَصْحَـٰبِ ٱلْفِيلِ**
-*"Alam tara kayfa fa'ala Rabbuka bi-ashaabil-feel"*
-
-**"Have you not seen how your Lord dealt with the companions of the elephant?"**
-
-**Word breakdown:**
-- **أَلَمْ تَرَ (alam tara)** - "have you not seen?" (rhetorical)
-- **كَيْفَ (kayfa)** - "how"
-- **فَعَلَ (fa'ala)** - "He dealt/did"
-- **رَبُّكَ (Rabbuka)** - "your Lord"
-- **بِأَصْحَـٰبِ (bi-ashaabi)** - "with the companions of"
-- **ٱلْفِيلِ (al-feel)** - "the elephant"
-
-**Why "have you not SEEN"?**
-The Prophet ﷺ was born that year but didn't witness it himself. This language implies:
-1. The event was so famous, it's as if everyone saw it
-2. The evidence was still visible (destroyed army remnants)
-3. It's addressed to all who hear it
-
-**رَبُّكَ - "YOUR Lord":**
-Personal address - Allah protected YOUR birthplace, YOUR family's sanctuary, for YOUR coming!`
-      },
-      {
-        id: "int8-verse2",
-        type: "explanation",
-        title: "Verse 2: Their Plan Foiled",
-        arabicContent: "أَلَمْ يَجْعَلْ كَيْدَهُمْ فِى تَضْلِيلٍ",
-        content: `**أَلَمْ يَجْعَلْ كَيْدَهُمْ فِى تَضْلِيلٍ**
-*"Alam yaj'al kaydahum fee tadleel"*
-
-**"Did He not make their plan into misguidance/ruin?"**
-
-**Word breakdown:**
-- **أَلَمْ يَجْعَلْ (alam yaj'al)** - "did He not make"
-- **كَيْدَهُمْ (kaydahum)** - "their plot/scheme"
-- **فِى تَضْلِيلٍ (fee tadleel)** - "into misguidance/ruin"
-
-**كَيْد (kayd)** - Plot, scheme, cunning plan
-The same word used for:
-- The brothers' plot against Yusuf
-- The women's scheme in Yusuf's story
-- Shaytan's plots
-
-**تَضْلِيل (tadleel)** - Two meanings:
-1. **Misguidance** - their plan led them astray
-2. **Ruin/loss** - their plan brought destruction
-
-Their sophisticated military strategy became WORTHLESS against Allah's plan!
-
-**Lesson:** No matter how powerful the enemy or elaborate the scheme, Allah's protection cannot be defeated.`
-      },
-      {
-        id: "int8-verse3",
-        type: "explanation",
-        title: "Verse 3: The Birds",
-        arabicContent: "وَأَرْسَلَ عَلَيْهِمْ طَيْرًا أَبَابِيلَ",
-        content: `**وَأَرْسَلَ عَلَيْهِمْ طَيْرًا أَبَابِيلَ**
-*"Wa arsala 'alayhim tayran abaabeel"*
-
-**"And He sent against them birds in flocks"**
-
-**Word breakdown:**
-- **وَأَرْسَلَ (wa arsala)** - "and He sent"
-- **عَلَيْهِمْ ('alayhim)** - "upon them"
-- **طَيْرًا (tayran)** - "birds"
-- **أَبَابِيلَ (abaabeel)** - "in flocks/groups"
-
-**أَبَابِيلَ (abaabeel):**
-This unique word appears only here in the Quran. It means:
-- Coming in successive waves
-- In groups/flocks
-- From all directions
-
-**What kind of birds?**
-The narrations describe them as:
-- Smaller than pigeons
-- Coming from the sea direction
-- Each carrying stones
-
-**The miracle:**
-Allah didn't use angels or earthquakes. He used BIRDS - small, ordinary-seeming creatures.
-
-**Lesson:** Allah's soldiers include the smallest creatures. A virus, an insect, a bird - all are armies of Allah!`
-      },
-      {
-        id: "int8-verse4",
-        type: "explanation",
-        title: "Verse 4: Stones of Baked Clay",
-        arabicContent: "تَرْمِيهِم بِحِجَارَةٍ مِّن سِجِّيلٍ",
-        content: `**تَرْمِيهِم بِحِجَارَةٍ مِّن سِجِّيلٍ**
-*"Tarmeehim bi-hijaaratim min sijjeel"*
-
-**"Striking them with stones of baked clay"**
-
-**Word breakdown:**
-- **تَرْمِيهِم (tarmeehim)** - "striking/pelting them"
-- **بِحِجَارَةٍ (bi-hijaaratin)** - "with stones"
-- **مِّن سِجِّيلٍ (min sijjeel)** - "of baked clay"
-
-**سِجِّيل (sijjeel):**
-Baked, hardite clay - similar to:
-- The stones that destroyed the people of Lut
-- Extremely hot/hard projectiles
-
-**The scene:**
-Each bird carried three stones:
-- One in its beak
-- One in each claw
-
-When dropped, each stone:
-- Would pierce through the soldier
-- Enter from the top, exit from below
-- Like bullets from heaven!
-
-**Tajweed note:**
-Notice: "تَرْمِيهِم بِحِجَارَةٍ" - Meem Sakinah before Ba = Ikhfa Shafawi (hide the meem)!
-
-**Historical note:**
-Elephants refused to march toward Makkah. They'd kneel or turn away. The lead elephant, Mahmoud, simply refused to attack the Ka'bah!`
-      },
-      {
-        id: "int8-verse5",
-        type: "explanation",
-        title: "Verse 5: The Aftermath",
-        arabicContent: "فَجَعَلَهُمْ كَعَصْفٍ مَّأْكُولٍۭ",
-        content: `**فَجَعَلَهُمْ كَعَصْفٍ مَّأْكُولٍۭ**
-*"Faja'alahum ka'asfim ma'kool"*
-
-**"And He made them like eaten straw"**
-
-**Word breakdown:**
-- **فَجَعَلَهُمْ (faja'alahum)** - "so He made them"
-- **كَعَصْفٍ (ka-'asfin)** - "like straw/chaff"
-- **مَّأْكُولٍۭ (ma'kool)** - "eaten/consumed"
-
-**عَصْف مَّأْكُول (asfin ma'kool):**
-The image is powerful:
-- Straw/chaff after animals have eaten it
-- Full of holes
-- Scattered and worthless
-- Trampled and destroyed
-
-**The mighty army:**
-60,000 soldiers
-War elephants
-Sophisticated weapons
-→ Became like chewed-up straw!
-
-**Abraha's fate:**
-He barely escaped back to Yemen, but his flesh began falling off his body. He died as his chest split open - a humiliating end for the would-be destroyer of the Ka'bah.
-
-**The lesson:**
-Size and power mean NOTHING before Allah. The greatest army became less than animal feed.`
-      },
-      {
-        id: "int8-memorize",
+        id: "int18-audio",
         type: "audio",
-        title: "Memorize Al-Fil",
-        content: `**Let's memorize this miraculous account!**
-
-**Full Surah:**
-أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِأَصْحَـٰبِ ٱلْفِيلِ ﴿١﴾
-أَلَمْ يَجْعَلْ كَيْدَهُمْ فِى تَضْلِيلٍ ﴿٢﴾
-وَأَرْسَلَ عَلَيْهِمْ طَيْرًا أَبَابِيلَ ﴿٣﴾
-تَرْمِيهِم بِحِجَارَةٍ مِّن سِجِّيلٍ ﴿٤﴾
-فَجَعَلَهُمْ كَعَصْفٍ مَّأْكُولٍۭ ﴿٥﴾
-
-**Story flow to remember:**
-1. Haven't you seen what Allah did? (Question)
-2. Their plot was ruined (Consequence)
-3. Birds came in flocks (Method)
-4. With stones of baked clay (Weapon)
-5. Made them like eaten straw (Result)
-
-Listen and repeat:`,
-        audioSegment: { surah: 105, ayahStart: 1, ayahEnd: 5, repeat: 10 }
+        title: "Review Al-Fil",
+        content: "Review both surahs together:",
+        audioSegment: { surah: 105, ayahStart: 1, ayahEnd: 5, repeat: 5 }
       },
       {
-        id: "int8-memorization",
+        id: "int18-memorization",
         type: "practice",
         title: "🎯 Memorization Practice",
         content: "MEMORIZATION_MODULE",
-        arabicContent: "أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِأَصْحَـٰبِ ٱلْفِيلِ ﴿١﴾ أَلَمْ يَجْعَلْ كَيْدَهُمْ فِى تَضْلِيلٍ ﴿٢﴾ وَأَرْسَلَ عَلَيْهِمْ طَيْرًا أَبَابِيلَ ﴿٣﴾ تَرْمِيهِم بِحِجَارَةٍ مِّن سِجِّيلٍ ﴿٤﴾ فَجَعَلَهُمْ كَعَصْفٍ مَّأْكُولٍۭ ﴿٥﴾",
+        arabicContent: "أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِأَصْحَابِ الْفِيلِ ﴿١﴾",
         audioSegment: { surah: 105, ayahStart: 1, ayahEnd: 5 }
-      },
-      {
-        id: "int8-review",
-        type: "instruction",
-        title: "Al-Fil Memorized! 🌟",
-        content: `**Alhamdulillah! You've memorized Surah Al-Fil!**
-
-**Key lessons:**
-1. Allah protects what He wills, with whatever means He chooses
-2. Military might is worthless against divine decree
-3. The Ka'bah was protected even before Islam
-4. Small creatures can defeat great armies
-5. This miracle heralded the Prophet's ﷺ birth
-
-**Reflect:**
-The same Lord who protected the Ka'bah with birds is YOUR Rabb.
-What are the "elephants" in your life that seem unconquerable?
-Remember: كَعَصْفٍ مَّأْكُولٍۭ - they can become like eaten straw!
-
-**Coming up:** Surah Quraysh - The connection between Al-Fil and Quraysh's blessings!`
       }
     ],
-    memorizationTechniques: [
-      "Visualize the story: army → birds → stones → destruction",
-      "Rhyme pattern: feel, tadleel, abaabeel, sijjeel, ma'kool",
-      "Connect to the Prophet's ﷺ birth - same year!"
-    ],
-    keyVocabulary: [
-      { arabic: "أَصْحَـٰبِ ٱلْفِيلِ", transliteration: "Ashaab al-Feel", meaning: "Companions of the Elephant" },
-      { arabic: "كَيْدَ", transliteration: "Kayd", meaning: "Plot/scheme" },
-      { arabic: "أَبَابِيلَ", transliteration: "Abaabeel", meaning: "In flocks" },
-      { arabic: "سِجِّيلٍ", transliteration: "Sijjeel", meaning: "Baked clay" },
-      { arabic: "عَصْفٍ", transliteration: "'Asf", meaning: "Straw/chaff" }
-    ]
+    memorizationTechniques: ["Connect twin surahs"],
+    keyVocabulary: [{ arabic: "أَصْحَابِ الْفِيلِ", transliteration: "Ashaab al-Feel", meaning: "People of the Elephant" }]
   },
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // LESSON 28: Quraysh (Surah 106) - The Connection
-  // ─────────────────────────────────────────────────────────────────────────
   {
-    id: "int-lesson-9",
+    id: "int-lesson-19",
     unit: 8,
-    unitTitle: "Short Surah Memorization",
+    unitTitle: "Medium Surah Memorization",
     path: "intermediate",
-    number: 28,
-    title: "Quraysh - For the Familiarity of Quraysh",
-    description: "Learn how Al-Fil and Quraysh are connected",
-    surah: 106,
+    number: 38,
+    title: "Intermediate Path Completion",
+    description: "Review and celebrate your intermediate achievements",
+    surah: 1,
     ayahStart: 1,
-    ayahEnd: 4,
-    estimatedMinutes: 20,
-    xpReward: 100,
+    ayahEnd: 7,
+    estimatedMinutes: 30,
+    xpReward: 250,
     steps: [
       {
-        id: "int9-intro",
+        id: "int19-intro",
         type: "instruction",
-        title: "The Twin Surahs",
-        content: `**Surah Quraysh is intimately connected to Surah Al-Fil!**
+        title: "Congratulations! 🎉",
+        content: `**You've completed the Intermediate Path!**
 
-Some scholars say they were originally ONE surah, or should always be recited together.
+**Your achievements:**
+- Mastered 8 essential Quranic roots
+- Learned all tajweed rules (Noon, Meem, Madd, Qalqalah, Ghunnah)
+- Memorized Surah Al-Mulk (30 verses)
+- Memorized Al-Kahf first 10 verses
+- Started Ya-Sin memorization
 
-**The connection:**
-- Al-Fil: Allah PROTECTED the Ka'bah
-- Quraysh: Therefore, worship the Lord who protected you!
-
-**Why it matters:**
-The destruction of Abraha's army:
-1. Saved the Ka'bah
-2. Elevated Quraysh's status (they were the guardians)
-3. Made their trade routes safe (who would attack Ka'bah's guardians?)
-4. Brought them prosperity
-
-**This surah says:** Given ALL these blessings, shouldn't you worship Allah alone?
-
-**Quraysh** = The Prophet's ﷺ tribe, the guardians of the Ka'bah.`
+**You're ready for the Advanced Path!**`
       },
       {
-        id: "int9-verse1",
-        type: "explanation",
-        title: "Verse 1: For Their Familiarity",
-        arabicContent: "لِإِيلَـٰفِ قُرَيْشٍ",
-        content: `**لِإِيلَـٰفِ قُرَيْشٍ**
-*"Li-eelaafi Quraysh"*
-
-**"For the familiarity/security of Quraysh"**
-
-**Word breakdown:**
-- **لِإِيلَـٰفِ (li-eelaafi)** - "for the familiarity/security of"
-- **قُرَيْشٍ (Quraysh)** - the tribe
-
-**إِيلَاف (eelaaf)** means:
-1. **Familiarity** - they were familiar with their trade routes
-2. **Security** - they felt safe traveling
-3. **Covenant/treaty** - they had agreements with surrounding tribes
-4. **Unity** - they were united and cohesive
-
-**The "لِ" (for):**
-This connects back to Al-Fil! "Because of what We did to the Elephant army, FOR THE SAKE OF Quraysh's security..."
-
-**Historical context:**
-Hashim (Prophet's great-great-grandfather) established trade covenants with Byzantine Rome and Abyssinia, allowing Quraysh safe passage.
-After the Elephant incident, their status was even MORE elevated!`
-      },
-      {
-        id: "int9-verse2",
-        type: "explanation",
-        title: "Verse 2: Their Trade Journeys",
-        arabicContent: "إِۦلَـٰفِهِمْ رِحْلَةَ ٱلشِّتَآءِ وَٱلصَّيْفِ",
-        content: `**إِۦلَـٰفِهِمْ رِحْلَةَ ٱلشِّتَآءِ وَٱلصَّيْفِ**
-*"Eelaafihim rihlatash-shitaa'i was-sayf"*
-
-**"Their familiarity with the winter and summer journeys"**
-
-**Word breakdown:**
-- **إِۦلَـٰفِهِمْ (eelaafihim)** - "their familiarity"
-- **رِحْلَةَ (rihlata)** - "journey of"
-- **ٱلشِّتَآءِ (ash-shitaa'i)** - "the winter"
-- **وَٱلصَّيْفِ (was-sayf)** - "and the summer"
-
-**The Two Trade Journeys:**
-
-**Winter Journey (رِحْلَة الشِّتَاء):**
-- Destination: Yemen (and beyond to India/Abyssinia)
-- For: Spices, incense, textiles
-- Warm climate during cold Meccan winters
-
-**Summer Journey (رِحْلَة الصَّيْف):**
-- Destination: Syria/Palestine (Byzantine territories)
-- For: Wheat, olive oil, wine, manufactured goods
-- Cooler climate during hot Meccan summers
-
-**Economic genius:**
-Makkah itself was barren, but its location made it a perfect trade hub!
-Quraysh became wealthy MERCHANTS, not farmers or craftsmen.
-
-**The blessing:** Safe, predictable trade routes = prosperity and stability.`
-      },
-      {
-        id: "int9-verse3",
-        type: "explanation",
-        title: "Verse 3: The Command",
-        arabicContent: "فَلْيَعْبُدُوا۟ رَبَّ هَـٰذَا ٱلْبَيْتِ",
-        content: `**فَلْيَعْبُدُوا۟ رَبَّ هَـٰذَا ٱلْبَيْتِ**
-*"Fal-ya'budoo Rabba haadhal-bayt"*
-
-**"Let them worship the Lord of this House"**
-
-**Word breakdown:**
-- **فَلْيَعْبُدُوا۟ (fal-ya'budoo)** - "so let them worship"
-- **رَبَّ (Rabba)** - "the Lord of"
-- **هَـٰذَا (haadha)** - "this"
-- **ٱلْبَيْتِ (al-bayt)** - "the House" (Ka'bah)
-
-**The logical conclusion:**
-Given that Allah:
-1. Destroyed the elephant army (Al-Fil)
-2. Preserved the Ka'bah
-3. Elevated Quraysh's status
-4. Made their trade routes safe
-5. Gave them prosperity
-
-**THEREFORE:** Worship the Lord of THIS HOUSE!
-
-**"This House" = The Ka'bah:**
-Not just any house - THE House of Allah that they are guardians of!
-The same house Abraha tried to destroy!
-
-**The irony:**
-Quraysh worshipped IDOLS inside the Ka'bah.
-They benefited from the House's prestige while filling it with false gods!
-This verse calls them back to the House's TRUE Lord.`
-      },
-      {
-        id: "int9-verse4",
-        type: "explanation",
-        title: "Verse 4: The Blessings",
-        arabicContent: "ٱلَّذِىٓ أَطْعَمَهُم مِّن جُوعٍ وَءَامَنَهُم مِّنْ خَوْفٍۭ",
-        content: `**ٱلَّذِىٓ أَطْعَمَهُم مِّن جُوعٍ وَءَامَنَهُم مِّنْ خَوْفٍۭ**
-*"Alladhee at'amahum min joo'in wa aamanahum min khawf"*
-
-**"Who fed them against hunger and made them safe from fear"**
-
-**Word breakdown:**
-- **ٱلَّذِىٓ (alladhee)** - "the One who"
-- **أَطْعَمَهُم (at'amahum)** - "fed them"
-- **مِّن جُوعٍ (min joo'in)** - "from/against hunger"
-- **وَءَامَنَهُم (wa aamanahum)** - "and secured them"
-- **مِّنْ خَوْفٍۭ (min khawf)** - "from fear"
-
-**Two fundamental blessings:**
-
-**1. Freedom from hunger (أَطْعَمَهُم مِّن جُوعٍ):**
-- Trade brought food to barren Makkah
-- Wealth meant they could buy provisions
-- They were never food-insecure
-
-**2. Freedom from fear (ءَامَنَهُم مِّنْ خَوْفٍۭ):**
-- Safe from invasion (Elephant army lesson!)
-- Safe during travel (covenant protections)
-- Sacred months = no warfare near Makkah
-- Respected status as Ka'bah guardians
-
-**The two basic human needs:**
-- Physical security (food)
-- Emotional security (safety)
-
-Allah gave them BOTH. What more do they need to worship Him?`
-      },
-      {
-        id: "int9-memorize",
-        type: "audio",
-        title: "Memorize Quraysh",
-        content: `**Let's memorize this short but profound surah!**
-
-**Full Surah:**
-لِإِيلَـٰفِ قُرَيْشٍ ﴿١﴾
-إِۦلَـٰفِهِمْ رِحْلَةَ ٱلشِّتَآءِ وَٱلصَّيْفِ ﴿٢﴾
-فَلْيَعْبُدُوا۟ رَبَّ هَـٰذَا ٱلْبَيْتِ ﴿٣﴾
-ٱلَّذِىٓ أَطْعَمَهُم مِّن جُوعٍ وَءَامَنَهُم مِّنْ خَوْفٍۭ ﴿٤﴾
-
-**Structure:**
-1-2: The blessing (security and trade)
-3: The command (worship the House's Lord)
-4: The reason (He fed and protected you)
-
-**Recite together with Al-Fil** for full context!
-
-Listen and repeat:`,
-        audioSegment: { surah: 106, ayahStart: 1, ayahEnd: 4, repeat: 10 }
-      },
-      {
-        id: "int9-memorization",
-        type: "practice",
-        title: "🎯 Memorization Practice",
-        content: "MEMORIZATION_MODULE",
-        arabicContent: "لِإِيلَـٰفِ قُرَيْشٍ ﴿١﴾ إِۦلَـٰفِهِمْ رِحْلَةَ ٱلشِّتَآءِ وَٱلصَّيْفِ ﴿٢﴾ فَلْيَعْبُدُوا۟ رَبَّ هَـٰذَا ٱلْبَيْتِ ﴿٣﴾ ٱلَّذِىٓ أَطْعَمَهُم مِّن جُوعٍ وَءَامَنَهُم مِّنْ خَوْفٍۭ ﴿٤﴾",
-        audioSegment: { surah: 106, ayahStart: 1, ayahEnd: 4 }
-      },
-      {
-        id: "int9-review",
+        id: "int19-final",
         type: "instruction",
-        title: "Quraysh Memorized! 🌟",
-        content: `**Alhamdulillah! You've completed Surah Quraysh!**
-
-**The twin-surah lesson:**
-Al-Fil + Quraysh = Protection leads to gratitude
-
-**Personal application:**
-Think about YOUR "trade journeys":
-- What routes does Allah keep safe for you? (commute, travel)
-- What "hunger" has He freed you from? (not just food - emotional, spiritual)
-- What "fears" has He removed?
-
-**Response:** Like Quraysh were commanded → Worship the Lord who provides!
-
-**Intermediate Path Progress:**
-You've now completed:
-- Unit 6: Quranic Vocabulary (3 lessons)
-- Unit 7: Basic Tajweed (3 lessons)
-- Unit 8: Short Surah Memorization (3 lessons)
-
-**Coming up in Advanced Path:**
-- Longer surah memorization techniques
-- Mutashabihat (similar verses)
+        title: "Next Steps",
+        content: `Continue to the Advanced Path for:
 - Advanced tajweed
-- Revision strategies`
+- Mutashabihat (similar verses)
+- Long surah strategies
+- Revision systems
+
+May Allah bless your journey!`
       }
     ],
-    memorizationTechniques: [
-      "Connect to Al-Fil: Protection → Therefore worship",
-      "Two journeys: Winter (South/Yemen) and Summer (North/Syria)",
-      "Two blessings: Fed from hunger, Safe from fear"
-    ],
-    keyVocabulary: [
-      { arabic: "إِيلَـٰفِ", transliteration: "Eelaaf", meaning: "Familiarity/security" },
-      { arabic: "رِحْلَةَ", transliteration: "Rihlah", meaning: "Journey" },
-      { arabic: "ٱلشِّتَآءِ", transliteration: "Ash-Shitaa", meaning: "Winter" },
-      { arabic: "ٱلصَّيْفِ", transliteration: "As-Sayf", meaning: "Summer" },
-      { arabic: "ٱلْبَيْتِ", transliteration: "Al-Bayt", meaning: "The House (Ka'bah)" },
-      { arabic: "جُوعٍ", transliteration: "Joo'", meaning: "Hunger" },
-      { arabic: "خَوْفٍ", transliteration: "Khawf", meaning: "Fear" }
-    ]
+    memorizationTechniques: ["Celebrate milestones", "Review what you've learned"],
+    keyVocabulary: []
   }
 ];
 
@@ -2079,7 +2779,7 @@ export const ALL_INTERMEDIATE_LESSONS: Lesson[] = [
 ];
 
 export const INTERMEDIATE_UNITS = [
-  { number: 6, title: "Common Quranic Vocabulary", lessons: 3, description: "Build understanding of frequently appearing words" },
-  { number: 7, title: "Basic Tajweed Rules", lessons: 3, description: "Master Noon Sakinah, Meem Sakinah, and Madd" },
-  { number: 8, title: "Short Surah Memorization", lessons: 3, description: "Deep-dive memorization with understanding" }
+  { number: 6, title: "Common Quranic Vocabulary", lessons: 5, description: "Names of Allah, verbs, particles, and root patterns" },
+  { number: 7, title: "Tajweed Rules in Depth", lessons: 5, description: "Noon Sakinah, Meem Sakinah, Madd, Qalqalah, Ghunnah" },
+  { number: 8, title: "Medium Surah Memorization", lessons: 9, description: "Al-Mulk, Al-Kahf (first 10), Ya-Sin portions" }
 ];

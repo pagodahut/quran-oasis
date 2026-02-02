@@ -828,20 +828,34 @@ export default function LessonDetailPage() {
         )}
       </AnimatePresence>
 
-      {/* Header */}
-      <header className="glass sticky top-0 z-40 safe-area-top">
-        <div className="flex items-center justify-between px-4 py-3">
-          <button onClick={() => router.push('/lessons')} className="btn-icon">
+      {/* Header - Premium Frosted Glass */}
+      <header className="sticky top-0 z-40 safe-area-top liquid-glass mx-2 mt-2 rounded-2xl">
+        <div className="flex items-center justify-between px-3 py-3">
+          <button 
+            onClick={() => router.push('/lessons')} 
+            className="liquid-icon-btn"
+            aria-label="Close lesson"
+          >
             <X className="w-5 h-5" />
           </button>
           
           <div className="flex-1 mx-4">
-            <div className="progress-bar h-2.5 bg-night-800 rounded-full overflow-hidden">
+            <div 
+              className="h-2.5 rounded-full overflow-hidden"
+              style={{
+                background: 'linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
+                border: '1px solid rgba(255,255,255,0.04)',
+              }}
+            >
               <motion.div
-                className="h-full bg-gradient-to-r from-gold-600 via-gold-500 to-gold-400 rounded-full"
+                className="h-full rounded-full"
+                style={{
+                  background: 'linear-gradient(90deg, rgba(201,162,39,0.85) 0%, rgba(201,162,39,1) 50%, rgba(220,180,50,1) 100%)',
+                  boxShadow: '0 0 12px rgba(201,162,39,0.4)',
+                }}
                 initial={{ width: 0 }}
                 animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
               />
             </div>
           </div>
@@ -852,7 +866,7 @@ export default function LessonDetailPage() {
         </div>
         
         {/* Lesson info */}
-        <div className="px-4 pb-3">
+        <div className="px-4 pb-3 pt-0.5">
           <p className="text-xs text-gold-500/80 font-medium">Unit {lesson.unit}: {lesson.unitTitle}</p>
           <h1 className="font-semibold text-night-100">{lesson.title}</h1>
         </div>
@@ -1111,17 +1125,19 @@ export default function LessonDetailPage() {
         </AnimatePresence>
       </main>
 
-      {/* Bottom Navigation - Sticky floating controls */}
-      <footer className="sticky bottom-0 z-40 glass safe-area-bottom border-t border-night-800">
+      {/* Bottom Navigation - Smooth Floating Glass Controls */}
+      <footer 
+        className="sticky bottom-0 z-40 safe-area-bottom mx-2 mb-2 rounded-2xl liquid-glass-strong"
+      >
         <div className="flex items-center justify-between px-4 py-4">
           {/* Previous Button */}
           <button
             onClick={goToPreviousStep}
             disabled={currentStepIndex === 0}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all min-h-[44px] ${
               currentStepIndex === 0
                 ? 'text-night-600 cursor-not-allowed'
-                : 'text-night-300 hover:bg-night-800 active:bg-night-700'
+                : 'text-night-300 hover:bg-white/5 active:bg-white/10'
             }`}
           >
             <ArrowLeft className="w-4 h-4" />
@@ -1139,13 +1155,16 @@ export default function LessonDetailPage() {
                 <motion.div
                   key={step.id}
                   layout
-                  className={`h-2 rounded-full transition-all ${
-                    actualIndex === currentStepIndex
-                      ? 'bg-gold-500 w-6'
+                  className="h-2 rounded-full"
+                  style={{
+                    width: actualIndex === currentStepIndex ? 24 : 8,
+                    background: actualIndex === currentStepIndex
+                      ? 'linear-gradient(90deg, rgba(201,162,39,1) 0%, rgba(220,180,50,1) 100%)'
                       : actualIndex < currentStepIndex
-                        ? 'bg-sage-500 w-2'
-                        : 'bg-night-700 w-2'
-                  }`}
+                        ? 'rgba(134,169,113,0.8)'
+                        : 'rgba(255,255,255,0.1)',
+                    transition: 'all 0.25s ease',
+                  }}
                 />
               );
             })}
@@ -1155,15 +1174,31 @@ export default function LessonDetailPage() {
           <motion.button
             onClick={goToNextStep}
             disabled={currentStep?.exercise && !showFeedback}
-            whileHover={!(currentStep?.exercise && !showFeedback) ? { scale: 1.02 } : {}}
-            whileTap={!(currentStep?.exercise && !showFeedback) ? { scale: 0.98 } : {}}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all ${
+            whileTap={!(currentStep?.exercise && !showFeedback) ? { scale: 0.97 } : {}}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium min-h-[44px] ${
               currentStep?.exercise && !showFeedback
-                ? 'bg-night-800 text-night-500 cursor-not-allowed'
-                : isLastStep
-                  ? 'bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white shadow-glow-sage'
-                  : 'bg-gold-500 hover:bg-gold-400 text-night-950 shadow-glow-gold'
+                ? 'cursor-not-allowed'
+                : ''
             }`}
+            style={{
+              background: currentStep?.exercise && !showFeedback
+                ? 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)'
+                : isLastStep
+                  ? 'linear-gradient(135deg, rgba(134,169,113,0.95) 0%, rgba(100,140,90,1) 100%)'
+                  : 'linear-gradient(135deg, rgba(201,162,39,0.95) 0%, rgba(180,140,30,1) 100%)',
+              color: currentStep?.exercise && !showFeedback
+                ? '#6b7280'
+                : isLastStep
+                  ? 'white'
+                  : '#0a0a0f',
+              boxShadow: currentStep?.exercise && !showFeedback
+                ? 'none'
+                : isLastStep
+                  ? '0 4px 16px rgba(134,169,113,0.3)'
+                  : '0 4px 16px rgba(201,162,39,0.35)',
+              border: '1px solid rgba(255,255,255,0.15)',
+              transition: 'all 0.2s ease',
+            }}
           >
             <span>{isLastStep ? 'Complete' : 'Continue'}</span>
             {isLastStep ? (

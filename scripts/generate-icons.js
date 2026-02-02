@@ -1,54 +1,45 @@
 #!/usr/bin/env node
 /**
- * Generate PWA icons from SVG
+ * Generate PWA icons from icon.svg
  */
 
+const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
-const sharp = require('sharp');
 
-const SIZES = [72, 96, 128, 144, 152, 192, 384, 512];
-const SVG_PATH = path.join(__dirname, '../public/icon.svg');
-const OUTPUT_DIR = path.join(__dirname, '../public/icons');
+const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+const inputSvg = path.join(__dirname, '../public/icon.svg');
+const outputDir = path.join(__dirname, '../public/icons');
 
 async function generateIcons() {
-  // Ensure output directory exists
-  if (!fs.existsSync(OUTPUT_DIR)) {
-    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
-  }
-
-  const svgBuffer = fs.readFileSync(SVG_PATH);
-
-  console.log('🎨 Generating PWA icons from icon.svg...\n');
-
-  for (const size of SIZES) {
-    const outputPath = path.join(OUTPUT_DIR, `icon-${size}x${size}.png`);
+  const svgBuffer = fs.readFileSync(inputSvg);
+  
+  for (const size of sizes) {
+    const outputPath = path.join(outputDir, `icon-${size}x${size}.png`);
     
     await sharp(svgBuffer)
       .resize(size, size)
       .png()
       .toFile(outputPath);
     
-    console.log(`  ✓ icon-${size}x${size}.png`);
+    console.log(`✓ Generated ${size}x${size}`);
   }
-
-  // Also create apple-touch-icon
-  const appleTouchPath = path.join(__dirname, '../public/apple-touch-icon.png');
-  await sharp(svgBuffer)
-    .resize(180, 180)
-    .png()
-    .toFile(appleTouchPath);
-  console.log('  ✓ apple-touch-icon.png (180x180)');
-
-  // Create favicon.ico (32x32 PNG, browsers accept this)
-  const faviconPath = path.join(__dirname, '../public/favicon.png');
+  
+  // Also generate favicon.png (32x32)
   await sharp(svgBuffer)
     .resize(32, 32)
     .png()
-    .toFile(faviconPath);
-  console.log('  ✓ favicon.png (32x32)');
-
-  console.log('\n✨ All icons generated successfully!');
+    .toFile(path.join(__dirname, '../public/favicon.png'));
+  console.log('✓ Generated favicon.png');
+  
+  // Generate apple-touch-icon (180x180)
+  await sharp(svgBuffer)
+    .resize(180, 180)
+    .png()
+    .toFile(path.join(__dirname, '../public/apple-touch-icon.png'));
+  console.log('✓ Generated apple-touch-icon.png');
+  
+  console.log('\n✅ All icons generated!');
 }
 
 generateIcons().catch(console.error);

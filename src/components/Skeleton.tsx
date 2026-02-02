@@ -7,7 +7,7 @@ interface SkeletonProps {
   variant?: 'text' | 'circular' | 'rectangular' | 'rounded';
   width?: string | number;
   height?: string | number;
-  animation?: 'pulse' | 'wave' | 'none';
+  animation?: 'pulse' | 'wave' | 'shimmer' | 'none';
 }
 
 export default function Skeleton({
@@ -15,7 +15,7 @@ export default function Skeleton({
   variant = 'text',
   width,
   height,
-  animation = 'pulse',
+  animation = 'shimmer',
 }: SkeletonProps) {
   const variantStyles = {
     text: 'rounded-md h-4',
@@ -24,20 +24,55 @@ export default function Skeleton({
     rounded: 'rounded-xl',
   };
 
+  // Use shimmer as default for smoother feel
+  const animationStyle = animation === 'shimmer' 
+    ? {
+        background: 'linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 100%)',
+        backgroundSize: '200% 100%',
+        animation: 'skeleton-shimmer 1.8s ease-in-out infinite',
+      }
+    : animation === 'pulse'
+      ? {}
+      : animation === 'wave'
+        ? {}
+        : {};
+
   const animationClass = animation === 'pulse' 
-    ? 'animate-pulse' 
+    ? 'animate-pulse bg-white/[0.04]' 
     : animation === 'wave' 
       ? 'liquid-skeleton' 
-      : '';
+      : animation === 'shimmer'
+        ? ''
+        : 'bg-white/[0.04]';
 
   return (
     <div
-      className={`bg-night-800/60 ${variantStyles[variant]} ${animationClass} ${className}`}
-      style={{ width, height }}
+      className={`${variantStyles[variant]} ${animationClass} ${className}`}
+      style={{ 
+        width, 
+        height,
+        ...animationStyle,
+      }}
       role="status"
       aria-label="Loading..."
     />
   );
+}
+
+// Add shimmer keyframes via style tag in component
+if (typeof document !== 'undefined') {
+  const styleId = 'skeleton-shimmer-style';
+  if (!document.getElementById(styleId)) {
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+      @keyframes skeleton-shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
 }
 
 // Pre-built skeleton layouts

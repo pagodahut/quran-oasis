@@ -2133,6 +2133,718 @@ Allah made it easy. It can be recovered. Start today!`
   }
 ];
 
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * UNIT 12: LONG SURAH STRATEGIES (Lessons 37-42)
+ * Systematic approaches for memorizing Al-Baqarah and other long surahs
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+const UNIT_12_LESSONS: Lesson[] = [
+  // ─────────────────────────────────────────────────────────────────────────
+  // LESSON 37: The Manzil System
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "adv-lesson-9",
+    unit: 12,
+    unitTitle: "Long Surah Strategies",
+    path: "advanced",
+    number: 37,
+    title: "The Manzil System",
+    description: "Learn the traditional 7-day Quran completion system",
+    surah: 1,
+    ayahStart: 1,
+    ayahEnd: 7,
+    estimatedMinutes: 25,
+    xpReward: 125,
+    steps: [
+      {
+        id: "adv9-intro",
+        type: "instruction",
+        title: "What is the Manzil System?",
+        content: `**Manzil (مَنْزِل)** means "station" or "stopping place."
+
+The Companions divided the Quran into **7 portions** for weekly completion.
+
+**The Prophet ﷺ said:**
+"Recite the Quran in seven days, and do not recite it in less than three days." (Abu Dawud)
+
+**The 7 Manzils (فَمِي بِشَوْقٍ):**
+Using the mnemonic "فَمِي بِشَوْقٍ" (My mouth with longing):
+
+1. **ف** = Fatiha → Al-Nisa (1-4)
+2. **م** = Ma'ida → At-Tawba (5-9)
+3. **ي** = Yunus → An-Nahl (10-16)
+4. **ب** = Bani Isra'il → Al-Furqan (17-25)
+5. **ش** = Shu'ara → Ya-Sin (26-36)
+6. **و** = Was-Saffat → Al-Hujurat (37-49)
+7. **ق** = Qaf → An-Nas (50-114)
+
+This system is perfect for revision!`
+      },
+      {
+        id: "adv9-application",
+        type: "explanation",
+        title: "Applying the Manzil System",
+        content: `**For Huffaz:**
+- Recite 1 manzil per day = complete Quran weekly
+- Each manzil takes 45-90 minutes
+
+**For those still memorizing:**
+- Use manzil divisions to track progress
+- Complete what you know from each manzil
+- Gradually fill in gaps
+
+**Weekly Schedule Example:**
+| Day | Manzil | Surahs |
+|-----|--------|--------|
+| Sat | 1 | Al-Fatiha to An-Nisa |
+| Sun | 2 | Al-Ma'ida to At-Tawba |
+| Mon | 3 | Yunus to An-Nahl |
+| Tue | 4 | Al-Isra to Al-Furqan |
+| Wed | 5 | Ash-Shu'ara to Ya-Sin |
+| Thu | 6 | As-Saffat to Al-Hujurat |
+| Fri | 7 | Qaf to An-Nas |
+
+**Friday advantage:**
+Manzil 7 includes Juz Amma - easiest to recite on the blessed day!`
+      },
+      {
+        id: "adv9-quiz",
+        type: "exercise",
+        title: "Manzil Quiz",
+        content: "Test your manzil knowledge!",
+        exercise: {
+          type: "comprehension",
+          question: "The mnemonic 'فَمِي بِشَوْقٍ' helps remember the 7 manzils. What does ش stand for?",
+          options: [
+            "Surah Ash-Shams",
+            "Surah Ash-Shu'ara (Manzil 5 start)",
+            "Surah Ash-Sharh",
+            "Surah As-Saff"
+          ],
+          correctAnswer: 1,
+          explanation: "ش = Ash-Shu'ara, which begins Manzil 5 (covering Surahs 26-36, ending at Ya-Sin)."
+        }
+      },
+      {
+        id: "adv9-review",
+        type: "instruction",
+        title: "Lesson Complete! 🌟",
+        content: `**You've learned the Manzil System!**
+
+**Remember:**
+- فَمِي بِشَوْقٍ = 7 manzil starting letters
+- 1 manzil per day = weekly Quran completion
+- Flexible: adapt to your level
+
+Apply this to your revision schedule!`
+      }
+    ],
+    memorizationTechniques: [
+      "فَمِي بِشَوْقٍ = mnemonic for 7 manzils",
+      "One manzil daily = weekly completion",
+      "Friday = Manzil 7 (Juz Amma)"
+    ],
+    keyVocabulary: [
+      { arabic: "مَنْزِل", transliteration: "Manzil", meaning: "Station/portion" },
+      { arabic: "فَمِي بِشَوْقٍ", transliteration: "Fami bi-shawqin", meaning: "My mouth with longing (mnemonic)" }
+    ]
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // LESSON 38: Al-Baqarah Strategy - First Page
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "adv-lesson-10",
+    unit: 12,
+    unitTitle: "Long Surah Strategies",
+    path: "advanced",
+    number: 38,
+    title: "Al-Baqarah - Beginning Your Journey",
+    description: "Start memorizing the longest surah with proven strategies",
+    surah: 2,
+    ayahStart: 1,
+    ayahEnd: 5,
+    estimatedMinutes: 40,
+    xpReward: 150,
+    steps: [
+      {
+        id: "adv10-intro",
+        type: "instruction",
+        title: "The Mountain Surah",
+        content: `**Surah Al-Baqarah** - 286 verses, ~2.5 Juz
+
+**Why memorize it?**
+The Prophet ﷺ said:
+"Recite Al-Baqarah, for taking it is a blessing, leaving it is a regret, and the magicians cannot withstand it." (Muslim)
+
+"Whoever recites the last two verses of Al-Baqarah at night, they will suffice him." (Bukhari)
+
+**Strategy overview:**
+1. Break into manageable sections (~10-15 verses/week)
+2. Learn themes to create mental structure
+3. Focus on key passages first (Ayat al-Kursi, last 2 verses)
+4. Consistent daily review
+
+**Let's start with verses 1-5!**`
+      },
+      {
+        id: "adv10-verses",
+        type: "explanation",
+        title: "Verses 1-5: The Guided Ones",
+        arabicContent: "الم • ذَٰلِكَ الْكِتَابُ لَا رَيْبَ ۛ فِيهِ ۛ هُدًى لِّلْمُتَّقِينَ",
+        content: `**الم (Alif-Lam-Meem)** - Mysterious letters
+
+**ذَٰلِكَ الْكِتَابُ لَا رَيْبَ فِيهِ هُدًى لِّلْمُتَّقِينَ**
+"This is the Book about which there is no doubt, a guidance for those conscious of Allah"
+
+**Key vocabulary:**
+- لَا رَيْبَ - no doubt
+- هُدًى - guidance
+- لِّلْمُتَّقِينَ - for the God-conscious
+
+**Verses 3-4 describe the متقين:**
+- They believe in the unseen
+- Establish prayer
+- Spend from what We provide
+- Believe in revelation
+
+**Verse 5:**
+أُولَٰئِكَ عَلَىٰ هُدًى مِّن رَّبِّهِمْ ۖ وَأُولَٰئِكَ هُمُ الْمُفْلِحُونَ
+"Those are upon guidance from their Lord, and they are the successful."`
+      },
+      {
+        id: "adv10-audio",
+        type: "audio",
+        title: "Listen and Memorize",
+        content: "Begin with the opening:",
+        audioSegment: { surah: 2, ayahStart: 1, ayahEnd: 5, repeat: 10 }
+      },
+      {
+        id: "adv10-memorization",
+        type: "practice",
+        title: "🎯 Memorization Practice",
+        content: "MEMORIZATION_MODULE",
+        arabicContent: "الم ﴿١﴾ ذَٰلِكَ الْكِتَابُ لَا رَيْبَ ۛ فِيهِ ۛ هُدًى لِّلْمُتَّقِينَ ﴿٢﴾",
+        audioSegment: { surah: 2, ayahStart: 1, ayahEnd: 5 }
+      },
+      {
+        id: "adv10-review",
+        type: "instruction",
+        title: "First Steps Complete! 🌟",
+        content: `**You've begun Al-Baqarah!**
+
+This is a marathon, not a sprint. Key lessons:
+- 5 verses is a great daily goal
+- Review yesterday's portion before adding new
+- The opening describes WHO benefits from Quran
+
+**Coming up:** Ayat al-Kursi - the greatest verse!`
+      }
+    ],
+    memorizationTechniques: [
+      "5-10 verses daily maximum",
+      "Opening describes the Muttaqeen (God-conscious)",
+      "Review before adding new content"
+    ],
+    keyVocabulary: [
+      { arabic: "الم", transliteration: "Alif-Lam-Meem", meaning: "Mysterious letters" },
+      { arabic: "لَا رَيْبَ", transliteration: "Laa rayba", meaning: "No doubt" },
+      { arabic: "الْمُتَّقِينَ", transliteration: "Al-Muttaqeen", meaning: "The God-conscious" },
+      { arabic: "الْمُفْلِحُونَ", transliteration: "Al-Muflihoon", meaning: "The successful" }
+    ]
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // LESSON 39: Ayat al-Kursi - The Greatest Verse
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "adv-lesson-11",
+    unit: 12,
+    unitTitle: "Long Surah Strategies",
+    path: "advanced",
+    number: 39,
+    title: "Ayat al-Kursi - The Greatest Verse",
+    description: "Memorize the most powerful verse in the Quran",
+    surah: 2,
+    ayahStart: 255,
+    ayahEnd: 257,
+    estimatedMinutes: 35,
+    xpReward: 175,
+    steps: [
+      {
+        id: "adv11-intro",
+        type: "instruction",
+        title: "The Throne Verse",
+        content: `**The Prophet ﷺ asked Ubayy ibn Ka'b:**
+"Which verse in the Quran is the greatest?"
+Ubayy said: "Allah and His Messenger know best."
+He ﷺ said: "Ayat al-Kursi."
+
+**Benefits:**
+- Recite after every prayer → guaranteed Paradise (Nasa'i)
+- Recite before sleep → protected until morning (Bukhari)
+- Contains 10 complete sentences
+- Mentions 5 Names of Allah
+
+**This ONE verse contains:**
+The essence of tawheed (monotheism) and Allah's attributes.`
+      },
+      {
+        id: "adv11-breakdown",
+        type: "explanation",
+        title: "Breaking Down Ayat al-Kursi",
+        arabicContent: "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ",
+        content: `**10 Sentences of Ayat al-Kursi:**
+
+1. اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ - Allah, no god except Him
+2. الْحَيُّ الْقَيُّومُ - The Ever-Living, Self-Sustaining
+3. لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ - Neither drowsiness nor sleep overtakes Him
+4. لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ - To Him belongs what is in the heavens and earth
+5. مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ - Who can intercede except by His permission?
+6. يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ - He knows what is before and behind them
+7. وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ - They encompass nothing of His knowledge except what He wills
+8. وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ - His Kursi extends over the heavens and earth
+9. وَلَا يَئُودُهُ حِفْظُهُمَا - Their preservation doesn't tire Him
+10. وَهُوَ الْعَلِيُّ الْعَظِيمُ - And He is the Most High, the Most Great
+
+**Memorize sentence by sentence!**`
+      },
+      {
+        id: "adv11-audio",
+        type: "audio",
+        title: "Listen and Memorize",
+        content: "Listen to Ayat al-Kursi:",
+        audioSegment: { surah: 2, ayahStart: 255, ayahEnd: 255, repeat: 15 }
+      },
+      {
+        id: "adv11-memorization",
+        type: "practice",
+        title: "🎯 Memorization Practice",
+        content: "MEMORIZATION_MODULE",
+        arabicContent: "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ ﴿٢٥٥﴾",
+        audioSegment: { surah: 2, ayahStart: 255, ayahEnd: 255 }
+      },
+      {
+        id: "adv11-review",
+        type: "instruction",
+        title: "The Greatest Verse Memorized! 🏆",
+        content: `**MashaAllah! You've memorized Ayat al-Kursi!**
+
+**Daily practice:**
+- After every fard prayer
+- Before sleeping
+- For protection from evil
+
+**This is one of the most important verses you'll ever memorize!**`
+      }
+    ],
+    memorizationTechniques: [
+      "10 sentences = 10 concepts",
+      "Each sentence is a complete statement about Allah",
+      "Recite after every prayer for Paradise"
+    ],
+    keyVocabulary: [
+      { arabic: "الْحَيُّ", transliteration: "Al-Hayy", meaning: "The Ever-Living" },
+      { arabic: "الْقَيُّومُ", transliteration: "Al-Qayyoom", meaning: "The Self-Sustaining" },
+      { arabic: "كُرْسِيُّ", transliteration: "Kursi", meaning: "Throne/Footstool" },
+      { arabic: "الْعَلِيُّ الْعَظِيمُ", transliteration: "Al-'Aliyy Al-'Azeem", meaning: "The Most High, Most Great" }
+    ]
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // LESSON 40: Last Two Verses of Al-Baqarah
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "adv-lesson-12",
+    unit: 12,
+    unitTitle: "Long Surah Strategies",
+    path: "advanced",
+    number: 40,
+    title: "Last Two Verses of Al-Baqarah",
+    description: "Memorize the protective closing of Al-Baqarah",
+    surah: 2,
+    ayahStart: 285,
+    ayahEnd: 286,
+    estimatedMinutes: 30,
+    xpReward: 150,
+    steps: [
+      {
+        id: "adv12-intro",
+        type: "instruction",
+        title: "The Sufficient Verses",
+        content: `**The Prophet ﷺ said:**
+"Whoever recites the last two verses of Surah Al-Baqarah at night, they will suffice him." (Bukhari, Muslim)
+
+**What do they suffice?**
+- Protection from evil
+- Reward for night prayer
+- Spiritual and worldly sufficiency
+
+These verses were given to the Prophet ﷺ during the Mi'raj (Night Journey) - they came directly from above the seven heavens!`
+      },
+      {
+        id: "adv12-verses",
+        type: "explanation",
+        title: "The Final Verses",
+        arabicContent: "آمَنَ الرَّسُولُ بِمَا أُنزِلَ إِلَيْهِ مِن رَّبِّهِ وَالْمُؤْمِنُونَ",
+        content: `**Verse 285:**
+آمَنَ الرَّسُولُ بِمَا أُنزِلَ إِلَيْهِ مِن رَّبِّهِ وَالْمُؤْمِنُونَ ۚ كُلٌّ آمَنَ بِاللَّهِ وَمَلَائِكَتِهِ وَكُتُبِهِ وَرُسُلِهِ لَا نُفَرِّقُ بَيْنَ أَحَدٍ مِّن رُّسُلِهِ ۚ وَقَالُوا سَمِعْنَا وَأَطَعْنَا ۖ غُفْرَانَكَ رَبَّنَا وَإِلَيْكَ الْمَصِيرُ
+
+**Key phrases:**
+- سَمِعْنَا وَأَطَعْنَا - We hear and we obey
+- غُفْرَانَكَ رَبَّنَا - Your forgiveness, our Lord
+
+**Verse 286 contains the famous du'a:**
+رَبَّنَا لَا تُؤَاخِذْنَا إِن نَّسِينَا أَوْ أَخْطَأْنَا
+"Our Lord, do not take us to account if we forget or make a mistake..."`
+      },
+      {
+        id: "adv12-audio",
+        type: "audio",
+        title: "Listen and Memorize",
+        content: "Listen to these blessed verses:",
+        audioSegment: { surah: 2, ayahStart: 285, ayahEnd: 286, repeat: 10 }
+      },
+      {
+        id: "adv12-memorization",
+        type: "practice",
+        title: "🎯 Memorization Practice",
+        content: "MEMORIZATION_MODULE",
+        arabicContent: "آمَنَ الرَّسُولُ بِمَا أُنزِلَ إِلَيْهِ مِن رَّبِّهِ وَالْمُؤْمِنُونَ ۚ كُلٌّ آمَنَ بِاللَّهِ وَمَلَائِكَتِهِ وَكُتُبِهِ وَرُسُلِهِ لَا نُفَرِّقُ بَيْنَ أَحَدٍ مِّن رُّسُلِهِ",
+        audioSegment: { surah: 2, ayahStart: 285, ayahEnd: 286 }
+      },
+      {
+        id: "adv12-review",
+        type: "instruction",
+        title: "Night Protection Memorized! 🌙",
+        content: `**Alhamdulillah! You've memorized the last two verses!**
+
+**Nightly practice:**
+- Recite before sleeping
+- Protection throughout the night
+- Given during the Mi'raj
+
+**You now have 3 key Al-Baqarah passages:**
+1. Opening (1-5)
+2. Ayat al-Kursi (255)
+3. Closing (285-286)`
+      }
+    ],
+    memorizationTechniques: [
+      "Recite every night before sleeping",
+      "Contains articles of faith",
+      "Ends with powerful du'a"
+    ],
+    keyVocabulary: [
+      { arabic: "سَمِعْنَا وَأَطَعْنَا", transliteration: "Sami'na wa ata'na", meaning: "We hear and obey" },
+      { arabic: "غُفْرَانَكَ", transliteration: "Ghufranaka", meaning: "Your forgiveness" },
+      { arabic: "لَا تُؤَاخِذْنَا", transliteration: "La tu'akhidhna", meaning: "Do not hold us accountable" }
+    ]
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // LESSON 41: Speed and Fluency Exercises
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "adv-lesson-13",
+    unit: 12,
+    unitTitle: "Long Surah Strategies",
+    path: "advanced",
+    number: 41,
+    title: "Speed and Fluency Exercises",
+    description: "Build recitation speed while maintaining accuracy",
+    surah: 1,
+    ayahStart: 1,
+    ayahEnd: 7,
+    estimatedMinutes: 25,
+    xpReward: 125,
+    steps: [
+      {
+        id: "adv13-intro",
+        type: "instruction",
+        title: "Why Speed Matters",
+        content: `**The goal isn't racing** - it's building fluency!
+
+**Benefits of increased speed:**
+1. Complete more revision in less time
+2. Build confidence in memory
+3. Prepare for Taraweeh leading
+4. More natural recitation flow
+
+**The Prophet ﷺ completed Quran with Jibreel annually** - this requires fluency!
+
+**Important:** Never sacrifice tajweed for speed. Build gradually.`
+      },
+      {
+        id: "adv13-techniques",
+        type: "explanation",
+        title: "Speed Building Techniques",
+        content: `**Technique 1: The 3-Speed Method**
+1. First pass: SLOW - focus on accuracy
+2. Second pass: MEDIUM - comfortable pace
+3. Third pass: FAST - push your limits
+4. Return to SLOW to check mistakes
+
+**Technique 2: Chunking**
+Instead of verse-by-verse, recite in:
+- 5-verse chunks
+- Page chunks
+- Theme-based sections
+Larger chunks = fewer pauses = better flow
+
+**Technique 3: Following a Fast Qari**
+1. Choose a Qari with faster recitation (Mishary Rashid - muratal)
+2. Try to keep up while reading along
+3. Gradually reduce looking at mushaf
+4. Eventually recite along from memory
+
+**Technique 4: Timer Challenge**
+1. Time your Juz recitation
+2. Record the time
+3. Try to beat it next week
+4. Track improvement over months`
+      },
+      {
+        id: "adv13-exercises",
+        type: "practice",
+        title: "Practice Exercise",
+        content: `**Today's Exercise: Juz Amma Speed Run**
+
+1. Set a timer
+2. Recite from An-Naba (78) to An-Nas (114)
+3. Maintain tajweed but push for fluency
+4. Record your time
+
+**Target times:**
+- Beginner: 45-60 minutes
+- Intermediate: 30-45 minutes
+- Advanced: 20-30 minutes
+- Master: Under 20 minutes
+
+**Start your timer and begin!**`
+      },
+      {
+        id: "adv13-review",
+        type: "instruction",
+        title: "Lesson Complete! 🌟",
+        content: `**You've learned speed-building techniques!**
+
+**Weekly practice:**
+- One timed recitation per week
+- Track your progress
+- Never sacrifice accuracy
+
+**Remember:** Fluency comes from consistent practice, not rushing!`
+      }
+    ],
+    memorizationTechniques: [
+      "3-Speed Method: Slow → Medium → Fast → Slow",
+      "Chunk larger portions for better flow",
+      "Follow along with fast Qaris"
+    ],
+    keyVocabulary: [
+      { arabic: "سُرْعَة", transliteration: "Sur'ah", meaning: "Speed" },
+      { arabic: "طَلَاقَة", transliteration: "Talaaqa", meaning: "Fluency" },
+      { arabic: "تَدَرُّج", transliteration: "Tadarruj", meaning: "Gradual progression" }
+    ]
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // LESSON 42: Teaching Others - The Best Practice
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "adv-lesson-14",
+    unit: 12,
+    unitTitle: "Long Surah Strategies",
+    path: "advanced",
+    number: 42,
+    title: "Teaching Others - The Best Practice",
+    description: "Learn how teaching strengthens your own memorization",
+    surah: 1,
+    ayahStart: 1,
+    ayahEnd: 7,
+    estimatedMinutes: 25,
+    xpReward: 150,
+    steps: [
+      {
+        id: "adv14a-intro",
+        type: "instruction",
+        title: "The Teacher's Reward",
+        content: `**The Prophet ﷺ said:**
+"The best of you are those who learn the Quran and teach it." (Bukhari)
+
+**Why teaching helps YOUR hifdh:**
+1. Forces you to review deeply
+2. Reveals gaps you didn't know existed
+3. Strengthens neural pathways through repetition
+4. Creates accountability
+5. Earns extra reward
+
+**You don't need to be a scholar to teach!**
+Even teaching one surah to a child qualifies.`
+      },
+      {
+        id: "adv14a-how",
+        type: "explanation",
+        title: "How to Start Teaching",
+        content: `**Step 1: Start with what you know best**
+- Your strongest surahs
+- Juz Amma is perfect for beginners
+
+**Step 2: Find a student**
+- Your own children
+- Younger siblings
+- Mosque weekend school
+- Online teaching platforms
+- New Muslim revert circles
+
+**Step 3: Prepare properly**
+- Review the surah multiple times
+- Know the tajweed rules that apply
+- Understand the basic meaning
+- Prepare for common mistakes
+
+**Step 4: Use the sandwich method**
+- Model (you recite)
+- Practice (they recite with you)
+- Independent (they recite alone)
+
+**Step 5: Be patient**
+The Prophet ﷺ was the most patient teacher!`
+      },
+      {
+        id: "adv14a-review",
+        type: "instruction",
+        title: "Become a Link in the Chain",
+        content: `**The Quran has been transmitted teacher-to-student for 1400+ years.**
+
+When you teach, you become part of this blessed chain (سِلْسِلَة).
+
+**Your assignment:**
+1. Choose one surah you know well
+2. Find one person to teach it to
+3. Complete teaching it within 2 weeks
+4. Notice how much stronger YOUR memory becomes!
+
+**The Prophet ﷺ said:**
+"Convey from me, even if it is one verse." (Bukhari)
+
+Start today!`
+      }
+    ],
+    memorizationTechniques: [
+      "Teaching forces deep review",
+      "Start with your strongest surahs",
+      "Use the sandwich method: Model → Practice → Independent"
+    ],
+    keyVocabulary: [
+      { arabic: "مُعَلِّم", transliteration: "Mu'allim", meaning: "Teacher" },
+      { arabic: "سِلْسِلَة", transliteration: "Silsila", meaning: "Chain (of transmission)" },
+      { arabic: "بَلِّغُوا", transliteration: "Ballighoo", meaning: "Convey" }
+    ]
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // LESSON 43: Advanced Path Completion
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "adv-lesson-15",
+    unit: 12,
+    unitTitle: "Long Surah Strategies",
+    path: "advanced",
+    number: 43,
+    title: "Advanced Path Completion - Your Hifdh Journey",
+    description: "Celebrate your achievements and plan your ongoing journey",
+    surah: 1,
+    ayahStart: 1,
+    ayahEnd: 7,
+    estimatedMinutes: 20,
+    xpReward: 300,
+    steps: [
+      {
+        id: "adv14-celebration",
+        type: "instruction",
+        title: "Congratulations, Advanced Learner! 🏆",
+        content: `**Alhamdulillah! You've completed ALL paths!**
+
+**Your complete journey:**
+
+**Beginner Path (Units 1-5):**
+✅ Arabic alphabet
+✅ Letter forms and connections
+✅ Vowels and reading skills
+✅ First surah memorization
+
+**Intermediate Path (Units 6-8):**
+✅ Quranic vocabulary and roots
+✅ Tajweed rules (Noon, Meem, Madd, Qalqalah)
+✅ Al-Mulk memorization
+✅ Al-Kahf first 10 verses
+
+**Advanced Path (Units 9-12):**
+✅ Advanced tajweed
+✅ Mutashabihat strategies
+✅ Revision systems
+✅ Long surah strategies
+✅ Manzil system
+✅ Al-Baqarah key passages`
+      },
+      {
+        id: "adv14-future",
+        type: "instruction",
+        title: "Your Ongoing Journey",
+        content: `**The journey of a Hafiz never ends!**
+
+**Lifetime goals:**
+1. Complete memorization of the entire Quran
+2. Perfect your tajweed with a qualified teacher
+3. Learn the meanings (tafsir) of what you recite
+4. Teach others what you know
+5. Recite regularly in night prayers
+
+**Daily practice:**
+- Morning: New memorization (if applicable)
+- Afternoon: Review recent portions
+- Evening: Old revision rotation
+- Night: Use memorization in Tahajjud
+
+**The Prophet ﷺ said:**
+"The best of you are those who learn the Quran and teach it." (Bukhari)
+
+**You are now among the People of the Quran! 📖**`
+      },
+      {
+        id: "adv14-dua",
+        type: "instruction",
+        title: "Final Du'a",
+        content: `**اللَّهُمَّ اجْعَلْنِي مِنْ أَهْلِ الْقُرْآنِ الَّذِينَ هُمْ أَهْلُكَ وَخَاصَّتُكَ**
+
+"O Allah, make me from the people of the Quran who are Your people and Your special ones."
+
+**رَبَّنَا تَقَبَّلْ مِنَّا ۖ إِنَّكَ أَنتَ السَّمِيعُ الْعَلِيمُ**
+
+"Our Lord, accept from us. Indeed You are the Hearing, the Knowing."
+
+**May your memorization be a light for you in this life, in the grave, and on the Day of Judgment.**
+
+**Ameen! 🤲**`
+      }
+    ],
+    memorizationTechniques: [
+      "The journey never ends - keep learning",
+      "Teach others to solidify your own knowledge",
+      "Use your hifdh in worship (Tahajjud, Taraweeh)"
+    ],
+    keyVocabulary: [
+      { arabic: "أَهْلُ الْقُرْآنِ", transliteration: "Ahl al-Quran", meaning: "People of the Quran" },
+      { arabic: "حَافِظ", transliteration: "Hafiz", meaning: "One who memorized the Quran" },
+      { arabic: "رِحْلَة", transliteration: "Rihla", meaning: "Journey" }
+    ]
+  }
+];
+
 // ═══════════════════════════════════════════════════════════════════════════
 // EXPORTS
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2140,11 +2852,13 @@ Allah made it easy. It can be recovered. Start today!`
 export const ALL_ADVANCED_LESSONS: Lesson[] = [
   ...UNIT_9_LESSONS,
   ...UNIT_10_LESSONS,
-  ...UNIT_11_LESSONS
+  ...UNIT_11_LESSONS,
+  ...UNIT_12_LESSONS
 ];
 
 export const ADVANCED_UNITS = [
   { number: 9, title: "Advanced Tajweed", lessons: 3, description: "Qalqalah, advanced idgham, complete madd system" },
   { number: 10, title: "Mutashabihat - Similar Verses", lessons: 2, description: "Strategies for distinguishing similar verses" },
-  { number: 11, title: "Revision Strategies", lessons: 3, description: "Science-backed systems for maintaining memorization" }
+  { number: 11, title: "Revision Strategies", lessons: 3, description: "Science-backed systems for maintaining memorization" },
+  { number: 12, title: "Long Surah Strategies", lessons: 7, description: "Manzil system, Al-Baqarah key passages, speed, teaching" }
 ];

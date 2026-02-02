@@ -197,14 +197,14 @@ export default function MushafPage() {
         onPlay={() => setIsPlaying(true)}
       />
 
-      {/* Header */}
-      <header className="liquid-glass sticky top-0 z-40 safe-area-top">
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-2">
-            <Link href="/" className="btn-icon">
+      {/* Header - Premium Frosted Glass */}
+      <header className="sticky top-0 z-40 safe-area-top liquid-glass rounded-b-2xl mx-2 mt-2">
+        <div className="flex items-center justify-between px-3 py-3">
+          <div className="flex items-center gap-1.5">
+            <Link href="/" className="liquid-icon-btn">
               <ChevronLeft className="w-5 h-5" />
             </Link>
-            <button onClick={() => setShowSurahList(true)} className="btn-icon">
+            <button onClick={() => setShowSurahList(true)} className="liquid-icon-btn">
               <List className="w-5 h-5" />
             </button>
           </div>
@@ -212,7 +212,7 @@ export default function MushafPage() {
           {/* Surah Title */}
           <button 
             onClick={() => setShowSurahList(true)}
-            className="text-center flex-1 mx-4"
+            className="text-center flex-1 mx-3 py-1 px-2 rounded-xl hover:bg-white/5 active:bg-white/10 transition-colors"
           >
             {currentSurah && (
               <>
@@ -222,31 +222,31 @@ export default function MushafPage() {
             )}
           </button>
 
-          <div className="flex items-center gap-2">
-            <button onClick={() => setShowSearch(true)} className="btn-icon">
+          <div className="flex items-center gap-1.5">
+            <button onClick={() => setShowSearch(true)} className="liquid-icon-btn">
               <Search className="w-5 h-5" />
             </button>
-            <Link href="/bookmarks" className="btn-icon">
+            <Link href="/bookmarks" className="liquid-icon-btn">
               <Bookmark className="w-5 h-5" />
             </Link>
-            <button onClick={() => setShowSettings(true)} className="btn-icon">
+            <button onClick={() => setShowSettings(true)} className="liquid-icon-btn">
               <Settings className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between px-4 py-2 border-t border-night-800/30 text-sm">
+        {/* Navigation - Smooth divider */}
+        <div className="flex items-center justify-between px-4 py-2.5 border-t border-white/[0.04] text-sm">
           <button
             onClick={() => surahNumber > 1 && setSurahNumber(surahNumber - 1)}
             disabled={surahNumber === 1}
-            className="flex items-center gap-1 text-night-400 disabled:opacity-30"
+            className="flex items-center gap-1 text-night-400 disabled:opacity-30 min-h-[36px] px-2 rounded-lg hover:bg-white/5 active:bg-white/10 transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
             Prev
           </button>
           
-          <span className="text-night-500">
+          <span className="text-night-500 text-xs">
             {currentSurah && (
               <>Surah {surahNumber} • {currentSurah.numberOfAyahs} verses • {currentSurah.revelationType}</>
             )}
@@ -255,7 +255,7 @@ export default function MushafPage() {
           <button
             onClick={() => surahNumber < 114 && setSurahNumber(surahNumber + 1)}
             disabled={surahNumber === 114}
-            className="flex items-center gap-1 text-night-400 disabled:opacity-30"
+            className="flex items-center gap-1 text-night-400 disabled:opacity-30 min-h-[36px] px-2 rounded-lg hover:bg-white/5 active:bg-white/10 transition-colors"
           >
             Next
             <ChevronRight className="w-4 h-4" />
@@ -418,30 +418,30 @@ export default function MushafPage() {
         )}
       </main>
 
-      {/* Audio Player - positioned above BottomNav */}
-      <div className="fixed bottom-16 left-0 right-0 liquid-glass z-40">
-        <div className="px-4 py-3 max-w-3xl mx-auto">
+      {/* Audio Player - Premium Frosted Glass - positioned above BottomNav */}
+      <div className="fixed bottom-20 left-2 right-2 z-40 liquid-glass-strong rounded-2xl">
+        <div className="px-4 py-3.5 max-w-3xl mx-auto">
           {/* Now Playing */}
           <div className="flex items-center justify-between mb-3">
             <div className="text-sm">
-              <span className="text-night-400">Playing:</span>
-              <span className="text-night-200 ml-2">
+              <span className="text-night-500 text-xs">Now Playing</span>
+              <p className="text-night-200 font-medium">
                 {currentSurah?.englishName} {surahNumber}:{currentAyah}
-              </span>
-              {loopRange && (
-                <span className="text-gold-400 ml-2 text-xs">
-                  (loop {loopRange.start}-{loopRange.end})
-                </span>
-              )}
+                {loopRange && (
+                  <span className="text-gold-400 ml-2 text-xs font-normal">
+                    (loop {loopRange.start}-{loopRange.end})
+                  </span>
+                )}
+              </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               {/* Word-by-word toggle */}
               <button
                 onClick={() => setWordByWordMode(!wordByWordMode)}
-                className={`text-xs px-2 py-1 rounded-lg transition-colors flex items-center gap-1 ${
+                className={`text-xs px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 min-h-[32px] ${
                   wordByWordMode 
-                    ? 'bg-sage-500/20 text-sage-400 border border-sage-500/50' 
-                    : 'bg-night-800 text-night-400 hover:bg-night-700'
+                    ? 'bg-sage-500/15 text-sage-400 border border-sage-500/30' 
+                    : 'bg-white/5 text-night-400 border border-white/5 hover:bg-white/10'
                 }`}
                 title="Word-by-word highlighting"
               >
@@ -451,19 +451,23 @@ export default function MushafPage() {
               {/* Multi-ayah loop button */}
               <button
                 onClick={() => setShowLoopPicker(!showLoopPicker)}
-                className={`text-xs px-2 py-1 rounded-lg transition-colors ${
+                className={`text-xs px-2.5 py-1.5 rounded-lg transition-all min-h-[32px] ${
                   loopRange 
-                    ? 'bg-gold-500/20 text-gold-400 border border-gold-500/50' 
-                    : 'bg-night-800 text-night-400 hover:bg-night-700'
+                    ? 'bg-gold-500/15 text-gold-400 border border-gold-500/30' 
+                    : 'bg-white/5 text-night-400 border border-white/5 hover:bg-white/10'
                 }`}
               >
                 {loopRange ? `${loopRange.start}-${loopRange.end}` : 'Range'}
               </button>
               <button
                 onClick={cycleRepeatMode}
-                className={`repeat-badge ${repeatMode !== 1 ? 'active' : ''}`}
+                className={`text-xs px-2.5 py-1.5 rounded-lg transition-all flex items-center min-h-[32px] ${
+                  repeatMode !== 1 
+                    ? 'bg-gold-500/15 text-gold-400 border border-gold-500/30' 
+                    : 'bg-white/5 text-night-400 border border-white/5 hover:bg-white/10'
+                }`}
               >
-                <Repeat className="w-3 h-3 inline mr-1" />
+                <Repeat className="w-3 h-3 mr-1" />
                 {repeatMode === 'infinite' ? '∞' : `${repeatMode}x`}
                 {repeatMode !== 1 && repeatCount > 0 && (
                   <span className="ml-1 opacity-70">({repeatCount + 1})</span>
@@ -555,32 +559,50 @@ export default function MushafPage() {
             )}
           </AnimatePresence>
 
-          {/* Controls */}
-          <div className="flex items-center justify-center gap-4">
-            <button onClick={playPrevious} className="btn-icon">
+          {/* Controls - Larger touch targets */}
+          <div className="flex items-center justify-center gap-3">
+            <button 
+              onClick={playPrevious} 
+              className="liquid-icon-btn !w-12 !h-12"
+              aria-label="Previous verse"
+            >
               <SkipBack className="w-5 h-5" />
             </button>
             
             <button
               onClick={togglePlay}
-              className="w-14 h-14 rounded-full bg-gold-500 hover:bg-gold-400 flex items-center justify-center transition-colors"
+              className="w-16 h-16 rounded-full flex items-center justify-center transition-all active:scale-95"
+              style={{
+                background: isPlaying 
+                  ? 'linear-gradient(135deg, rgba(201,162,39,1) 0%, rgba(180,140,30,1) 100%)'
+                  : 'linear-gradient(135deg, rgba(201,162,39,0.95) 0%, rgba(180,140,30,1) 100%)',
+                boxShadow: isPlaying 
+                  ? '0 0 32px rgba(201,162,39,0.5), 0 8px 24px rgba(0,0,0,0.3)'
+                  : '0 4px 20px rgba(201,162,39,0.35), 0 8px 24px rgba(0,0,0,0.2)',
+                border: '1px solid rgba(255,255,255,0.2)',
+              }}
+              aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? (
-                <Pause className="w-6 h-6 text-night-950" />
+                <Pause className="w-7 h-7 text-night-950" />
               ) : (
-                <Play className="w-6 h-6 text-night-950 ml-1" />
+                <Play className="w-7 h-7 text-night-950 ml-1" />
               )}
             </button>
             
-            <button onClick={playNext} className="btn-icon">
+            <button 
+              onClick={playNext} 
+              className="liquid-icon-btn !w-12 !h-12"
+              aria-label="Next verse"
+            >
               <SkipForward className="w-5 h-5" />
             </button>
           </div>
 
           {/* Reciter & Speed */}
-          <div className="flex items-center justify-center gap-4 mt-3 text-xs text-night-400">
-            <span>{RECITERS.find(r => r.id === selectedReciter)?.name}</span>
-            <span>•</span>
+          <div className="flex items-center justify-center gap-3 mt-3 text-xs text-night-400">
+            <span className="text-night-500">{RECITERS.find(r => r.id === selectedReciter)?.name}</span>
+            <span className="text-night-700">•</span>
             <select
               value={playbackRate}
               onChange={(e) => {
@@ -588,7 +610,7 @@ export default function MushafPage() {
                 setPlaybackRate(rate);
                 if (audioRef.current) audioRef.current.playbackRate = rate;
               }}
-              className="bg-transparent text-night-400 text-xs"
+              className="bg-white/5 text-night-300 text-xs px-2 py-1 rounded-lg border border-white/5 min-h-[28px]"
             >
               <option value={0.5}>0.5x</option>
               <option value={0.75}>0.75x</option>

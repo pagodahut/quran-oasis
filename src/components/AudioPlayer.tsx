@@ -139,7 +139,14 @@ export function AudioPlayer({
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="liquid-glass-strong rounded-3xl p-5 relative overflow-hidden"
+      className="rounded-3xl p-5 relative overflow-hidden"
+      style={{
+        background: 'linear-gradient(180deg, rgba(28,33,40,0.92) 0%, rgba(22,27,34,0.96) 100%)',
+        backdropFilter: 'blur(48px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(48px) saturate(180%)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.15), 0 12px 40px rgba(0,0,0,0.12)',
+      }}
     >
       {/* Animated background glow when playing */}
       <AnimatePresence>
@@ -220,16 +227,16 @@ export function AudioPlayer({
 
             {/* Play/Pause - Prominent Center Button */}
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileTap={{ scale: 0.94 }}
               onClick={togglePlay}
               className="relative w-16 h-16 rounded-full flex items-center justify-center"
               style={{
-                background: 'linear-gradient(135deg, rgba(201,162,39,0.95) 0%, rgba(180,140,30,1) 100%)',
+                background: 'linear-gradient(135deg, rgba(212,175,55,1) 0%, rgba(201,162,39,1) 50%, rgba(180,140,30,1) 100%)',
                 boxShadow: isPlaying 
-                  ? '0 0 40px rgba(201,162,39,0.6), 0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3)'
-                  : '0 4px 24px rgba(201,162,39,0.4), 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.3)',
+                  ? '0 0 32px rgba(201,162,39,0.5), 0 8px 24px rgba(0,0,0,0.25)'
+                  : '0 4px 20px rgba(201,162,39,0.35), 0 8px 24px rgba(0,0,0,0.2)',
                 border: '1px solid rgba(255,255,255,0.2)',
+                transition: 'box-shadow 0.3s ease',
               }}
               aria-label={isPlaying ? 'Pause' : 'Play'}
             >

@@ -496,12 +496,18 @@ export default function PracticePage() {
       <div className="fixed inset-0 pattern-arabesque opacity-20" />
       <div className="fixed inset-0 bg-gradient-to-b from-night-950 via-transparent to-night-950" />
 
-      {/* Header */}
-      <header className="glass sticky top-0 z-40 safe-area-top">
+      {/* Header - Premium Frosted Glass */}
+      <header className="sticky top-0 z-40 safe-area-top liquid-glass mx-2 mt-2 rounded-2xl">
         <div className="px-4 py-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center">
+              <div 
+                className="w-11 h-11 rounded-xl flex items-center justify-center"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(201,162,39,0.95) 0%, rgba(180,140,30,1) 100%)',
+                  boxShadow: '0 4px 16px rgba(201,162,39,0.3)',
+                }}
+              >
                 <Moon className="w-5 h-5 text-night-950" />
               </div>
               <div>
@@ -513,12 +519,16 @@ export default function PracticePage() {
             {stats && <StreakDisplay streak={stats.streak} longestStreak={stats.longestStreak} />}
           </div>
 
-          {/* Due summary */}
+          {/* Due summary - Smooth glass card */}
           {totalDue > 0 && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex items-center gap-3 p-3 bg-gold-900/30 border border-gold-700/30 rounded-xl"
+              className="flex items-center gap-3 p-3.5 rounded-xl"
+              style={{
+                background: 'linear-gradient(135deg, rgba(201,162,39,0.12) 0%, rgba(201,162,39,0.05) 100%)',
+                border: '1px solid rgba(201,162,39,0.15)',
+              }}
             >
               <AlertCircle className="w-5 h-5 text-gold-400" />
               <span className="text-gold-200 text-sm">
