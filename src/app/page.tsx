@@ -243,14 +243,18 @@ function AnimatedCounter({ value, suffix = '' }: { value: number; suffix?: strin
   return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
 }
 
-// Arabic calligraphy icons for Path to Memorization - golden, authentic
+// Arabic calligraphy icons for Path to Memorization - large, golden, elegant
 function PersonalizedIcon({ className = "" }: { className?: string }) {
   // Arabic: تَعَلُّم (ta'allum - learning/personalized learning)
   return (
     <div className={`${className} flex items-center justify-center`}>
       <span 
-        className="text-white font-arabic text-lg leading-none"
-        style={{ fontFamily: 'var(--font-arabic)', direction: 'rtl' }}
+        className="text-3xl font-bold leading-none text-gold-400"
+        style={{ 
+          fontFamily: 'var(--font-arabic)', 
+          direction: 'rtl',
+          textShadow: '0 0 20px rgba(201, 162, 39, 0.5), 0 2px 4px rgba(0,0,0,0.3)'
+        }}
       >
         تَعَلُّم
       </span>
@@ -263,8 +267,12 @@ function SpacedRepIcon({ className = "" }: { className?: string }) {
   return (
     <div className={`${className} flex items-center justify-center`}>
       <span 
-        className="text-white font-arabic text-lg leading-none"
-        style={{ fontFamily: 'var(--font-arabic)', direction: 'rtl' }}
+        className="text-3xl font-bold leading-none text-gold-400"
+        style={{ 
+          fontFamily: 'var(--font-arabic)', 
+          direction: 'rtl',
+          textShadow: '0 0 20px rgba(201, 162, 39, 0.5), 0 2px 4px rgba(0,0,0,0.3)'
+        }}
       >
         تَكرار
       </span>
@@ -277,8 +285,12 @@ function ProgressIcon({ className = "" }: { className?: string }) {
   return (
     <div className={`${className} flex items-center justify-center`}>
       <span 
-        className="text-white font-arabic text-lg leading-none"
-        style={{ fontFamily: 'var(--font-arabic)', direction: 'rtl' }}
+        className="text-3xl font-bold leading-none text-gold-400"
+        style={{ 
+          fontFamily: 'var(--font-arabic)', 
+          direction: 'rtl',
+          textShadow: '0 0 20px rgba(201, 162, 39, 0.5), 0 2px 4px rgba(0,0,0,0.3)'
+        }}
       >
         تَقَدُّم
       </span>
@@ -305,11 +317,11 @@ function FeatureCard({
       transition={{ type: "spring", stiffness: 300 }}
       className="liquid-card-interactive p-6 group"
     >
-      {/* Icon with gradient background */}
-      <div className={`relative w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-5 shadow-lg group-hover:shadow-xl transition-shadow`}>
-        <IconComponent className="w-7 h-7 text-white" />
-        {/* Subtle glow on hover */}
-        <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${gradient} blur-lg opacity-0 group-hover:opacity-30 transition-opacity`} />
+      {/* Golden Arabic calligraphy icon with subtle glow */}
+      <div className="relative w-20 h-20 rounded-2xl bg-night-900/60 border border-gold-500/30 flex items-center justify-center mb-5 group-hover:border-gold-500/50 transition-colors">
+        <IconComponent className="" />
+        {/* Golden glow on hover */}
+        <div className="absolute inset-0 rounded-2xl bg-gold-500/20 blur-xl opacity-0 group-hover:opacity-60 transition-opacity" />
       </div>
       
       <h3 className="font-semibold text-night-100 text-lg mb-2">{title}</h3>
