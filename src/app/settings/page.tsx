@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -14,44 +14,97 @@ import {
   Check,
   Info,
   Heart,
-  Github,
-  ExternalLink,
   Moon,
   Type,
+  Volume2,
+  Play,
+  Clock,
+  Bell,
+  Download,
+  Trash2,
+  HardDrive,
+  Cloud,
+  CloudOff,
+  Eye,
+  EyeOff,
+  Gauge,
+  ChevronRight,
+  Sparkles,
+  BookOpen,
 } from 'lucide-react';
 import { 
-  useSettings, 
-  RECITERS, 
+  usePreferences,
+  RECITERS,
   TRANSLATIONS,
+  FONT_SIZE_OPTIONS,
+  PLAYBACK_SPEED_OPTIONS,
   DAILY_GOAL_OPTIONS,
-  type UserSettings,
-} from '@/lib/settings';
+  exportPreferences,
+  importPreferences,
+  clearAllLocalData,
+  getStorageUsage,
+  type FontSize,
+  type PlaybackSpeed,
+} from '@/lib/preferencesStore';
 import BottomNav from '@/components/BottomNav';
 import { setDailyGoal } from '@/lib/motivationStore';
+
+// ============================================
+// Components
+// ============================================
 
 function SettingSection({ 
   icon: Icon, 
   title, 
   description,
-  children 
+  iconColor = 'text-gold-400',
+  iconBg = 'bg-gold-500/10',
+  children,
+  collapsible = false,
+  defaultOpen = true,
 }: { 
   icon: React.ElementType;
   title: string;
   description?: string;
+  iconColor?: string;
+  iconBg?: string;
   children: React.ReactNode;
+  collapsible?: boolean;
+  defaultOpen?: boolean;
 }) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gold-500/10 flex items-center justify-center">
-          <Icon className="w-5 h-5 text-gold-400" />
+      <button
+        onClick={() => collapsible && setIsOpen(!isOpen)}
+        className={`w-full flex items-center gap-3 ${collapsible ? 'cursor-pointer' : 'cursor-default'}`}
+        disabled={!collapsible}
+      >
+        <div className={`w-10 h-10 rounded-xl ${iconBg} flex items-center justify-center`}>
+          <Icon className={`w-5 h-5 ${iconColor}`} />
         </div>
-        <div>
+        <div className="flex-1 text-left">
           <h2 className="font-semibold text-night-100">{title}</h2>
           {description && <p className="text-xs text-night-500">{description}</p>}
         </div>
-      </div>
-      <div className="ml-13">{children}</div>
+        {collapsible && (
+          <ChevronRight className={`w-5 h-5 text-night-500 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
+        )}
+      </button>
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="ml-0 md:ml-13">{children}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -87,9 +140,12 @@ function ReciterOption({
             <span className="mx-2">•</span>
             {reciter.style}
           </p>
+          {reciter.description && (
+            <p className="text-xs text-night-600 mt-1">{reciter.description}</p>
+          )}
         </div>
         {selected && (
-          <div className="w-6 h-6 rounded-full bg-gold-500 flex items-center justify-center">
+          <div className="w-6 h-6 rounded-full bg-gold-500 flex items-center justify-center flex-shrink-0">
             <Check className="w-4 h-4 text-night-950" />
           </div>
         )}
@@ -124,10 +180,79 @@ function ToggleSwitch({
   );
 }
 
+function SettingRow({
+  label,
+  description,
+  children,
+}: {
+  label: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center justify-between p-4 rounded-xl bg-night-800/50">
+      <div className="flex-1 mr-4">
+        <p className="text-night-100">{label}</p>
+        {description && <p className="text-xs text-night-500 mt-0.5">{description}</p>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function SelectGrid<T extends string | number>({
+  options,
+  value,
+  onChange,
+  columns = 3,
+}: {
+  options: { value: T; label: string; description?: string }[];
+  value: T;
+  onChange: (value: T) => void;
+  columns?: 2 | 3 | 4;
+}) {
+  const colClass = {
+    2: 'grid-cols-2',
+    3: 'grid-cols-3',
+    4: 'grid-cols-4',
+  }[columns];
+  
+  return (
+    <div className={`grid ${colClass} gap-2`}>
+      {options.map((option) => (
+        <button
+          key={String(option.value)}
+          onClick={() => onChange(option.value)}
+          className={`p-3 rounded-xl text-center transition-all ${
+            value === option.value 
+              ? 'bg-gold-500/10 border-2 border-gold-500/50' 
+              : 'bg-night-800/50 border-2 border-transparent hover:border-night-700'
+          }`}
+        >
+          <p className="font-semibold text-night-100">{option.label}</p>
+          {option.description && (
+            <p className="text-xs text-night-500 mt-0.5">{option.description}</p>
+          )}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ============================================
+// Main Component
+// ============================================
+
 export default function SettingsPage() {
-  const { settings, update, reset } = useSettings();
+  const { preferences, update, reset, isLoaded } = usePreferences();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showClearDataConfirm, setShowClearDataConfirm] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [storageUsage, setStorageUsage] = useState({ used: 0, total: 0, percentage: 0 });
+
+  useEffect(() => {
+    setStorageUsage(getStorageUsage());
+  }, []);
 
   const showSuccess = (message: string) => {
     setSuccessMessage(message);
@@ -135,24 +260,68 @@ export default function SettingsPage() {
   };
 
   const handleReciterChange = (reciterId: string) => {
-    update({ reciter: reciterId });
+    update('audio', { reciter: reciterId });
     showSuccess('Reciter updated');
   };
 
   const handleTranslationChange = (translationId: 'sahih' | 'asad') => {
-    update({ translation: translationId });
+    update('display', { translation: translationId });
     showSuccess('Translation updated');
   };
 
-  const handleDailyGoalChange = (goal: number) => {
-    update({ dailyGoal: goal });
-    // Also sync to motivation store
-    setDailyGoal('verses', goal);
+  const handleDailyGoalChange = (type: 'minutes' | 'verses', value: number) => {
+    if (type === 'minutes') {
+      update('learning', { dailyGoalMinutes: value });
+    } else {
+      update('learning', { dailyGoalVerses: value });
+      // Sync to motivation store
+      setDailyGoal('verses', value);
+    }
     showSuccess('Daily goal updated');
   };
 
-  const handleFontSizeChange = (size: number) => {
-    update({ arabicFontSize: size });
+  const handleFontSizeChange = (size: FontSize) => {
+    update('display', { arabicFontSize: size });
+    showSuccess('Font size updated');
+  };
+
+  const handlePlaybackSpeedChange = (speed: PlaybackSpeed) => {
+    update('audio', { playbackSpeed: speed });
+    showSuccess('Playback speed updated');
+  };
+
+  const handleVolumeChange = (volume: number) => {
+    update('audio', { volume: volume / 100 });
+  };
+
+  const handleExport = () => {
+    const data = exportPreferences();
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `hifz-settings-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showSuccess('Settings exported');
+  };
+
+  const handleImport = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      
+      const text = await file.text();
+      if (importPreferences(text)) {
+        showSuccess('Settings imported');
+      } else {
+        showSuccess('Failed to import settings');
+      }
+    };
+    input.click();
   };
 
   const handleReset = () => {
@@ -160,6 +329,21 @@ export default function SettingsPage() {
     setShowResetConfirm(false);
     showSuccess('Settings reset to defaults');
   };
+
+  const handleClearData = () => {
+    clearAllLocalData();
+    setShowClearDataConfirm(false);
+    setStorageUsage(getStorageUsage());
+    showSuccess('All local data cleared');
+  };
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-night-950 flex items-center justify-center">
+        <div className="animate-pulse text-gold-400">Loading settings...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-night-950">
@@ -193,64 +377,260 @@ export default function SettingsPage() {
       </header>
 
       {/* Content */}
-      <main className="px-4 py-6 pb-28 space-y-8">
-        {/* Reciter Selection */}
+      <main className="px-4 py-6 pb-28 space-y-8 max-w-2xl mx-auto">
+        
+        {/* ============ AUDIO & RECITER ============ */}
         <SettingSection 
           icon={Headphones} 
-          title="Reciter"
-          description="Choose your preferred Quran reciter"
+          title="Audio & Reciter"
+          description="Configure audio playback settings"
         >
-          <div className="space-y-3">
-            {RECITERS.map((reciter) => (
-              <ReciterOption
-                key={reciter.id}
-                reciter={reciter}
-                selected={settings.reciter === reciter.id}
-                onSelect={() => handleReciterChange(reciter.id)}
+          <div className="space-y-6">
+            {/* Reciter Selection */}
+            <div>
+              <label className="text-sm text-night-400 mb-3 block">Choose Reciter</label>
+              <div className="space-y-3">
+                {RECITERS.map((reciter) => (
+                  <ReciterOption
+                    key={reciter.id}
+                    reciter={reciter}
+                    selected={preferences.audio.reciter === reciter.id}
+                    onSelect={() => handleReciterChange(reciter.id)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Playback Speed */}
+            <div>
+              <label className="text-sm text-night-400 mb-3 block flex items-center gap-2">
+                <Gauge className="w-4 h-4" />
+                Playback Speed
+              </label>
+              <SelectGrid
+                options={PLAYBACK_SPEED_OPTIONS}
+                value={preferences.audio.playbackSpeed}
+                onChange={(speed) => handlePlaybackSpeedChange(speed as PlaybackSpeed)}
+                columns={3}
               />
-            ))}
+            </div>
+
+            {/* Volume */}
+            <div className="p-4 rounded-xl bg-night-800/50">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Volume2 className="w-4 h-4 text-night-400" />
+                  <span className="text-night-100">Volume</span>
+                </div>
+                <span className="text-night-400 text-sm">{Math.round(preferences.audio.volume * 100)}%</span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={preferences.audio.volume * 100}
+                onChange={(e) => handleVolumeChange(parseInt(e.target.value))}
+                className="w-full"
+              />
+            </div>
+
+            {/* Auto-play */}
+            <SettingRow
+              label="Auto-play on Lesson Start"
+              description="Automatically play audio when starting a lesson"
+            >
+              <ToggleSwitch
+                enabled={preferences.audio.autoPlayOnLesson}
+                onToggle={() => update('audio', { autoPlayOnLesson: !preferences.audio.autoPlayOnLesson })}
+                label="Auto-play on lesson start"
+              />
+            </SettingRow>
           </div>
         </SettingSection>
 
         <div className="liquid-divider" />
 
-        {/* Translation */}
+        {/* ============ DISPLAY SETTINGS ============ */}
         <SettingSection 
-          icon={Languages} 
-          title="Translation"
-          description="Select your preferred translation"
+          icon={Palette} 
+          title="Display"
+          description="Customize how content appears"
+          iconColor="text-purple-400"
+          iconBg="bg-purple-500/10"
         >
-          <div className="space-y-4">
-            {/* Show/Hide Toggle */}
-            <div className="flex items-center justify-between p-4 rounded-xl bg-night-800/50">
-              <div>
-                <p className="text-night-100">Show Translation</p>
-                <p className="text-xs text-night-500">Display English translation below verses</p>
+          <div className="space-y-6">
+            {/* Arabic Font Size */}
+            <div>
+              <label className="text-sm text-night-400 mb-3 block flex items-center gap-2">
+                <Type className="w-4 h-4" />
+                Arabic Font Size
+              </label>
+              <SelectGrid
+                options={FONT_SIZE_OPTIONS.map(opt => ({
+                  value: opt.value,
+                  label: opt.label,
+                  description: `${opt.px}px`,
+                }))}
+                value={preferences.display.arabicFontSize}
+                onChange={handleFontSizeChange}
+                columns={4}
+              />
+              {/* Preview */}
+              <div className="mt-4 p-4 rounded-xl bg-night-900/50 text-center">
+                <p 
+                  className="text-gold-400"
+                  style={{ 
+                    fontFamily: 'var(--font-arabic)', 
+                    fontSize: preferences.display.arabicFontSizePx,
+                    direction: 'rtl'
+                  }}
+                  lang="ar"
+                  dir="rtl"
+                >
+                  بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+                </p>
               </div>
+            </div>
+
+            {/* Translation Toggle */}
+            <SettingRow
+              label="Show Translation"
+              description="Display English translation below verses"
+            >
               <ToggleSwitch 
-                enabled={settings.showTranslation}
-                onToggle={() => update({ showTranslation: !settings.showTranslation })}
+                enabled={preferences.display.showTranslation}
+                onToggle={() => update('display', { showTranslation: !preferences.display.showTranslation })}
                 label="Show translation"
+              />
+            </SettingRow>
+
+            {/* Translation Selection */}
+            {preferences.display.showTranslation && (
+              <div>
+                <label className="text-sm text-night-400 mb-3 block">Translation</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {TRANSLATIONS.map((trans) => (
+                    <button
+                      key={trans.id}
+                      onClick={() => handleTranslationChange(trans.id as 'sahih' | 'asad')}
+                      className={`p-4 rounded-xl text-left transition-all ${
+                        preferences.display.translation === trans.id 
+                          ? 'bg-gold-500/10 border-2 border-gold-500/50' 
+                          : 'bg-night-800/50 border-2 border-transparent hover:border-night-700'
+                      }`}
+                    >
+                      <p className="font-medium text-night-100">{trans.name}</p>
+                      <p className="text-xs text-night-500 mt-0.5">{trans.language}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Transliteration Toggle */}
+            <SettingRow
+              label="Show Transliteration"
+              description="Display phonetic pronunciation guide"
+            >
+              <ToggleSwitch 
+                enabled={preferences.display.showTransliteration}
+                onToggle={() => update('display', { showTransliteration: !preferences.display.showTransliteration })}
+                label="Show transliteration"
+              />
+            </SettingRow>
+
+            {/* Theme */}
+            <div className="p-4 rounded-xl bg-night-800/50">
+              <div className="flex items-center gap-3">
+                <Moon className="w-5 h-5 text-night-400" />
+                <div className="flex-1">
+                  <p className="text-night-100">Theme</p>
+                  <p className="text-xs text-night-500">Dark mode only (light mode coming soon)</p>
+                </div>
+                <span className="px-3 py-1 rounded-lg bg-night-700 text-night-300 text-sm">
+                  Dark
+                </span>
+              </div>
+            </div>
+          </div>
+        </SettingSection>
+
+        <div className="liquid-divider" />
+
+        {/* ============ LEARNING SETTINGS ============ */}
+        <SettingSection 
+          icon={Target} 
+          title="Learning Goals"
+          description="Set your daily memorization targets"
+          iconColor="text-sage-400"
+          iconBg="bg-sage-500/10"
+        >
+          <div className="space-y-6">
+            {/* Daily Goal - Verses */}
+            <div>
+              <label className="text-sm text-night-400 mb-3 block flex items-center gap-2">
+                <BookOpen className="w-4 h-4" />
+                Daily Verse Goal
+              </label>
+              <SelectGrid
+                options={DAILY_GOAL_OPTIONS.verses}
+                value={preferences.learning.dailyGoalVerses}
+                onChange={(v) => handleDailyGoalChange('verses', v)}
+                columns={3}
               />
             </div>
 
-            {/* Translation Options */}
-            {settings.showTranslation && (
-              <div className="grid grid-cols-2 gap-3">
-                {TRANSLATIONS.map((trans) => (
-                  <button
-                    key={trans.id}
-                    onClick={() => handleTranslationChange(trans.id as 'sahih' | 'asad')}
-                    className={`p-4 rounded-xl text-left transition-all ${
-                      settings.translation === trans.id 
-                        ? 'bg-gold-500/10 border-2 border-gold-500/50' 
-                        : 'bg-night-800/50 border-2 border-transparent hover:border-night-700'
-                    }`}
-                  >
-                    <p className="font-medium text-night-100">{trans.name}</p>
-                    <p className="text-xs text-night-500 mt-0.5">{trans.language}</p>
-                  </button>
-                ))}
+            {/* Daily Goal - Time */}
+            <div>
+              <label className="text-sm text-night-400 mb-3 block flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                Daily Time Goal
+              </label>
+              <SelectGrid
+                options={DAILY_GOAL_OPTIONS.minutes}
+                value={preferences.learning.dailyGoalMinutes}
+                onChange={(v) => handleDailyGoalChange('minutes', v)}
+                columns={3}
+              />
+            </div>
+
+            {/* Info Tip */}
+            <div className="flex items-start gap-2 p-3 rounded-xl bg-sage-500/10 border border-sage-500/20">
+              <Info className="w-4 h-4 text-sage-400 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-sage-400">
+                Consistency is key! Start with a manageable goal and increase as you build a habit.
+                Your daily progress is tracked on your profile.
+              </p>
+            </div>
+
+            {/* Notifications (future) */}
+            <div className="opacity-60">
+              <SettingRow
+                label="Practice Reminders"
+                description="Get reminded to practice daily (coming soon)"
+              >
+                <ToggleSwitch 
+                  enabled={false}
+                  onToggle={() => {}}
+                  label="Practice reminders"
+                />
+              </SettingRow>
+            </div>
+
+            {preferences.learning.practiceReminders && (
+              <div className="p-4 rounded-xl bg-night-800/50">
+                <div className="flex items-center gap-3">
+                  <Bell className="w-5 h-5 text-night-400" />
+                  <div className="flex-1">
+                    <p className="text-night-100">Reminder Time</p>
+                  </div>
+                  <input
+                    type="time"
+                    value={preferences.learning.reminderTime}
+                    onChange={(e) => update('learning', { reminderTime: e.target.value })}
+                    className="bg-night-700 text-night-200 px-3 py-2 rounded-lg border border-night-600"
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -258,97 +638,100 @@ export default function SettingsPage() {
 
         <div className="liquid-divider" />
 
-        {/* Arabic Font Size */}
+        {/* ============ DATA & PRIVACY ============ */}
         <SettingSection 
-          icon={Type} 
-          title="Arabic Font Size"
-          description="Adjust the size of Arabic text"
+          icon={HardDrive} 
+          title="Data & Privacy"
+          description="Manage your data and storage"
+          iconColor="text-blue-400"
+          iconBg="bg-blue-500/10"
         >
-          <div className="p-4 rounded-xl bg-night-800/50 space-y-4">
-            <div className="flex items-center justify-between">
-              <label htmlFor="arabic-font-size" className="text-night-300">Size: {settings.arabicFontSize}px</label>
-              <input
-                id="arabic-font-size"
-                type="range"
-                min={20}
-                max={48}
-                value={settings.arabicFontSize}
-                onChange={(e) => handleFontSizeChange(parseInt(e.target.value))}
-                className="w-40"
-                aria-valuemin={20}
-                aria-valuemax={48}
-                aria-valuenow={settings.arabicFontSize}
-                aria-valuetext={`${settings.arabicFontSize} pixels`}
-              />
-            </div>
-            <div className="text-center p-4 rounded-xl bg-night-900/50">
-              <p 
-                className="text-gold-400"
-                style={{ 
-                  fontFamily: 'var(--font-arabic)', 
-                  fontSize: settings.arabicFontSize,
-                  direction: 'rtl'
-                }}
-                lang="ar"
-                dir="rtl"
-                aria-label="Bismillah sample text"
-              >
-                بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+          <div className="space-y-4">
+            {/* Storage Usage */}
+            <div className="p-4 rounded-xl bg-night-800/50">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-night-300">Local Storage</span>
+                <span className="text-sm text-night-500">
+                  {(storageUsage.used / 1024).toFixed(1)} KB used
+                </span>
+              </div>
+              <div className="h-2 bg-night-700 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-gold-500 to-gold-400 transition-all"
+                  style={{ width: `${Math.min(storageUsage.percentage, 100)}%` }}
+                />
+              </div>
+              <p className="text-xs text-night-600 mt-2">
+                {storageUsage.percentage}% of available storage
               </p>
             </div>
-          </div>
-        </SettingSection>
 
-        <div className="liquid-divider" />
+            {/* Sync Status */}
+            <div className="p-4 rounded-xl bg-night-800/50">
+              <div className="flex items-center gap-3">
+                <CloudOff className="w-5 h-5 text-night-500" />
+                <div className="flex-1">
+                  <p className="text-night-100">Cloud Sync</p>
+                  <p className="text-xs text-night-500">Sign in to sync across devices (coming soon)</p>
+                </div>
+                <span className="px-3 py-1 rounded-lg bg-night-700 text-night-400 text-sm">
+                  Offline
+                </span>
+              </div>
+            </div>
 
-        {/* Daily Goal */}
-        <SettingSection 
-          icon={Target} 
-          title="Daily Goal"
-          description="How many verses do you want to memorize per day?"
-        >
-          <div className="grid grid-cols-3 gap-2">
-            {DAILY_GOAL_OPTIONS.map((option) => (
+            {/* Export/Import */}
+            <div className="grid grid-cols-2 gap-3">
               <button
-                key={option.value}
-                onClick={() => handleDailyGoalChange(option.value)}
-                className={`p-3 rounded-xl text-center transition-all ${
-                  settings.dailyGoal === option.value 
-                    ? 'bg-gold-500/10 border-2 border-gold-500/50' 
-                    : 'bg-night-800/50 border-2 border-transparent hover:border-night-700'
-                }`}
+                onClick={handleExport}
+                className="p-4 rounded-xl bg-night-800/50 hover:bg-night-800 transition-colors text-left"
               >
-                <p className="font-semibold text-night-100">{option.label}</p>
-                <p className="text-xs text-night-500 mt-0.5">{option.description}</p>
+                <Download className="w-5 h-5 text-sage-400 mb-2" />
+                <p className="text-night-100 font-medium">Export</p>
+                <p className="text-xs text-night-500">Download settings</p>
               </button>
-            ))}
-          </div>
-          
-          <div className="flex items-start gap-2 mt-4 p-3 rounded-xl bg-sage-500/10 border border-sage-500/20">
-            <Info className="w-4 h-4 text-sage-400 mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-sage-400">
-              Consistency is key! Start with a manageable goal and increase as you build a habit.
-            </p>
+              <button
+                onClick={handleImport}
+                className="p-4 rounded-xl bg-night-800/50 hover:bg-night-800 transition-colors text-left"
+              >
+                <Sparkles className="w-5 h-5 text-purple-400 mb-2" />
+                <p className="text-night-100 font-medium">Import</p>
+                <p className="text-xs text-night-500">Restore settings</p>
+              </button>
+            </div>
+
+            {/* Clear Local Data */}
+            <button
+              onClick={() => setShowClearDataConfirm(true)}
+              className="w-full p-4 rounded-xl bg-red-500/10 border border-red-500/20 
+                        text-red-400 hover:bg-red-500/20 transition-colors flex items-center gap-3"
+            >
+              <Trash2 className="w-5 h-5" />
+              <div className="text-left">
+                <p className="font-medium">Clear All Local Data</p>
+                <p className="text-xs opacity-70">Remove all progress, bookmarks, and settings</p>
+              </div>
+            </button>
           </div>
         </SettingSection>
 
         <div className="liquid-divider" />
 
-        {/* Reset Settings */}
+        {/* ============ RESET SETTINGS ============ */}
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
-              <RotateCcw className="w-5 h-5 text-red-400" />
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+              <RotateCcw className="w-5 h-5 text-amber-400" />
             </div>
             <div>
               <h2 className="font-semibold text-night-100">Reset Settings</h2>
-              <p className="text-xs text-night-500">Return all settings to defaults</p>
+              <p className="text-xs text-night-500">Return settings to defaults (keeps progress)</p>
             </div>
           </div>
           <button
             onClick={() => setShowResetConfirm(true)}
-            className="w-full p-4 rounded-xl bg-red-500/10 border border-red-500/20 
-                      text-red-400 hover:bg-red-500/20 transition-colors"
+            className="w-full p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 
+                      text-amber-400 hover:bg-amber-500/20 transition-colors"
           >
             Reset All Settings
           </button>
@@ -356,7 +739,7 @@ export default function SettingsPage() {
 
         <div className="liquid-divider" />
 
-        {/* About */}
+        {/* ============ ABOUT ============ */}
         <div className="space-y-4">
           <h2 className="font-semibold text-night-100 flex items-center gap-2">
             <Moon className="w-5 h-5 text-gold-400" />
@@ -387,7 +770,7 @@ export default function SettingsPage() {
         </div>
       </main>
 
-      {/* Reset Confirmation Modal */}
+      {/* Reset Settings Confirmation Modal */}
       <AnimatePresence>
         {showResetConfirm && (
           <motion.div
@@ -399,7 +782,6 @@ export default function SettingsPage() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="reset-modal-title"
-            aria-describedby="reset-modal-description"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
@@ -410,24 +792,85 @@ export default function SettingsPage() {
             >
               <div className="text-center">
                 <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
-                  <AlertCircle className="w-6 h-6 text-amber-400" aria-hidden="true" />
+                  <AlertCircle className="w-6 h-6 text-amber-400" />
                 </div>
-                <h2 id="reset-modal-title" className="text-xl font-semibold text-night-100 mb-2">Reset Settings?</h2>
-                <p id="reset-modal-description" className="text-night-400 mb-6">
+                <h2 id="reset-modal-title" className="text-xl font-semibold text-night-100 mb-2">
+                  Reset Settings?
+                </h2>
+                <p className="text-night-400 mb-6">
                   This will reset all your preferences to their default values. Your bookmarks and progress will not be affected.
                 </p>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowResetConfirm(false)}
-                    className="flex-1 py-3 rounded-xl bg-night-800 text-night-200 hover:bg-night-700 transition-colors focus-visible-ring"
+                    className="flex-1 py-3 rounded-xl bg-night-800 text-night-200 hover:bg-night-700 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleReset}
-                    className="flex-1 py-3 rounded-xl bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors focus-visible-ring"
+                    className="flex-1 py-3 rounded-xl bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors"
                   >
                     Reset
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Clear Data Confirmation Modal */}
+      <AnimatePresence>
+        {showClearDataConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-night-950/90 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setShowClearDataConfirm(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="clear-modal-title"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="liquid-modal p-6 max-w-sm w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+                  <Trash2 className="w-6 h-6 text-red-400" />
+                </div>
+                <h2 id="clear-modal-title" className="text-xl font-semibold text-night-100 mb-2">
+                  Clear All Data?
+                </h2>
+                <p className="text-night-400 mb-6">
+                  This will permanently delete all your local data including:
+                </p>
+                <ul className="text-left text-sm text-night-400 mb-6 space-y-1 pl-4">
+                  <li>• Memorization progress</li>
+                  <li>• Bookmarks</li>
+                  <li>• Settings and preferences</li>
+                  <li>• Streaks and achievements</li>
+                </ul>
+                <p className="text-red-400 text-sm mb-6 font-medium">
+                  This action cannot be undone!
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowClearDataConfirm(false)}
+                    className="flex-1 py-3 rounded-xl bg-night-800 text-night-200 hover:bg-night-700 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleClearData}
+                    className="flex-1 py-3 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
+                  >
+                    Clear All
                   </button>
                 </div>
               </div>

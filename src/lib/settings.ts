@@ -3,10 +3,22 @@
  * Store and manage user preferences in localStorage
  */
 
+import { useState, useEffect, useCallback } from 'react';
+
+// ============================================
+// Types
+// ============================================
+
+export type AudioQuality = 'high' | 'medium' | 'low' | 'auto';
+
 export interface UserSettings {
   // Audio
   reciter: string;
   playbackSpeed: number;
+  audioQuality: AudioQuality;
+  crossfadeEnabled: boolean;
+  crossfadeDuration: number; // ms
+  autoPreload: boolean;
   
   // Display
   translation: 'sahih' | 'asad';
@@ -24,11 +36,19 @@ export interface UserSettings {
   theme: 'dark' | 'light' | 'system';
 }
 
+// ============================================
+// Constants
+// ============================================
+
 const STORAGE_KEY = 'quran-oasis-settings';
 
 export const DEFAULT_SETTINGS: UserSettings = {
   reciter: 'alafasy',
   playbackSpeed: 1,
+  audioQuality: 'auto',
+  crossfadeEnabled: false,
+  crossfadeDuration: 500,
+  autoPreload: true,
   translation: 'sahih',
   showTranslation: true,
   arabicFontSize: 28,
@@ -91,6 +111,26 @@ export const DAILY_GOAL_OPTIONS = [
   { value: 15, label: '15+ verses', description: 'Intensive' },
 ];
 
+export const AUDIO_QUALITY_OPTIONS: { value: AudioQuality; label: string; description: string }[] = [
+  { value: 'auto', label: 'Auto', description: 'Adjust based on network' },
+  { value: 'high', label: 'High', description: '128-192 kbps' },
+  { value: 'medium', label: 'Medium', description: '64 kbps' },
+  { value: 'low', label: 'Low', description: 'Save data' },
+];
+
+export const PLAYBACK_SPEED_OPTIONS = [
+  { value: 0.5, label: '0.5x' },
+  { value: 0.75, label: '0.75x' },
+  { value: 1, label: '1x' },
+  { value: 1.25, label: '1.25x' },
+  { value: 1.5, label: '1.5x' },
+  { value: 2, label: '2x' },
+];
+
+// ============================================
+// Core Functions
+// ============================================
+
 // Get all settings
 export function getSettings(): UserSettings {
   if (typeof window === 'undefined') return DEFAULT_SETTINGS;
@@ -130,8 +170,9 @@ export function resetSettings(): UserSettings {
   return DEFAULT_SETTINGS;
 }
 
-// React hook for settings
-import { useState, useEffect, useCallback } from 'react';
+// ============================================
+// React Hook
+// ============================================
 
 export function useSettings() {
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
@@ -164,4 +205,67 @@ export function useSettings() {
     update,
     reset,
   };
+}
+
+// ============================================
+// Preferred Reciter per Surah
+// ============================================
+
+const SURAH_RECITER_KEY = 'quran-oasis-surah-reciters';
+
+interface SurahReciterPreferences {
+  [surah: string]: string; // surah number -> reciter id
+}
+
+export function getSurahReciter(surah: number): string | null {
+  if (typeof window === 'undefined') return null;
+  
+  try {
+    const prefs: SurahReciterPreferences = JSON.parse(
+      localStorage.getItem(SURAH_RECITER_KEY) || '{}'
+    );
+    return prefs[surah.toString()] || null;
+  } catch {
+    return null;
+  }
+}
+
+export function setSurahReciter(surah: number, reciterId: string): void {
+  if (typeof window === 'undefined') return;
+  
+  try {
+    const prefs: SurahReciterPreferences = JSON.parse(
+      localStorage.getItem(SURAH_RECITER_KEY) || '{}'
+    );
+    prefs[surah.toString()] = reciterId;
+    localStorage.setItem(SURAH_RECITER_KEY, JSON.stringify(prefs));
+  } catch {
+    // Ignore errors
+  }
+}
+
+export function clearSurahReciter(surah: number): void {
+  if (typeof window === 'undefined') return;
+  
+  try {
+    const prefs: SurahReciterPreferences = JSON.parse(
+      localStorage.getItem(SURAH_RECITER_KEY) || '{}'
+    );
+    delete prefs[surah.toString()];
+    localStorage.setItem(SURAH_RECITER_KEY, JSON.stringify(prefs));
+  } catch {
+    // Ignore errors
+  }
+}
+
+// ============================================
+// Effective Reciter (considers surah preference)
+// ============================================
+
+export function getEffectiveReciter(surah?: number): string {
+  if (surah) {
+    const surahReciter = getSurahReciter(surah);
+    if (surahReciter) return surahReciter;
+  }
+  return getSetting('reciter');
 }
