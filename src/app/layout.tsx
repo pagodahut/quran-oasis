@@ -4,6 +4,7 @@ import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import { SyncProvider, SyncIndicator } from '@/components/SyncProvider';
 import InstallPrompt from '@/components/InstallPrompt';
 import OfflineIndicator from '@/components/OfflineIndicator';
+import SkipToContent from '@/components/SkipToContent';
 import { fontVariables } from '@/lib/fonts';
 import JsonLd from '@/components/JsonLd';
 import { 
@@ -138,10 +139,13 @@ export default function RootLayout({
         <JsonLd data={structuredData} />
       </head>
       <body className="bg-night-950 text-night-100 antialiased standalone-tweaks">
+        <SkipToContent />
         <SyncProvider>
           <ServiceWorkerRegistration />
           <OfflineIndicator />
-          {children}
+          <main id="main-content" tabIndex={-1} className="outline-none">
+            {children}
+          </main>
           <InstallPrompt />
           <SyncIndicator />
         </SyncProvider>
