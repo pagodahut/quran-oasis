@@ -2,6 +2,11 @@
 const nextConfig = {
   reactStrictMode: true,
   
+  // Fix Turbopack root directory detection
+  turbopack: {
+    root: __dirname,
+  },
+  
   // Image optimization (NOT unoptimized for production)
   images: {
     remotePatterns: [
