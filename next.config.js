@@ -2,9 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   
-  // Fix Turbopack root directory detection
-  turbopack: {
-    root: __dirname,
+  // Disable turbopack for stable builds
+  experimental: {
+    turbo: false,
   },
   
   // Image optimization (NOT unoptimized for production)

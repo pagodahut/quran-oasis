@@ -242,7 +242,7 @@ export async function analyzeRecitation(
           return claudeAnalysis;
         }
       } catch (e) {
-        console.log('Claude analysis unavailable, using basic analysis');
+        // Fallback to basic analysis when Claude unavailable
       }
       
       return generateAIFeedback(transcription, expectedText, surah, ayah);

@@ -102,7 +102,7 @@ export default function TajweedPractice({
     expectedText: arabicText,
     onWord: (index, word) => {
       // Could add haptic feedback or sounds here
-      console.log(`Word ${index} matched:`, word.word);
+      // Debug: console.log(`Word ${index} matched:`, word.word);
     },
     onComplete: async (result) => {
       setRealtimeResult(result);
