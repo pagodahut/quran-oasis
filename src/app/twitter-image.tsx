@@ -9,8 +9,7 @@ export const size = {
 };
 export const contentType = 'image/png';
 
-// Twitter card uses same design as OG image
-export default async function TwitterImage() {
+export default async function Image() {
   return new ImageResponse(
     (
       <div

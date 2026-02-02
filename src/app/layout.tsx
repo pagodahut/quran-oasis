@@ -82,8 +82,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
+  userScalable: true, // WCAG 2.1 AA: Allow zooming up to 200%+
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#0f1419' },
     { media: '(prefers-color-scheme: dark)', color: '#0f1419' },

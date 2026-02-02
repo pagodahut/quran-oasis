@@ -2,11 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
   
-  // Disable turbopack for stable builds
-  experimental: {
-    turbo: false,
-  },
-  
   // Image optimization (NOT unoptimized for production)
   images: {
     remotePatterns: [
