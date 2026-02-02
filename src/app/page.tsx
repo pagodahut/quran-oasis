@@ -431,19 +431,19 @@ export default function HomePage() {
                   >
                     <Link 
                       href="/mushaf" 
-                      className="text-night-400 hover:text-gold-400 transition-colors text-sm font-medium hidden sm:block px-2 py-1.5 rounded-lg hover:bg-white/5"
+                      className="text-night-400 hover:text-gold-400 transition-colors text-sm font-medium hidden sm:block px-2 py-1.5 rounded-lg hover:bg-white/5 focus-visible-ring"
                     >
                       Quran
                     </Link>
                     <Link 
                       href="/techniques" 
-                      className="text-night-400 hover:text-gold-400 transition-colors text-sm font-medium hidden sm:block px-2 py-1.5 rounded-lg hover:bg-white/5"
+                      className="text-night-400 hover:text-gold-400 transition-colors text-sm font-medium hidden sm:block px-2 py-1.5 rounded-lg hover:bg-white/5 focus-visible-ring"
                     >
                       Methods
                     </Link>
                     <Link 
                       href="/lessons"
-                      className="liquid-pill text-sm font-medium text-night-100 flex items-center gap-2"
+                      className="liquid-pill text-sm font-medium text-night-100 flex items-center gap-2 focus-visible-ring"
                     >
                       <Sparkles className="w-4 h-4 text-gold-400" />
                       <span className="hidden sm:inline">My Lessons</span>

@@ -100,17 +100,22 @@ function ReciterOption({
 
 function ToggleSwitch({ 
   enabled, 
-  onToggle 
+  onToggle,
+  label 
 }: { 
   enabled: boolean;
   onToggle: () => void;
+  label: string;
 }) {
   return (
     <button
       onClick={onToggle}
-      className={`relative w-12 h-7 rounded-full transition-colors ${
+      className={`relative w-12 h-7 rounded-full transition-colors focus-visible-ring ${
         enabled ? 'bg-gold-500' : 'bg-night-700'
       }`}
+      role="switch"
+      aria-checked={enabled}
+      aria-label={label}
     >
       <div className={`absolute top-1 w-5 h-5 rounded-full bg-white transition-transform ${
         enabled ? 'left-6' : 'left-1'
@@ -225,6 +230,7 @@ export default function SettingsPage() {
               <ToggleSwitch 
                 enabled={settings.showTranslation}
                 onToggle={() => update({ showTranslation: !settings.showTranslation })}
+                label="Show translation"
               />
             </div>
 
