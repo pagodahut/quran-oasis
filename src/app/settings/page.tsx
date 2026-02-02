@@ -266,14 +266,19 @@ export default function SettingsPage() {
         >
           <div className="p-4 rounded-xl bg-night-800/50 space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-night-300">Size: {settings.arabicFontSize}px</span>
+              <label htmlFor="arabic-font-size" className="text-night-300">Size: {settings.arabicFontSize}px</label>
               <input
+                id="arabic-font-size"
                 type="range"
                 min={20}
                 max={48}
                 value={settings.arabicFontSize}
                 onChange={(e) => handleFontSizeChange(parseInt(e.target.value))}
                 className="w-40"
+                aria-valuemin={20}
+                aria-valuemax={48}
+                aria-valuenow={settings.arabicFontSize}
+                aria-valuetext={`${settings.arabicFontSize} pixels`}
               />
             </div>
             <div className="text-center p-4 rounded-xl bg-night-900/50">
@@ -284,6 +289,9 @@ export default function SettingsPage() {
                   fontSize: settings.arabicFontSize,
                   direction: 'rtl'
                 }}
+                lang="ar"
+                dir="rtl"
+                aria-label="Bismillah sample text"
               >
                 بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
               </p>
@@ -388,6 +396,10 @@ export default function SettingsPage() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-night-950/90 backdrop-blur-sm flex items-center justify-center p-4"
             onClick={() => setShowResetConfirm(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="reset-modal-title"
+            aria-describedby="reset-modal-description"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
@@ -398,22 +410,22 @@ export default function SettingsPage() {
             >
               <div className="text-center">
                 <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
-                  <AlertCircle className="w-6 h-6 text-amber-400" />
+                  <AlertCircle className="w-6 h-6 text-amber-400" aria-hidden="true" />
                 </div>
-                <h2 className="text-xl font-semibold text-night-100 mb-2">Reset Settings?</h2>
-                <p className="text-night-400 mb-6">
+                <h2 id="reset-modal-title" className="text-xl font-semibold text-night-100 mb-2">Reset Settings?</h2>
+                <p id="reset-modal-description" className="text-night-400 mb-6">
                   This will reset all your preferences to their default values. Your bookmarks and progress will not be affected.
                 </p>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setShowResetConfirm(false)}
-                    className="flex-1 py-3 rounded-xl bg-night-800 text-night-200 hover:bg-night-700 transition-colors"
+                    className="flex-1 py-3 rounded-xl bg-night-800 text-night-200 hover:bg-night-700 transition-colors focus-visible-ring"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleReset}
-                    className="flex-1 py-3 rounded-xl bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors"
+                    className="flex-1 py-3 rounded-xl bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors focus-visible-ring"
                   >
                     Reset
                   </button>
