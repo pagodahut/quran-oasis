@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 interface LogoProps {
   size?: number;
@@ -10,92 +11,46 @@ interface LogoProps {
 }
 
 /**
- * HIFZ Logo - The Open Quran
+ * HIFZ Logo - The Official Crest
  * 
- * Design Philosophy:
- * - Ultra-simple open book shape = instant Quran recognition
- * - Works at ALL sizes (even 16px favicon)
- * - Gold/night color palette matches the app
- * - No complex geometry that breaks at small sizes
+ * Design: Islamic crest with mihrab arch, crescent moon, stars, 
+ * open Quran, and crossed ribbons. Gold on white/transparent.
  * 
- * The simplicity is intentional: like Apple's logo, 
- * one shape that's instantly recognizable.
+ * The crest image is /public/hifz-crest.png
+ * All icon sizes are generated in /public/icons/
  */
-export function HifzIcon({ size = 40, className = '', animated = true }: LogoProps) {
-  const Icon = animated ? motion.svg : 'svg';
+
+// Main crest icon using the image
+export function HifzIcon({ 
+  size = 40, 
+  className = '', 
+  animated = true 
+}: LogoProps) {
+  const Container = animated ? motion.div : 'div';
   
   return (
-    <Icon
-      viewBox="0 0 100 100"
-      width={size}
-      height={size}
-      className={className}
+    <Container
+      className={`relative ${className}`}
+      style={{ width: size, height: size }}
       {...(animated && {
         initial: { opacity: 0, scale: 0.9 },
         animate: { opacity: 1, scale: 1 },
         transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] }
       })}
     >
-      <defs>
-        {/* Premium gold gradient */}
-        <linearGradient id="hifz-gold" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#f4d47c" />
-          <stop offset="50%" stopColor="#c9a227" />
-          <stop offset="100%" stopColor="#8b6914" />
-        </linearGradient>
-        
-        {/* Dark night background */}
-        <linearGradient id="hifz-night" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#1a1f25" />
-          <stop offset="100%" stopColor="#0f1419" />
-        </linearGradient>
-      </defs>
-      
-      {/* Background circle */}
-      <circle cx="50" cy="50" r="48" fill="url(#hifz-night)" />
-      
-      {/* Subtle border */}
-      <circle 
-        cx="50" cy="50" r="46" 
-        fill="none" 
-        stroke="url(#hifz-gold)" 
-        strokeWidth="1.5"
-        opacity="0.4"
+      <Image
+        src="/hifz-crest.png"
+        alt="HIFZ"
+        width={size}
+        height={size}
+        className="object-contain"
+        priority={size > 100}
       />
-      
-      {/* THE BOOK - Open Quran silhouette */}
-      {/* Left page */}
-      <path
-        d="M 50 28
-           Q 38 30, 22 35
-           L 22 72
-           Q 38 68, 50 65
-           Z"
-        fill="url(#hifz-gold)"
-      />
-      
-      {/* Right page */}
-      <path
-        d="M 50 28
-           Q 62 30, 78 35
-           L 78 72
-           Q 62 68, 50 65
-           Z"
-        fill="url(#hifz-gold)"
-      />
-      
-      {/* Dark spine separating the pages */}
-      <path
-        d="M 50 28 L 50 65"
-        stroke="url(#hifz-night)"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-    </Icon>
+    </Container>
   );
 }
 
-// Simple icon for small contexts (nav, tabs)
+// Simple icon for small contexts (nav, tabs) - uses smaller pre-generated icons
 export function HifzIconSimple({ 
   size = 24, 
   className = '' 
@@ -103,47 +58,17 @@ export function HifzIconSimple({
   size?: number; 
   className?: string;
 }) {
+  // Use closest pre-generated icon size
+  const iconSize = size <= 24 ? 32 : size <= 48 ? 48 : size <= 72 ? 72 : 96;
+  
   return (
-    <svg
-      viewBox="0 0 24 24"
+    <Image
+      src={`/icons/icon-${iconSize}x${iconSize}.png`}
+      alt="HIFZ"
       width={size}
       height={size}
-      className={className}
-      fill="none"
-    >
-      <defs>
-        <linearGradient id="simple-gold" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#f4d47c" />
-          <stop offset="50%" stopColor="#c9a227" />
-          <stop offset="100%" stopColor="#8b6914" />
-        </linearGradient>
-      </defs>
-      
-      {/* Simplified book shape */}
-      <path
-        d="M 12 5
-           Q 8 6, 4 7
-           L 4 19
-           Q 8 18, 12 17
-           Z"
-        fill="url(#simple-gold)"
-      />
-      <path
-        d="M 12 5
-           Q 16 6, 20 7
-           L 20 19
-           Q 16 18, 12 17
-           Z"
-        fill="url(#simple-gold)"
-      />
-      <line
-        x1="12" y1="5"
-        x2="12" y2="17"
-        stroke="#0f1419"
-        strokeWidth="1"
-        strokeLinecap="round"
-      />
-    </svg>
+      className={`object-contain ${className}`}
+    />
   );
 }
 
@@ -160,6 +85,9 @@ export function HifzWordmark({
   const height = size;
   const width = size * 2.8;
   
+  // Gold gradient colors matching the crest
+  const isGradient = color === 'gradient';
+  
   return (
     <svg
       viewBox="0 0 140 50"
@@ -170,9 +98,9 @@ export function HifzWordmark({
     >
       <defs>
         <linearGradient id="wordmark-gold" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#f4d47c" />
+          <stop offset="0%" stopColor="#d4a84b" />
           <stop offset="50%" stopColor="#c9a227" />
-          <stop offset="100%" stopColor="#d4af37" />
+          <stop offset="100%" stopColor="#8b6914" />
         </linearGradient>
       </defs>
       
@@ -180,11 +108,11 @@ export function HifzWordmark({
         x="70"
         y="38"
         textAnchor="middle"
-        fontFamily="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
-        fontWeight="700"
+        fontFamily="'Playfair Display', Georgia, serif"
+        fontWeight="600"
         fontSize="38"
-        letterSpacing="0.08em"
-        fill={color === 'gradient' ? 'url(#wordmark-gold)' : color}
+        letterSpacing="0.12em"
+        fill={isGradient ? 'url(#wordmark-gold)' : color}
       >
         HIFZ
       </text>
@@ -216,7 +144,7 @@ export function HifzLogo({
         })}
       >
         <HifzIcon size={size} animated={animated} />
-        <HifzWordmark size={size * 0.5} color="gradient" />
+        <HifzWordmark size={size * 0.4} color="gradient" />
       </Container>
     );
   }
@@ -233,9 +161,9 @@ export function HifzLogo({
     >
       <HifzIcon size={size} animated={animated} />
       <span 
-        className="font-display text-xl font-bold tracking-wider"
+        className="font-serif text-xl font-semibold tracking-widest"
         style={{
-          background: 'linear-gradient(135deg, #f4d47c 0%, #c9a227 50%, #d4af37 100%)',
+          background: 'linear-gradient(135deg, #d4a84b 0%, #c9a227 50%, #8b6914 100%)',
           backgroundClip: 'text',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
@@ -251,21 +179,26 @@ export function HifzLogo({
 export function HifzLogoAnimated({ size = 80 }: { size?: number }) {
   return (
     <motion.div
-      className="relative"
+      className="relative flex items-center justify-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
       <motion.div
         animate={{ 
-          scale: [1, 1.05, 1],
+          scale: [1, 1.1, 1],
+          opacity: [0.3, 0.5, 0.3]
         }}
         transition={{ 
           duration: 2, 
           repeat: Infinity, 
           ease: "easeInOut" 
         }}
-        className="absolute inset-0 rounded-full bg-gold-500/20 blur-xl"
+        className="absolute inset-0 rounded-full"
+        style={{
+          background: 'radial-gradient(circle, rgba(201, 162, 39, 0.3) 0%, transparent 70%)',
+          filter: 'blur(20px)',
+        }}
       />
       <HifzIcon size={size} animated={true} />
     </motion.div>
