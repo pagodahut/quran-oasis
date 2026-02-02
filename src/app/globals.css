@@ -2535,3 +2535,204 @@ input[type="range"]::-moz-range-thumb {
     }
   }
 }
+
+/* ============================================
+   Accessibility Enhancements (WCAG 2.1 AA)
+   ============================================ */
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  /* Disable all animations */
+  .liquid-shimmer-text,
+  .liquid-glow-pulse,
+  .liquid-float,
+  .audio-playing,
+  .recording-active,
+  .confetti-particle,
+  .xp-animation,
+  .splash-logo {
+    animation: none !important;
+  }
+  
+  /* Keep essential state changes but instant */
+  .liquid-progress-fill {
+    animation: none !important;
+    transition: width 0.01ms !important;
+  }
+}
+
+/* Focus Visible Ring - Consistent and visible */
+@layer components {
+  .focus-visible-ring {
+    @apply outline-none;
+  }
+  
+  .focus-visible-ring:focus-visible {
+    outline: 2px solid rgba(201, 162, 39, 0.8);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(201, 162, 39, 0.2);
+  }
+  
+  /* Alternative focus for dark backgrounds */
+  .focus-visible-ring-light:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.9);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Touch Target Minimum Size (44x44 for WCAG) */
+@layer components {
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+    @apply flex items-center justify-center;
+  }
+  
+  /* Recording button with larger touch target */
+  .record-btn-large {
+    @apply w-24 h-24 rounded-full flex items-center justify-center
+           shadow-lg transition-all duration-200;
+    min-width: 96px;
+    min-height: 96px;
+  }
+  
+  .record-btn-large.recording {
+    @apply bg-red-500 text-white;
+    animation: recording-pulse 1.5s ease-in-out infinite;
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .record-btn-large.recording {
+      animation: none;
+      box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.4);
+    }
+  }
+}
+
+/* Audio Level Indicator (for screen readers) */
+@layer components {
+  .audio-level-bar {
+    @apply w-1 bg-gold-500 rounded-full transition-all;
+    min-height: 8px;
+  }
+}
+
+/* Screen Reader Only (but not display:none) */
+@layer utilities {
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+  
+  .not-sr-only {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: more) {
+  :root {
+    --gold-leaf: #ffcc00;
+    --gold-leaf-light: #ffdd44;
+    --gold-leaf-dark: #cc9900;
+  }
+  
+  .liquid-glass,
+  .liquid-glass-subtle,
+  .liquid-glass-strong,
+  .liquid-glass-dark,
+  .liquid-glass-gold {
+    border-width: 2px !important;
+  }
+  
+  .text-night-400,
+  .text-night-500 {
+    @apply text-night-300 !important;
+  }
+  
+  button, a, [role="button"] {
+    border: 1px solid currentColor !important;
+  }
+}
+
+/* Forced Colors Mode (Windows High Contrast) */
+@media (forced-colors: active) {
+  .liquid-btn,
+  .liquid-btn-outline {
+    forced-color-adjust: none;
+    background: ButtonFace;
+    color: ButtonText;
+    border: 2px solid ButtonText;
+  }
+  
+  .liquid-btn:hover,
+  .liquid-btn-outline:hover {
+    background: Highlight;
+    color: HighlightText;
+  }
+  
+  .liquid-btn:focus-visible {
+    outline: 3px solid Highlight;
+  }
+}
+
+/* ARIA Live Regions */
+@layer components {
+  .live-region {
+    @apply sr-only;
+  }
+  
+  .live-region-visible {
+    @apply fixed bottom-20 left-4 right-4 z-50
+           bg-night-800 text-night-100 
+           px-4 py-3 rounded-xl shadow-lg
+           border border-night-700;
+  }
+}
+
+/* Visible Focus for All Interactive Elements */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid rgba(201, 162, 39, 0.8);
+  outline-offset: 2px;
+}
+
+/* Link Underlines for Better Visibility */
+a:not(.liquid-btn):not(.liquid-btn-outline):not([class*="rounded"]) {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:not(.liquid-btn):not(.liquid-btn-outline):not([class*="rounded"]):hover {
+  text-decoration-thickness: 2px;
+}
