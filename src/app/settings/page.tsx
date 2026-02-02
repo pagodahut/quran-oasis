@@ -445,6 +445,86 @@ export default function SettingsPage() {
                 label="Auto-play on lesson start"
               />
             </SettingRow>
+
+            {/* Audio Quality */}
+            <div>
+              <label className="text-sm text-night-400 mb-3 block flex items-center gap-2">
+                <Cloud className="w-4 h-4" />
+                Audio Quality
+              </label>
+              <SelectGrid
+                options={[
+                  { value: 'auto' as const, label: 'Auto', description: 'Adapts to network' },
+                  { value: 'high' as const, label: 'High', description: '128-192 kbps' },
+                  { value: 'medium' as const, label: 'Medium', description: '64 kbps' },
+                  { value: 'low' as const, label: 'Low', description: 'Save data' },
+                ]}
+                value={preferences.audio.audioQuality || 'auto'}
+                onChange={(quality) => update('audio', { audioQuality: quality })}
+                columns={4}
+              />
+            </div>
+
+            {/* Smart Preloading */}
+            <SettingRow
+              label="Smart Audio Preloading"
+              description="Preload upcoming ayahs for seamless playback"
+            >
+              <ToggleSwitch
+                enabled={preferences.audio.autoPreload !== false}
+                onToggle={() => update('audio', { autoPreload: !preferences.audio.autoPreload })}
+                label="Smart audio preloading"
+              />
+            </SettingRow>
+
+            {/* Gapless Playback */}
+            <SettingRow
+              label="Gapless Playback"
+              description="No gaps between ayahs during continuous play"
+            >
+              <ToggleSwitch
+                enabled={preferences.audio.gaplessPlayback !== false}
+                onToggle={() => update('audio', { gaplessPlayback: !preferences.audio.gaplessPlayback })}
+                label="Gapless playback"
+              />
+            </SettingRow>
+
+            {/* Crossfade */}
+            <div className="space-y-3">
+              <SettingRow
+                label="Crossfade Between Ayahs"
+                description="Smooth audio transition effect"
+              >
+                <ToggleSwitch
+                  enabled={preferences.audio.crossfadeEnabled === true}
+                  onToggle={() => update('audio', { crossfadeEnabled: !preferences.audio.crossfadeEnabled })}
+                  label="Crossfade between ayahs"
+                />
+              </SettingRow>
+              
+              {preferences.audio.crossfadeEnabled && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="p-4 rounded-xl bg-night-800/30 ml-4"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-night-300">Crossfade Duration</span>
+                    <span className="text-night-400 text-sm">{preferences.audio.crossfadeDuration || 500}ms</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={200}
+                    max={2000}
+                    step={100}
+                    value={preferences.audio.crossfadeDuration || 500}
+                    onChange={(e) => update('audio', { crossfadeDuration: parseInt(e.target.value) })}
+                    className="w-full"
+                  />
+                </motion.div>
+              )}
+            </div>
           </div>
         </SettingSection>
 

@@ -27,6 +27,7 @@ import {
   RECITERS,
 } from '@/lib/quranAudioService';
 import { markVerseMemorized, getVerseProgress } from '@/lib/progressStore';
+import { useAudioPreferences } from '@/lib/preferencesStore';
 
 interface MemorizationPracticeProps {
   surah: number;
@@ -80,10 +81,11 @@ export default function MemorizationPractice({
   arabicText,
   translation,
   transliteration,
-  reciterId = 'alafasy',
+  reciterId,
   onComplete,
   onClose,
 }: MemorizationPracticeProps) {
+  const { audio: audioPrefs } = useAudioPreferences();
   const [phase, setPhase] = useState<Phase>('intro');
   const [isPlaying, setIsPlaying] = useState(false);
   const [readCount, setReadCount] = useState(0);
@@ -95,8 +97,11 @@ export default function MemorizationPractice({
   const requiredReadCount = 10;
   const requiredRecallCount = 3;
 
+  // Use prop reciter if provided, otherwise use preference
+  const effectiveReciterId = reciterId || audioPrefs.reciter;
+
   // Get current reciter
-  const reciter = RECITERS.find(r => r.id === reciterId) || RECITERS[0];
+  const reciter = RECITERS.find(r => r.id === effectiveReciterId) || RECITERS[0];
 
   // Play audio
   const playVerseAudio = useCallback(async () => {
@@ -109,7 +114,7 @@ export default function MemorizationPractice({
     setIsPlaying(true);
     try {
       await playAyah(surah, ayah, {
-        reciterId,
+        reciterId: effectiveReciterId,
         onStart: () => setIsPlaying(true),
         onEnd: () => {
           setIsPlaying(false);
@@ -129,7 +134,7 @@ export default function MemorizationPractice({
       console.error('Failed to play audio:', error);
       setIsPlaying(false);
     }
-  }, [isPlaying, surah, ayah, reciterId, phase]);
+  }, [isPlaying, surah, ayah, effectiveReciterId, phase]);
 
   // Move to next phase
   const nextPhase = useCallback(() => {

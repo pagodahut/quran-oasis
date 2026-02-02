@@ -12,12 +12,19 @@ import { useEffect, useState, useCallback } from 'react';
 export type FontSize = 'small' | 'medium' | 'large' | 'extra-large';
 export type Theme = 'dark' | 'light' | 'auto';
 export type PlaybackSpeed = 0.5 | 0.75 | 1 | 1.25 | 1.5 | 2;
+export type AudioQuality = 'auto' | 'high' | 'medium' | 'low';
 
 export interface AudioPreferences {
   reciter: string;
   playbackSpeed: PlaybackSpeed;
   autoPlayOnLesson: boolean;
   volume: number; // 0-1
+  // New audio enhancement settings
+  audioQuality: AudioQuality;
+  crossfadeEnabled: boolean;
+  crossfadeDuration: number; // ms
+  autoPreload: boolean;
+  gaplessPlayback: boolean;
 }
 
 export interface DisplayPreferences {
@@ -83,6 +90,13 @@ export const PLAYBACK_SPEED_OPTIONS: { value: PlaybackSpeed; label: string }[] =
   { value: 1.25, label: '1.25x' },
   { value: 1.5, label: '1.5x' },
   { value: 2, label: '2x (Fast)' },
+];
+
+export const AUDIO_QUALITY_OPTIONS: { value: AudioQuality; label: string; description: string }[] = [
+  { value: 'auto', label: 'Auto', description: 'Adjust based on network speed' },
+  { value: 'high', label: 'High', description: '128-192 kbps, best quality' },
+  { value: 'medium', label: 'Medium', description: '64 kbps, balanced' },
+  { value: 'low', label: 'Low', description: 'Save data, lower quality' },
 ];
 
 export const DAILY_GOAL_OPTIONS = {
@@ -157,6 +171,11 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
     playbackSpeed: 1,
     autoPlayOnLesson: true,
     volume: 1,
+    audioQuality: 'auto',
+    crossfadeEnabled: false,
+    crossfadeDuration: 500,
+    autoPreload: true,
+    gaplessPlayback: true,
   },
   display: {
     arabicFontSize: 'medium',
