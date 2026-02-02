@@ -78,7 +78,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const content = (
-    <html lang="en" dir="ltr" className="dark">
+    <html lang="en" dir="ltr" className="dark" data-scroll-behavior="smooth">
       <head>
         {/* Favicon */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
