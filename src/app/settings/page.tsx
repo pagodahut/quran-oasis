@@ -27,6 +27,7 @@ import {
   type UserSettings,
 } from '@/lib/settings';
 import BottomNav from '@/components/BottomNav';
+import { setDailyGoal } from '@/lib/motivationStore';
 
 function SettingSection({ 
   icon: Icon, 
@@ -140,6 +141,8 @@ export default function SettingsPage() {
 
   const handleDailyGoalChange = (goal: number) => {
     update({ dailyGoal: goal });
+    // Also sync to motivation store
+    setDailyGoal('verses', goal);
     showSuccess('Daily goal updated');
   };
 

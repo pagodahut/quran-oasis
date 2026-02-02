@@ -26,9 +26,19 @@ import {
   Mail,
   Edit3,
   Loader2,
+  TrendingUp,
+  Zap,
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 import { getProgressStats, getSurahProgressList } from '@/lib/progressStore';
+import { StreakDisplay, GoalProgressRing } from '@/components/Celebrations';
+import { 
+  getStreakInfo, 
+  getDailyGoalStatus, 
+  getQuranProgress,
+  getAchievements,
+  updateStreak,
+} from '@/lib/motivationStore';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
@@ -111,6 +121,10 @@ export default function ProfilePage() {
     name: string;
     progress: number;
   }>>([]);
+  const [streakInfo, setStreakInfo] = useState(getStreakInfo());
+  const [goalStatus, setGoalStatus] = useState(getDailyGoalStatus());
+  const [quranProgress, setQuranProgress] = useState(getQuranProgress());
+  const [achievements, setAchievements] = useState(getAchievements());
 
   // Load progress from local storage
   useEffect(() => {
@@ -140,6 +154,28 @@ export default function ProfilePage() {
       averageSessionMinutes: progressStats.averageSessionMinutes || 0,
       totalMinutesLearned: progressStats.totalMinutesLearned || 0,
     });
+    
+    // Load motivation data
+    setStreakInfo(getStreakInfo());
+    setGoalStatus(getDailyGoalStatus());
+    setQuranProgress(getQuranProgress());
+    setAchievements(getAchievements());
+    
+    // Listen for updates
+    const handleUpdate = () => {
+      setStreakInfo(getStreakInfo());
+      setGoalStatus(getDailyGoalStatus());
+      setQuranProgress(getQuranProgress());
+      setAchievements(getAchievements());
+    };
+    
+    window.addEventListener('motivation-updated', handleUpdate);
+    window.addEventListener('progress-updated', handleUpdate);
+    
+    return () => {
+      window.removeEventListener('motivation-updated', handleUpdate);
+      window.removeEventListener('progress-updated', handleUpdate);
+    };
   }, []);
 
   // Get user info
@@ -245,18 +281,25 @@ export default function ProfilePage() {
               </button>
             )}
             
-            {/* Streak info */}
-            {stats.currentStreak > 0 ? (
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold-500/10 text-gold-400 text-sm">
-                <Flame className="w-4 h-4" />
-                <span>{stats.currentStreak} day streak! Keep it up!</span>
-              </div>
-            ) : (
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-night-800/50 text-night-400 text-sm">
-                <Flame className="w-4 h-4" />
-                <span>Start your streak today!</span>
-              </div>
-            )}
+            {/* Enhanced Streak Display */}
+            <div className="flex justify-center mb-4">
+              <StreakDisplay
+                current={streakInfo.current}
+                isActiveToday={streakInfo.isActiveToday}
+                streakAtRisk={streakInfo.streakAtRisk}
+                freezesAvailable={streakInfo.freezesAvailable}
+                nextMilestone={streakInfo.nextMilestone}
+                size="lg"
+              />
+            </div>
+            
+            {/* Quran Progress Mini */}
+            <div className="flex items-center justify-center gap-2 text-sm text-night-400">
+              <BookOpen className="w-4 h-4 text-gold-400" />
+              <span>{quranProgress.versesMemorized.toLocaleString()} verses</span>
+              <span className="text-night-600">•</span>
+              <span className="text-gold-400">{quranProgress.percentage}% of Quran</span>
+            </div>
 
             {/* Sign in prompt for guests */}
             {!isSignedIn && (
@@ -277,25 +320,31 @@ export default function ProfilePage() {
 
           {/* Stats Grid - 2 columns, responsive */}
           <motion.div variants={fadeInUp}>
-            <h3 className="text-sm font-medium text-night-400 mb-3 px-1">Your Progress</h3>
+            <div className="flex items-center justify-between mb-3 px-1">
+              <h3 className="text-sm font-medium text-night-400">Your Progress</h3>
+              <Link href="/progress" className="text-xs text-gold-400 hover:text-gold-300 flex items-center gap-1">
+                <TrendingUp className="w-3 h-3" />
+                View Details
+              </Link>
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <StatCard 
                 icon={BookOpen} 
-                value={stats.versesMemorized} 
+                value={quranProgress.versesMemorized} 
                 label="Verses Memorized" 
                 color="text-gold-400"
               />
               <StatCard 
                 icon={Award} 
-                value={stats.surahsCompleted} 
-                label="Surahs Complete" 
-                color="text-sage-400"
+                value={achievements.unlocked.length} 
+                label="Achievements" 
+                color="text-purple-400"
               />
               <StatCard 
-                icon={Calendar} 
-                value={stats.totalDaysActive} 
-                label="Days Active" 
-                color="text-indigo-400"
+                icon={Zap} 
+                value={streakInfo.longest} 
+                label="Best Streak" 
+                color="text-orange-400"
               />
               <StatCard 
                 icon={Clock} 
@@ -350,25 +399,46 @@ export default function ProfilePage() {
             </div>
           </motion.div>
 
-          {/* Daily Goal */}
+          {/* Daily Goal - Enhanced */}
           <motion.div variants={fadeInUp}>
-            <h3 className="text-sm font-medium text-night-400 mb-3 px-1">Daily Goal</h3>
+            <h3 className="text-sm font-medium text-night-400 mb-3 px-1">Today's Goal</h3>
             <div className="liquid-card p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Target className="w-5 h-5 text-gold-400" />
-                  <span className="text-night-200">15 minutes / day</span>
-                </div>
-                <span className="text-sm text-night-500">{stats.averageSessionMinutes} min avg</span>
-              </div>
-              <div className="h-2 rounded-full bg-night-800 overflow-hidden">
-                <div 
-                  className="h-full rounded-full"
-                  style={{
-                    width: `${Math.min(100, (stats.averageSessionMinutes / 15) * 100)}%`,
-                    background: 'linear-gradient(90deg, #c9a227 0%, #f4d47c 100%)',
-                  }}
+              <div className="flex items-center gap-4">
+                <GoalProgressRing
+                  progress={goalStatus.progress}
+                  target={goalStatus.target}
+                  type={goalStatus.type}
+                  size={70}
                 />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-night-200 font-medium">
+                      {goalStatus.progress} / {goalStatus.target} {goalStatus.type === 'minutes' ? 'min' : 'verses'}
+                    </span>
+                    {goalStatus.goalMet && (
+                      <span className="text-xs text-sage-400 bg-sage-500/20 px-2 py-1 rounded-full">
+                        ✓ Complete!
+                      </span>
+                    )}
+                  </div>
+                  <div className="h-2 rounded-full bg-night-800 overflow-hidden">
+                    <motion.div 
+                      className="h-full rounded-full"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${goalStatus.percentage}%` }}
+                      style={{
+                        background: goalStatus.goalMet 
+                          ? 'linear-gradient(90deg, #86a971 0%, #5a7f4c 100%)'
+                          : 'linear-gradient(90deg, #c9a227 0%, #f4d47c 100%)',
+                      }}
+                    />
+                  </div>
+                  {!goalStatus.goalMet && goalStatus.progress > 0 && (
+                    <p className="text-xs text-night-500 mt-2">
+                      {goalStatus.target - goalStatus.progress} {goalStatus.type === 'minutes' ? 'minutes' : 'verses'} to go!
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </motion.div>
@@ -377,6 +447,7 @@ export default function ProfilePage() {
           <motion.div variants={fadeInUp}>
             <h3 className="text-sm font-medium text-night-400 mb-3 px-1">Quick Access</h3>
             <div className="liquid-card overflow-hidden">
+              <SettingsRow icon={TrendingUp} label="Detailed Progress" href="/progress" />
               <SettingsRow icon={Bookmark} label="Bookmarks" href="/bookmarks" />
               <SettingsRow icon={List} label="Surah Index" href="/surahs" />
             </div>

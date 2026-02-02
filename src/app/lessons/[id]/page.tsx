@@ -57,6 +57,14 @@ import {
 } from '@/components/LessonContentRenderer';
 import MemorizationPractice from '@/components/MemorizationPractice';
 import { playAyah, stopPlayback } from '@/lib/quranAudioService';
+import { CelebrationOverlay, useCelebration } from '@/components/Celebrations';
+import { 
+  updateStreak, 
+  updateDailyProgress, 
+  triggerCelebration,
+  checkAndUnlockAchievements,
+  getQuranProgress,
+} from '@/lib/motivationStore';
 
 // ============================================
 // Audio Speaker Button Component
@@ -538,6 +546,9 @@ export default function LessonDetailPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPlayingReciter, setIsPlayingReciter] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  
+  // Celebration hook
+  const { currentEvent, closeCelebration } = useCelebration();
 
   // Load lesson data
   useEffect(() => {
@@ -612,10 +623,33 @@ export default function LessonDetailPage() {
       localStorage.setItem('quranOasis_completedLessons', JSON.stringify(completed));
     }
     
+    // Update streak and daily progress
+    const streakResult = updateStreak();
+    const goalResult = updateDailyProgress(5); // 5 minutes per lesson completion
+    
+    // Check for new achievements
+    const quranProgress = getQuranProgress();
+    const newAchievements = checkAndUnlockAchievements(
+      quranProgress.versesMemorized,
+      [], // completedSurahs - would need to track this
+      []  // completedJuz - would need to track this
+    );
+    
+    // Trigger celebration based on results
+    if (streakResult.newMilestone) {
+      setTimeout(() => {
+        triggerCelebration({ type: 'streak_milestone', days: streakResult.newMilestone! });
+      }, 2500);
+    } else if (goalResult.goalMet) {
+      setTimeout(() => {
+        triggerCelebration({ type: 'daily_goal_met' });
+      }, 2500);
+    }
+    
     // Navigate after animation
     setTimeout(() => {
       router.push('/lessons?completed=' + lessonId);
-    }, 1500);
+    }, streakResult.newMilestone || goalResult.goalMet ? 5000 : 1500);
   };
 
   // Render step content with proper formatting and smart detection
@@ -807,9 +841,17 @@ export default function LessonDetailPage() {
       
       {/* Celebration effects */}
       <AnimatePresence>
-        <CelebrationBurst show={showCelebration} />
-        <XPGain amount={lesson.xpReward} show={showXP} />
+        {showCelebration && <CelebrationBurst key="celebration" show={showCelebration} />}
+        {showXP && <XPGain key="xp-gain" amount={lesson.xpReward} show={showXP} />}
       </AnimatePresence>
+      
+      {/* Celebration Overlay for achievements, streaks, etc. */}
+      <CelebrationOverlay
+        event={currentEvent}
+        onClose={closeCelebration}
+        autoClose={true}
+        autoCloseDelay={5000}
+      />
       
       {/* Memorization Module Modal */}
       <AnimatePresence>

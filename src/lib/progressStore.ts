@@ -4,6 +4,15 @@
  */
 
 import { VerseProgress, MemorizationStatus, StudyCategory, calculateNextReview, initializeVerse, QualityRating } from './memorizationSystem';
+import { 
+  updateStreak, 
+  updateDailyProgress, 
+  triggerCelebration,
+  checkAndUnlockAchievements,
+  getSurahProgressList as getMotivationSurahProgress,
+  getJuzProgress,
+} from './motivationStore';
+import { SURAH_METADATA } from './surahMetadata';
 
 // ============ TYPES ============
 
