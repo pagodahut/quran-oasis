@@ -44,19 +44,23 @@ import TafsirDrawer from '@/components/TafsirDrawer';
 import WordByWord from '@/components/WordByWord';
 import TajweedPractice from '@/components/TajweedPractice';
 import { useBookmarks } from '@/lib/bookmarks';
+import { useReadingPreferences } from '@/hooks/useAppliedPreferences';
 
 export default function MushafPage() {
   const router = useRouter();
   const { toggle: toggleBookmark, check: isBookmarked } = useBookmarks();
   
-  // State
+  // Get preferences
+  const prefs = useReadingPreferences();
+  
+  // State - initialized from preferences
   const [currentSurah, setCurrentSurah] = useState<Surah | null>(null);
   const [surahNumber, setSurahNumber] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [selectedReciter, setSelectedReciter] = useState('alafasy');
-  const [showTranslation, setShowTranslation] = useState(true);
-  const [translationEdition, setTranslationEdition] = useState<'sahih' | 'asad'>('sahih');
-  const [fontSize, setFontSize] = useState(28);
+  const [selectedReciter, setSelectedReciter] = useState(prefs.reciter);
+  const [showTranslation, setShowTranslation] = useState(prefs.showTranslation);
+  const [translationEdition, setTranslationEdition] = useState<'sahih' | 'asad'>(prefs.translation);
+  const [fontSize, setFontSize] = useState(prefs.arabicFontSize);
   
   // Audio state
   const [currentAyah, setCurrentAyah] = useState(1);
@@ -84,6 +88,15 @@ export default function MushafPage() {
   // Refs
   const audioRef = useRef<HTMLAudioElement>(null);
   const verseRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
+
+  // Sync with preferences
+  useEffect(() => {
+    setSelectedReciter(prefs.reciter);
+    setShowTranslation(prefs.showTranslation);
+    setTranslationEdition(prefs.translation);
+    setFontSize(prefs.arabicFontSize);
+    setPlaybackRate(prefs.playbackSpeed);
+  }, [prefs]);
 
   // Load surah
   useEffect(() => {
