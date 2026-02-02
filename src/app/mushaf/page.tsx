@@ -216,17 +216,17 @@ export default function MushafPage() {
           >
             {currentSurah && (
               <>
-                <h1 className="quran-text text-xl text-gold-400">{currentSurah.name}</h1>
+                <h1 className="quran-text text-xl text-gold-400" lang="ar" dir="rtl">{currentSurah.name}</h1>
                 <p className="text-xs text-night-400">{currentSurah.englishName}</p>
               </>
             )}
           </button>
 
           <div className="flex items-center gap-1.5">
-            <button onClick={() => setShowSearch(true)} className="liquid-icon-btn">
-              <Search className="w-5 h-5" />
+            <button onClick={() => setShowSearch(true)} className="liquid-icon-btn" aria-label="Search Quran">
+              <Search className="w-5 h-5" aria-hidden="true" />
             </button>
-            <Link href="/bookmarks" className="liquid-icon-btn">
+            <Link href="/bookmarks" className="liquid-icon-btn" aria-label="View bookmarks">
               <Bookmark className="w-5 h-5" />
             </Link>
             <button onClick={() => setShowSettings(true)} className="liquid-icon-btn">
@@ -328,9 +328,11 @@ export default function MushafPage() {
                       <p 
                         className="quran-text text-night-100 mb-4"
                         style={{ fontSize }}
+                        lang="ar"
+                        dir="rtl"
                       >
                         {ayah.text.arabic}
-                        <span className="verse-number">{ayah.numberInSurah}</span>
+                        <span className="verse-number" aria-label={`Verse ${ayah.numberInSurah}`}>{ayah.numberInSurah}</span>
                       </p>
                     )}
 

@@ -320,8 +320,8 @@ function LessonsContent() {
         className="sticky top-0 z-40 safe-area-top liquid-glass mx-2 mt-2 rounded-2xl"
       >
         <div className="flex items-center justify-between px-3 py-3">
-          <Link href="/" className="liquid-icon-btn">
-            <ChevronLeft className="w-5 h-5" />
+          <Link href="/" className="liquid-icon-btn" aria-label="Back to home">
+            <ChevronLeft className="w-5 h-5" aria-hidden="true" />
           </Link>
           <h1 className="font-semibold text-night-100 text-lg">Lessons</h1>
           <div className="w-11" />

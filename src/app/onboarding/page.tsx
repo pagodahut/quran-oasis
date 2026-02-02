@@ -362,16 +362,24 @@ export default function OnboardingPage() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               onClick={goBack} 
-              className="liquid-icon-btn"
+              className="liquid-icon-btn focus-visible-ring"
+              aria-label="Go back"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="w-5 h-5" aria-hidden="true" />
             </motion.button>
           ) : (
             <div className="w-11" />
           )}
           
           {step !== 'complete' && (
-            <div className="flex-1 mx-4">
+            <div 
+              className="flex-1 mx-4"
+              role="progressbar"
+              aria-valuenow={Math.round(progress)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`Onboarding progress: ${Math.round(progress)}%`}
+            >
               <div className="liquid-progress h-1.5">
                 <motion.div
                   className="liquid-progress-fill"
@@ -385,7 +393,7 @@ export default function OnboardingPage() {
           {step !== 'complete' && (
             <button 
               onClick={() => router.push('/lessons')}
-              className="text-sm text-night-500 hover:text-night-300 transition-colors px-2 py-1"
+              className="text-sm text-night-500 hover:text-night-300 transition-colors px-2 py-1 focus-visible-ring rounded-lg"
             >
               Skip
             </button>
