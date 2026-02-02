@@ -108,7 +108,8 @@ export default function MemorizationPractice({
 
     setIsPlaying(true);
     try {
-      await playAyah(surah, ayah, reciterId, {
+      await playAyah(surah, ayah, {
+        reciterId,
         onStart: () => setIsPlaying(true),
         onEnd: () => {
           setIsPlaying(false);

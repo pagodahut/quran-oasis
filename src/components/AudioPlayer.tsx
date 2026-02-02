@@ -1,9 +1,32 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, SkipBack, SkipForward, Repeat, Volume2, VolumeX, Gauge } from 'lucide-react';
+import { 
+  Play, Pause, SkipBack, SkipForward, Repeat, Volume2, VolumeX, 
+  Gauge, Download, Mic, Wifi, WifiOff, ChevronDown, Check,
+  RotateCcw
+} from 'lucide-react';
 import { getAyahAudioUrl } from '@/lib/quran';
+import { 
+  preloadNextAyahs, 
+  downloadSurahForOffline, 
+  isAyahCached,
+  detectNetworkQuality,
+  getCacheStats,
+  type AudioQuality 
+} from '@/lib/audioPreload';
+import { 
+  useSettings, 
+  RECITERS, 
+  AUDIO_QUALITY_OPTIONS,
+  type AudioQuality as SettingsAudioQuality 
+} from '@/lib/settings';
+import { playReciterPreview, stopReciterPreview, isPreviewPlaying } from '@/lib/quranAudioService';
+
+// ============================================
+// Types
+// ============================================
 
 interface AudioPlayerProps {
   surah: number;
@@ -12,30 +35,69 @@ interface AudioPlayerProps {
   onEnded?: () => void;
   autoPlay?: boolean;
   showControls?: boolean;
+  totalAyahs?: number;
+  onAyahChange?: (ayah: number) => void;
 }
 
 type RepeatMode = 1 | 3 | 5 | 10 | 'infinite';
 
+// ============================================
+// Main Audio Player Component
+// ============================================
+
 export function AudioPlayer({
   surah,
   ayah,
-  reciter = 'alafasy',
+  reciter: propReciter,
   onEnded,
   autoPlay = false,
-  showControls = true
+  showControls = true,
+  totalAyahs,
+  onAyahChange
 }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const { settings, update } = useSettings();
+  
+  // Use prop reciter or settings
+  const reciter = propReciter || settings.reciter;
+  
+  // State
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [repeatMode, setRepeatMode] = useState<RepeatMode>(1);
   const [repeatCount, setRepeatCount] = useState(0);
-  const [playbackRate, setPlaybackRate] = useState(1);
+  const [playbackRate, setPlaybackRate] = useState(settings.playbackSpeed);
   const [volume, setVolume] = useState(1);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  const [showReciterPicker, setShowReciterPicker] = useState(false);
+  const [showQualityPicker, setShowQualityPicker] = useState(false);
+  const [isCached, setIsCached] = useState(false);
+  const [networkQuality, setNetworkQuality] = useState<AudioQuality>('high');
+  const [previewingReciter, setPreviewingReciter] = useState<string | null>(null);
+
+  // Get effective quality
+  const effectiveQuality: AudioQuality = settings.audioQuality === 'auto' 
+    ? networkQuality 
+    : settings.audioQuality as AudioQuality;
 
   const audioUrl = getAyahAudioUrl(surah, ayah, reciter);
 
+  // Check cache status and network quality
+  useEffect(() => {
+    isAyahCached(surah, ayah, reciter, effectiveQuality).then(setIsCached);
+    setNetworkQuality(detectNetworkQuality());
+  }, [surah, ayah, reciter, effectiveQuality]);
+
+  // Auto-preload next ayahs when playing
+  useEffect(() => {
+    if (isPlaying && settings.autoPreload && totalAyahs) {
+      preloadNextAyahs(surah, ayah, totalAyahs, reciter, effectiveQuality, 3);
+    }
+  }, [isPlaying, surah, ayah, reciter, effectiveQuality, totalAyahs, settings.autoPreload]);
+
+  // Auto-play effect
   useEffect(() => {
     if (audioRef.current && autoPlay) {
       audioRef.current.play();
@@ -43,42 +105,54 @@ export function AudioPlayer({
     }
   }, [autoPlay, surah, ayah]);
 
+  // Playback rate sync
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.playbackRate = playbackRate;
     }
   }, [playbackRate]);
 
+  // Volume sync
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
     }
   }, [volume]);
 
-  const togglePlay = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
+  // Handlers
+  const togglePlay = useCallback(() => {
+    if (!audioRef.current) return;
+    
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
     }
-  };
+    setIsPlaying(!isPlaying);
+  }, [isPlaying]);
 
-  const handleTimeUpdate = () => {
+  const handleTimeUpdate = useCallback(() => {
     if (audioRef.current) {
       setCurrentTime(audioRef.current.currentTime);
     }
-  };
+  }, []);
 
-  const handleLoadedMetadata = () => {
+  const handleLoadedMetadata = useCallback(() => {
     if (audioRef.current) {
       setDuration(audioRef.current.duration);
+      setIsLoading(false);
     }
-  };
+  }, []);
 
-  const handleEnded = () => {
+  const handleLoadStart = useCallback(() => {
+    setIsLoading(true);
+  }, []);
+
+  const handleCanPlay = useCallback(() => {
+    setIsLoading(false);
+  }, []);
+
+  const handleEnded = useCallback(() => {
     if (repeatMode === 'infinite' || repeatCount + 1 < repeatMode) {
       setRepeatCount(prev => prev + 1);
       if (audioRef.current) {
@@ -90,42 +164,68 @@ export function AudioPlayer({
       setIsPlaying(false);
       onEnded?.();
     }
-  };
+  }, [repeatMode, repeatCount, onEnded]);
 
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSeek = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const time = parseFloat(e.target.value);
     if (audioRef.current) {
       audioRef.current.currentTime = time;
       setCurrentTime(time);
     }
-  };
+  }, []);
 
-  const skipBack = () => {
+  const skipBack = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 5);
     }
-  };
+  }, []);
 
-  const skipForward = () => {
+  const skipForward = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.currentTime = Math.min(duration, audioRef.current.currentTime + 5);
     }
-  };
+  }, [duration]);
 
-  const cycleRepeatMode = () => {
+  const cycleRepeatMode = useCallback(() => {
     const modes: RepeatMode[] = [1, 3, 5, 10, 'infinite'];
     const currentIndex = modes.indexOf(repeatMode);
     const nextIndex = (currentIndex + 1) % modes.length;
     setRepeatMode(modes[nextIndex]);
     setRepeatCount(0);
-  };
+  }, [repeatMode]);
 
-  const cyclePlaybackRate = () => {
+  const cyclePlaybackRate = useCallback(() => {
     const rates = [0.5, 0.75, 1, 1.25, 1.5];
     const currentIndex = rates.indexOf(playbackRate);
     const nextIndex = (currentIndex + 1) % rates.length;
-    setPlaybackRate(rates[nextIndex]);
-  };
+    const newRate = rates[nextIndex];
+    setPlaybackRate(newRate);
+    update({ playbackSpeed: newRate });
+  }, [playbackRate, update]);
+
+  const handleReciterChange = useCallback((newReciterId: string) => {
+    update({ reciter: newReciterId });
+    setShowReciterPicker(false);
+    stopReciterPreview();
+    setPreviewingReciter(null);
+  }, [update]);
+
+  const handleQualityChange = useCallback((newQuality: SettingsAudioQuality) => {
+    update({ audioQuality: newQuality });
+    setShowQualityPicker(false);
+  }, [update]);
+
+  const handleReciterPreview = useCallback((reciterId: string) => {
+    if (previewingReciter === reciterId) {
+      stopReciterPreview();
+      setPreviewingReciter(null);
+    } else {
+      setPreviewingReciter(reciterId);
+      playReciterPreview(reciterId, () => {
+        setPreviewingReciter(null);
+      });
+    }
+  }, [previewingReciter]);
 
   const formatTime = (time: number): string => {
     const mins = Math.floor(time / 60);
@@ -134,6 +234,7 @@ export function AudioPlayer({
   };
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const currentReciter = RECITERS.find(r => r.id === reciter) || RECITERS[0];
 
   return (
     <motion.div 
@@ -166,16 +267,167 @@ export function AudioPlayer({
         )}
       </AnimatePresence>
 
+      {/* Loading overlay */}
+      <AnimatePresence>
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 flex items-center justify-center bg-night-900/50 z-20"
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            >
+              <RotateCcw className="w-6 h-6 text-gold-400" />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <audio
         ref={audioRef}
         src={audioUrl}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
+        onLoadStart={handleLoadStart}
+        onCanPlay={handleCanPlay}
         onEnded={handleEnded}
+        preload="auto"
       />
 
       {showControls && (
         <div className="relative z-10">
+          {/* Reciter & Quality Info Bar */}
+          <div className="flex items-center justify-between mb-4 text-sm">
+            {/* Reciter Selector */}
+            <button
+              onClick={() => setShowReciterPicker(!showReciterPicker)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg liquid-glass-subtle hover:bg-night-700/50 transition-colors"
+            >
+              <Mic className="w-3.5 h-3.5 text-gold-400" />
+              <span className="text-night-200 truncate max-w-[140px]">{currentReciter.name}</span>
+              <ChevronDown className={`w-3.5 h-3.5 text-night-400 transition-transform ${showReciterPicker ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Status indicators */}
+            <div className="flex items-center gap-2">
+              {/* Cache indicator */}
+              {isCached && (
+                <span className="text-xs text-sage-400 flex items-center gap-1">
+                  <Download className="w-3 h-3" />
+                  Cached
+                </span>
+              )}
+              
+              {/* Quality indicator */}
+              <button
+                onClick={() => setShowQualityPicker(!showQualityPicker)}
+                className="flex items-center gap-1 px-2 py-1 rounded-md liquid-glass-subtle hover:bg-night-700/50 transition-colors"
+              >
+                {settings.audioQuality === 'auto' ? (
+                  networkQuality === 'high' ? <Wifi className="w-3.5 h-3.5 text-sage-400" /> : <WifiOff className="w-3.5 h-3.5 text-amber-400" />
+                ) : null}
+                <span className="text-xs text-night-400 uppercase">{effectiveQuality}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Reciter Picker Dropdown */}
+          <AnimatePresence>
+            {showReciterPicker && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mb-4 overflow-hidden"
+              >
+                <div className="liquid-glass-strong rounded-xl p-2 space-y-1 max-h-60 overflow-y-auto">
+                  {RECITERS.map((r) => (
+                    <div
+                      key={r.id}
+                      className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
+                        r.id === reciter ? 'bg-gold-500/10 border border-gold-500/30' : 'hover:bg-night-700/50'
+                      }`}
+                    >
+                      <div 
+                        className="flex-1"
+                        onClick={() => handleReciterChange(r.id)}
+                      >
+                        <p className="text-night-100 text-sm font-medium">{r.name}</p>
+                        <p className="text-night-500 text-xs">{r.arabicName}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {/* Preview button */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleReciterPreview(r.id);
+                          }}
+                          className={`p-1.5 rounded-full transition-colors ${
+                            previewingReciter === r.id 
+                              ? 'bg-gold-500 text-night-950' 
+                              : 'bg-night-700/50 text-night-300 hover:bg-night-600/50'
+                          }`}
+                          title="Preview reciter"
+                        >
+                          {previewingReciter === r.id ? (
+                            <Pause className="w-3 h-3" />
+                          ) : (
+                            <Play className="w-3 h-3" />
+                          )}
+                        </button>
+                        
+                        {r.id === reciter && (
+                          <div className="w-5 h-5 rounded-full bg-gold-500 flex items-center justify-center">
+                            <Check className="w-3 h-3 text-night-950" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Quality Picker Dropdown */}
+          <AnimatePresence>
+            {showQualityPicker && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mb-4 overflow-hidden"
+              >
+                <div className="liquid-glass-strong rounded-xl p-2 space-y-1">
+                  {AUDIO_QUALITY_OPTIONS.map((q) => (
+                    <button
+                      key={q.value}
+                      onClick={() => handleQualityChange(q.value)}
+                      className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors ${
+                        settings.audioQuality === q.value 
+                          ? 'bg-gold-500/10 border border-gold-500/30' 
+                          : 'hover:bg-night-700/50'
+                      }`}
+                    >
+                      <div className="text-left">
+                        <p className="text-night-100 text-sm font-medium">{q.label}</p>
+                        <p className="text-night-500 text-xs">{q.description}</p>
+                      </div>
+                      {settings.audioQuality === q.value && (
+                        <div className="w-5 h-5 rounded-full bg-gold-500 flex items-center justify-center">
+                          <Check className="w-3 h-3 text-night-950" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Progress Bar - Liquid Glass Style */}
           <div className="mb-5">
             <div className="relative h-2 rounded-full overflow-hidden"
@@ -234,7 +486,8 @@ export function AudioPlayer({
             <motion.button
               whileTap={{ scale: 0.94 }}
               onClick={togglePlay}
-              className="relative w-16 h-16 rounded-full flex items-center justify-center"
+              disabled={isLoading}
+              className="relative w-16 h-16 rounded-full flex items-center justify-center disabled:opacity-50"
               style={{
                 background: 'linear-gradient(135deg, rgba(212,175,55,1) 0%, rgba(201,162,39,1) 50%, rgba(180,140,30,1) 100%)',
                 boxShadow: isPlaying 
@@ -389,7 +642,10 @@ export function AudioPlayer({
   );
 }
 
-// Simple play button for inline use - Enhanced with Liquid Glass
+// ============================================
+// Simple Play Button Component
+// ============================================
+
 export function PlayButton({
   surah,
   ayah,
@@ -474,5 +730,97 @@ export function PlayButton({
         </AnimatePresence>
       </motion.button>
     </>
+  );
+}
+
+// ============================================
+// Download Button Component
+// ============================================
+
+export function DownloadSurahButton({
+  surah,
+  totalAyahs,
+  reciter = 'alafasy',
+  quality = 'high' as AudioQuality,
+  className = ''
+}: {
+  surah: number;
+  totalAyahs: number;
+  reciter?: string;
+  quality?: AudioQuality;
+  className?: string;
+}) {
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [progress, setProgress] = useState({ loaded: 0, total: 0 });
+
+  const handleDownload = async () => {
+    setIsDownloading(true);
+    setProgress({ loaded: 0, total: totalAyahs });
+
+    try {
+      await downloadSurahForOffline(surah, totalAyahs, reciter, quality, (status) => {
+        setProgress({ loaded: status.loaded, total: status.total });
+      });
+    } catch (error) {
+      console.error('Download failed:', error);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const progressPercent = progress.total > 0 ? (progress.loaded / progress.total) * 100 : 0;
+
+  return (
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={handleDownload}
+      disabled={isDownloading}
+      className={`flex items-center gap-2 px-4 py-2 rounded-xl liquid-glass-subtle hover:bg-night-700/50 transition-colors disabled:opacity-50 ${className}`}
+    >
+      {isDownloading ? (
+        <>
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+          >
+            <Download className="w-4 h-4 text-gold-400" />
+          </motion.div>
+          <span className="text-sm text-night-200">
+            {Math.round(progressPercent)}%
+          </span>
+        </>
+      ) : (
+        <>
+          <Download className="w-4 h-4 text-gold-400" />
+          <span className="text-sm text-night-200">Download for Offline</span>
+        </>
+      )}
+    </motion.button>
+  );
+}
+
+// ============================================
+// Cache Stats Component
+// ============================================
+
+export function CacheStatsDisplay() {
+  const [stats, setStats] = useState<{
+    totalSizeMB: string;
+    itemCount: number;
+    memoryItems: number;
+  } | null>(null);
+
+  useEffect(() => {
+    getCacheStats().then(setStats);
+  }, []);
+
+  if (!stats) return null;
+
+  return (
+    <div className="text-xs text-night-500 space-y-1">
+      <p>Cached: {stats.totalSizeMB} MB ({stats.itemCount} files)</p>
+      <p>In memory: {stats.memoryItems} files</p>
+    </div>
   );
 }

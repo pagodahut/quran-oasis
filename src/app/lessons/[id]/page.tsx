@@ -1018,8 +1018,8 @@ export default function LessonDetailPage() {
                               await playAyah(
                                 currentStep.audioSegment!.surah,
                                 currentStep.audioSegment!.ayahStart,
-                                'alafasy',
                                 {
+                                  reciterId: 'alafasy',
                                   onEnd: () => setIsPlayingReciter(false),
                                   onError: () => setIsPlayingReciter(false),
                                 }

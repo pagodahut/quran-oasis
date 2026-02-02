@@ -407,21 +407,27 @@ export default function ProfilePage() {
 
           {/* Daily Goal - Enhanced */}
           <motion.div variants={fadeInUp}>
-            <h3 className="text-sm font-medium text-night-400 mb-3 px-1">Today's Goal</h3>
+            <div className="flex items-center justify-between mb-3 px-1">
+              <h3 className="text-sm font-medium text-night-400">Today's Goal</h3>
+              <Link href="/settings" className="text-xs text-gold-400 hover:text-gold-300 flex items-center gap-1">
+                <Target className="w-3 h-3" />
+                {learningPrefs.dailyGoalVerses} verses / day
+              </Link>
+            </div>
             <div className="liquid-card p-4">
               <div className="flex items-center gap-4">
                 <GoalProgressRing
                   progress={goalStatus.progress}
-                  target={goalStatus.target}
-                  type={goalStatus.type}
+                  target={learningPrefs.dailyGoalVerses || goalStatus.target}
+                  type="verses"
                   size={70}
                 />
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-night-200 font-medium">
-                      {goalStatus.progress} / {goalStatus.target} {goalStatus.type === 'minutes' ? 'min' : 'verses'}
+                      {goalStatus.progress} / {learningPrefs.dailyGoalVerses || goalStatus.target} verses
                     </span>
-                    {goalStatus.goalMet && (
+                    {goalStatus.progress >= (learningPrefs.dailyGoalVerses || goalStatus.target) && (
                       <span className="text-xs text-sage-400 bg-sage-500/20 px-2 py-1 rounded-full">
                         ✓ Complete!
                       </span>
@@ -431,17 +437,24 @@ export default function ProfilePage() {
                     <motion.div 
                       className="h-full rounded-full"
                       initial={{ width: 0 }}
-                      animate={{ width: `${goalStatus.percentage}%` }}
+                      animate={{ 
+                        width: `${Math.min(100, (goalStatus.progress / (learningPrefs.dailyGoalVerses || goalStatus.target)) * 100)}%` 
+                      }}
                       style={{
-                        background: goalStatus.goalMet 
+                        background: goalStatus.progress >= (learningPrefs.dailyGoalVerses || goalStatus.target)
                           ? 'linear-gradient(90deg, #86a971 0%, #5a7f4c 100%)'
                           : 'linear-gradient(90deg, #c9a227 0%, #f4d47c 100%)',
                       }}
                     />
                   </div>
-                  {!goalStatus.goalMet && goalStatus.progress > 0 && (
+                  {goalStatus.progress < (learningPrefs.dailyGoalVerses || goalStatus.target) && goalStatus.progress > 0 && (
                     <p className="text-xs text-night-500 mt-2">
-                      {goalStatus.target - goalStatus.progress} {goalStatus.type === 'minutes' ? 'minutes' : 'verses'} to go!
+                      {(learningPrefs.dailyGoalVerses || goalStatus.target) - goalStatus.progress} verses to go!
+                    </p>
+                  )}
+                  {goalStatus.progress === 0 && (
+                    <p className="text-xs text-night-500 mt-2">
+                      Start memorizing to build your streak!
                     </p>
                   )}
                 </div>
