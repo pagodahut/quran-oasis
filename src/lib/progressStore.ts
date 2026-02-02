@@ -5,8 +5,8 @@
 
 import { VerseProgress, MemorizationStatus, StudyCategory, calculateNextReview, initializeVerse, QualityRating } from './memorizationSystem';
 import { 
-  updateStreak, 
-  updateDailyProgress, 
+  updateStreak as updateMotivationStreak, 
+  updateDailyProgress as updateMotivationDailyProgress, 
   triggerCelebration,
   checkAndUnlockAchievements,
   getSurahProgressList as getMotivationSurahProgress,
@@ -242,6 +242,74 @@ export function markVerseMemorized(surah: number, ayah: number): VerseProgress {
   progress.level = Math.floor(progress.totalXP / 100) + 1;
   
   saveProgress(progress);
+  
+  // === MOTIVATION SYSTEM INTEGRATION ===
+  // Update streak in motivation store
+  const streakResult = updateMotivationStreak();
+  
+  // Update daily progress (1 verse)
+  const goalResult = updateMotivationDailyProgress(1);
+  
+  // Count total memorized verses
+  const totalMemorized = Object.values(progress.verses).filter(
+    v => v.status === 'memorized' || v.status === 'reviewing' || v.status === 'learning'
+  ).length;
+  
+  // Check for surah completion
+  const surahMeta = SURAH_METADATA.find(s => s.number === surah);
+  if (surahMeta) {
+    const surahVerses = Object.entries(progress.verses)
+      .filter(([k]) => k.startsWith(`${surah}:`))
+      .map(([, v]) => v);
+    
+    const memorizedInSurah = surahVerses.filter(
+      v => v.status === 'memorized' || v.status === 'reviewing' || v.status === 'learning'
+    ).length;
+    
+    // Surah complete!
+    if (memorizedInSurah === surahMeta.numberOfAyahs) {
+      triggerCelebration({
+        type: 'surah_complete',
+        surahNumber: surah,
+        surahName: surahMeta.englishName,
+      });
+    }
+  }
+  
+  // Check for achievements
+  const completedSurahs = SURAH_METADATA
+    .filter(sm => {
+      const verses = Object.entries(progress.verses)
+        .filter(([k]) => k.startsWith(`${sm.number}:`))
+        .map(([, v]) => v);
+      const memorized = verses.filter(
+        v => v.status === 'memorized' || v.status === 'reviewing' || v.status === 'learning'
+      ).length;
+      return memorized === sm.numberOfAyahs;
+    })
+    .map(sm => sm.number);
+  
+  const juzProgress = getJuzProgress();
+  const completedJuz = juzProgress.filter(j => j.status === 'complete').map(j => j.juzNumber);
+  
+  checkAndUnlockAchievements(totalMemorized, completedSurahs, completedJuz);
+  
+  // Trigger verse memorized celebration
+  triggerCelebration({ type: 'verse_memorized', verseCount: 1 });
+  
+  // Check streak milestone
+  if (streakResult.newMilestone) {
+    setTimeout(() => {
+      triggerCelebration({ type: 'streak_milestone', days: streakResult.newMilestone! });
+    }, 1500);
+  }
+  
+  // Check daily goal met
+  if (goalResult.goalMet) {
+    setTimeout(() => {
+      triggerCelebration({ type: 'daily_goal_met' });
+    }, streakResult.newMilestone ? 5000 : 1500);
+  }
   
   return verse;
 }

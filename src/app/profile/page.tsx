@@ -2,6 +2,7 @@
 
 import { useUser, SignOutButton, useClerk } from '@clerk/nextjs';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { 

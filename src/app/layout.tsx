@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import { SyncProvider, SyncIndicator } from '@/components/SyncProvider';
+import { fontVariables } from '@/lib/fonts';
 import './globals.css';
 
 // Check if Clerk is configured
@@ -78,7 +79,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const content = (
-    <html lang="en" dir="ltr" className="dark" data-scroll-behavior="smooth">
+    <html lang="en" dir="ltr" className={`dark ${fontVariables}`} data-scroll-behavior="smooth">
       <head>
         {/* Favicon */}
         <link rel="icon" href="/favicon.ico" sizes="any" />

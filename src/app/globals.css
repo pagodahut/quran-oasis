@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=DM+Serif+Display&family=Cormorant+Garamond:wght@400;500;600;700&family=Pinyon+Script&family=DM+Sans:wght@400;500;600;700&display=swap');
+/* Fonts loaded via Next.js font optimization in src/lib/fonts.ts */
 
 @tailwind base;
 @tailwind components;

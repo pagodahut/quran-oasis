@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -17,11 +17,15 @@ import {
   Brain,
   Heart,
   Star,
-  Loader2
+  Loader2,
+  MapPin,
+  RefreshCw,
+  Music,
+  Search
 } from 'lucide-react';
 import { RECITERS, getAudioUrl } from '@/lib/quranData';
 
-type Step = 'arabic' | 'memorization' | 'goal' | 'time' | 'reciter' | 'complete';
+type Step = 'arabic' | 'memorization' | 'goal' | 'time' | 'starting' | 'reciter' | 'complete';
 
 const ARABIC_LEVELS = [
   { value: 'none' as const, label: "I can't read Arabic yet", desc: "Starting from scratch", icon: <BookOpen className="w-5 h-5" /> },
@@ -54,12 +58,69 @@ const TIME_OPTIONS = [
   { value: 60, label: "60+ minutes", desc: "Intensive learning" },
 ];
 
+// Starting point options based on goal
+const STARTING_POINTS = {
+  full_hifz: {
+    title: "Where would you like to start?",
+    subtitle: "Most students begin from Al-Fatiha and progress forward",
+    options: [
+      { value: 'fatiha', label: "Al-Fatiha (Chapter 1)", desc: "The traditional starting point", icon: <BookOpen className="w-5 h-5" />, surah: 1 },
+      { value: 'juz_amma', label: "Juz Amma (Short Surahs)", desc: "Start with the 30th Juz", icon: <Star className="w-5 h-5" />, surah: 114 },
+      { value: 'baqarah', label: "Al-Baqarah (Chapter 2)", desc: "The longest surah, great rewards", icon: <GraduationCap className="w-5 h-5" />, surah: 2 },
+    ]
+  },
+  juz_amma: {
+    title: "Ready to start Juz Amma!",
+    subtitle: "We recommend starting from the shortest surahs",
+    options: [
+      { value: 'nas', label: "An-Nas (Chapter 114)", desc: "The shortest, easiest start", icon: <Heart className="w-5 h-5" />, surah: 114 },
+      { value: 'ikhlas', label: "Al-Ikhlas (Chapter 112)", desc: "Equal to 1/3 of the Quran", icon: <Sparkles className="w-5 h-5" />, surah: 112 },
+      { value: 'fatiha', label: "Al-Fatiha first", desc: "Master the Opening first", icon: <BookOpen className="w-5 h-5" />, surah: 1 },
+    ]
+  },
+  selected_surahs: {
+    title: "Which surahs interest you?",
+    subtitle: "Pick a starting point for your journey",
+    options: [
+      { value: 'mulk', label: "Al-Mulk (Chapter 67)", desc: "Protection from the grave", icon: <Target className="w-5 h-5" />, surah: 67 },
+      { value: 'yasin', label: "Ya-Sin (Chapter 36)", desc: "Heart of the Quran", icon: <Heart className="w-5 h-5" />, surah: 36 },
+      { value: 'kahf', label: "Al-Kahf (Chapter 18)", desc: "Friday surah, light & guidance", icon: <Star className="w-5 h-5" />, surah: 18 },
+      { value: 'rahman', label: "Ar-Rahman (Chapter 55)", desc: "The Most Merciful", icon: <Sparkles className="w-5 h-5" />, surah: 55 },
+    ]
+  },
+  daily_connection: {
+    title: "Let's find your starting point",
+    subtitle: "Build a daily habit with achievable goals",
+    options: [
+      { value: 'fatiha', label: "Al-Fatiha", desc: "Perfect for daily recitation", icon: <BookOpen className="w-5 h-5" />, surah: 1 },
+      { value: 'short_surahs', label: "Short Prayer Surahs", desc: "An-Nas, Al-Falaq, Al-Ikhlas", icon: <Star className="w-5 h-5" />, surah: 114 },
+      { value: 'ayat_kursi', label: "Ayat Al-Kursi", desc: "The Throne Verse (2:255)", icon: <Sparkles className="w-5 h-5" />, surah: 2 },
+    ]
+  },
+};
+
+// Surah list for "Continue" flow (when user has prior memorization)
+const POPULAR_SURAHS = [
+  { number: 2, name: "Al-Baqarah", arabic: "البقرة" },
+  { number: 3, name: "Ali 'Imran", arabic: "آل عمران" },
+  { number: 18, name: "Al-Kahf", arabic: "الكهف" },
+  { number: 19, name: "Maryam", arabic: "مريم" },
+  { number: 36, name: "Ya-Sin", arabic: "يس" },
+  { number: 55, name: "Ar-Rahman", arabic: "الرحمن" },
+  { number: 56, name: "Al-Waqi'ah", arabic: "الواقعة" },
+  { number: 67, name: "Al-Mulk", arabic: "الملك" },
+  { number: 78, name: "An-Naba", arabic: "النبأ" },
+];
+
 interface OnboardingData {
   arabicLevel: 'none' | 'letters' | 'basic' | 'intermediate' | 'fluent';
   priorMemorization: 'none' | 'juz_amma' | 'multiple_juz' | 'significant';
   goal: 'full_hifz' | 'juz_amma' | 'selected_surahs' | 'daily_connection';
   dailyTimeMinutes: number;
   preferredReciter: string;
+  startingPoint: string;
+  startingSurah: number;
+  continueSurah?: number; // For users continuing previous hifz
 }
 
 interface StudyPlanRecommendation {
