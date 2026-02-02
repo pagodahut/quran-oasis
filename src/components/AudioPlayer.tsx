@@ -338,11 +338,14 @@ export function AudioPlayer({
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowVolumeSlider(!showVolumeSlider)}
                 className="liquid-icon-btn"
+                aria-label={volume === 0 ? 'Volume muted. Click to adjust.' : `Volume ${Math.round(volume * 100)}%. Click to adjust.`}
+                aria-expanded={showVolumeSlider}
+                aria-controls="volume-slider"
               >
                 {volume === 0 ? (
-                  <VolumeX className="w-4 h-4" />
+                  <VolumeX className="w-4 h-4" aria-hidden="true" />
                 ) : (
-                  <Volume2 className="w-4 h-4" />
+                  <Volume2 className="w-4 h-4" aria-hidden="true" />
                 )}
               </motion.button>
 
@@ -350,10 +353,13 @@ export function AudioPlayer({
               <AnimatePresence>
                 {showVolumeSlider && (
                   <motion.div
+                    id="volume-slider"
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     className="absolute bottom-full right-0 mb-2 p-3 liquid-glass-strong rounded-xl"
+                    role="group"
+                    aria-label="Volume control"
                   >
                     <input
                       type="range"
@@ -366,6 +372,11 @@ export function AudioPlayer({
                       style={{
                         background: `linear-gradient(to right, rgba(201,162,39,0.8) 0%, rgba(201,162,39,0.8) ${volume * 100}%, rgba(255,255,255,0.1) ${volume * 100}%, rgba(255,255,255,0.1) 100%)`,
                       }}
+                      aria-label="Volume"
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-valuenow={Math.round(volume * 100)}
+                      aria-valuetext={`${Math.round(volume * 100)}%`}
                     />
                   </motion.div>
                 )}
@@ -437,6 +448,8 @@ export function PlayButton({
         style={{
           boxShadow: isPlaying ? '0 0 20px rgba(201,162,39,0.3)' : undefined,
         }}
+        aria-label={isPlaying ? 'Pause recitation' : 'Play recitation'}
+        aria-pressed={isPlaying}
       >
         <AnimatePresence mode="wait">
           {isPlaying ? (
@@ -446,7 +459,7 @@ export function PlayButton({
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.5, opacity: 0 }}
             >
-              <Pause className={`${iconSizes[size]} text-gold-400`} />
+              <Pause className={`${iconSizes[size]} text-gold-400`} aria-hidden="true" />
             </motion.div>
           ) : (
             <motion.div
@@ -455,7 +468,7 @@ export function PlayButton({
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.5, opacity: 0 }}
             >
-              <Play className={`${iconSizes[size]} text-gold-400 ml-0.5`} />
+              <Play className={`${iconSizes[size]} text-gold-400 ml-0.5`} aria-hidden="true" />
             </motion.div>
           )}
         </AnimatePresence>

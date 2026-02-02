@@ -607,7 +607,7 @@ export default function HomePage() {
               <div className="flex items-center justify-center mb-4">
                 <GeometricDivider className="text-gold-500" />
               </div>
-              <h2 className="font-display text-3xl md:text-5xl text-night-100 mb-4 heading-illuminated">
+              <h2 id="features" className="font-display text-3xl md:text-5xl text-night-100 mb-4 heading-illuminated">
                 The Path to Memorization
               </h2>
               <p className="text-night-400 max-w-xl mx-auto text-lg">
