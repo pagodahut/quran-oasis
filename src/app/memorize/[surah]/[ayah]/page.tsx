@@ -351,6 +351,9 @@ export default function MemorizePage() {
   const params = useParams();
   const router = useRouter();
   
+  // Get preferences
+  const prefs = useReadingPreferences();
+  
   const surahNum = parseInt(params.surah as string);
   const ayahNum = parseInt(params.ayah as string);
   
@@ -368,10 +371,9 @@ export default function MemorizePage() {
   
   // UI state
   const [showCelebration, setShowCelebration] = useState(false);
-  const [settings, setSettings] = useState({ preferredReciter: 'alafasy' });
   
-  // Audio
-  const audioUrl = getAudioUrl(surahNum, ayahNum, settings.preferredReciter);
+  // Audio - use reciter from preferences
+  const audioUrl = getAudioUrl(surahNum, ayahNum, prefs.reciter);
   const { isPlaying, isLoading, progress, play, pause, toggle, reset } = useAudio(audioUrl);
   
   const autoPlayRef = useRef(false);
@@ -398,10 +400,6 @@ export default function MemorizePage() {
         startMemorizingVerse(surahNum, ayahNum);
       }
     }
-    
-    // Load settings
-    const userSettings = getSettings();
-    setSettings(userSettings);
   }, [surahNum, ayahNum]);
 
   // Handle audio repeat for listen phase
