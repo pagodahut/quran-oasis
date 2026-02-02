@@ -29,10 +29,10 @@ import {
   startMemorizingVerse, 
   markVerseMemorized, 
   completeVerseSession,
-  getSettings,
   getProgress,
   saveProgress,
 } from '@/lib/progressStore';
+import { useReadingPreferences } from '@/hooks/useAppliedPreferences';
 
 // ============ PHASE TYPES ============
 

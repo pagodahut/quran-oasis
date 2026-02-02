@@ -12,6 +12,7 @@ import {
   type WordData,
 } from '@/lib/wordTimingService';
 import { getAudioUrl } from '@/lib/quranData';
+import { useAudioPreferences, useDisplayPreferences } from '@/lib/preferencesStore';
 
 interface WordByWordProps {
   surah: number;
@@ -29,13 +30,20 @@ export default function WordByWord({
   surah,
   ayah,
   arabicText,
-  reciterId = 'alafasy',
+  reciterId,
   isPlaying,
   audioRef,
-  fontSize = 28,
+  fontSize,
   showWordTranslation = false,
   onWordTap,
 }: WordByWordProps) {
+  // Use preferences
+  const { audio: audioPrefs } = useAudioPreferences();
+  const { display: displayPrefs } = useDisplayPreferences();
+  
+  // Use prop values if provided, otherwise use preferences
+  const effectiveReciterId = reciterId || audioPrefs.reciter;
+  const effectiveFontSize = fontSize || displayPrefs.arabicFontSizePx;
   const [wordTiming, setWordTiming] = useState<AyahWordTiming | null>(null);
   const [currentWordIndex, setCurrentWordIndex] = useState(-1);
   const [playingWordIndex, setPlayingWordIndex] = useState(-1);
@@ -165,7 +173,7 @@ export default function WordByWord({
     return (
       <p 
         className="quran-text text-night-100"
-        style={{ fontSize, direction: 'rtl' }}
+        style={{ fontSize: effectiveFontSize, direction: 'rtl' }}
       >
         {arabicText}
       </p>
@@ -198,7 +206,7 @@ export default function WordByWord({
               }`}
               style={{
                 fontFamily: 'var(--font-quran)',
-                fontSize,
+                fontSize: effectiveFontSize,
               }}
               animate={{
                 scale: isCurrentWord ? 1.08 : isPlayingWord ? 1.05 : 1,
