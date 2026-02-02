@@ -3,6 +3,8 @@
  * Stores pending updates in IndexedDB when offline, syncs when back online
  */
 
+import logger from '@/lib/logger';
+
 const DB_NAME = 'hifz-offline';
 const DB_VERSION = 1;
 const STORE_NAME = 'sync-queue';
@@ -206,7 +208,7 @@ export async function registerBackgroundSync(): Promise<boolean> {
   try {
     const registration = await navigator.serviceWorker.ready;
     await (registration as any).sync.register('sync-progress');
-    console.log('[OfflineSync] Background sync registered');
+    logger.debug('[OfflineSync] Background sync registered');
     return true;
   } catch (error) {
     console.error('[OfflineSync] Background sync registration failed:', error);
@@ -242,9 +244,9 @@ export async function queueBookmarkUpdate(bookmark: any): Promise<void> {
 // Listen for online event and process queue
 if (typeof window !== 'undefined') {
   window.addEventListener('online', () => {
-    console.log('[OfflineSync] Back online, processing queue...');
+    logger.debug('[OfflineSync] Back online, processing queue...');
     processSyncQueue().then(({ synced, failed }) => {
-      console.log(`[OfflineSync] Processed: ${synced} synced, ${failed} failed`);
+      logger.debug(`[OfflineSync] Processed: ${synced} synced, ${failed} failed`);
     });
   });
 }

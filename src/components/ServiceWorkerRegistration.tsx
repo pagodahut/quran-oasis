@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { RefreshCw, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import logger from '@/lib/logger';
 
 export default function ServiceWorkerRegistration() {
   const [updateAvailable, setUpdateAvailable] = useState(false);
@@ -20,7 +21,7 @@ export default function ServiceWorkerRegistration() {
           scope: '/',
         });
         
-        console.log('[App] Service Worker registered:', reg.scope);
+        logger.debug('[App] Service Worker registered:', reg.scope);
         setRegistration(reg);
 
         // Check for updates on registration
@@ -31,7 +32,7 @@ export default function ServiceWorkerRegistration() {
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
               // New update available
-              console.log('[App] New Service Worker available');
+              logger.debug('[App] New Service Worker available');
               setUpdateAvailable(true);
             }
           });
