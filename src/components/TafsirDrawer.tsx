@@ -39,6 +39,39 @@ export default function TafsirDrawer({ isOpen, onClose, surahNumber, ayahNumber 
   const [selectedTafsir, setSelectedTafsir] = useState(169); // Default to Ibn Kathir
   const [reflectionPrompts] = useState(() => getReflectionPrompts(surahNumber, ayahNumber));
   
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  
+  // Handle escape key to close drawer
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape' && isOpen) {
+      onClose();
+    }
+  }, [isOpen, onClose]);
+  
+  // Focus management and escape key
+  useEffect(() => {
+    if (isOpen) {
+      // Add escape key listener
+      document.addEventListener('keydown', handleKeyDown);
+      
+      // Focus the close button when drawer opens
+      setTimeout(() => {
+        closeButtonRef.current?.focus();
+      }, 100);
+      
+      // Prevent body scroll
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, handleKeyDown]);
+  
   useEffect(() => {
     if (isOpen) {
       setLoading(true);
@@ -86,6 +119,7 @@ export default function TafsirDrawer({ isOpen, onClose, surahNumber, ayahNumber 
           
           {/* Drawer - Liquid Glass Modal */}
           <motion.div
+            ref={drawerRef}
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -99,6 +133,9 @@ export default function TafsirDrawer({ isOpen, onClose, surahNumber, ayahNumber 
               boxShadow: '-24px 0 80px rgba(0, 0, 0, 0.5)',
             }}
             onClick={e => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="tafsir-drawer-title"
           >
             {/* Top Glow Effect */}
             <div 
