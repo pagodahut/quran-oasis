@@ -246,6 +246,68 @@ Press play to begin!`
         }
       },
       {
+        id: "adv1-quiz2",
+        type: "exercise",
+        title: "Qalqalah Intensity",
+        content: "Compare small vs large:",
+        exercise: {
+          type: "word_match",
+          question: "Why is qalqalah at the end of a word (when stopping) MORE pronounced than in the middle?",
+          options: [
+            "The rules are different",
+            "Air pressure builds up with nowhere to go, creating stronger release",
+            "It's just a stylistic choice",
+            "There's no difference"
+          ],
+          correctAnswer: 1,
+          explanation: "At the end (when stopping), there's no following letter to flow into. The air pressure builds up and releases with a stronger bounce. In the middle, the sound continues to the next letter."
+        }
+      },
+      {
+        id: "adv1-quiz3",
+        type: "exercise",
+        title: "Common Error Detection",
+        content: "Spot the mistake:",
+        exercise: {
+          type: "comprehension",
+          question: "A reciter says 'أَحَدَ' (ahad-a) with a full vowel at the end instead of 'أَحَدْ' with an echo. What's wrong?",
+          options: [
+            "Nothing - that's correct",
+            "They added a vowel instead of making the echo/bounce",
+            "They should merge into the next word",
+            "Qalqalah doesn't apply here"
+          ],
+          correctAnswer: 1,
+          explanation: "Adding a full vowel 'a' is incorrect! Qalqalah is a slight ECHO/BOUNCE, not an added vowel. 'Ahad-d' with a brief bounce, NOT 'ahad-a' with a vowel."
+        }
+      },
+      {
+        id: "adv1-quiz4",
+        type: "exercise",
+        title: "Surah Al-Masad Practice",
+        content: "Find all qalqalah letters:",
+        exercise: {
+          type: "word_match",
+          question: "In 'تَبَّتْ يَدَا أَبِي لَهَبٍ وَتَبَّ', how many qalqalah letters are there?",
+          options: ["1 (just one ب)", "2 (two ب letters)", "3 (counting the shaddah ب twice)", "4 or more"],
+          correctAnswer: 1,
+          explanation: "There are 2 qalqalah occurrences: تَبَّ (the ب with shaddah at the end - Large when stopping) and أَبِي (the ب in the middle - Small). Note: لَهَبٍ also ends with ب when we stop!"
+        }
+      },
+      {
+        id: "adv1-timed-challenge",
+        type: "exercise",
+        title: "⏱️ Rapid Qalqalah Identification",
+        content: "Quick! 15 seconds!",
+        exercise: {
+          type: "word_match",
+          question: "Does the word 'الْحَقّ' have qalqalah when stopping?",
+          options: ["Yes - ق is a qalqalah letter", "No - shaddah cancels qalqalah", "Only small qalqalah", "Qaf isn't a qalqalah letter"],
+          correctAnswer: 0,
+          explanation: "Yes! Qaf (ق) is a qalqalah letter, and when stopping on الْحَقّ, there's Large Qalqalah on the Qaf despite the shaddah. The bounce still occurs!"
+        }
+      },
+      {
         id: "adv1-review",
         type: "instruction",
         title: "Lesson Complete! 🌟",
