@@ -23,7 +23,9 @@ import {
   ChevronRight,
   Layers,
   BookOpen,
+  Grid3X3,
 } from 'lucide-react';
+import WordByWordInline from '@/components/WordByWordInline';
 import { getSurah, getAudioUrl, RECITERS, cleanAyahText, type Ayah } from '@/lib/quranData';
 import { 
   startMemorizingVerse, 
@@ -165,12 +167,18 @@ function VerseDisplay({
   showText = true,
   highlight = false,
   size = 'large',
+  wordByWord = false,
+  isPlaying = false,
+  currentTime,
 }: { 
   verse: Ayah;
   surahNumber: number;
   showText?: boolean;
   highlight?: boolean;
   size?: 'small' | 'medium' | 'large';
+  wordByWord?: boolean;
+  isPlaying?: boolean;
+  currentTime?: number;
 }) {
   // Clean the verse text to remove Bismillah prefix (for audio sync)
   const displayText = cleanAyahText(verse.text.arabic, surahNumber, verse.numberInSurah);
@@ -199,18 +207,35 @@ function VerseDisplay({
 
       <AnimatePresence mode="wait">
         {showText ? (
-          <motion.p
-            key="visible"
-            initial={{ opacity: 0, filter: 'blur(10px)' }}
-            animate={{ opacity: 1, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, filter: 'blur(10px)' }}
-            className={`font-quran ${sizeClasses[size]} leading-loose text-center ${
-              highlight ? 'text-gold-300' : 'text-night-100'
-            }`}
-            style={{ direction: 'rtl' }}
-          >
-            {displayText}
-          </motion.p>
+          wordByWord ? (
+            <motion.div
+              key="word-by-word"
+              initial={{ opacity: 0, filter: 'blur(10px)' }}
+              animate={{ opacity: 1, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, filter: 'blur(10px)' }}
+            >
+              <WordByWordInline
+                surah={surahNumber}
+                ayah={verse.numberInSurah}
+                isPlaying={isPlaying}
+                currentTime={currentTime}
+                showTransliteration={true}
+              />
+            </motion.div>
+          ) : (
+            <motion.p
+              key="visible"
+              initial={{ opacity: 0, filter: 'blur(10px)' }}
+              animate={{ opacity: 1, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, filter: 'blur(10px)' }}
+              className={`font-quran ${sizeClasses[size]} leading-loose text-center ${
+                highlight ? 'text-gold-300' : 'text-night-100'
+              }`}
+              style={{ direction: 'rtl' }}
+            >
+              {displayText}
+            </motion.p>
+          )
         ) : (
           <motion.div
             key="hidden"
@@ -375,6 +400,7 @@ export default function MemorizePage() {
   
   // UI state
   const [showCelebration, setShowCelebration] = useState(false);
+  const [wordByWordMode, setWordByWordMode] = useState(false);
   
   // Audio - use reciter from preferences
   const audioUrl = getAudioUrl(surahNum, ayahNum, prefs.reciter);
@@ -528,6 +554,19 @@ export default function MemorizePage() {
             </div>
           </div>
           
+          {/* Word-by-Word Toggle */}
+          <button
+            onClick={() => setWordByWordMode(!wordByWordMode)}
+            className={`p-2 rounded-xl transition-colors mr-2 ${
+              wordByWordMode 
+                ? 'bg-gold-500/20 text-gold-400' 
+                : 'hover:bg-night-800 text-night-400'
+            }`}
+            title={wordByWordMode ? 'Switch to full verse' : 'Word-by-word view'}
+          >
+            <Grid3X3 className="w-5 h-5" />
+          </button>
+          
           <span className="text-sm text-night-400 font-medium">
             {currentPhaseIndex + 1}/{PHASES.length}
           </span>
@@ -567,7 +606,7 @@ export default function MemorizePage() {
                 </p>
               </div>
 
-              <VerseDisplay verse={verse} surahNumber={surahNum} size="large" highlight />
+              <VerseDisplay verse={verse} surahNumber={surahNum} size="large" highlight wordByWord={wordByWordMode} />
 
               {/* Translation */}
               <div className="bg-night-900/50 rounded-2xl p-6 border border-night-800">
@@ -614,7 +653,7 @@ export default function MemorizePage() {
                 </p>
               </div>
 
-              <VerseDisplay verse={verse} surahNumber={surahNum} size="large" highlight={isPlaying} />
+              <VerseDisplay verse={verse} surahNumber={surahNum} size="large" highlight={isPlaying} wordByWord={wordByWordMode} isPlaying={isPlaying} />
 
               <AudioControls
                 isPlaying={isPlaying}
@@ -658,7 +697,7 @@ export default function MemorizePage() {
                 </p>
               </div>
 
-              <VerseDisplay verse={verse} surahNumber={surahNum} size="large" highlight={isPlaying} />
+              <VerseDisplay verse={verse} surahNumber={surahNum} size="large" highlight={isPlaying} wordByWord={wordByWordMode} isPlaying={isPlaying} />
 
               <AudioControls
                 isPlaying={isPlaying}
@@ -694,7 +733,7 @@ export default function MemorizePage() {
                 </p>
               </div>
 
-              <VerseDisplay verse={verse} surahNumber={surahNum} size="large" />
+              <VerseDisplay verse={verse} surahNumber={surahNum} size="large" wordByWord={wordByWordMode} />
 
               <RepetitionCounter 
                 current={repetitions} 
