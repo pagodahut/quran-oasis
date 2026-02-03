@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ChevronLeft, 
@@ -444,85 +445,43 @@ function PathSection({
 
 // ============================================
 // Branded Path Icons - Matching the HIFZ Logo System
-// Beginner: Moon + Open Book (1 chevron)
-// Intermediate: Moon + Book with 2 chevrons  
-// Advanced: Moon + Book with 3 chevrons
+// Beginner: Crescent Moon only
+// Intermediate: Moon + 1 book chevron
+// Advanced: Moon + 2 book chevrons (full logo)
 // ============================================
 function BeginnerIcon() {
   return (
-    <svg viewBox="0 0 32 32" className="w-7 h-7" fill="none">
-      {/* Crescent Moon - top left */}
-      <path 
-        d="M12 3C8 3 5 6 5 10s3 7 7 7c-4 0-7-3-7-7s3-7 7-7z" 
-        fill="#0a0a0f"
-      />
-      {/* Open book - single V shape */}
-      <path 
-        d="M16 14 C12 16, 6 18, 2 21 L16 28 L30 21 C26 18, 20 16, 16 14 Z" 
-        fill="#0a0a0f"
-      />
-    </svg>
+    <Image
+      src="/icons/level-beginner.png"
+      alt="Beginner"
+      width={28}
+      height={28}
+      className="object-contain"
+    />
   );
 }
 
 function IntermediateIcon() {
   return (
-    <svg viewBox="0 0 32 32" className="w-7 h-7" fill="none">
-      {/* Crescent Moon - top left */}
-      <path 
-        d="M12 2C8 2 5 5 5 9s3 7 7 7c-4 0-7-3-7-7s3-7 7-7z" 
-        fill="#0a0a0f"
-      />
-      {/* Open book - V shape */}
-      <path 
-        d="M16 11 C12 13, 6 15, 2 17 L16 23 L30 17 C26 15, 20 13, 16 11 Z" 
-        fill="#0a0a0f"
-      />
-      {/* Second chevron */}
-      <path 
-        d="M2 22 L16 28 L30 22" 
-        fill="#0a0a0f"
-        stroke="#0a0a0f"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+    <Image
+      src="/icons/level-intermediate.png"
+      alt="Intermediate"
+      width={28}
+      height={28}
+      className="object-contain"
+    />
   );
 }
 
 function AdvancedIcon() {
   return (
-    <svg viewBox="0 0 32 32" className="w-7 h-7" fill="none">
-      {/* Crescent Moon - top left */}
-      <path 
-        d="M12 1C8 1 5 4 5 8s3 7 7 7c-4 0-7-3-7-7s3-7 7-7z" 
-        fill="#0a0a0f"
-      />
-      {/* Open book - V shape */}
-      <path 
-        d="M16 9 C12 11, 6 13, 2 15 L16 20 L30 15 C26 13, 20 11, 16 9 Z" 
-        fill="#0a0a0f"
-      />
-      {/* Second chevron */}
-      <path 
-        d="M2 19 L16 24 L30 19" 
-        fill="#0a0a0f"
-        stroke="#0a0a0f"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      {/* Third chevron */}
-      <path 
-        d="M2 24 L16 29 L30 24" 
-        fill="#0a0a0f"
-        stroke="#0a0a0f"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+    <Image
+      src="/icons/level-advanced.png"
+      alt="Advanced"
+      width={28}
+      height={28}
+      className="object-contain"
+    />
   );
 }
 
