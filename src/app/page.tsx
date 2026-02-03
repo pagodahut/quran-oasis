@@ -97,6 +97,85 @@ function GeometricDivider({ className = "" }: { className?: string }) {
   );
 }
 
+// Scroll-animated golden star with circle forming around it
+function ScrollAnimatedStar() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  });
+  
+  // Circle draws as you scroll (0 to 1)
+  const circleProgress = useTransform(scrollYProgress, [0.2, 0.6], [0, 1]);
+  // Star grows slightly
+  const starScale = useTransform(scrollYProgress, [0.2, 0.6], [1, 1.15]);
+  const starGlow = useTransform(scrollYProgress, [0.2, 0.6], [0.3, 0.8]);
+  
+  return (
+    <motion.div 
+      ref={ref}
+      className="flex items-center justify-center my-8"
+    >
+      <div className="relative w-24 h-24">
+        {/* Animated circle forming around star */}
+        <svg 
+          viewBox="0 0 100 100" 
+          className="absolute inset-0 w-full h-full"
+        >
+          <motion.circle
+            cx="50"
+            cy="50"
+            r="45"
+            fill="none"
+            stroke="url(#goldGradient)"
+            strokeWidth="2"
+            strokeLinecap="round"
+            style={{
+              pathLength: circleProgress,
+              rotate: -90,
+            }}
+            strokeDasharray="1"
+            strokeDashoffset="0"
+          />
+          <defs>
+            <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#f4d47c" />
+              <stop offset="100%" stopColor="#c9a227" />
+            </linearGradient>
+          </defs>
+        </svg>
+        
+        {/* Growing golden star */}
+        <motion.div 
+          className="absolute inset-0 flex items-center justify-center"
+          style={{ scale: starScale }}
+        >
+          <motion.div
+            className="absolute inset-0 rounded-full blur-xl"
+            style={{ 
+              opacity: starGlow,
+              background: 'radial-gradient(circle, rgba(201, 162, 39, 0.4) 0%, transparent 70%)'
+            }}
+          />
+          <svg 
+            viewBox="0 0 24 24" 
+            width={40} 
+            height={40}
+            className="text-gold-500 relative z-10"
+          >
+            {/* 8-pointed star */}
+            <path 
+              d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z" 
+              fill="currentColor"
+            />
+            <circle cx="12" cy="12" r="3" fill="#0a0a0f" opacity="0.6" />
+          </svg>
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+}
+
 // Subtle floating geometric particles - minimal, elegant
 // Uses seeded positions to avoid hydration mismatch
 function FloatingParticles() {
@@ -298,7 +377,7 @@ function ProgressIcon({ className = "" }: { className?: string }) {
   );
 }
 
-// Feature card with custom icon
+// Feature card with custom icon - CENTERED layout
 function FeatureCard({ 
   iconComponent: IconComponent,
   title, 
@@ -315,10 +394,10 @@ function FeatureCard({
       variants={scaleIn}
       whileHover={{ y: -6, scale: 1.01 }}
       transition={{ type: "spring", stiffness: 300 }}
-      className="liquid-card-interactive p-6 group"
+      className="liquid-card-interactive p-6 group text-center"
     >
-      {/* Golden Arabic calligraphy icon with subtle glow */}
-      <div className="relative w-20 h-20 rounded-2xl bg-night-900/60 border border-gold-500/30 flex items-center justify-center mb-5 group-hover:border-gold-500/50 transition-colors">
+      {/* Golden Arabic calligraphy icon with subtle glow - CENTERED */}
+      <div className="relative w-20 h-20 rounded-2xl bg-night-900/60 border border-gold-500/30 flex items-center justify-center mb-5 group-hover:border-gold-500/50 transition-colors mx-auto">
         <IconComponent className="" />
         {/* Golden glow on hover */}
         <div className="absolute inset-0 rounded-2xl bg-gold-500/20 blur-xl opacity-0 group-hover:opacity-60 transition-opacity" />
@@ -576,7 +655,7 @@ export default function HomePage() {
           
         </section>
 
-        {/* Features Section */}
+        {/* Features Section - Islamic Manuscript Box */}
         <section className="px-6 py-24 relative">
           <motion.div
             initial="hidden"
@@ -585,37 +664,53 @@ export default function HomePage() {
             variants={staggerContainer}
             className="max-w-6xl mx-auto"
           >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <div className="flex items-center justify-center mb-4">
-                <GeometricDivider className="text-gold-500" />
-              </div>
-              <h2 id="features" className="font-display text-3xl md:text-5xl text-night-100 mb-4 heading-illuminated">
-                The Path to Memorization
-              </h2>
-              <p className="text-night-400 max-w-xl mx-auto text-lg">
-                Everything you need for a successful <span className="text-gold-400 font-semibold">HIFZ</span> journey
-              </p>
-            </motion.div>
+            {/* Islamic Manuscript-style Container */}
+            <div 
+              className="relative p-8 md:p-12 rounded-3xl"
+              style={{
+                background: 'linear-gradient(135deg, rgba(139, 105, 20, 0.08) 0%, rgba(201, 162, 39, 0.04) 50%, rgba(139, 105, 20, 0.08) 100%)',
+                border: '2px solid rgba(201, 162, 39, 0.2)',
+                boxShadow: 'inset 0 0 60px rgba(139, 105, 20, 0.05), 0 8px 32px rgba(0, 0, 0, 0.2)',
+              }}
+            >
+              {/* Decorative corner ornaments */}
+              <div className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-gold-500/40 rounded-tl-lg" />
+              <div className="absolute top-3 right-3 w-8 h-8 border-t-2 border-r-2 border-gold-500/40 rounded-tr-lg" />
+              <div className="absolute bottom-3 left-3 w-8 h-8 border-b-2 border-l-2 border-gold-500/40 rounded-bl-lg" />
+              <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-gold-500/40 rounded-br-lg" />
+              
+              <motion.div variants={fadeInUp} className="text-center mb-12">
+                <div className="flex items-center justify-center mb-4">
+                  <GeometricDivider className="text-gold-500" />
+                </div>
+                <h2 id="features" className="font-display text-3xl md:text-5xl text-night-100 mb-4 heading-illuminated">
+                  The Path to Memorization
+                </h2>
+                <p className="text-night-400 max-w-xl mx-auto text-lg">
+                  Everything you need for a successful <span className="text-gold-400 font-semibold">HIFZ</span> journey
+                </p>
+              </motion.div>
 
-            <div className="grid md:grid-cols-3 gap-6">
-              <FeatureCard
-                iconComponent={PersonalizedIcon}
-                title="Personalized Learning"
-                description="AI creates a custom study plan based on your level, goals, and available time"
-                gradient="from-gold-500 to-amber-600"
-              />
-              <FeatureCard
-                iconComponent={SpacedRepIcon}
-                title="Spaced Repetition"
-                description="Science-backed review system ensures you never forget what you've memorized"
-                gradient="from-purple-500 to-pink-500"
-              />
-              <FeatureCard
-                iconComponent={ProgressIcon}
-                title="Track Progress"
-                description="Beautiful visualizations show your journey from first verse to full HIFZ"
-                gradient="from-sage-500 to-emerald-500"
-              />
+              <div className="grid md:grid-cols-3 gap-6">
+                <FeatureCard
+                  iconComponent={PersonalizedIcon}
+                  title="Personalized Learning"
+                  description="AI creates a custom study plan based on your level, goals, and available time"
+                  gradient="from-gold-500 to-amber-600"
+                />
+                <FeatureCard
+                  iconComponent={SpacedRepIcon}
+                  title="Spaced Repetition"
+                  description="Science-backed review system ensures you never forget what you've memorized"
+                  gradient="from-purple-500 to-pink-500"
+                />
+                <FeatureCard
+                  iconComponent={ProgressIcon}
+                  title="Track Progress"
+                  description="Beautiful visualizations show your journey from first verse to full HIFZ"
+                  gradient="from-sage-500 to-emerald-500"
+                />
+              </div>
             </div>
           </motion.div>
         </section>
@@ -632,7 +727,7 @@ export default function HomePage() {
             variants={staggerContainer}
             className="max-w-5xl mx-auto relative"
           >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
+            <motion.div variants={fadeInUp} className="text-center mb-8">
               <div className="flex items-center justify-center mb-4">
                 <GeometricDivider className="text-gold-500" />
               </div>
@@ -643,6 +738,9 @@ export default function HomePage() {
                 We combine centuries-old Tahfiz methodology with cutting-edge technology
               </p>
             </motion.div>
+            
+            {/* Scroll-animated star with circle forming around it */}
+            <ScrollAnimatedStar />
 
             <div className="grid md:grid-cols-2 gap-6">
               <MethodCard 
@@ -670,16 +768,16 @@ export default function HomePage() {
           </motion.div>
         </section>
 
-        {/* Quote Section */}
+        {/* Quote Section - Centered, scaled up, no quote symbol */}
         <section className="px-6 py-24">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="max-w-3xl mx-auto"
+            className="max-w-4xl mx-auto"
           >
-            <div className="liquid-glass-gold-premium rounded-3xl p-8 md:p-12 text-center relative overflow-hidden">
+            <div className="liquid-glass-gold-premium rounded-3xl p-10 md:p-16 flex flex-col items-center justify-center min-h-[280px] relative overflow-hidden">
               {/* Subtle corner accents */}
               <div className="absolute top-4 left-4">
                 <GeometricAccent size={8} className="text-gold-500/25" />
@@ -694,11 +792,11 @@ export default function HomePage() {
                 <GeometricAccent size={8} className="text-gold-500/25" />
               </div>
               
-              <Quote className="w-12 h-12 text-gold-500/40 mx-auto mb-6" />
-              <p className="text-xl md:text-2xl text-night-100 italic leading-relaxed mb-6 max-w-lg mx-auto">
-                "The best among you are those who<br className="hidden sm:inline" /> learn the Quran and teach it."
+              {/* No quote symbol - just the text, scaled up and centered */}
+              <p className="text-2xl md:text-4xl text-night-100 italic leading-relaxed mb-8 text-center max-w-2xl">
+                "The best among you are those who learn the Quran and teach it."
               </p>
-              <p className="text-gold-400 font-medium">— Prophet Muhammad ﷺ (Bukhari)</p>
+              <p className="text-gold-400 font-semibold text-lg">— Prophet Muhammad ﷺ (Bukhari)</p>
               
               {/* Subtle glow effects */}
               <div className="absolute top-0 right-0 w-48 h-48 bg-gold-500/5 rounded-full blur-3xl" />
@@ -721,7 +819,7 @@ export default function HomePage() {
                 { value: 6236, label: 'Verses', suffix: '' },
                 { value: 114, label: 'Surahs', suffix: '' },
                 { value: 30, label: 'Juz', suffix: '' },
-                { value: 100, label: 'Free Forever', suffix: '%' },
+                { value: 50, label: 'Lessons', suffix: '+' },
               ].map((stat, i) => (
                 <motion.div
                   key={stat.label}

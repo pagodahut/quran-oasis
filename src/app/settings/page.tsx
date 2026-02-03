@@ -37,6 +37,7 @@ import {
   RECITERS,
   TRANSLATIONS,
   FONT_SIZE_OPTIONS,
+  ARABIC_FONT_STYLE_OPTIONS,
   PLAYBACK_SPEED_OPTIONS,
   DAILY_GOAL_OPTIONS,
   exportPreferences,
@@ -44,6 +45,7 @@ import {
   clearAllLocalData,
   getStorageUsage,
   type FontSize,
+  type ArabicFontStyle,
   type PlaybackSpeed,
 } from '@/lib/preferencesStore';
 import BottomNav from '@/components/BottomNav';
@@ -567,7 +569,7 @@ export default function SettingsPage() {
                 <p 
                   className="text-gold-400"
                   style={{ 
-                    fontFamily: 'var(--font-arabic)', 
+                    fontFamily: ARABIC_FONT_STYLE_OPTIONS.find(f => f.value === preferences.display.arabicFontStyle)?.fontFamily || 'var(--font-arabic)', 
                     fontSize: preferences.display.arabicFontSizePx,
                     direction: 'rtl'
                   }}
@@ -576,6 +578,38 @@ export default function SettingsPage() {
                 >
                   بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
                 </p>
+              </div>
+            </div>
+
+            {/* Arabic Font Style */}
+            <div>
+              <label className="text-sm text-night-400 mb-3 block flex items-center gap-2">
+                <BookOpen className="w-4 h-4" />
+                Arabic Script Style
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                {ARABIC_FONT_STYLE_OPTIONS.map((font) => (
+                  <button
+                    key={font.value}
+                    onClick={() => update('display', { arabicFontStyle: font.value })}
+                    className={`p-4 rounded-xl text-left transition-all ${
+                      preferences.display.arabicFontStyle === font.value 
+                        ? 'bg-gold-500/10 border-2 border-gold-500/50' 
+                        : 'bg-night-800/50 border-2 border-transparent hover:border-night-700'
+                    }`}
+                  >
+                    <p className="font-medium text-night-100">{font.label}</p>
+                    <p 
+                      className="text-gold-400 text-xl mt-2"
+                      style={{ fontFamily: font.fontFamily, direction: 'rtl' }}
+                      lang="ar"
+                      dir="rtl"
+                    >
+                      {font.arabicSample}
+                    </p>
+                    <p className="text-xs text-night-500 mt-2">{font.description}</p>
+                  </button>
+                ))}
               </div>
             </div>
 

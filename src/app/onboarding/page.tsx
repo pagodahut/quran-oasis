@@ -37,6 +37,7 @@ const ARABIC_LEVELS = [
 
 const MEMORIZATION_LEVELS = [
   { value: 'none' as const, label: "This is my first time", desc: "I haven't memorized any Quran yet", icon: <Heart className="w-5 h-5" /> },
+  { value: 'some_surahs' as const, label: "Some surahs", desc: "I can get through my daily prayers", icon: <Target className="w-5 h-5" /> },
   { value: 'juz_amma' as const, label: "I know Juz Amma", desc: "Memorized the 30th Juz (short surahs)", icon: <BookOpen className="w-5 h-5" /> },
   { value: 'multiple_juz' as const, label: "I know multiple Juz", desc: "Memorized 2-10 Juz", icon: <Star className="w-5 h-5" /> },
   { value: 'significant' as const, label: "Significant portion", desc: "Memorized more than 10 Juz", icon: <Sparkles className="w-5 h-5" /> },
@@ -114,7 +115,7 @@ const POPULAR_SURAHS = [
 
 interface OnboardingData {
   arabicLevel: 'none' | 'letters' | 'basic' | 'intermediate' | 'fluent';
-  priorMemorization: 'none' | 'juz_amma' | 'multiple_juz' | 'significant';
+  priorMemorization: 'none' | 'some_surahs' | 'juz_amma' | 'multiple_juz' | 'significant';
   goal: 'full_hifz' | 'juz_amma' | 'selected_surahs' | 'daily_connection';
   dailyTimeMinutes: number;
   preferredReciter: string;

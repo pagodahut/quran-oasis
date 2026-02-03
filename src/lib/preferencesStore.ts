@@ -10,6 +10,7 @@ import { useEffect, useState, useCallback } from 'react';
 // ============================================
 
 export type FontSize = 'small' | 'medium' | 'large' | 'extra-large';
+export type ArabicFontStyle = 'uthmani' | 'madina' | 'indopak' | 'kitab';
 export type Theme = 'dark' | 'light' | 'auto';
 export type PlaybackSpeed = 0.5 | 0.75 | 1 | 1.25 | 1.5 | 2;
 export type AudioQuality = 'auto' | 'high' | 'medium' | 'low';
@@ -30,6 +31,7 @@ export interface AudioPreferences {
 export interface DisplayPreferences {
   arabicFontSize: FontSize;
   arabicFontSizePx: number;
+  arabicFontStyle: ArabicFontStyle;
   showTranslation: boolean;
   showTransliteration: boolean;
   translation: 'sahih' | 'asad';
@@ -81,6 +83,43 @@ export const FONT_SIZE_OPTIONS: { value: FontSize; label: string; px: number }[]
   { value: 'medium', label: 'Medium', px: 28 },
   { value: 'large', label: 'Large', px: 34 },
   { value: 'extra-large', label: 'Extra Large', px: 42 },
+];
+
+export const ARABIC_FONT_STYLE_OPTIONS: { 
+  value: ArabicFontStyle; 
+  label: string; 
+  arabicSample: string;
+  description: string;
+  fontFamily: string;
+}[] = [
+  { 
+    value: 'uthmani', 
+    label: 'Uthmani', 
+    arabicSample: 'بِسْمِ ٱللَّهِ',
+    description: 'Standard Uthmani script used in most Mushafs',
+    fontFamily: 'var(--font-arabic)',
+  },
+  { 
+    value: 'madina', 
+    label: 'Madina', 
+    arabicSample: 'بِسْمِ ٱللَّهِ',
+    description: 'King Fahad Complex style, clear and elegant',
+    fontFamily: '"KFGQPC Uthmanic Script HAFS", var(--font-arabic)',
+  },
+  { 
+    value: 'indopak', 
+    label: 'Indo-Pak', 
+    arabicSample: 'بِسْمِ ٱللَّهِ',
+    description: 'Nastaliq-influenced style popular in South Asia',
+    fontFamily: '"Noto Nastaliq Urdu", var(--font-arabic)',
+  },
+  { 
+    value: 'kitab', 
+    label: 'Kitab', 
+    arabicSample: 'بِسْمِ ٱللَّهِ',
+    description: 'Clean, modern style for easy reading',
+    fontFamily: '"Scheherazade New", var(--font-arabic)',
+  },
 ];
 
 export const PLAYBACK_SPEED_OPTIONS: { value: PlaybackSpeed; label: string }[] = [
@@ -145,21 +184,42 @@ export const RECITERS = [
     name: 'Abdul Basit Abdul Samad', 
     arabicName: 'عبدالباسط عبدالصمد',
     style: 'Mujawwad',
-    description: 'Legendary Egyptian reciter, melodious style',
+    description: 'Legendary Egyptian reciter, beautiful mujawwad style',
   },
   { 
     id: 'ghamadi', 
     name: 'Saad Al-Ghamdi', 
     arabicName: 'سعد الغامدي',
     style: 'Murattal',
-    description: 'Saudi reciter, clear and steady pace',
+    description: 'Clear and melodious Saudi reciter',
+  },
+  { 
+    id: 'shuraym', 
+    name: "Sa'ud ash-Shuraym", 
+    arabicName: 'سعود الشريم',
+    style: 'Murattal',
+    description: 'Imam of Masjid Al-Haram, powerful and clear',
+  },
+  { 
+    id: 'hani_rifai', 
+    name: 'Hani ar-Rifai', 
+    arabicName: 'هاني الرفاعي',
+    style: 'Murattal',
+    description: 'Beautiful Saudi reciter with emotional delivery',
+  },
+  { 
+    id: 'yasser_dossari', 
+    name: 'Yasser Ad-Dossari', 
+    arabicName: 'ياسر الدوسري',
+    style: 'Murattal',
+    description: 'Young Saudi reciter with mesmerizing voice',
   },
   { 
     id: 'hazza', 
     name: 'Hazza Al Balushi', 
     arabicName: 'هزاع البلوشي',
     style: 'Murattal',
-    description: 'Young Emirati reciter, beautiful voice',
+    description: 'Young Omani reciter, beautiful voice',
     listenOnly: true,
   },
 ];
@@ -188,6 +248,7 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   display: {
     arabicFontSize: 'medium',
     arabicFontSizePx: 28,
+    arabicFontStyle: 'uthmani',
     showTranslation: true,
     showTransliteration: false,
     translation: 'sahih',

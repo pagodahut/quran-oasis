@@ -201,6 +201,44 @@ function CategoryCard({
   );
 }
 
+// ============ FLASHCARD SECTION ============
+function FlashcardSection() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-900/40 via-night-900 to-night-950 border border-purple-700/30 p-6 mb-6"
+    >
+      {/* Decorative elements */}
+      <div className="absolute top-0 right-0 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl" />
+      
+      <div className="relative">
+        <div className="flex items-start gap-4 mb-4">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center shadow-lg flex-shrink-0">
+            <Layers className="w-7 h-7 text-night-950" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-night-100 mb-1">Flashcard Practice</h2>
+            <p className="text-night-400 text-sm">Master Arabic letters, vocabulary & Tajweed rules</p>
+          </div>
+        </div>
+        
+        <Link href="/practice/flashcards">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-purple-500 hover:bg-purple-400 text-white font-semibold transition-colors"
+          >
+            <Layers className="w-5 h-5" />
+            Practice Flashcards
+            <ArrowRight className="w-5 h-5" />
+          </motion.button>
+        </Link>
+      </div>
+    </motion.div>
+  );
+}
+
 function QuickStartSection() {
   const [recommendedSurah, setRecommendedSurah] = useState<{
     number: number;
@@ -542,6 +580,9 @@ export default function PracticePage() {
       {/* Main Content */}
       <main className="relative px-4 py-6 space-y-6">
         {/* Quick Start for new users */}
+        {/* Flashcard Practice - always show */}
+        <FlashcardSection />
+        
         {!hasProgress && <QuickStartSection />}
 
         {/* Stats Row */}

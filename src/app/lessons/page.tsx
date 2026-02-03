@@ -25,36 +25,16 @@ import {
   ALL_BEGINNER_LESSONS,
   ALL_INTERMEDIATE_LESSONS,
   ALL_ADVANCED_LESSONS,
-  UNITS,
+  BEGINNER_UNITS,
   INTERMEDIATE_UNITS,
   ADVANCED_UNITS,
-  getUnitsForPath,
   type Lesson,
   getLessonById,
   getLessonsByUnit,
+  getLessonsByPath,
+  getUnitsForPath,
   isLessonUnlocked 
 } from '@/lib/lesson-content';
-
-// Path type
-type LessonPath = 'beginner' | 'intermediate' | 'advanced';
-
-const PATH_INFO = {
-  beginner: {
-    title: 'Beginner',
-    description: 'Arabic letters & foundational reading',
-    icon: '🌱',
-  },
-  intermediate: {
-    title: 'Intermediate',
-    description: 'Tajweed rules & pronunciation',
-    icon: '📚',
-  },
-  advanced: {
-    title: 'Advanced',
-    description: 'Advanced recitation & memorization',
-    icon: '🎓',
-  },
-};
 import LessonCompletionOverlay from '@/components/LessonCompletionOverlay';
 import BottomNav from '@/components/BottomNav';
 import { DailyWisdom } from '@/components/JourneyMap';
@@ -199,7 +179,7 @@ function UnitSection({ unit, lessons, completedLessons, isActive, nextLessonId }
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="p-4 pt-3 space-y-3">
+            <div className="p-4 pt-2 space-y-2">
               {lessons.map((lesson, index) => {
                 const isLessonComplete = completedLessons.includes(lesson.id);
                 const isNextLesson = nextLessonId === lesson.id;
@@ -289,6 +269,263 @@ function UnitSection({ unit, lessons, completedLessons, isActive, nextLessonId }
   );
 }
 
+// ============================================
+// Path Section Component - Accordion Drawer
+// ============================================
+interface PathSectionProps {
+  path: 'beginner' | 'intermediate' | 'advanced';
+  title: string;
+  subtitle: string;
+  icon: React.ReactNode;
+  lessons: Lesson[];
+  units: { number: number; title: string; lessons: number; description: string }[];
+  completedLessons: string[];
+  isDefaultOpen?: boolean;
+  nextLessonId?: string;
+}
+
+function PathSection({ 
+  path, 
+  title, 
+  subtitle, 
+  icon, 
+  lessons, 
+  units, 
+  completedLessons, 
+  isDefaultOpen = false,
+  nextLessonId 
+}: PathSectionProps) {
+  const [isOpen, setIsOpen] = useState(isDefaultOpen);
+  const completedCount = lessons.filter(l => completedLessons.includes(l.id)).length;
+  const progress = lessons.length > 0 ? (completedCount / lessons.length) * 100 : 0;
+  const isComplete = completedCount === lessons.length && lessons.length > 0;
+  
+  // Path colors
+  const pathColors = {
+    beginner: {
+      bg: 'rgba(201,162,39,0.12)',
+      bgEnd: 'rgba(201,162,39,0.04)',
+      border: 'rgba(201,162,39,0.25)',
+      accent: '#c9a227',
+    },
+    intermediate: {
+      bg: 'rgba(134,169,113,0.12)',
+      bgEnd: 'rgba(134,169,113,0.04)',
+      border: 'rgba(134,169,113,0.25)',
+      accent: '#86a971',
+    },
+    advanced: {
+      bg: 'rgba(168,85,247,0.12)',
+      bgEnd: 'rgba(168,85,247,0.04)',
+      border: 'rgba(168,85,247,0.25)',
+      accent: '#a855f7',
+    },
+  };
+  
+  const colors = pathColors[path];
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-3xl overflow-hidden mb-4"
+      style={{
+        background: `linear-gradient(135deg, ${colors.bg} 0%, ${colors.bgEnd} 100%)`,
+        border: `1px solid ${colors.border}`,
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
+      }}
+    >
+      {/* Path Header */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full p-5 flex items-center gap-4 text-left transition-all hover:bg-white/[0.02]"
+      >
+        {/* Path Icon */}
+        <div 
+          className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
+          style={{
+            background: `linear-gradient(135deg, ${colors.accent}dd 0%, ${colors.accent} 100%)`,
+            boxShadow: `0 8px 24px ${colors.accent}40, inset 0 1px 0 rgba(255,255,255,0.3)`,
+            border: '1px solid rgba(255,255,255,0.2)',
+          }}
+        >
+          {icon}
+        </div>
+        
+        {/* Path Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="font-semibold text-night-100 text-lg">{title}</h3>
+            {isComplete && (
+              <span 
+                className="text-xs px-2.5 py-0.5 rounded-full font-medium"
+                style={{
+                  background: `${colors.accent}20`,
+                  color: colors.accent,
+                  border: `1px solid ${colors.accent}30`,
+                }}
+              >
+                ✓ Complete
+              </span>
+            )}
+          </div>
+          <p className="text-sm text-night-400 mb-2">{subtitle}</p>
+          <div className="flex items-center gap-3 text-xs text-night-500">
+            <span>{completedCount}/{lessons.length} lessons</span>
+            <span>•</span>
+            <span style={{ color: colors.accent }} className="font-medium">{Math.round(progress)}%</span>
+          </div>
+        </div>
+        
+        {/* Expand/Collapse */}
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+          className="liquid-icon-btn !w-10 !h-10"
+        >
+          <ChevronDown className="w-5 h-5" />
+        </motion.div>
+      </button>
+      
+      {/* Progress Bar */}
+      <div className="px-5 pb-3">
+        <div className="liquid-progress">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="liquid-progress-fill"
+            style={{
+              background: `linear-gradient(90deg, ${colors.accent}cc 0%, ${colors.accent} 100%)`,
+              boxShadow: `0 0 12px ${colors.accent}50, inset 0 1px 0 rgba(255,255,255,0.3)`,
+            }}
+          />
+        </div>
+      </div>
+      
+      {/* Units List */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className="px-4 pb-4 space-y-3">
+              {units.map((unit) => {
+                const unitLessons = lessons.filter(l => l.unit === unit.number);
+                const isFirstIncomplete = units.findIndex(u => {
+                  const uLessons = lessons.filter(l => l.unit === u.number);
+                  return uLessons.some(l => !completedLessons.includes(l.id));
+                }) === units.indexOf(unit);
+                
+                return (
+                  <UnitSection
+                    key={`${path}-${unit.number}`}
+                    unit={unit}
+                    lessons={unitLessons}
+                    completedLessons={completedLessons}
+                    isActive={isFirstIncomplete}
+                    nextLessonId={nextLessonId}
+                  />
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
+// ============================================
+// Branded Path Icons - Matching the HIFZ Logo System
+// Beginner: Moon + Open Book (1 chevron)
+// Intermediate: Moon + Book with 2 chevrons  
+// Advanced: Moon + Book with 3 chevrons
+// ============================================
+function BeginnerIcon() {
+  return (
+    <svg viewBox="0 0 32 32" className="w-7 h-7" fill="none">
+      {/* Crescent Moon - top left */}
+      <path 
+        d="M12 3C8 3 5 6 5 10s3 7 7 7c-4 0-7-3-7-7s3-7 7-7z" 
+        fill="#0a0a0f"
+      />
+      {/* Open book - single V shape */}
+      <path 
+        d="M16 14 C12 16, 6 18, 2 21 L16 28 L30 21 C26 18, 20 16, 16 14 Z" 
+        fill="#0a0a0f"
+      />
+    </svg>
+  );
+}
+
+function IntermediateIcon() {
+  return (
+    <svg viewBox="0 0 32 32" className="w-7 h-7" fill="none">
+      {/* Crescent Moon - top left */}
+      <path 
+        d="M12 2C8 2 5 5 5 9s3 7 7 7c-4 0-7-3-7-7s3-7 7-7z" 
+        fill="#0a0a0f"
+      />
+      {/* Open book - V shape */}
+      <path 
+        d="M16 11 C12 13, 6 15, 2 17 L16 23 L30 17 C26 15, 20 13, 16 11 Z" 
+        fill="#0a0a0f"
+      />
+      {/* Second chevron */}
+      <path 
+        d="M2 22 L16 28 L30 22" 
+        fill="#0a0a0f"
+        stroke="#0a0a0f"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function AdvancedIcon() {
+  return (
+    <svg viewBox="0 0 32 32" className="w-7 h-7" fill="none">
+      {/* Crescent Moon - top left */}
+      <path 
+        d="M12 1C8 1 5 4 5 8s3 7 7 7c-4 0-7-3-7-7s3-7 7-7z" 
+        fill="#0a0a0f"
+      />
+      {/* Open book - V shape */}
+      <path 
+        d="M16 9 C12 11, 6 13, 2 15 L16 20 L30 15 C26 13, 20 11, 16 9 Z" 
+        fill="#0a0a0f"
+      />
+      {/* Second chevron */}
+      <path 
+        d="M2 19 L16 24 L30 19" 
+        fill="#0a0a0f"
+        stroke="#0a0a0f"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Third chevron */}
+      <path 
+        d="M2 24 L16 29 L30 24" 
+        fill="#0a0a0f"
+        stroke="#0a0a0f"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 // Wrapper component to handle search params with Suspense
 function LessonsContent() {
   const searchParams = useSearchParams();
@@ -296,19 +533,10 @@ function LessonsContent() {
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const [currentStreak, setCurrentStreak] = useState(0);
   const [totalXP, setTotalXP] = useState(0);
-  const [currentPath, setCurrentPath] = useState<LessonPath>('beginner');
   
   // Handle completion query param
   const completedLessonId = searchParams.get('completed');
   const completedLesson = completedLessonId ? getLessonById(completedLessonId) : null;
-  
-  // Get lessons and units for current path
-  const currentUnits = getUnitsForPath(currentPath);
-  const currentLessons = currentPath === 'beginner' 
-    ? ALL_BEGINNER_LESSONS 
-    : currentPath === 'intermediate' 
-      ? ALL_INTERMEDIATE_LESSONS 
-      : ALL_ADVANCED_LESSONS;
 
   useEffect(() => {
     const saved = localStorage.getItem('quranOasis_completedLessons');
@@ -334,13 +562,12 @@ function LessonsContent() {
     router.replace('/lessons', { scroll: false });
   };
 
-  const totalLessons = currentLessons.length;
-  const pathCompletedLessons = completedLessons.filter(id => 
-    currentLessons.some(l => l.id === id)
-  );
-  const progressPercent = (pathCompletedLessons.length / totalLessons) * 100;
+  const totalLessons = ALL_BEGINNER_LESSONS.length + ALL_INTERMEDIATE_LESSONS.length + ALL_ADVANCED_LESSONS.length;
+  const beginnerLessonsCount = ALL_BEGINNER_LESSONS.length;
+  const beginnerCompleted = completedLessons.filter(id => ALL_BEGINNER_LESSONS.some(l => l.id === id)).length;
+  const progressPercent = (completedLessons.length / totalLessons) * 100;
 
-  const nextLesson = currentLessons.find(
+  const nextLesson = ALL_BEGINNER_LESSONS.find(
     lesson => !completedLessons.includes(lesson.id) && isLessonUnlocked(lesson.id, completedLessons)
   );
 
@@ -418,9 +645,9 @@ function LessonsContent() {
                 <p className="text-3xl font-bold text-night-100">{Math.round(progressPercent)}%</p>
               </div>
               <div className="text-right">
-                <p className="text-night-400 text-sm">{PATH_INFO[currentPath].title} Path</p>
+                <p className="text-night-400 text-sm">All Paths</p>
                 <p className="text-sm text-night-300 font-medium">
-                  {pathCompletedLessons.length} of {totalLessons} lessons
+                  {completedLessons.length} of {totalLessons} lessons
                 </p>
               </div>
             </div>
@@ -434,24 +661,6 @@ function LessonsContent() {
               />
             </div>
           </motion.div>
-
-          {/* Path Tabs */}
-          <div className="flex gap-2 mb-6">
-            {(Object.keys(PATH_INFO) as LessonPath[]).map((path) => (
-              <button
-                key={path}
-                onClick={() => setCurrentPath(path)}
-                className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all ${
-                  currentPath === path
-                    ? 'bg-gold-500/20 text-gold-400 border border-gold-500/30'
-                    : 'bg-night-800/50 text-night-400 border border-night-700/50 hover:bg-night-800'
-                }`}
-              >
-                <span className="mr-1.5">{PATH_INFO[path].icon}</span>
-                {PATH_INFO[path].title}
-              </button>
-            ))}
-          </div>
 
           {/* Continue Learning CTA - Prominent Liquid Glass */}
           {nextLesson && (
@@ -501,65 +710,51 @@ function LessonsContent() {
             <DailyWisdom />
           </div>
 
-          {/* Units with Lessons */}
+          {/* Learning Paths - Accordion Structure */}
           <div className="space-y-4">
             <h2 className="text-sm font-semibold text-night-500 uppercase tracking-widest px-1 mb-2">
-              {PATH_INFO[currentPath].title} Path
+              Learning Paths
             </h2>
-            <p className="text-xs text-night-500 px-1 -mt-1 mb-3">
-              {PATH_INFO[currentPath].description}
-            </p>
             
-            {currentUnits.map((unit, unitIndex) => {
-              // Filter lessons for this unit from current path's lessons
-              const unitLessons = currentLessons.filter(l => l.unit === unit.number);
-              const completedInUnit = unitLessons.filter(l => completedLessons.includes(l.id)).length;
-              const isUnitComplete = completedInUnit === unitLessons.length && unitLessons.length > 0;
-              const isFirstIncomplete = currentUnits.findIndex(u => {
-                const lessons = currentLessons.filter(l => l.unit === u.number);
-                return lessons.some(l => !completedLessons.includes(l.id));
-              }) === unitIndex;
-              
-              return (
-                <UnitSection 
-                  key={`${currentPath}-${unit.number}`}
-                  unit={unit}
-                  lessons={unitLessons}
-                  completedLessons={completedLessons}
-                  isActive={isFirstIncomplete}
-                  nextLessonId={nextLesson?.id}
-                />
-              );
-            })}
+            {/* Beginner Path - Open by Default */}
+            <PathSection
+              path="beginner"
+              title="Beginner"
+              subtitle="Arabic foundations & first surahs"
+              icon={<BeginnerIcon />}
+              lessons={ALL_BEGINNER_LESSONS}
+              units={BEGINNER_UNITS}
+              completedLessons={completedLessons}
+              isDefaultOpen={true}
+              nextLessonId={nextLesson?.id}
+            />
+            
+            {/* Intermediate Path - Collapsed */}
+            <PathSection
+              path="intermediate"
+              title="Intermediate"
+              subtitle="Tajweed rules & longer surahs"
+              icon={<IntermediateIcon />}
+              lessons={ALL_INTERMEDIATE_LESSONS}
+              units={INTERMEDIATE_UNITS}
+              completedLessons={completedLessons}
+              isDefaultOpen={false}
+              nextLessonId={nextLesson?.id}
+            />
+            
+            {/* Advanced Path - Collapsed */}
+            <PathSection
+              path="advanced"
+              title="Advanced"
+              subtitle="Deep tajweed & full juz memorization"
+              icon={<AdvancedIcon />}
+              lessons={ALL_ADVANCED_LESSONS}
+              units={ADVANCED_UNITS}
+              completedLessons={completedLessons}
+              isDefaultOpen={false}
+              nextLessonId={nextLesson?.id}
+            />
           </div>
-
-          {/* Coming Soon - Liquid Glass */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-8 mt-8 text-center rounded-3xl"
-            style={{
-              background: 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(99,102,241,0.02) 100%)',
-              border: '1px solid rgba(99,102,241,0.15)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-            }}
-          >
-            <div 
-              className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
-              style={{
-                background: 'linear-gradient(135deg, rgba(99,102,241,0.2) 0%, rgba(99,102,241,0.1) 100%)',
-                border: '1px solid rgba(99,102,241,0.2)',
-              }}
-            >
-              <Lock className="w-6 h-6 text-indigo-400" />
-            </div>
-            <h3 className="font-semibold text-night-100 mb-2 text-lg">More Paths Coming Soon</h3>
-            <p className="text-sm text-night-400 max-w-xs mx-auto">
-              Intermediate and Advanced paths with 40+ additional lessons are in development.
-              Complete the Beginner path to unlock them!
-            </p>
-          </motion.div>
         </div>
       </main>
       

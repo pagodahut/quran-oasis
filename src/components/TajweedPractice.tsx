@@ -22,6 +22,8 @@ import {
   Zap,
   Wifi,
   WifiOff,
+  BookOpen,
+  Info,
 } from 'lucide-react';
 import {
   initializeRecording,
@@ -260,7 +262,14 @@ export default function TajweedPractice({
       const enhancedFeedback: TajweedFeedback = {
         ...analysisResult,
         // Use the real-time accuracy if it's significantly different
-        accuracy: Math.round((analysisResult.accuracy + result.accuracy) / 2),
+        // In practice mode (no API), use real-time accuracy only
+        accuracy: analysisResult.accuracy != null 
+          ? Math.round((analysisResult.accuracy + result.accuracy) / 2)
+          : result.accuracy,
+        // If we have real-time data, we have actual analysis
+        overall: analysisResult.accuracy != null ? analysisResult.overall : 
+          (result.accuracy >= 80 ? 'excellent' : result.accuracy >= 60 ? 'good' : 'needs_practice'),
+        isPracticeMode: false, // We have real-time data, so not in pure practice mode
       };
       
       setFeedback(enhancedFeedback);
@@ -937,40 +946,73 @@ export default function TajweedPractice({
               >
                 {/* Score badge */}
                 <div className="flex flex-col items-center">
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
-                    className={`w-24 h-24 rounded-full flex items-center justify-center ${
-                      feedback.overall === 'excellent'
-                        ? 'bg-gradient-to-br from-gold-400 to-gold-600 shadow-glow-gold'
-                        : feedback.overall === 'good'
-                          ? 'bg-gradient-to-br from-sage-400 to-sage-600'
-                          : 'bg-gradient-to-br from-night-600 to-night-700'
-                    }`}
-                  >
-                    <span className="text-3xl font-bold text-night-950">
-                      {feedback.accuracy}%
-                    </span>
-                  </motion.div>
-                  
-                  <h3 className={`text-xl font-bold mt-4 ${
-                    feedback.overall === 'excellent'
-                      ? 'text-gold-400'
-                      : feedback.overall === 'good'
-                        ? 'text-sage-400'
-                        : 'text-night-300'
-                  }`}>
-                    {feedback.overall === 'excellent' && '🌟 Excellent!'}
-                    {feedback.overall === 'good' && '👍 Good Job!'}
-                    {feedback.overall === 'needs_practice' && '💪 Keep Practicing!'}
-                  </h3>
+                  {feedback.overall === 'practice_mode' ? (
+                    // Practice mode - no AI scoring
+                    <>
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
+                        className="w-24 h-24 rounded-full flex items-center justify-center bg-gradient-to-br from-night-600 to-night-700 border-2 border-gold-500/30"
+                      >
+                        <HelpCircle className="w-12 h-12 text-gold-400" />
+                      </motion.div>
+                      <h3 className="text-xl font-bold mt-4 text-gold-400">
+                        📚 Learning Mode
+                      </h3>
+                      <p className="text-sm text-night-400 mt-2 text-center max-w-xs">
+                        Self-assess your recitation using the tajweed rules below
+                      </p>
+                    </>
+                  ) : (
+                    // AI-scored mode
+                    <>
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
+                        className={`w-24 h-24 rounded-full flex items-center justify-center ${
+                          feedback.overall === 'excellent'
+                            ? 'bg-gradient-to-br from-gold-400 to-gold-600 shadow-glow-gold'
+                            : feedback.overall === 'good'
+                              ? 'bg-gradient-to-br from-sage-400 to-sage-600'
+                              : 'bg-gradient-to-br from-night-600 to-night-700'
+                        }`}
+                      >
+                        <span className="text-3xl font-bold text-night-950">
+                          {feedback.accuracy}%
+                        </span>
+                      </motion.div>
+                      
+                      <h3 className={`text-xl font-bold mt-4 ${
+                        feedback.overall === 'excellent'
+                          ? 'text-gold-400'
+                          : feedback.overall === 'good'
+                            ? 'text-sage-400'
+                            : 'text-night-300'
+                      }`}>
+                        {feedback.overall === 'excellent' && '🌟 Excellent!'}
+                        {feedback.overall === 'good' && '👍 Good Job!'}
+                        {feedback.overall === 'needs_practice' && '💪 Keep Practicing!'}
+                      </h3>
+                    </>
+                  )}
                 </div>
 
                 {/* Encouragement */}
                 <div className="bg-night-900/30 rounded-xl p-4 border border-night-800/50 text-center">
                   <p className="text-night-200">{feedback.encouragement}</p>
                 </div>
+
+                {/* Practice mode note */}
+                {feedback.isPracticeMode && feedback.practiceNote && (
+                  <div className="bg-night-900/50 rounded-xl p-3 border border-night-800/30 text-center">
+                    <p className="text-xs text-night-500 flex items-center justify-center gap-2">
+                      <Info className="w-3 h-3" />
+                      {feedback.practiceNote}
+                    </p>
+                  </div>
+                )}
 
                 {/* Real-time alignment summary (if available) */}
                 {realtimeResult && (
@@ -1007,7 +1049,7 @@ export default function TajweedPractice({
                   <div className="space-y-3">
                     <h4 className="text-night-400 text-sm font-medium flex items-center gap-2">
                       <HelpCircle className="w-4 h-4" />
-                      Tajweed Analysis
+                      {feedback.isPracticeMode ? 'Tajweed Rules in This Verse' : 'Tajweed Analysis'}
                     </h4>
                     {feedback.rulesAnalysis.map((rule, index) => (
                       <div
@@ -1015,17 +1057,25 @@ export default function TajweedPractice({
                         className={`flex items-start gap-3 p-3 rounded-xl ${
                           rule.status === 'correct'
                             ? 'bg-sage-900/20 border border-sage-700/30'
-                            : 'bg-amber-900/20 border border-amber-700/30'
+                            : rule.status === 'learning'
+                              ? 'bg-gold-900/20 border border-gold-700/30'
+                              : 'bg-amber-900/20 border border-amber-700/30'
                         }`}
                       >
                         {rule.status === 'correct' ? (
                           <CheckCircle2 className="w-5 h-5 text-sage-400 flex-shrink-0 mt-0.5" />
+                        ) : rule.status === 'learning' ? (
+                          <BookOpen className="w-5 h-5 text-gold-400 flex-shrink-0 mt-0.5" />
                         ) : (
                           <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
                         )}
                         <div>
                           <p className={`font-medium ${
-                            rule.status === 'correct' ? 'text-sage-300' : 'text-amber-300'
+                            rule.status === 'correct' 
+                              ? 'text-sage-300' 
+                              : rule.status === 'learning'
+                                ? 'text-gold-300'
+                                : 'text-amber-300'
                           }`}>
                             {TAJWEED_RULES[rule.rule]?.name || rule.rule}
                           </p>

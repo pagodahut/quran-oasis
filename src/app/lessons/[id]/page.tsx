@@ -579,6 +579,8 @@ export default function LessonDetailPage() {
       setSelectedAnswer(null);
       setShowFeedback(false);
       setIsCorrect(false);
+      // Scroll to top of content
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -588,6 +590,8 @@ export default function LessonDetailPage() {
       setCurrentStepIndex(prev => prev - 1);
       setSelectedAnswer(null);
       setShowFeedback(false);
+      // Scroll to top of content
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -670,7 +674,7 @@ export default function LessonDetailPage() {
           return (
             <strong 
               key={`${key}-${j}`} 
-              className={`font-semibold ${isArabic ? 'font-arabic text-gold-300 text-xl' : 'text-gold-400'}`}
+              className={`font-semibold ${isArabic ? 'font-arabic text-gold-300 text-2xl' : 'text-gold-400'}`}
               style={isArabic ? { direction: 'rtl', display: 'inline-block' } : undefined}
             >
               {innerText}
@@ -716,6 +720,26 @@ export default function LessonDetailPage() {
               <div>
                 <h5 className="font-semibold text-sage-400 mb-1">🎯 Practice</h5>
                 <p className="text-night-300 text-sm leading-relaxed">{practiceContent || lines[++i]}</p>
+              </div>
+            </div>
+          </div>
+        );
+        i++;
+        continue;
+      }
+      
+      // Tip blocks  
+      if (line.toLowerCase().includes('tip:') || line.toLowerCase().startsWith('**tip')) {
+        const tipContent = line.replace(/\*\*tip:?\*\*:?/i, '').replace(/tip:?/i, '').trim();
+        result.push(
+          <div key={i} className="my-4 bg-sage-900/20 border border-sage-700/30 rounded-xl p-4">
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg bg-sage-700/30 flex items-center justify-center flex-shrink-0">
+                <Lightbulb className="w-4 h-4 text-sage-400" />
+              </div>
+              <div>
+                <h5 className="font-semibold text-sage-400 mb-1">💡 Tip</h5>
+                <p className="text-night-300 text-sm leading-relaxed">{tipContent || lines[++i]}</p>
               </div>
             </div>
           </div>
@@ -982,7 +1006,7 @@ export default function LessonDetailPage() {
                     {currentStep.arabicContent && (
                       <div className="bg-night-900/50 rounded-xl p-6">
                         <p 
-                          className="font-arabic text-2xl text-gold-300 leading-[2] text-center"
+                          className="font-arabic text-3xl text-gold-300 leading-[2] text-center"
                           style={{ direction: 'rtl' }}
                         >
                           {currentStep.arabicContent}
@@ -1103,7 +1127,7 @@ export default function LessonDetailPage() {
                                 )}
                               </span>
                               <span 
-                                className={`text-lg ${isArabicOption ? 'font-arabic text-xl' : ''}`}
+                                className={`text-lg ${isArabicOption ? 'font-arabic text-2xl' : ''}`}
                                 style={isArabicOption ? { direction: 'rtl' } : undefined}
                               >
                                 {option}

@@ -219,11 +219,32 @@ export const RECITERS: Reciter[] = [
     folder: 'Ghamadi_40kbps',
   },
   {
+    id: 'shuraym',
+    name: "Sa'ud ash-Shuraym",
+    arabicName: 'سعود الشريم',
+    style: 'Murattal',
+    folder: 'Saood_ash-Shuraym_128kbps',
+  },
+  {
+    id: 'hani_rifai',
+    name: 'Hani ar-Rifai',
+    arabicName: 'هاني الرفاعي',
+    style: 'Murattal',
+    folder: 'Hani_Rifai_192kbps',
+  },
+  {
+    id: 'yasser_dossari',
+    name: 'Yasser Ad-Dossari',
+    arabicName: 'ياسر الدوسري',
+    style: 'Murattal',
+    folder: 'Yasser_Ad-Dussary_128kbps',
+  },
+  {
     id: 'hazza',
     name: 'Hazza Al Balushi',
     arabicName: 'هزاع البلوشي',
     style: 'Murattal',
-    folder: '', // No EveryAyah folder
+    folder: '', // No EveryAyah folder - full surah only
     listenOnly: true,
     surahAudioUrl: 'https://ia801208.us.archive.org/33/items/Quran-Huzza-Al_Baloushi/{surah}.mp3',
   },

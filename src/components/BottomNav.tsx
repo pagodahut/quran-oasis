@@ -93,18 +93,18 @@ export default function BottomNav() {
     <nav 
       role="navigation"
       aria-label="Main navigation"
-      className={`fixed bottom-0 left-0 right-0 z-50 px-3 sm:px-4 transition-all duration-300 ease-out ${
-        isCollapsed ? 'pb-2' : 'pb-3 sm:pb-4'
+      className={`fixed bottom-0 left-0 right-0 z-50 px-4 sm:px-6 transition-all duration-300 ease-out ${
+        isCollapsed ? 'pb-3' : 'pb-5 sm:pb-6'
       }`}
-      style={{ paddingBottom: `max(${isCollapsed ? '0.5rem' : '0.75rem'}, env(safe-area-inset-bottom))` }}
+      style={{ paddingBottom: `max(${isCollapsed ? '0.75rem' : '1.25rem'}, env(safe-area-inset-bottom))` }}
     >
-      {/* Premium frosted glass floating nav */}
+      {/* Premium frosted glass floating nav - narrower for centered icons */}
       <motion.div 
         layout
         className={`mx-auto overflow-hidden ${
           isCollapsed 
-            ? 'max-w-[300px] rounded-full' 
-            : 'max-w-md rounded-2xl'
+            ? 'max-w-[280px] rounded-full' 
+            : 'max-w-sm rounded-2xl'
         }`}
         style={{
           background: 'rgba(22, 27, 34, 0.8)',

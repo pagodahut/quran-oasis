@@ -56,16 +56,20 @@ export interface RecordingState {
 }
 
 export interface TajweedFeedback {
-  overall: 'excellent' | 'good' | 'needs_practice';
-  accuracy: number; // 0-100
+  overall: 'excellent' | 'good' | 'needs_practice' | 'practice_mode';
+  accuracy?: number; // 0-100, undefined in practice mode
   transcription?: string;
   rulesAnalysis: {
     rule: TajweedRule;
-    status: 'correct' | 'needs_work' | 'not_detected';
+    status: 'correct' | 'needs_work' | 'not_detected' | 'learning';
     feedback: string;
   }[];
   encouragement: string;
   specificTips: string[];
+  /** True when AI analysis is not available (no API keys) */
+  isPracticeMode?: boolean;
+  /** Note explaining why AI analysis isn't available */
+  practiceNote?: string;
 }
 
 export interface PracticeSession {
@@ -405,26 +409,148 @@ function generateAIFeedback(
 
 /**
  * Generate basic feedback when AI is not available
+ * This provides educational content based on tajweed rules present in the verse,
+ * since we can't transcribe without API keys.
  */
 function generateBasicFeedback(
   expectedText: string,
   surah: number,
   ayah: number
 ): TajweedFeedback {
-  const cleanExpected = cleanArabicText(expectedText);
-  const rulesAnalysis = analyzeTextForTajweed(cleanExpected);
+  const rulesAnalysis = analyzeTextForTajweedEducational(expectedText);
+  
+  // Generate dynamic tips based on rules present in the verse
+  const specificTips = generateRuleBasedTips(rulesAnalysis);
+  
+  // Vary the encouragement based on verse complexity
+  const encouragement = rulesAnalysis.length > 3 
+    ? "This verse has rich tajweed - great for developing your skills! 📚"
+    : rulesAnalysis.length > 0
+    ? "Practice with the reciter audio to hear proper pronunciation. 🎧"
+    : "Focus on clear articulation and proper makharij. ✨";
   
   return {
-    overall: 'good',
-    accuracy: 80, // Default score
+    overall: 'practice_mode', // Indicate this is practice, not AI-scored
+    accuracy: undefined, // Don't show fake accuracy without transcription
     rulesAnalysis,
-    encouragement: "Great effort! Keep practicing to perfect your recitation. 🌟",
-    specificTips: [
-      "Listen to the verse a few more times to internalize the rhythm",
-      "Pay attention to the elongation (madd) in longer vowels",
-      "Practice makes perfect - try recording yourself again",
-    ],
+    encouragement,
+    specificTips,
+    isPracticeMode: true, // Flag that AI analysis wasn't available
+    practiceNote: "For AI-powered feedback with accuracy scoring, enable the OpenAI API key in settings.",
   };
+}
+
+/**
+ * Analyze text for tajweed rules (educational mode - provides learning points)
+ */
+function analyzeTextForTajweedEducational(text: string): TajweedFeedback['rulesAnalysis'] {
+  const analysis: TajweedFeedback['rulesAnalysis'] = [];
+  
+  // Detect noon sakinah/tanween rules
+  if (/نْ|ًا|ٍ|ٌ/.test(text)) {
+    // Check what follows for specific rule
+    if (/[نْ][يرملون]|[ًٌٍ][يرملون]/u.test(text)) {
+      analysis.push({
+        rule: 'noon_sakinah',
+        status: 'learning',
+        feedback: 'Idgham (إدغام): Merge noon into the following ي/ر/م/ل/و/ن with nasalization for يمنو, or without for ل/ر.',
+      });
+    } else if (/[نْ]ب|[ًٌٍ]ب/.test(text)) {
+      analysis.push({
+        rule: 'noon_sakinah',
+        status: 'learning',
+        feedback: "Iqlab (إقلاب): Change noon to meem sound before ب with nasalization.",
+      });
+    } else if (/[نْ][ءهعحغخ]|[ًٌٍ][ءهعحغخ]/u.test(text)) {
+      analysis.push({
+        rule: 'noon_sakinah',
+        status: 'learning',
+        feedback: 'Izhar (إظهار): Pronounce noon clearly before throat letters without nasalization.',
+      });
+    } else {
+      analysis.push({
+        rule: 'noon_sakinah',
+        status: 'learning',
+        feedback: 'Ikhfa (إخفاء): Hide noon sound with light nasalization before remaining letters.',
+      });
+    }
+  }
+  
+  // Detect madd (elongation)
+  if (/[اوي]/.test(text)) {
+    const hasMaddRequired = /آ|ٓ|ـٰ/.test(text);
+    analysis.push({
+      rule: 'madd',
+      status: 'learning',
+      feedback: hasMaddRequired 
+        ? 'Madd Lazim: 6 counts elongation required where indicated.'
+        : 'Natural Madd: Elongate vowel letters (ا و ي) for 2 counts when followed by sukoon or shaddah.',
+    });
+  }
+  
+  // Detect qalqalah letters (ق ط ب ج د)
+  if (/[قطبجد]ْ|[قطبجد]$/.test(text)) {
+    analysis.push({
+      rule: 'qalqalah',
+      status: 'learning',
+      feedback: 'Qalqalah (قلقلة): Add a slight "bounce" or echo when ق/ط/ب/ج/د have sukoon or are at the end of a word.',
+    });
+  }
+  
+  // Detect ghunnah (noon/meem with shaddah)
+  if (/[نم]ّ/.test(text)) {
+    analysis.push({
+      rule: 'ghunnah',
+      status: 'learning',
+      feedback: 'Ghunnah (غنّة): Hold the nasal sound for 2 counts on doubled noon or meem.',
+    });
+  }
+  
+  // Detect heavy letters (tafkheem)
+  if (/[خصضغطقظ]/.test(text)) {
+    analysis.push({
+      rule: 'tafkheem',
+      status: 'learning',
+      feedback: 'Tafkheem (تفخيم): Pronounce the heavy letters (خ/ص/ض/غ/ط/ق/ظ) with fullness from back of mouth.',
+    });
+  }
+  
+  // Detect lam rules (sun/moon letters)
+  if (/ٱل/.test(text) || /ال/.test(text)) {
+    analysis.push({
+      rule: 'tarqeeq',
+      status: 'learning',
+      feedback: 'Al-Shamsiyyah/Qamariyyah: Assimilate "ال" into sun letters, pronounce clearly before moon letters.',
+    });
+  }
+  
+  return analysis;
+}
+
+/**
+ * Generate practice tips based on detected rules
+ */
+function generateRuleBasedTips(rulesAnalysis: TajweedFeedback['rulesAnalysis']): string[] {
+  const tips: string[] = [];
+  
+  // Always include general tips
+  tips.push("Listen to the reciter carefully, then try to match their timing and melody");
+  
+  // Add rule-specific tips
+  if (rulesAnalysis.some(r => r.rule === 'noon_sakinah')) {
+    tips.push("Focus on the nasalization (ghunnah) - it should come from the nose, not throat");
+  }
+  if (rulesAnalysis.some(r => r.rule === 'qalqalah')) {
+    tips.push("For qalqalah, the bounce should be subtle - not a full vowel sound");
+  }
+  if (rulesAnalysis.some(r => r.rule === 'madd')) {
+    tips.push("Count the beats during elongation - consistency is key for beautiful recitation");
+  }
+  if (rulesAnalysis.some(r => r.rule === 'tafkheem')) {
+    tips.push("Heavy letters require raising the back of your tongue toward the roof of mouth");
+  }
+  
+  return tips.slice(0, 4); // Limit to 4 tips
 }
 
 /**
@@ -666,12 +792,17 @@ export function getVersePracticeStats(surah: number, ayah: number): {
     };
   }
   
-  const accuracies = sessions.map(s => s.feedback.accuracy);
+  // Filter to only sessions with actual accuracy scores (not practice mode)
+  const accuracies = sessions
+    .map(s => s.feedback.accuracy)
+    .filter((acc): acc is number => acc !== undefined && acc !== null);
   
   return {
     totalSessions: sessions.length,
-    averageAccuracy: Math.round(accuracies.reduce((a, b) => a + b, 0) / accuracies.length),
-    bestAccuracy: Math.max(...accuracies),
+    averageAccuracy: accuracies.length > 0 
+      ? Math.round(accuracies.reduce((a, b) => a + b, 0) / accuracies.length)
+      : 0,
+    bestAccuracy: accuracies.length > 0 ? Math.max(...accuracies) : 0,
     lastPracticed: sessions[sessions.length - 1].timestamp,
   };
 }
@@ -693,8 +824,10 @@ export function getOverallPracticeStats(): {
       .map(s => `${s.surah}:${s.ayah}`)
   ).size;
   
-  const avgAccuracy = sessions.length > 0
-    ? Math.round(sessions.reduce((sum, s) => sum + s.feedback.accuracy, 0) / sessions.length)
+  // Calculate average accuracy only from sessions with actual scores
+  const sessionsWithAccuracy = sessions.filter(s => s.feedback.accuracy != null);
+  const avgAccuracy = sessionsWithAccuracy.length > 0
+    ? Math.round(sessionsWithAccuracy.reduce((sum, s) => sum + (s.feedback.accuracy ?? 0), 0) / sessionsWithAccuracy.length)
     : 0;
   
   // Calculate streak (simplified)
