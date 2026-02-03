@@ -631,8 +631,4 @@ export async function fetchQuranComAudioUrl(
   }
 }
 
-// ============================================
-// Exports for Lesson Integration
-// ============================================
-
-export type { AudioConfig, ListenRepeatConfig, PlaybackState, PlaybackCallbacks };
+// Types are exported inline with their definitions above

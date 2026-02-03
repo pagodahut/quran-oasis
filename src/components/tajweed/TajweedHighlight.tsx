@@ -385,13 +385,13 @@ export function TajweedLegend({
               onClick={() => onRuleSelect?.(rule)}
               className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-xs transition-all ${
                 isSelected
-                  ? 'ring-2 ring-offset-1 ring-offset-night-900'
+                  ? ''
                   : 'opacity-80 hover:opacity-100'
               }`}
               style={{
                 backgroundColor: `${ruleInfo.color}20`,
                 color: ruleInfo.color,
-                ringColor: isSelected ? ruleInfo.color : undefined,
+                boxShadow: isSelected ? `0 0 0 2px ${ruleInfo.color}` : undefined,
               }}
             >
               <span

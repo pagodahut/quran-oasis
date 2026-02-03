@@ -1007,7 +1007,7 @@ export function createMemorizationHook(
         };
         
         if (newState.completed) {
-          newSession = advanceSabaqSession(newSession);
+          newSession = advanceSabaqSession(newSession) as typeof newSession;
         }
         
         updateSession(newSession);
