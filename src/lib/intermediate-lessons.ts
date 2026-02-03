@@ -1358,6 +1358,58 @@ The action of making right
         }
       },
       {
+        id: "int5-practice2",
+        type: "exercise",
+        title: "Worship Root Family",
+        content: "Build the ع-ب-د family:",
+        exercise: {
+          type: "word_match",
+          question: "From root ع-ب-د (worship/servitude), which word means 'servants' (plural)?",
+          options: ["عَبَدَ (he worshipped)", "عِبَادَة (worship)", "عَبْد (servant-singular)", "عِبَاد (servants-plural)"],
+          correctAnswer: 3,
+          explanation: "عِبَاد is the plural of عَبْد (servant). You see this in 'يَا عِبَادِي' (O My servants) - Allah's loving address to believers!"
+        }
+      },
+      {
+        id: "int5-practice3",
+        type: "exercise",
+        title: "Speech Root Family",
+        content: "The most frequent verb's family:",
+        exercise: {
+          type: "word_match",
+          question: "From ق-و-ل (speech), what does قُلْ mean?",
+          options: ["He said", "They say", "Say! (command to Prophet)", "A saying"],
+          correctAnswer: 2,
+          explanation: "قُلْ means 'Say!' - it's the command form. It appears 332 times commanding the Prophet ﷺ to convey a message. 'قُلْ هُوَ اللَّهُ أَحَدٌ' - Say: He is Allah, the One!"
+        }
+      },
+      {
+        id: "int5-practice4",
+        type: "exercise",
+        title: "Complete the Formula",
+        content: "The Quranic success formula:",
+        exercise: {
+          type: "fill_blank",
+          question: "الَّذِينَ ___ وَعَمِلُوا الصَّالِحَاتِ (Those who ___ and do righteous deeds)",
+          options: ["عَلِمُوا (knew)", "آمَنُوا (believed)", "قَالُوا (said)", "ذَكَرُوا (remembered)"],
+          correctAnswer: 1,
+          explanation: "آمَنُوا (believed)! This phrase 'الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ' (those who believe and do righteous deeds) appears 50+ times. Faith (أ-م-ن) + Action (ع-م-ل) + Righteousness (ص-ل-ح) = three roots combined!"
+        }
+      },
+      {
+        id: "int5-timed-challenge",
+        type: "exercise",
+        title: "⏱️ Rapid Root Match",
+        content: "Quick! Match the word to its root!",
+        exercise: {
+          type: "word_match",
+          question: "ذِكْر (remembrance) comes from which root?",
+          options: ["ق-و-ل (speech)", "ع-ب-د (worship)", "ذ-ك-ر (remember)", "ص-ل-ح (righteous)"],
+          correctAnswer: 2,
+          explanation: "ذ-ك-ر! The Quran itself is called 'الذِّكْر' (The Reminder). Related words: ذَكَرَ (he remembered), تَذْكِرَة (reminder), مُذَكِّر (warner)."
+        }
+      },
+      {
         id: "int5-review",
         type: "instruction",
         title: "Lesson Complete! 🌟",
@@ -1391,111 +1443,6 @@ The action of making right
       { arabic: "ق-و-ل", transliteration: "Q-W-L", meaning: "Say, Speech" },
       { arabic: "ص-ل-ح", transliteration: "S-L-H", meaning: "Righteous, Good" }
     ]
-  }
-];
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // UNIT 6 REVIEW: Vocabulary Consolidation
-  // ─────────────────────────────────────────────────────────────────────────
-  {
-    id: "int-unit6-review",
-    unit: 6,
-    unitTitle: "Common Quranic Vocabulary",
-    path: "intermediate",
-    number: 24.5, // Placed between lesson 24 and 25
-    title: "Unit 6 Review - Vocabulary Mastery",
-    description: "Consolidate all vocabulary concepts from Unit 6",
-    surah: 1,
-    ayahStart: 1,
-    ayahEnd: 7,
-    estimatedMinutes: 20,
-    xpReward: 150,
-    isUnitReview: true,
-    steps: [
-      {
-        id: "u6r-intro",
-        type: "instruction",
-        title: "Unit 6 Review 📚",
-        content: `**Congratulations on completing Unit 6!**
-
-Before moving to Tajweed, let's consolidate what you've learned.
-
-**Unit 6 covered:**
-1. Names of Allah (الله، الرحمن، الرحيم، الرب، الملك)
-2. Common Quranic verbs (آمن، علم، عمل، هدى)
-3. Particles and connectors (إن، لا، ما، من، الذي، و، ف، ثم)
-4. Arabic root system (س-ل-م، ح-م-د، أ-م-ن)
-5. More essential roots (ع-ب-د، ر-ح-م، ذ-ك-ر، ق-و-ل، ص-ل-ح)
-
-**This review will test your retention!**`
-      },
-      {
-        id: "u6r-quiz1",
-        type: "exercise",
-        title: "Names of Allah Review",
-        content: "Test your knowledge of Allah's names:",
-        exercise: {
-          type: "word_match",
-          question: "Which name means 'The Lord, Sustainer, Master' and appears 900+ times in Quran?",
-          options: ["الرحمن", "الرب", "الملك", "الرحيم"],
-          correctAnswer: 1,
-          explanation: "الرب (Ar-Rabb) means Lord, Sustainer, Master. It encompasses creation, ownership, nurturing, and guidance."
-        }
-      },
-      {
-        id: "u6r-quiz2",
-        type: "exercise",
-        title: "Root System Review",
-        content: "Apply your root knowledge:",
-        exercise: {
-          type: "word_match",
-          question: "The words إسلام, مسلم, and سلام all share root س-ل-م. What's the core meaning?",
-          options: ["Knowledge", "Mercy", "Peace and submission", "Praise"],
-          correctAnswer: 2,
-          explanation: "Root س-ل-م means peace and submission. Islam = submission, Muslim = one who submits, Salaam = peace."
-        }
-      },
-      {
-        id: "u6r-quiz3",
-        type: "exercise",
-        title: "Particle Review",
-        content: "Test your particle knowledge:",
-        exercise: {
-          type: "word_match",
-          question: "What's the difference between فَ and ثُمَّ?",
-          options: [
-            "Both mean 'and' with no difference",
-            "فَ = immediate sequence, ثُمَّ = delayed sequence",
-            "فَ = negation, ثُمَّ = affirmation",
-            "فَ = question, ثُمَّ = answer"
-          ],
-          correctAnswer: 1,
-          explanation: "فَ indicates immediate consequence, while ثُمَّ indicates sequence after some time. Both mean 'then' but with different timing!"
-        }
-      },
-      {
-        id: "u6r-summary",
-        type: "instruction",
-        title: "Unit 6 Complete! 🎉",
-        content: `**Excellent! You've mastered the vocabulary foundations!**
-
-**Key takeaways:**
-- Learn words through their **3-letter roots**
-- One root → many related words
-- Particles are small but **change meaning dramatically**
-- Names of Allah reveal His attributes
-
-**You're ready for Unit 7: Tajweed Rules!**
-
-The vocabulary you learned will help you understand the examples in tajweed lessons.`
-      }
-    ],
-    memorizationTechniques: [
-      "Group related words by root",
-      "Review Names of Allah during daily prayers",
-      "Notice particles as you read Quran"
-    ],
-    keyVocabulary: []
   }
 ];
 
@@ -2747,107 +2694,6 @@ If the sound stops, you're doing it correctly!
       { arabic: "مُشَدَّد", transliteration: "Mushaddad", meaning: "Doubled (with shaddah)" },
       { arabic: "حَرَكَتَان", transliteration: "Harakatan", meaning: "Two counts" }
     ]
-  }
-];
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // UNIT 7 REVIEW: Tajweed Consolidation
-  // ─────────────────────────────────────────────────────────────────────────
-  {
-    id: "int-unit7-review",
-    unit: 7,
-    unitTitle: "Tajweed Rules in Depth",
-    path: "intermediate",
-    number: 29.5,
-    title: "Unit 7 Review - Tajweed Mastery",
-    description: "Consolidate all tajweed rules from Unit 7",
-    surah: 1,
-    ayahStart: 1,
-    ayahEnd: 7,
-    estimatedMinutes: 25,
-    xpReward: 175,
-    isUnitReview: true,
-    steps: [
-      {
-        id: "u7r-intro",
-        type: "instruction",
-        title: "Tajweed Review 🎵",
-        content: `**You've completed Unit 7 - Tajweed Rules!**
-
-**Rules mastered:**
-1. **Noon Sakinah/Tanween:** Izhar, Idgham, Iqlab, Ikhfa
-2. **Meem Sakinah:** Idgham Shafawi, Ikhfa Shafawi, Izhar Shafawi
-3. **Madd:** Natural, Connected, Separated, Compulsory
-4. **Qalqalah:** قُطْبُ جَدّ letters (ق ط ب ج د)
-5. **Ghunnah:** Nasal sound on ن and م
-
-Let's make sure you can apply these rules!`
-      },
-      {
-        id: "u7r-quiz1",
-        type: "exercise",
-        title: "Noon Sakinah Review",
-        content: "Apply your tajweed knowledge:",
-        exercise: {
-          type: "word_match",
-          question: "In 'مِنْ رَبِّهِمْ', what rule applies to the noon before Ra?",
-          options: ["Izhar - clear", "Idgham without ghunnah - merge", "Iqlab - convert", "Ikhfa - hide"],
-          correctAnswer: 1,
-          explanation: "Idgham without ghunnah! Ra (ر) is in YARMALOON, and it's one of the two letters (ل، ر) that merge WITHOUT nasal sound."
-        }
-      },
-      {
-        id: "u7r-quiz2",
-        type: "exercise",
-        title: "Madd Review",
-        content: "Identify the madd type:",
-        exercise: {
-          type: "word_match",
-          question: "In 'الضَّالِّينَ', what type of madd is on the alif before the shaddah?",
-          options: ["Natural Madd - 2 counts", "Connected Madd - 4-5 counts", "Separated Madd - 2-5 counts", "Compulsory Madd - 6 counts"],
-          correctAnswer: 3,
-          explanation: "Compulsory Madd (لَازِم)! The alif is followed by a letter with shaddah (ل), requiring 6 full counts."
-        }
-      },
-      {
-        id: "u7r-quiz3",
-        type: "exercise",
-        title: "Qalqalah Review",
-        content: "Test your qalqalah knowledge:",
-        exercise: {
-          type: "word_match",
-          question: "When stopping on 'أَحَدْ', what happens to the final Dal?",
-          options: ["Nothing special", "Small Qalqalah", "Large Qalqalah (strong echo)", "It becomes silent"],
-          correctAnswer: 2,
-          explanation: "Large Qalqalah (كُبْرَى)! Dal (د) is a qalqalah letter, and at the end of a word when stopping, it gets a strong bounce/echo."
-        }
-      },
-      {
-        id: "u7r-summary",
-        type: "instruction",
-        title: "Tajweed Mastered! 🏆",
-        content: `**Outstanding! You've mastered intermediate tajweed!**
-
-**Quick Reference Card:**
-
-| Rule | When | Action |
-|------|------|--------|
-| Izhar | نْ + throat | Clear |
-| Idgham | نْ + يرملون | Merge |
-| Iqlab | نْ + ب | → Meem |
-| Ikhfa | نْ + 15 letters | Hide |
-| Qalqalah | قطبجد + sukoon | Echo |
-| Madd Lazim | Madd + sukoon | 6 counts |
-
-**You're ready for surah memorization with proper tajweed!**`
-      }
-    ],
-    memorizationTechniques: [
-      "6-6-1-15: Izhar-Idgham-Iqlab-Ikhfa letter counts",
-      "قُطْبُ جَدّ for qalqalah",
-      "Practice with Al-Fatiha - find all rules"
-    ],
-    keyVocabulary: []
   }
 ];
 

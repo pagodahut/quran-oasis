@@ -1042,92 +1042,6 @@ In classical Arabic recitation, these pronouns naturally connect and elongate to
   }
 ];
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // UNIT 9 REVIEW: Advanced Tajweed Consolidation
-  // ─────────────────────────────────────────────────────────────────────────
-  {
-    id: "adv-unit9-review",
-    unit: 9,
-    unitTitle: "Advanced Tajweed",
-    path: "advanced",
-    number: 31.5,
-    title: "Unit 9 Review - Advanced Tajweed Mastery",
-    description: "Consolidate all advanced tajweed concepts",
-    surah: 112,
-    ayahStart: 1,
-    ayahEnd: 4,
-    estimatedMinutes: 20,
-    xpReward: 175,
-    isUnitReview: true,
-    steps: [
-      {
-        id: "u9r-intro",
-        type: "instruction",
-        title: "Advanced Tajweed Review 🎯",
-        content: `**Unit 9 Complete - Let's consolidate!**
-
-**Advanced concepts mastered:**
-1. **Qalqalah** - Echo on قطبجد (small vs large)
-2. **Advanced Idgham** - Mutamaathilain, Mutajaanisain, Mutaqaaribain
-3. **Complete Madd System** - All 9 types with durations
-
-This review ensures you can apply these in actual recitation!`
-      },
-      {
-        id: "u9r-quiz1",
-        type: "exercise",
-        title: "Idgham Types Review",
-        content: "Distinguish the idgham types:",
-        exercise: {
-          type: "word_match",
-          question: "In 'قُل رَّبِّ', what type of idgham occurs between Lam and Ra?",
-          options: ["Mutamaathilain (identical)", "Mutajaanisain (same point)", "Mutaqaaribain (close points)", "No idgham"],
-          correctAnswer: 2,
-          explanation: "Mutaqaaribain! Lam and Ra come from CLOSE articulation points. The Lam merges into Ra → 'qur-rabbi'."
-        }
-      },
-      {
-        id: "u9r-quiz2",
-        type: "exercise",
-        title: "Madd System Review",
-        content: "Apply your complete madd knowledge:",
-        exercise: {
-          type: "word_match",
-          question: "When stopping on 'الرَّحِيمِ', what type of madd occurs on the Yaa?",
-          options: ["Madd Tabee'i (Natural)", "Madd Muttasil (Connected)", "Madd 'Aarid (Presented)", "Madd Lazim (Compulsory)"],
-          correctAnswer: 2,
-          explanation: "Madd 'Aarid lil-Sukoon! When stopping, the Meem gets sukoon, creating a 'presented' sukoon after the Yaa. You can hold 2, 4, or 6 counts."
-        }
-      },
-      {
-        id: "u9r-summary",
-        type: "instruction",
-        title: "Advanced Tajweed Mastered! 🏆",
-        content: `**Excellent! You've mastered advanced tajweed!**
-
-**Complete Madd Reference:**
-| Type | Cause | Counts |
-|------|-------|--------|
-| Natural | Base | 2 |
-| Connected | Hamza same word | 4-5 |
-| Separated | Hamza next word | 2-5 |
-| Compulsory | Sukoon/shaddah | 6 |
-| Presented | Stop creates sukoon | 2/4/6 |
-| Exchange | Tanween fatha stop | 2 |
-| Soft | Waw/Ya + fatha | 2/4/6 |
-
-**Ready for Mutashabihat - similar verses!**`
-      }
-    ],
-    memorizationTechniques: [
-      "Qalqalah: قُطْبُ جَدّ - echo the 5 letters",
-      "3 idgham types: identical, same point, close points",
-      "Madd: What follows determines the type"
-    ],
-    keyVocabulary: []
-  }
-];
-
 /**
  * ═══════════════════════════════════════════════════════════════════════════
  * UNIT 10: MUTASHABIHAT - SIMILAR VERSES (Lessons 32-33)
@@ -1671,6 +1585,76 @@ Compare with Ad-Duha's "أَلَمْ يَجِدْكَ" (Did HE not FIND...) - Th
 This distinction helps you know which surah you're reciting!`
       },
       {
+        id: "adv5-quiz",
+        type: "exercise",
+        title: "Juz Amma Distinction Quiz",
+        content: "Test your surah identification!",
+        exercise: {
+          type: "word_match",
+          question: "Which surah begins with 'وَالْفَجْرِ' (By the dawn)?",
+          options: ["Al-Balad (90)", "Al-Fajr (89)", "Ad-Duha (93)", "Al-Layl (92)"],
+          correctAnswer: 1,
+          explanation: "Al-Fajr (89)! It begins with simple 'وَ' oaths about time (dawn, ten nights, even and odd). Al-Balad (90) uses 'لَا أُقْسِمُ' instead."
+        }
+      },
+      {
+        id: "adv5-quiz2",
+        type: "exercise",
+        title: "Opening Pattern Recognition",
+        content: "Distinguish similar openings:",
+        exercise: {
+          type: "word_match",
+          question: "'أَلَمْ يَجِدْكَ' (Did He not find you) is from which surah?",
+          options: ["Ad-Duha (93)", "Al-Inshirah (94)", "Al-'Alaq (96)", "Al-Qadr (97)"],
+          correctAnswer: 0,
+          explanation: "Ad-Duha! It uses third person 'He found YOU' (يَجِدْكَ). Al-Inshirah uses 'Did WE not expand' (أَلَمْ نَشْرَحْ) - first person."
+        }
+      },
+      {
+        id: "adv5-quiz3",
+        type: "exercise",
+        title: "Al-Kafirun Internal Repetition",
+        content: "Know the internal structure:",
+        exercise: {
+          type: "word_match",
+          question: "In Al-Kafirun, verses 2-3 use present tense while verses 4-5 indicate...",
+          options: [
+            "Past tense",
+            "Future/ongoing state (will never worship)",
+            "Exactly the same as 2-3",
+            "Questions"
+          ],
+          correctAnswer: 1,
+          explanation: "Future state! 2-3 = 'I do not worship' (present). 4-5 = 'I will not be a worshipper' (ongoing/future). The repetition emphasizes: not now, not ever!"
+        }
+      },
+      {
+        id: "adv5-quiz4",
+        type: "exercise",
+        title: "Ending Pattern Match",
+        content: "Group by similar endings:",
+        exercise: {
+          type: "word_match",
+          question: "'وَإِلَىٰ رَبِّكَ فَارْغَب' (And to your Lord direct your longing) ends which surah?",
+          options: ["Ad-Duha (93)", "Al-Inshirah (94)", "Al-Qadr (97)", "Al-Fatiha (1)"],
+          correctAnswer: 1,
+          explanation: "Al-Inshirah! Ad-Duha ends with 'فَحَدِّثْ' (so proclaim/report the favor). Both address the Prophet ﷺ but with different concluding instructions."
+        }
+      },
+      {
+        id: "adv5-timed-challenge",
+        type: "exercise",
+        title: "⏱️ Rapid Surah ID",
+        content: "Quick! Name the surah!",
+        exercise: {
+          type: "word_match",
+          question: "'لَا أَعْبُدُ مَا تَعْبُدُونَ' - Which surah?",
+          options: ["Al-Ikhlas (112)", "Al-Kafirun (109)", "Al-Masad (111)", "Al-Nasr (110)"],
+          correctAnswer: 1,
+          explanation: "Al-Kafirun! 'I do not worship what you worship' is the defining verse of this surah about complete distinction between belief and disbelief."
+        }
+      },
+      {
         id: "adv5-review",
         type: "instruction",
         title: "Lesson Complete! 🌟",
@@ -1705,79 +1689,6 @@ This distinction helps you know which surah you're reciting!`
       { arabic: "أَلَمْ يَجِدْكَ", transliteration: "Alam yajidka", meaning: "Did He not find you" },
       { arabic: "أَلَمْ نَشْرَحْ", transliteration: "Alam nashrah", meaning: "Did We not expand" }
     ]
-  }
-];
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // UNIT 10 REVIEW: Mutashabihat Consolidation
-  // ─────────────────────────────────────────────────────────────────────────
-  {
-    id: "adv-unit10-review",
-    unit: 10,
-    unitTitle: "Mutashabihat - Similar Verses",
-    path: "advanced",
-    number: 33.5,
-    title: "Unit 10 Review - Mutashabihat Mastery",
-    description: "Consolidate strategies for similar verses",
-    surah: 93,
-    ayahStart: 1,
-    ayahEnd: 8,
-    estimatedMinutes: 15,
-    xpReward: 150,
-    isUnitReview: true,
-    steps: [
-      {
-        id: "u10r-intro",
-        type: "instruction",
-        title: "Mutashabihat Review 🔍",
-        content: `**You've learned to tackle similar verses!**
-
-**Key strategies:**
-1. Create a dedicated mutashabihat notebook
-2. Understand the context - WHY does each version appear?
-3. Focus on the DISTINGUISHING words
-4. Use numerical associations
-5. Recite pairs side-by-side`
-      },
-      {
-        id: "u10r-quiz",
-        type: "exercise",
-        title: "Quick Distinction Test",
-        content: "Apply your mutashabihat skills:",
-        exercise: {
-          type: "word_match",
-          question: "How do you distinguish Ad-Duha (93) from Al-Inshirah (94) openings?",
-          options: [
-            "They're identical - no distinction needed",
-            "Duha uses يَجِدْكَ (He found you), Inshirah uses نَشْرَحْ (We expanded)",
-            "Duha is longer than Inshirah",
-            "Inshirah comes before Duha in order"
-          ],
-          correctAnswer: 1,
-          explanation: "Ad-Duha asks 'أَلَمْ يَجِدْكَ' (Did He not FIND you) - third person. Al-Inshirah asks 'أَلَمْ نَشْرَحْ' (Did WE not EXPAND) - first person. Person and verb differ!"
-        }
-      },
-      {
-        id: "u10r-summary",
-        type: "instruction",
-        title: "Mutashabihat Strategies Mastered! ✅",
-        content: `**You can now handle similar verses!**
-
-**Remember:**
-- Mutashabihat require EXTRA review time
-- Context is your best friend
-- Test specifically on the differences
-- Teach others to cement your knowledge
-
-**Ready for Revision Strategies!**`
-      }
-    ],
-    memorizationTechniques: [
-      "Dedicated mutashabihat notebook",
-      "Context determines which version",
-      "Test specifically on differences"
-    ],
-    keyVocabulary: []
   }
 ];
 
@@ -2779,6 +2690,91 @@ Allah made it easy. It can be recovered. Start today!`
         }
       },
       {
+        id: "adv8-quiz2",
+        type: "exercise",
+        title: "Problem: Same Spots Slipping",
+        content: "Targeted solution:",
+        exercise: {
+          type: "word_match",
+          question: "You keep forgetting the same verse connection. What's the MOST effective solution?",
+          options: [
+            "Just repeat the whole surah more",
+            "Isolation drilling: extract that spot, repeat 50+ times, connect to before AND after",
+            "Skip that verse",
+            "Change to a different surah"
+          ],
+          correctAnswer: 1,
+          explanation: "Isolation drilling! Extract the SPECIFIC problematic spot, drill it 50+ times in one session, and practice connecting it to the verse before AND after. Targeted practice beats general repetition."
+        }
+      },
+      {
+        id: "adv8-quiz3",
+        type: "exercise",
+        title: "Problem: Can't Recite Without Looking",
+        content: "Break the dependency:",
+        exercise: {
+          type: "word_match",
+          question: "You always need to look at the mushaf. What technique helps build true memory?",
+          options: [
+            "Use a bigger font mushaf",
+            "Close-test-open method: memorize, close, try, open only when stuck",
+            "Read faster",
+            "Only practice with the mushaf open"
+          ],
+          correctAnswer: 1,
+          explanation: "Close-test-open! This forces your brain to actively retrieve rather than passively recognize. Close the mushaf, TRY to recall, and only open when truly stuck. This builds real memory pathways."
+        }
+      },
+      {
+        id: "adv8-quiz4",
+        type: "exercise",
+        title: "Problem: Lost Motivation",
+        content: "Rekindling the fire:",
+        exercise: {
+          type: "comprehension",
+          question: "You've lost motivation to continue memorizing. Which approach is LEAST effective?",
+          options: [
+            "Remember your original 'why' for starting",
+            "Wait until motivation returns naturally",
+            "Change your environment or method",
+            "Connect memorization to prayer (tahajjud, taraweeh)"
+          ],
+          correctAnswer: 1,
+          explanation: "Waiting for motivation is least effective! Motivation follows ACTION, not the other way around. Start small, change something (environment, method), reconnect to your purpose, and motivation will return."
+        }
+      },
+      {
+        id: "adv8-timed-challenge",
+        type: "exercise",
+        title: "⏱️ Scenario Solution",
+        content: "Quick problem-solving!",
+        exercise: {
+          type: "word_match",
+          question: "Life got busy and you haven't revised in 3 months. Your first step should be...",
+          options: [
+            "Feel guilty and give up",
+            "Assess what's retained, forgive yourself, start with strong portions",
+            "Try to recite everything immediately",
+            "Start memorizing new material"
+          ],
+          correctAnswer: 1,
+          explanation: "Assess, forgive, start strong! Recovery is FASTER than initial memorization because neural pathways still exist. Be patient with yourself - what took months to memorize may return in weeks with consistent review."
+        }
+      },
+      {
+        id: "adv8-final-complete-ayah",
+        type: "exercise",
+        title: "Complete the Ayah - Final Test",
+        content: "A fitting end to your journey:",
+        exercise: {
+          type: "fill_blank",
+          question: "الَّذِينَ آتَيْنَاهُمُ الْكِتَابَ يَتْلُونَهُ ___ تِلَاوَتِهِ (2:121)",
+          options: ["حَقَّ (with its true)", "كُلَّ (all of)", "أَحْسَنَ (the best)", "بَعْضَ (some of)"],
+          correctAnswer: 0,
+          explanation: "'Those to whom We have given the Book RECITE IT WITH ITS TRUE RECITATION (حَقَّ تِلَاوَتِهِ).' May you be among those who recite the Quran as it deserves to be recited!"
+        }
+      },
+      {
         id: "adv8-review",
         type: "instruction",
         title: "Advanced Path COMPLETE! 🏆",
@@ -2821,81 +2817,6 @@ Allah made it easy. It can be recovered. Start today!`
       { arabic: "تَثْبِيت", transliteration: "Tathbeet", meaning: "Strengthening/consolidation" },
       { arabic: "اِسْتِمْرَار", transliteration: "Istimrar", meaning: "Continuity/persistence" }
     ]
-  }
-];
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // UNIT 11 REVIEW: Revision Systems Consolidation
-  // ─────────────────────────────────────────────────────────────────────────
-  {
-    id: "adv-unit11-review",
-    unit: 11,
-    unitTitle: "Revision Strategies",
-    path: "advanced",
-    number: 36.5,
-    title: "Unit 11 Review - Revision Systems Mastery",
-    description: "Consolidate your revision strategies",
-    surah: 1,
-    ayahStart: 1,
-    ayahEnd: 7,
-    estimatedMinutes: 15,
-    xpReward: 150,
-    isUnitReview: true,
-    steps: [
-      {
-        id: "u11r-intro",
-        type: "instruction",
-        title: "Revision Systems Review 📊",
-        content: `**You've built a complete revision system!**
-
-**Key principles learned:**
-1. **Forgetting curve** - Review at optimal intervals
-2. **Spaced repetition** - Increasing gaps between reviews
-3. **3:1 ratio** - 3 parts revision to 1 part new memorization
-4. **Level-appropriate systems** - Different amounts need different strategies
-5. **Troubleshooting** - Solutions for common problems`
-      },
-      {
-        id: "u11r-quiz",
-        type: "exercise",
-        title: "Revision Strategy Check",
-        content: "Test your system knowledge:",
-        exercise: {
-          type: "word_match",
-          question: "If you've stopped revising for months and want to restart, what's the BEST first step?",
-          options: [
-            "Try to recite everything at once",
-            "Start memorizing new material to build momentum",
-            "Assess what's retained, start with strong portions",
-            "Wait until you feel motivated"
-          ],
-          correctAnswer: 2,
-          explanation: "Assess first, then start with strong portions! Building confidence with retained material creates momentum. Never wait for motivation - systems beat willpower."
-        }
-      },
-      {
-        id: "u11r-summary",
-        type: "instruction",
-        title: "Revision Master! 📈",
-        content: `**You have the tools to maintain your hifdh!**
-
-**Your daily system:**
-- Morning: New + Fresh revision
-- Midday: Quick test
-- Evening: Old + Deep revision
-
-**Weekly:** Complete portion review + Mutashabihat
-**Monthly:** Assessment + adjust
-
-**Ready for Long Surah Strategies!**`
-      }
-    ],
-    memorizationTechniques: [
-      "3:1 ratio - revision:memorization",
-      "Morning for new, evening for old",
-      "Test yourself, don't just read"
-    ],
-    keyVocabulary: []
   }
 ];
 
