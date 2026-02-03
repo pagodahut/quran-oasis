@@ -447,3 +447,4 @@ export function TajweedLegend({
     </div>
   );
 }
+// Build cache bust: 1770104181
