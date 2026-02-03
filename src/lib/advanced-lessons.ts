@@ -588,6 +588,73 @@ Press play and repeat until the merging feels natural.`
         }
       },
       {
+        id: "adv2-quiz2",
+        type: "exercise",
+        title: "Identical Letters",
+        content: "Mutamaathilain practice:",
+        exercise: {
+          type: "word_match",
+          question: "In 'وَقَد دَّخَلُوا' (and they had entered), what type of idgham occurs?",
+          options: [
+            "Mutamaathilain (identical - Dal+Dal)",
+            "Mutajaanisain (same point - Dal+Ta)",
+            "Mutaqaaribain (close points)",
+            "No idgham"
+          ],
+          correctAnswer: 0,
+          explanation: "Mutamaathilain! Two identical letters (دْ + د = Dal meeting Dal) merge into one doubled Dal. Pronounced 'wa qa-da-khaloo' with one elongated Dal."
+        }
+      },
+      {
+        id: "adv2-quiz3",
+        type: "exercise",
+        title: "Same Articulation Point",
+        content: "Mutajaanisain practice:",
+        exercise: {
+          type: "word_match",
+          question: "In 'قَد تَّبَيَّنَ' (has become clear), Dal merges into Ta. Why is this Mutajaanisain?",
+          options: [
+            "They're identical letters",
+            "They share the SAME articulation point (tongue tip against upper teeth)",
+            "They're from nearby articulation points",
+            "This isn't idgham"
+          ],
+          correctAnswer: 1,
+          explanation: "Mutajaanisain! Dal (د) and Ta (ت) both come from the exact SAME articulation point - tongue tip touching the base of the upper teeth. Same point, different characteristics!"
+        }
+      },
+      {
+        id: "adv2-quiz4",
+        type: "exercise",
+        title: "Idgham Decision Flow",
+        content: "Apply the logic:",
+        exercise: {
+          type: "comprehension",
+          question: "How do you determine which type of idgham applies?",
+          options: [
+            "It depends on the meaning of the word",
+            "Check if letters are identical → same point → close points",
+            "Just memorize each case",
+            "It's random"
+          ],
+          correctAnswer: 1,
+          explanation: "Follow the logic: 1) Are letters identical? = Mutamaathilain. 2) Same articulation point? = Mutajaanisain. 3) Close points? = Mutaqaaribain. Systematic!"
+        }
+      },
+      {
+        id: "adv2-timed-challenge",
+        type: "exercise",
+        title: "⏱️ Rapid Idgham Classification",
+        content: "Quick identification!",
+        exercise: {
+          type: "word_match",
+          question: "ب + ب in 'اذْهَب بِّكِتَابِي' - Which type?",
+          options: ["Mutamaathilain (identical)", "Mutajaanisain (same point)", "Mutaqaaribain (close)", "No idgham"],
+          correctAnswer: 0,
+          explanation: "Mutamaathilain! Two identical Ba letters merge. 'Idh-hab-bi-kitaabi' with one merged, lengthened Ba sound."
+        }
+      },
+      {
         id: "adv2-review",
         type: "instruction",
         title: "Lesson Complete! 🌟",
@@ -862,6 +929,78 @@ In classical Arabic recitation, these pronouns naturally connect and elongate to
           ],
           correctAnswer: 2,
           explanation: "Madd 'Aarid lil-Sukoon! When stopping, the Noon gets sukoon, which 'presents' a sukoon after the Yaa. This temporary sukoon creates flexibility: you can hold for 2, 4, or 6 counts."
+        }
+      },
+      {
+        id: "adv3-quiz2",
+        type: "exercise",
+        title: "Madd 'Iwad Practice",
+        content: "The exchange madd:",
+        exercise: {
+          type: "word_match",
+          question: "When stopping on 'عَلِيمًا حَكِيمًا', what happens to the tanween fatha?",
+          options: [
+            "Pronounced as 'an' sound",
+            "Exchanged for a long 'aa' sound (2 counts)",
+            "Becomes silent",
+            "Pronounced as 'in' sound"
+          ],
+          correctAnswer: 1,
+          explanation: "Madd 'Iwad (Exchange)! When stopping on tanween fatha (ـًـا), it's 'exchanged' for a long 'aa'. 'Hakeem-aa' not 'Hakeeman'. Only tanween FATHA gets this exchange!"
+        }
+      },
+      {
+        id: "adv3-quiz3",
+        type: "exercise",
+        title: "Madd Leen Identification",
+        content: "The soft madd:",
+        exercise: {
+          type: "word_match",
+          question: "In 'قُرَيْشٍ' (Quraysh), why is the Yaa a 'Leen' letter, not a regular madd?",
+          options: [
+            "It has sukoon and is preceded by FATHA (not kasra)",
+            "It's at the end of the word",
+            "There's a hamza after it",
+            "It has shaddah"
+          ],
+          correctAnswer: 0,
+          explanation: "Madd Leen! The Yaa has sukoon (يْ) but is preceded by FATHA (on the Ra), not Kasra. This makes it a 'soft' letter - 'ay' sound rather than 'ee'. It only elongates when stopping!"
+        }
+      },
+      {
+        id: "adv3-quiz4",
+        type: "exercise",
+        title: "Madd Sila Practice",
+        content: "The connecting madd:",
+        exercise: {
+          type: "word_match",
+          question: "In 'إِنَّهُ هُوَ' (Indeed He is), what happens to the ه pronoun?",
+          options: [
+            "Pronounced short with no elongation",
+            "Sila Sughra - slight elongation (2 counts) as it connects to next word",
+            "Sila Kubra - long elongation (4-5 counts)",
+            "Silent"
+          ],
+          correctAnswer: 1,
+          explanation: "Sila Sughra! The pronoun ه at the end of إِنَّهُ connects to the next word with slight elongation. It's NOT followed by hamza, so it's the SMALL connection (2 counts)."
+        }
+      },
+      {
+        id: "adv3-timed-challenge",
+        type: "exercise",
+        title: "⏱️ Madd Type Rapid Fire",
+        content: "Quick identification!",
+        exercise: {
+          type: "word_match",
+          question: "مَالَهُ أَخْلَدَهُ - What madd on the ه before hamza?",
+          options: [
+            "Sila Sughra (small connection)",
+            "Sila Kubra (large connection - before hamza)",
+            "Madd Tabee'i",
+            "No madd"
+          ],
+          correctAnswer: 1,
+          explanation: "Sila Kubra! The pronoun ه is followed by hamza (أ) in the next word. This requires LARGE connection with 4-5 counts of elongation!"
         }
       },
       {
@@ -1195,6 +1334,78 @@ CONTEXT helps you know which version comes next!`
           ],
           correctAnswer: 1,
           explanation: "Mutashabihat exist by Divine wisdom - they test and strengthen memorizers, emphasize important concepts through repetition with variation, and create rhetorical effects. Understanding this helps you approach them strategically!"
+        }
+      },
+      {
+        id: "adv4-quiz2",
+        type: "exercise",
+        title: "Word Substitution Example",
+        content: "Spot the difference:",
+        exercise: {
+          type: "word_match",
+          question: "Al-Baqarah 2:80 says 'أَيَّامًا مَّعْدُودَةً' while Aal-Imran 3:24 says 'أَيَّامًا مَّعْدُودَاتٍ'. What's the difference?",
+          options: [
+            "Different meanings entirely",
+            "Same meaning, different grammatical form (singular vs plural pattern)",
+            "Typo in one version",
+            "Different surahs, different topics"
+          ],
+          correctAnswer: 1,
+          explanation: "Same meaning, different forms! معدودة (singular pattern) vs معدودات (plural pattern). Both mean 'numbered/counted days' - Arabic grammatical variation with identical meaning."
+        }
+      },
+      {
+        id: "adv4-quiz3",
+        type: "exercise",
+        title: "Strategy Application",
+        content: "How to remember which version?",
+        exercise: {
+          type: "comprehension",
+          question: "Which strategy is MOST effective for distinguishing mutashabihat?",
+          options: [
+            "Memorize both versions without understanding context",
+            "Understand WHY each version appears in its context",
+            "Skip the confusing parts",
+            "Read faster so you don't notice the difference"
+          ],
+          correctAnswer: 1,
+          explanation: "Understanding CONTEXT is key! Ask: Why does THIS version appear HERE? The theme of the surah, the audience, and the surrounding verses often explain why a particular wording was chosen."
+        }
+      },
+      {
+        id: "adv4-quiz4",
+        type: "exercise",
+        title: "Practical Exercise",
+        content: "Identify the type of mutashabihat:",
+        exercise: {
+          type: "word_match",
+          question: "'فَاذْكُرُونِي' (Remember ME - Al-Baqarah) vs 'اذْكُرُوا اللَّهَ' (Remember ALLAH - Al-Jumu'ah). What type of similarity?",
+          options: [
+            "Word substitution",
+            "Addition/deletion",
+            "Word order change",
+            "First person vs third person reference"
+          ],
+          correctAnswer: 3,
+          explanation: "Person change! In Baqarah, Allah speaks directly (ME - first person). In Jumu'ah, it's instruction through the Prophet (Allah's name - third person). Same command, different grammatical person."
+        }
+      },
+      {
+        id: "adv4-timed-challenge",
+        type: "exercise",
+        title: "⏱️ Quick Recall",
+        content: "Fast answer!",
+        exercise: {
+          type: "word_match",
+          question: "What should you do when you encounter mutashabihat?",
+          options: [
+            "Panic and skip it",
+            "Isolate the DIFFERENT part and practice specifically",
+            "Memorize only one version",
+            "Avoid those surahs"
+          ],
+          correctAnswer: 1,
+          explanation: "Isolate and practice the DIFFERENCE! Don't just repeat the whole verse. Focus on what makes each version unique and drill that specific part."
         }
       },
       {
@@ -1772,6 +1983,68 @@ If NO, it needs MORE review!`
           ],
           correctAnswer: 1,
           explanation: "Just before forgetting! This is when review is most effective. Reviewing too early is inefficient (you still know it), too late means you've lost it. Spaced repetition schedules reviews at optimal intervals."
+        }
+      },
+      {
+        id: "adv6-quiz2",
+        type: "exercise",
+        title: "Forgetting Curve Knowledge",
+        content: "Understanding memory science:",
+        exercise: {
+          type: "word_match",
+          question: "According to Ebbinghaus's forgetting curve, how much is retained after 1 day without review?",
+          options: ["About 80%", "About 50%", "About 34%", "About 10%"],
+          correctAnswer: 2,
+          explanation: "Only about 34% is retained after 1 day! This is why immediate review after memorizing is crucial. Each review 'resets' and strengthens the memory."
+        }
+      },
+      {
+        id: "adv6-quiz3",
+        type: "exercise",
+        title: "Revision Type Matching",
+        content: "Know which type to use when:",
+        exercise: {
+          type: "word_match",
+          question: "You just memorized new verses yesterday. Which type of revision should you prioritize?",
+          options: [
+            "Old revision (مُرَاجَعَة قَدِيمَة)",
+            "Fresh revision (مُرَاجَعَة جَدِيدَة)",
+            "Deep revision only once a month",
+            "No revision needed yet"
+          ],
+          correctAnswer: 1,
+          explanation: "Fresh revision! Newly memorized portions (< 30 days) need high-frequency review - daily or every other day. The goal is to solidify before it fades!"
+        }
+      },
+      {
+        id: "adv6-quiz4",
+        type: "exercise",
+        title: "Daily System Design",
+        content: "Optimal scheduling:",
+        exercise: {
+          type: "comprehension",
+          question: "Why is morning (after Fajr) the best time for new memorization and fresh revision?",
+          options: [
+            "It's just tradition",
+            "Memory is sharpest in the morning, and it's spiritually blessed time",
+            "It's the only free time",
+            "It doesn't matter what time you choose"
+          ],
+          correctAnswer: 1,
+          explanation: "Research shows memory is sharpest in the morning after rest. Additionally, the time after Fajr has special barakah (blessing) - the Prophet ﷺ made du'a for blessing in the early morning for his Ummah!"
+        }
+      },
+      {
+        id: "adv6-timed-challenge",
+        type: "exercise",
+        title: "⏱️ Quick Recall",
+        content: "What's the Prophet's hadith?",
+        exercise: {
+          type: "word_match",
+          question: "The Prophet ﷺ said: 'Keep reviewing the Quran, for by the One in Whose Hand is my soul, it escapes faster than...'",
+          options: ["Water from a container", "Camels from their ropes", "Birds from their cages", "Dreams from memory"],
+          correctAnswer: 1,
+          explanation: "Camels from their ropes! (Bukhari & Muslim). This hadith emphasizes how quickly memorization can slip away without regular review."
         }
       },
       {
