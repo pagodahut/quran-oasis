@@ -493,7 +493,7 @@ export default function ProfilePage() {
           {/* Sign Out - visible at bottom */}
           {isSignedIn && (
             <motion.div variants={fadeInUp} className="pt-4">
-              <SignOutButton>
+              <SignOutButton redirectUrl="/">
                 <button className="w-full py-3 px-4 rounded-xl text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2">
                   <LogOut className="w-5 h-5" />
                   <span>Sign Out</span>
