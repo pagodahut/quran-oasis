@@ -497,9 +497,9 @@ export default function HomePage() {
                 <span className="relative inline-block">
                   <span className="liquid-shimmer-text tracking-wider font-bold">HIFZ</span>
                   <motion.span
-                    className="absolute -inset-4 bg-gold-500/10 rounded-2xl -z-10 blur-sm"
-                    animate={{ scale: [1, 1.05, 1], opacity: [0.5, 0.8, 0.5] }}
-                    transition={{ duration: 3, repeat: Infinity }}
+                    className="absolute -inset-8 bg-gold-500/15 rounded-full -z-10 blur-2xl"
+                    animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
+                    transition={{ duration: 4, repeat: Infinity }}
                   />
                 </span>
                 <span className="text-night-100"> Starts Here</span>
@@ -574,24 +574,6 @@ export default function HomePage() {
             </motion.div>
           </motion.div>
           
-          {/* Scroll indicator */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.5 }}
-            className="absolute bottom-8"
-          >
-            <motion.div
-              animate={{ y: [0, 8, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-              className="w-6 h-10 rounded-full border-2 border-night-700/50 flex items-start justify-center p-1.5"
-            >
-              <motion.div 
-                className="w-1.5 h-3 rounded-full"
-                style={{ background: 'linear-gradient(to bottom, #c9a227, #8b6914)' }}
-              />
-            </motion.div>
-          </motion.div>
         </section>
 
         {/* Features Section */}
