@@ -2,7 +2,9 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
+import { stopPlayback } from '@/lib/quranAudioService';
+import { stopAllAudio } from '@/lib/audioService';
 
 interface PageTransitionProps {
   children: ReactNode;
@@ -35,6 +37,17 @@ const pageTransition = {
 
 export default function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname();
+  const prevPathRef = useRef(pathname);
+
+  // Stop all audio when route changes
+  useEffect(() => {
+    if (prevPathRef.current !== pathname) {
+      // Route changed - stop all audio to prevent overlaps
+      stopPlayback();
+      stopAllAudio();
+      prevPathRef.current = pathname;
+    }
+  }, [pathname]);
 
   return (
     <AnimatePresence mode="wait" initial={false}>
