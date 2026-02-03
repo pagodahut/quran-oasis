@@ -691,25 +691,111 @@ export default function HomePage() {
                 </p>
               </motion.div>
 
-              <div className="grid md:grid-cols-3 gap-6">
-                <FeatureCard
-                  iconComponent={PersonalizedIcon}
-                  title="Personalized Learning"
-                  description="AI creates a custom study plan based on your level, goals, and available time"
-                  gradient="from-gold-500 to-amber-600"
-                />
-                <FeatureCard
-                  iconComponent={SpacedRepIcon}
-                  title="Spaced Repetition"
-                  description="Science-backed review system ensures you never forget what you've memorized"
-                  gradient="from-purple-500 to-pink-500"
-                />
-                <FeatureCard
-                  iconComponent={ProgressIcon}
-                  title="Track Progress"
-                  description="Beautiful visualizations show your journey from first verse to full HIFZ"
-                  gradient="from-sage-500 to-emerald-500"
-                />
+              {/* Animated Pathway */}
+              <div className="relative">
+                {/* SVG Path that draws itself */}
+                <motion.svg
+                  className="absolute inset-0 w-full h-full pointer-events-none hidden md:block"
+                  viewBox="0 0 1200 200"
+                  preserveAspectRatio="none"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-50px" }}
+                >
+                  <defs>
+                    <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#c9a227" />
+                      <stop offset="50%" stopColor="#a855f7" />
+                      <stop offset="100%" stopColor="#86a971" />
+                    </linearGradient>
+                    <filter id="glow">
+                      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                      <feMerge>
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                      </feMerge>
+                    </filter>
+                  </defs>
+                  {/* Connecting path */}
+                  <motion.path
+                    d="M 200 100 C 350 100, 450 100, 600 100 C 750 100, 850 100, 1000 100"
+                    fill="none"
+                    stroke="url(#pathGradient)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    filter="url(#glow)"
+                    variants={{
+                      hidden: { pathLength: 0, opacity: 0 },
+                      visible: { 
+                        pathLength: 1, 
+                        opacity: 1,
+                        transition: { duration: 1.5, ease: "easeInOut" }
+                      }
+                    }}
+                  />
+                  {/* Node dots */}
+                  {[200, 600, 1000].map((x, i) => (
+                    <motion.circle
+                      key={x}
+                      cx={x}
+                      cy={100}
+                      r={8}
+                      fill={i === 0 ? "#c9a227" : i === 1 ? "#a855f7" : "#86a971"}
+                      filter="url(#glow)"
+                      variants={{
+                        hidden: { scale: 0, opacity: 0 },
+                        visible: { 
+                          scale: 1, 
+                          opacity: 1,
+                          transition: { delay: 0.5 + i * 0.3, duration: 0.4, type: "spring" }
+                        }
+                      }}
+                    />
+                  ))}
+                </motion.svg>
+
+                {/* Feature Cards with staggered animation */}
+                <div className="grid md:grid-cols-3 gap-6 relative z-10">
+                  <motion.div
+                    initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.2, duration: 0.5, type: "spring" }}
+                  >
+                    <FeatureCard
+                      iconComponent={PersonalizedIcon}
+                      title="Personalized Learning"
+                      description="AI creates a custom study plan based on your level, goals, and available time"
+                      gradient="from-gold-500 to-amber-600"
+                    />
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.5, duration: 0.5, type: "spring" }}
+                  >
+                    <FeatureCard
+                      iconComponent={SpacedRepIcon}
+                      title="Spaced Repetition"
+                      description="Science-backed review system ensures you never forget what you've memorized"
+                      gradient="from-purple-500 to-pink-500"
+                    />
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.8, duration: 0.5, type: "spring" }}
+                  >
+                    <FeatureCard
+                      iconComponent={ProgressIcon}
+                      title="Track Progress"
+                      description="Beautiful visualizations show your journey from first verse to full HIFZ"
+                      gradient="from-sage-500 to-emerald-500"
+                    />
+                  </motion.div>
+                </div>
               </div>
             </div>
           </motion.div>
