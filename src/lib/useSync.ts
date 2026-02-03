@@ -1,12 +1,22 @@
 'use client';
 
-import { useUser } from '@clerk/nextjs';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getProgress, saveProgress, UserProgress } from './progressStore';
 import { getBookmarks, Bookmark } from './bookmarks';
 
 const SYNC_DEBOUNCE_MS = 5000; // Wait 5 seconds after last change before syncing
 const LAST_SYNC_KEY = 'quranOasis_lastSync';
+
+// Safely import useUser - returns null values if Clerk is not available
+function useClerkUser() {
+  try {
+    // Dynamic import to avoid errors when Clerk isn't configured
+    const { useUser } = require('@clerk/nextjs');
+    return useUser();
+  } catch {
+    return { user: null, isSignedIn: false, isLoaded: true };
+  }
+}
 
 export interface SyncState {
   isSyncing: boolean;
@@ -16,7 +26,7 @@ export interface SyncState {
 }
 
 export function useSync() {
-  const { user, isSignedIn, isLoaded } = useUser();
+  const { user, isSignedIn, isLoaded } = useClerkUser();
   const [syncState, setSyncState] = useState<SyncState>({
     isSyncing: false,
     lastSynced: null,
