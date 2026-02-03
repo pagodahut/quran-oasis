@@ -24,7 +24,7 @@ import {
   Layers,
   BookOpen,
 } from 'lucide-react';
-import { getSurah, getAudioUrl, RECITERS, type Ayah } from '@/lib/quranData';
+import { getSurah, getAudioUrl, RECITERS, cleanAyahText, type Ayah } from '@/lib/quranData';
 import { 
   startMemorizingVerse, 
   markVerseMemorized, 
@@ -160,16 +160,20 @@ function Celebration({ xp }: { xp: number }) {
 // ============ VERSE DISPLAY COMPONENT ============
 
 function VerseDisplay({ 
-  verse, 
+  verse,
+  surahNumber,
   showText = true,
   highlight = false,
   size = 'large',
 }: { 
   verse: Ayah;
+  surahNumber: number;
   showText?: boolean;
   highlight?: boolean;
   size?: 'small' | 'medium' | 'large';
 }) {
+  // Clean the verse text to remove Bismillah prefix (for audio sync)
+  const displayText = cleanAyahText(verse.text.arabic, surahNumber, verse.numberInSurah);
   const sizeClasses = {
     small: 'text-2xl',
     medium: 'text-3xl md:text-4xl',
@@ -205,7 +209,7 @@ function VerseDisplay({
             }`}
             style={{ direction: 'rtl' }}
           >
-            {verse.text.arabic}
+            {displayText}
           </motion.p>
         ) : (
           <motion.div
@@ -563,7 +567,7 @@ export default function MemorizePage() {
                 </p>
               </div>
 
-              <VerseDisplay verse={verse} size="large" highlight />
+              <VerseDisplay verse={verse} surahNumber={surahNum} size="large" highlight />
 
               {/* Translation */}
               <div className="bg-night-900/50 rounded-2xl p-6 border border-night-800">
@@ -610,7 +614,7 @@ export default function MemorizePage() {
                 </p>
               </div>
 
-              <VerseDisplay verse={verse} size="large" highlight={isPlaying} />
+              <VerseDisplay verse={verse} surahNumber={surahNum} size="large" highlight={isPlaying} />
 
               <AudioControls
                 isPlaying={isPlaying}
@@ -654,7 +658,7 @@ export default function MemorizePage() {
                 </p>
               </div>
 
-              <VerseDisplay verse={verse} size="large" highlight={isPlaying} />
+              <VerseDisplay verse={verse} surahNumber={surahNum} size="large" highlight={isPlaying} />
 
               <AudioControls
                 isPlaying={isPlaying}
@@ -690,7 +694,7 @@ export default function MemorizePage() {
                 </p>
               </div>
 
-              <VerseDisplay verse={verse} size="large" />
+              <VerseDisplay verse={verse} surahNumber={surahNum} size="large" />
 
               <RepetitionCounter 
                 current={repetitions} 
@@ -739,7 +743,7 @@ export default function MemorizePage() {
               </div>
 
               <div onClick={() => setShowText(!showText)} className="cursor-pointer">
-                <VerseDisplay verse={verse} showText={showText} size="large" />
+                <VerseDisplay verse={verse} surahNumber={surahNum} showText={showText} size="large" />
               </div>
 
               {!showText && (
@@ -808,7 +812,7 @@ export default function MemorizePage() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.1 }}
                 >
-                  <VerseDisplay verse={pv} size="small" />
+                  <VerseDisplay verse={pv} surahNumber={surahNum} size="small" />
                   <div className="flex justify-center my-2">
                     <ChevronRight className="w-5 h-5 text-night-600 rotate-90" />
                   </div>
@@ -816,7 +820,7 @@ export default function MemorizePage() {
               ))}
 
               {/* Current verse (highlighted) */}
-              <VerseDisplay verse={verse} size="medium" highlight />
+              <VerseDisplay verse={verse} surahNumber={surahNum} size="medium" highlight />
 
               <div className="text-center text-night-500 text-sm mt-4">
                 <p>Recite all verses from the beginning, ending with the new one</p>
@@ -864,7 +868,7 @@ export default function MemorizePage() {
                 </div>
               </div>
 
-              <VerseDisplay verse={verse} size="medium" />
+              <VerseDisplay verse={verse} surahNumber={surahNum} size="medium" />
             </motion.div>
           )}
         </AnimatePresence>

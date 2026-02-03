@@ -35,6 +35,7 @@ import {
   RECITERS,
   BISMILLAH,
   shouldShowBismillah,
+  cleanAyahText,
   type Surah,
   type Ayah
 } from '@/lib/quranData';
@@ -329,7 +330,7 @@ export default function MushafPage() {
                         <WordByWord
                           surah={surahNumber}
                           ayah={ayah.numberInSurah}
-                          arabicText={ayah.text.arabic}
+                          arabicText={cleanAyahText(ayah.text.arabic, surahNumber, ayah.numberInSurah)}
                           reciterId={selectedReciter}
                           isPlaying={isPlaying}
                           audioRef={audioRef}
@@ -344,7 +345,7 @@ export default function MushafPage() {
                         lang="ar"
                         dir="rtl"
                       >
-                        {ayah.text.arabic}
+                        {cleanAyahText(ayah.text.arabic, surahNumber, ayah.numberInSurah)}
                         <span className="verse-number" aria-label={`Verse ${ayah.numberInSurah}`}>{ayah.numberInSurah}</span>
                       </p>
                     )}
@@ -829,7 +830,7 @@ export default function MushafPage() {
           <TajweedPractice
             surah={surahNumber}
             ayah={tajweedPracticeAyah}
-            arabicText={currentSurah.ayahs.find(a => a.numberInSurah === tajweedPracticeAyah)?.text.arabic || ''}
+            arabicText={cleanAyahText(currentSurah.ayahs.find(a => a.numberInSurah === tajweedPracticeAyah)?.text.arabic || '', surahNumber, tajweedPracticeAyah)}
             translation={currentSurah.ayahs.find(a => a.numberInSurah === tajweedPracticeAyah)?.text.translations[translationEdition]}
             audioUrl={getAudioUrl(surahNumber, tajweedPracticeAyah, selectedReciter)}
             onClose={() => setShowTajweedPractice(false)}

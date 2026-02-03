@@ -273,6 +273,45 @@ export function formatVerseRef(surah: number, ayah: number): string {
  */
 export const BISMILLAH = 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ';
 
+// Various Bismillah text patterns that might appear in data
+const BISMILLAH_PATTERNS = [
+  'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
+  'بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ',
+  'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ',
+  'بسم الله الرحمن الرحيم',
+];
+
 export function shouldShowBismillah(surahNumber: number): boolean {
   return surahNumber !== 1 && surahNumber !== 9;
+}
+
+/**
+ * Clean ayah text by removing Bismillah prefix if present
+ * Bismillah is only counted as part of ayah 1 in Al-Fatiha (surah 1)
+ * For all other surahs, Bismillah is separate and should not be in ayah 1 text
+ * This ensures audio sync with EveryAyah.com which doesn't include Bismillah in ayah 1 audio
+ */
+export function cleanAyahText(text: string, surahNumber: number, ayahNumber: number): string {
+  // Only clean ayah 1 of non-Fatiha surahs
+  if (surahNumber === 1 || ayahNumber !== 1) {
+    return text;
+  }
+  
+  // Remove Bismillah prefix if present
+  let cleaned = text.trim();
+  for (const pattern of BISMILLAH_PATTERNS) {
+    if (cleaned.startsWith(pattern)) {
+      cleaned = cleaned.slice(pattern.length).trim();
+      break;
+    }
+  }
+  
+  return cleaned;
+}
+
+/**
+ * Get ayah text with Bismillah handling
+ */
+export function getAyahTextForDisplay(ayah: Ayah, surahNumber: number): string {
+  return cleanAyahText(ayah.text.arabic, surahNumber, ayah.numberInSurah);
 }
