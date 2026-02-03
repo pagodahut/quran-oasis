@@ -1,3 +1,6 @@
+// Force dynamic rendering for all pages - Clerk needs runtime context
+export const dynamic = 'force-dynamic';
+
 import type { Metadata, Viewport } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
