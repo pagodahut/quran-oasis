@@ -22,13 +22,39 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import { 
-  ALL_BEGINNER_LESSONS, 
+  ALL_BEGINNER_LESSONS,
+  ALL_INTERMEDIATE_LESSONS,
+  ALL_ADVANCED_LESSONS,
   UNITS,
+  INTERMEDIATE_UNITS,
+  ADVANCED_UNITS,
+  getUnitsForPath,
   type Lesson,
   getLessonById,
   getLessonsByUnit,
   isLessonUnlocked 
 } from '@/lib/lesson-content';
+
+// Path type
+type LessonPath = 'beginner' | 'intermediate' | 'advanced';
+
+const PATH_INFO = {
+  beginner: {
+    title: 'Beginner',
+    description: 'Arabic letters & foundational reading',
+    icon: '🌱',
+  },
+  intermediate: {
+    title: 'Intermediate',
+    description: 'Tajweed rules & pronunciation',
+    icon: '📚',
+  },
+  advanced: {
+    title: 'Advanced',
+    description: 'Advanced recitation & memorization',
+    icon: '🎓',
+  },
+};
 import LessonCompletionOverlay from '@/components/LessonCompletionOverlay';
 import BottomNav from '@/components/BottomNav';
 import { DailyWisdom } from '@/components/JourneyMap';
@@ -173,7 +199,7 @@ function UnitSection({ unit, lessons, completedLessons, isActive, nextLessonId }
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="p-4 pt-2 space-y-2">
+            <div className="p-4 pt-3 space-y-3">
               {lessons.map((lesson, index) => {
                 const isLessonComplete = completedLessons.includes(lesson.id);
                 const isNextLesson = nextLessonId === lesson.id;
@@ -270,10 +296,19 @@ function LessonsContent() {
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const [currentStreak, setCurrentStreak] = useState(0);
   const [totalXP, setTotalXP] = useState(0);
+  const [currentPath, setCurrentPath] = useState<LessonPath>('beginner');
   
   // Handle completion query param
   const completedLessonId = searchParams.get('completed');
   const completedLesson = completedLessonId ? getLessonById(completedLessonId) : null;
+  
+  // Get lessons and units for current path
+  const currentUnits = getUnitsForPath(currentPath);
+  const currentLessons = currentPath === 'beginner' 
+    ? ALL_BEGINNER_LESSONS 
+    : currentPath === 'intermediate' 
+      ? ALL_INTERMEDIATE_LESSONS 
+      : ALL_ADVANCED_LESSONS;
 
   useEffect(() => {
     const saved = localStorage.getItem('quranOasis_completedLessons');
@@ -299,10 +334,13 @@ function LessonsContent() {
     router.replace('/lessons', { scroll: false });
   };
 
-  const totalLessons = ALL_BEGINNER_LESSONS.length;
-  const progressPercent = (completedLessons.length / totalLessons) * 100;
+  const totalLessons = currentLessons.length;
+  const pathCompletedLessons = completedLessons.filter(id => 
+    currentLessons.some(l => l.id === id)
+  );
+  const progressPercent = (pathCompletedLessons.length / totalLessons) * 100;
 
-  const nextLesson = ALL_BEGINNER_LESSONS.find(
+  const nextLesson = currentLessons.find(
     lesson => !completedLessons.includes(lesson.id) && isLessonUnlocked(lesson.id, completedLessons)
   );
 
@@ -380,9 +418,9 @@ function LessonsContent() {
                 <p className="text-3xl font-bold text-night-100">{Math.round(progressPercent)}%</p>
               </div>
               <div className="text-right">
-                <p className="text-night-400 text-sm">Beginner Path</p>
+                <p className="text-night-400 text-sm">{PATH_INFO[currentPath].title} Path</p>
                 <p className="text-sm text-night-300 font-medium">
-                  {completedLessons.length} of {totalLessons} lessons
+                  {pathCompletedLessons.length} of {totalLessons} lessons
                 </p>
               </div>
             </div>
@@ -396,6 +434,24 @@ function LessonsContent() {
               />
             </div>
           </motion.div>
+
+          {/* Path Tabs */}
+          <div className="flex gap-2 mb-6">
+            {(Object.keys(PATH_INFO) as LessonPath[]).map((path) => (
+              <button
+                key={path}
+                onClick={() => setCurrentPath(path)}
+                className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all ${
+                  currentPath === path
+                    ? 'bg-gold-500/20 text-gold-400 border border-gold-500/30'
+                    : 'bg-night-800/50 text-night-400 border border-night-700/50 hover:bg-night-800'
+                }`}
+              >
+                <span className="mr-1.5">{PATH_INFO[path].icon}</span>
+                {PATH_INFO[path].title}
+              </button>
+            ))}
+          </div>
 
           {/* Continue Learning CTA - Prominent Liquid Glass */}
           {nextLesson && (
@@ -448,21 +504,25 @@ function LessonsContent() {
           {/* Units with Lessons */}
           <div className="space-y-4">
             <h2 className="text-sm font-semibold text-night-500 uppercase tracking-widest px-1 mb-2">
-              Your Learning Path
+              {PATH_INFO[currentPath].title} Path
             </h2>
+            <p className="text-xs text-night-500 px-1 -mt-1 mb-3">
+              {PATH_INFO[currentPath].description}
+            </p>
             
-            {UNITS.map((unit) => {
-              const unitLessons = getLessonsByUnit(unit.number);
+            {currentUnits.map((unit, unitIndex) => {
+              // Filter lessons for this unit from current path's lessons
+              const unitLessons = currentLessons.filter(l => l.unit === unit.number);
               const completedInUnit = unitLessons.filter(l => completedLessons.includes(l.id)).length;
-              const isUnitComplete = completedInUnit === unitLessons.length;
-              const isFirstIncomplete = UNITS.findIndex(u => {
-                const lessons = getLessonsByUnit(u.number);
+              const isUnitComplete = completedInUnit === unitLessons.length && unitLessons.length > 0;
+              const isFirstIncomplete = currentUnits.findIndex(u => {
+                const lessons = currentLessons.filter(l => l.unit === u.number);
                 return lessons.some(l => !completedLessons.includes(l.id));
-              }) === UNITS.indexOf(unit);
+              }) === unitIndex;
               
               return (
                 <UnitSection 
-                  key={unit.number}
+                  key={`${currentPath}-${unit.number}`}
                   unit={unit}
                   lessons={unitLessons}
                   completedLessons={completedLessons}

@@ -133,14 +133,19 @@ export default function OnboardingWelcomePage() {
               >
                 <motion.div 
                   whileHover={{ scale: 1.05 }}
-                  className="w-20 h-20 mx-auto mb-6 rounded-3xl flex items-center justify-center relative"
+                  className="w-20 h-20 mx-auto mb-6 rounded-3xl flex items-center justify-center relative overflow-hidden"
                   style={{
                     background: 'linear-gradient(135deg, rgba(201,162,39,0.95) 0%, rgba(180,140,30,1) 100%)',
                     boxShadow: '0 8px 32px rgba(201,162,39,0.4), inset 0 1px 0 rgba(255,255,255,0.3)',
                     border: '1px solid rgba(255,255,255,0.2)',
                   }}
                 >
-                  <Moon className="w-10 h-10 text-night-950" />
+                  {/* HIFZ Crest Logo */}
+                  <img 
+                    src="/hifz-crest.png" 
+                    alt="HIFZ" 
+                    className="w-14 h-14 object-contain"
+                  />
                   {/* Glow ring */}
                   <motion.div
                     className="absolute inset-0 rounded-3xl"

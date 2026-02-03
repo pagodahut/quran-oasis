@@ -377,7 +377,7 @@ export default function SettingsPage() {
       </header>
 
       {/* Content */}
-      <main className="px-4 py-6 pb-28 space-y-8 max-w-2xl mx-auto">
+      <main className="px-4 py-6 pb-40 space-y-8 max-w-2xl mx-auto">
         
         {/* ============ AUDIO & RECITER ============ */}
         <SettingSection 

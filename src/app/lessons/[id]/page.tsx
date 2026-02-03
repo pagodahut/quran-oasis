@@ -996,8 +996,8 @@ export default function LessonDetailPage() {
                   </div>
                 )}
                 
-                {/* Reciter Audio Button - for audio steps */}
-                {currentStep.audioSegment && currentStep.content !== 'MEMORIZATION_MODULE' && (
+                {/* Reciter Audio Button - for audio steps (supports both audioSegment and audioConfig) */}
+                {(currentStep.audioSegment || currentStep.audioConfig) && currentStep.content !== 'MEMORIZATION_MODULE' && (
                   <div className="mt-6 p-4 bg-night-900/50 rounded-xl border border-night-800/50">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -1015,15 +1015,19 @@ export default function LessonDetailPage() {
                           } else {
                             setIsPlayingReciter(true);
                             try {
-                              await playAyah(
-                                currentStep.audioSegment!.surah,
-                                currentStep.audioSegment!.ayahStart,
-                                {
-                                  reciterId: 'alafasy',
-                                  onEnd: () => setIsPlayingReciter(false),
-                                  onError: () => setIsPlayingReciter(false),
-                                }
-                              );
+                              // Support both audioSegment and audioConfig
+                              const audioData = currentStep.audioSegment || currentStep.audioConfig;
+                              if (audioData) {
+                                await playAyah(
+                                  audioData.surah,
+                                  audioData.ayahStart ?? 1,
+                                  {
+                                    reciterId: ('reciterId' in audioData && audioData.reciterId) || 'alafasy',
+                                    onEnd: () => setIsPlayingReciter(false),
+                                    onError: () => setIsPlayingReciter(false),
+                                  }
+                                );
+                              }
                             } catch {
                               setIsPlayingReciter(false);
                             }

@@ -277,7 +277,7 @@ export default function MushafPage() {
       </header>
 
       {/* Mushaf Content */}
-      <main className="pb-48">
+      <main className="pb-56">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="animate-pulse text-gold-400">Loading...</div>

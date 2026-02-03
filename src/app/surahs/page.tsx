@@ -258,7 +258,7 @@ export default function SurahsPage() {
       </header>
 
       {/* Surah List */}
-      <main className="px-4 py-6 pb-28">
+      <main className="px-4 py-6 pb-40">
         {filteredSurahs.length === 0 ? (
           <div className="text-center py-20">
             <BookOpen className="w-12 h-12 text-night-700 mx-auto mb-4" />

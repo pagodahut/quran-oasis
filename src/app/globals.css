@@ -2726,13 +2726,8 @@ select:focus-visible {
   outline-offset: 2px;
 }
 
-/* Link Underlines for Better Visibility */
-a:not(.liquid-btn):not(.liquid-btn-outline):not([class*="rounded"]) {
-  text-decoration-line: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
-}
-
-a:not(.liquid-btn):not(.liquid-btn-outline):not([class*="rounded"]):hover {
-  text-decoration-thickness: 2px;
+/* Link Underlines - Disabled for cleaner look 
+   Original accessibility feature removed per design requirements */
+a {
+  text-decoration: none;
 }
