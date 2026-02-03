@@ -7,8 +7,19 @@ import { getBookmarks, Bookmark } from './bookmarks';
 const SYNC_DEBOUNCE_MS = 5000; // Wait 5 seconds after last change before syncing
 const LAST_SYNC_KEY = 'quranOasis_lastSync';
 
-// Safely import useUser - returns null values if Clerk is not available
+// Safely get Clerk user - returns null values if Clerk is not available or not in context
 function useClerkUser() {
+  // Check if we're on server or if Clerk key is not set
+  if (typeof window === 'undefined') {
+    return { user: null, isSignedIn: false, isLoaded: true };
+  }
+  
+  // Check for Clerk publishable key
+  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  if (!clerkKey) {
+    return { user: null, isSignedIn: false, isLoaded: true };
+  }
+
   try {
     // Dynamic import to avoid errors when Clerk isn't configured
     const { useUser } = require('@clerk/nextjs');
