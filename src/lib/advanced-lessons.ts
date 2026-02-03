@@ -2328,6 +2328,73 @@ Nothing strengthens memory like using it for worship!`
         }
       },
       {
+        id: "adv7-quiz2",
+        type: "exercise",
+        title: "Beginner Level Strategy",
+        content: "For those with < 3 Juz:",
+        exercise: {
+          type: "word_match",
+          question: "If you've only memorized Juz Amma, what's your daily revision goal?",
+          options: [
+            "Review 1 surah per week",
+            "Full Juz Amma review daily (30-45 minutes)",
+            "Only review what you memorized yesterday",
+            "No revision needed at this stage"
+          ],
+          correctAnswer: 1,
+          explanation: "Full Juz Amma daily! At the beginner stage, the amount is manageable. Frequent full review builds a rock-solid foundation. Quality now saves time later!"
+        }
+      },
+      {
+        id: "adv7-quiz3",
+        type: "exercise",
+        title: "Advanced Level Groups",
+        content: "For 10-20 Juz memorizers:",
+        exercise: {
+          type: "word_match",
+          question: "The 4-group rotation system divides your hifdh into groups (A,B,C,D). What's the weekly focus pattern?",
+          options: [
+            "Review all groups equally every day",
+            "Focus on one group deeply while doing quick review of the next",
+            "Only review Group A, ignore others",
+            "Random selection each day"
+          ],
+          correctAnswer: 1,
+          explanation: "Systematic rotation! Each week, deeply focus on one group (1 Juz/day) while doing quick review of the next group. Complete rotation in 4 weeks, keeping everything fresh."
+        }
+      },
+      {
+        id: "adv7-quiz4",
+        type: "exercise",
+        title: "Hafiz Maintenance",
+        content: "For those who've memorized the entire Quran:",
+        exercise: {
+          type: "word_match",
+          question: "The traditional Hafiz system of completing 1 Juz daily means completing the Quran in...",
+          options: ["7 days", "14 days", "30 days", "60 days"],
+          correctAnswer: 2,
+          explanation: "30 days! 1 Juz × 30 Juz = monthly completion. This requires 45-60 minutes of daily recitation but ensures the entire Quran stays fresh."
+        }
+      },
+      {
+        id: "adv7-timed-challenge",
+        type: "exercise",
+        title: "⏱️ Quick Application",
+        content: "Scenario-based question:",
+        exercise: {
+          type: "comprehension",
+          question: "You have 7 Juz memorized. Today is busy. What's your 'never miss' minimum?",
+          options: [
+            "Skip today, make up tomorrow",
+            "At least 1 page - maintain the habit",
+            "Full 7 Juz must be reviewed",
+            "Only new memorization today"
+          ],
+          correctAnswer: 1,
+          explanation: "At least 1 page! A non-negotiable minimum keeps the habit alive. Busy days happen - the key is NEVER breaking the chain completely. Adjust up when possible, never below your minimum."
+        }
+      },
+      {
         id: "adv7-review",
         type: "instruction",
         title: "Lesson Complete! 🌟",
