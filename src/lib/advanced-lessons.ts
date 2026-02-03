@@ -7,9 +7,42 @@
  * - Mutashabihat (similar verses) identification
  * - Advanced tajweed (madd, qalqalah, idgham)
  * - Revision strategies for large portions
+ * 
+ * Audio Integration:
+ * - EveryAyah.com: https://everyayah.com/data/{reciter_folder}/{surah:03d}{ayah:03d}.mp3
+ * - Default reciter: Alafasy_128kbps (Mishary Rashid Alafasy)
+ * - For tajweed learning, consider: Husary_Muallim (teaching mode)
  */
 
-import type { Lesson } from './lesson-content';
+import type { Lesson, AudioConfig, ListenRepeatConfig } from './lesson-content';
+
+/** Helper to create audio config for steps */
+function audio(surah: number, ayahStart: number, ayahEnd?: number, options?: Partial<AudioConfig>): AudioConfig {
+  return {
+    surah,
+    ayahStart,
+    ayahEnd: ayahEnd ?? ayahStart,
+    reciterId: options?.reciterId ?? 'alafasy',
+    repeat: options?.repeat ?? 1,
+    loopAyah: options?.loopAyah ?? false,
+    pauseBetweenAyahs: options?.pauseBetweenAyahs ?? 500,
+    playbackRate: options?.playbackRate ?? 1,
+  };
+}
+
+/** Helper to create listen-repeat config for memorization steps */
+function listenRepeat(surah: number, ayahStart: number, ayahEnd?: number, repeatCount: number = 3): ListenRepeatConfig {
+  return {
+    surah,
+    ayahStart,
+    ayahEnd: ayahEnd ?? ayahStart,
+    reciterId: 'alafasy',
+    mode: 'listen-repeat',
+    repeatCount,
+    showTransliteration: true,
+    showTranslation: true,
+  };
+}
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
@@ -154,6 +187,7 @@ Read "أَقْرَبُ" (aqrabu) - Feel the slight bounce on the Qaf, but don't 
         type: "practice",
         title: "Qalqalah in Surah Al-Ikhlas",
         arabicContent: "قُلْ هُوَ ٱللَّهُ أَحَدٌ",
+        audioConfig: audio(112, 1, 4, { repeat: 3, pauseBetweenAyahs: 1500, playbackRate: 0.9 }),
         content: `**Let's practice Qalqalah in Surah Al-Ikhlas!**
 
 **قُلْ هُوَ ٱللَّهُ أَحَدٌ ﴿١﴾**
@@ -173,8 +207,30 @@ Read "أَقْرَبُ" (aqrabu) - Feel the slight bounce on the Qaf, but don't 
 
 **Notice:** This surah is FULL of qalqalah opportunities because of all the words ending in Dal!
 
-**Recording yourself:** Try recording your recitation and listen for the bounces. Are they clear but not exaggerated?`,
-        audioSegment: { surah: 112, ayahStart: 1, ayahEnd: 4, repeat: 5 }
+**Recording yourself:** Try recording your recitation and listen for the bounces. Are they clear but not exaggerated?`
+      },
+      {
+        id: "adv1-listen-repeat",
+        type: "listen-repeat",
+        title: "Practice: Surah Al-Ikhlas with Qalqalah",
+        arabicContent: "قُلْ هُوَ ٱللَّهُ أَحَدٌ ٱللَّهُ ٱلصَّمَدُ لَمْ يَلِدْ وَلَمْ يُولَدْ وَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌۢ",
+        listenRepeatConfig: listenRepeat(112, 1, 4, 5),
+        content: `**Listen and Repeat: Surah Al-Ikhlas**
+
+Focus on the qalqalah letters: ق ط ب ج د
+
+Listen carefully for the "echo" or "bounce" on:
+- "أَحَدْ" (both occurrences)
+- "الصَّمَدْ"
+- "يَلِدْ"
+- "يُولَدْ"
+
+**Instructions:**
+1. Listen to the complete surah
+2. Repeat verse by verse, focusing on qalqalah
+3. The audio will loop ${5} times - use each repetition to improve
+
+Press play to begin!`
       },
       {
         id: "adv1-quiz",
@@ -406,6 +462,7 @@ The Lam-Ra idgham is by far the most common. Listen for it in phrases like:
         type: "practice",
         title: "Practice in Context",
         arabicContent: "قُلْ هُوَ اللَّهُ أَحَدٌ",
+        audioConfig: audio(17, 24, 24, { repeat: 3, playbackRate: 0.85 }), // Surah Al-Isra 17:24
         content: `**Let's find idgham in Surah Al-Ikhlas and beyond:**
 
 **Surah Al-Ikhlas:**
@@ -429,8 +486,26 @@ The Lam-Ra idgham is by far the most common. Listen for it in phrases like:
 - "قُل رَّبِّ" (17:24) - Lam + Ra
 - "بَل رَّبُّكُمْ" (21:56) - Lam + Ra
 
-**Practice these phrases out loud, paying attention to smooth merging!**`,
-        audioSegment: { surah: 17, ayahStart: 24, ayahEnd: 24, repeat: 3 }
+**Practice these phrases out loud, paying attention to smooth merging!**`
+      },
+      {
+        id: "adv2-listen-repeat",
+        type: "listen-repeat",
+        title: "Practice: Idgham Mutaqaaribain",
+        arabicContent: "وَقُل رَّبِّ ٱرْحَمْهُمَا كَمَا رَبَّيَانِى صَغِيرًا",
+        listenRepeatConfig: listenRepeat(17, 24, 24, 3),
+        content: `**Listen and Repeat: Surah Al-Isra 17:24**
+
+This beautiful verse contains a clear example of Idgham Mutaqaaribain:
+- "قُل رَّبِّ" - The Lam merges into the Ra
+
+**Translation:** "And say: My Lord, have mercy upon them as they brought me up when I was small."
+
+Focus on:
+1. The smooth merging of Lam into Ra
+2. The doubled Ra sound (qur-rabbi, not qul rabbi)
+
+Press play and repeat until the merging feels natural.`
       },
       {
         id: "adv2-quiz",
@@ -598,6 +673,22 @@ Most reciters choose one length and maintain it throughout!
 - "الدِّينِ" when stopping → Madd 'Aarid on the Yaa`
       },
       {
+        id: "adv3-checkpoint",
+        type: "checkpoint",
+        title: "Progress Check ✨",
+        content: `**You've completed 60% of this comprehensive lesson!**
+
+**Madd types covered:**
+- **Madd 'Iwad** - Exchange (tanween fatha → aa when stopping)
+- **Madd 'Aarid** - Presented (sukoon created by stopping, 2/4/6 flexible)
+
+**Coming up:** Madd Leen, Madd Sila, and the complete reference chart.
+
+Take a breath - this is dense material! Continue or save for later?`,
+        progressPercent: 60,
+        offerBreak: true
+      },
+      {
         id: "adv3-leen",
         type: "explanation",
         title: "Madd Leen - The Soft Madd",
@@ -750,6 +841,92 @@ In classical Arabic recitation, these pronouns naturally connect and elongate to
   }
 ];
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // UNIT 9 REVIEW: Advanced Tajweed Consolidation
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "adv-unit9-review",
+    unit: 9,
+    unitTitle: "Advanced Tajweed",
+    path: "advanced",
+    number: 31.5,
+    title: "Unit 9 Review - Advanced Tajweed Mastery",
+    description: "Consolidate all advanced tajweed concepts",
+    surah: 112,
+    ayahStart: 1,
+    ayahEnd: 4,
+    estimatedMinutes: 20,
+    xpReward: 175,
+    isUnitReview: true,
+    steps: [
+      {
+        id: "u9r-intro",
+        type: "instruction",
+        title: "Advanced Tajweed Review 🎯",
+        content: `**Unit 9 Complete - Let's consolidate!**
+
+**Advanced concepts mastered:**
+1. **Qalqalah** - Echo on قطبجد (small vs large)
+2. **Advanced Idgham** - Mutamaathilain, Mutajaanisain, Mutaqaaribain
+3. **Complete Madd System** - All 9 types with durations
+
+This review ensures you can apply these in actual recitation!`
+      },
+      {
+        id: "u9r-quiz1",
+        type: "exercise",
+        title: "Idgham Types Review",
+        content: "Distinguish the idgham types:",
+        exercise: {
+          type: "word_match",
+          question: "In 'قُل رَّبِّ', what type of idgham occurs between Lam and Ra?",
+          options: ["Mutamaathilain (identical)", "Mutajaanisain (same point)", "Mutaqaaribain (close points)", "No idgham"],
+          correctAnswer: 2,
+          explanation: "Mutaqaaribain! Lam and Ra come from CLOSE articulation points. The Lam merges into Ra → 'qur-rabbi'."
+        }
+      },
+      {
+        id: "u9r-quiz2",
+        type: "exercise",
+        title: "Madd System Review",
+        content: "Apply your complete madd knowledge:",
+        exercise: {
+          type: "word_match",
+          question: "When stopping on 'الرَّحِيمِ', what type of madd occurs on the Yaa?",
+          options: ["Madd Tabee'i (Natural)", "Madd Muttasil (Connected)", "Madd 'Aarid (Presented)", "Madd Lazim (Compulsory)"],
+          correctAnswer: 2,
+          explanation: "Madd 'Aarid lil-Sukoon! When stopping, the Meem gets sukoon, creating a 'presented' sukoon after the Yaa. You can hold 2, 4, or 6 counts."
+        }
+      },
+      {
+        id: "u9r-summary",
+        type: "instruction",
+        title: "Advanced Tajweed Mastered! 🏆",
+        content: `**Excellent! You've mastered advanced tajweed!**
+
+**Complete Madd Reference:**
+| Type | Cause | Counts |
+|------|-------|--------|
+| Natural | Base | 2 |
+| Connected | Hamza same word | 4-5 |
+| Separated | Hamza next word | 2-5 |
+| Compulsory | Sukoon/shaddah | 6 |
+| Presented | Stop creates sukoon | 2/4/6 |
+| Exchange | Tanween fatha stop | 2 |
+| Soft | Waw/Ya + fatha | 2/4/6 |
+
+**Ready for Mutashabihat - similar verses!**`
+      }
+    ],
+    memorizationTechniques: [
+      "Qalqalah: قُطْبُ جَدّ - echo the 5 letters",
+      "3 idgham types: identical, same point, close points",
+      "Madd: What follows determines the type"
+    ],
+    keyVocabulary: []
+  }
+];
+
 /**
  * ═══════════════════════════════════════════════════════════════════════════
  * UNIT 10: MUTASHABIHAT - SIMILAR VERSES (Lessons 32-33)
@@ -774,6 +951,7 @@ const UNIT_10_LESSONS: Lesson[] = [
     ayahEnd: 5,
     estimatedMinutes: 35,
     xpReward: 150,
+    mastery_required: 80, // Must master advanced tajweed first
     steps: [
       {
         id: "adv4-intro",
@@ -1162,6 +1340,7 @@ Group surahs by ending patterns. Know which ending belongs to which surah!`
         id: "adv5-practice",
         type: "practice",
         title: "Mutashabihat Drill",
+        audioConfig: audio(93, 1, 8, { repeat: 1 }), // Surah Ad-Duha full
         content: `**Let's test your distinguishing ability!**
 
 **Quick identification - which surah?**
@@ -1179,8 +1358,44 @@ Group surahs by ending patterns. Know which ending belongs to which surah!`
 4. Al-Inshirah/Ash-Sharh (94) - "Did We not expand your breast"
 5. Al-Kafirun (109) - "I do not worship what you worship"
 
-**How did you do?** These openings are KEY identifiers!`,
-        audioSegment: { surah: 93, ayahStart: 1, ayahEnd: 8, repeat: 2 }
+**How did you do?** These openings are KEY identifiers!`
+      },
+      {
+        id: "adv5-listen-compare-1",
+        type: "listen-repeat",
+        title: "Compare: Ad-Duha vs Al-Inshirah",
+        arabicContent: "أَلَمْ يَجِدْكَ يَتِيمًا فَآوَىٰ",
+        listenRepeatConfig: listenRepeat(93, 6, 8, 2),
+        content: `**Listen and Compare: Surah Ad-Duha (93:6-8)**
+
+أَلَمْ يَجِدْكَ يَتِيمًا فَآوَىٰ ﴿٦﴾
+أَلَمْ يَجِدْكَ ضَالًّا فَهَدَىٰ ﴿٧﴾
+أَلَمْ يَجِدْكَ عَائِلًا فَأَغْنَىٰ ﴿٨﴾
+
+Notice the pattern: "أَلَمْ يَجِدْكَ" (Did He not FIND you...)
+
+This is DIFFERENT from Al-Inshirah which says "أَلَمْ نَشْرَحْ" (Did We not EXPAND...)
+
+Listen carefully and note the difference!`
+      },
+      {
+        id: "adv5-listen-compare-2",
+        type: "listen-repeat",
+        title: "Compare: Al-Inshirah Opening",
+        arabicContent: "أَلَمْ نَشْرَحْ لَكَ صَدْرَكَ",
+        listenRepeatConfig: listenRepeat(94, 1, 4, 2),
+        content: `**Listen and Compare: Surah Al-Inshirah (94:1-4)**
+
+أَلَمْ نَشْرَحْ لَكَ صَدْرَكَ ﴿١﴾
+وَوَضَعْنَا عَنكَ وِزْرَكَ ﴿٢﴾
+الَّذِي أَنقَضَ ظَهْرَكَ ﴿٣﴾
+وَرَفَعْنَا لَكَ ذِكْرَكَ ﴿٤﴾
+
+Notice: "أَلَمْ نَشْرَحْ" (Did WE not EXPAND...) - First person "We"
+
+Compare with Ad-Duha's "أَلَمْ يَجِدْكَ" (Did HE not FIND...) - Third person "He"
+
+This distinction helps you know which surah you're reciting!`
       },
       {
         id: "adv5-review",
@@ -1220,6 +1435,79 @@ Group surahs by ending patterns. Know which ending belongs to which surah!`
   }
 ];
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // UNIT 10 REVIEW: Mutashabihat Consolidation
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "adv-unit10-review",
+    unit: 10,
+    unitTitle: "Mutashabihat - Similar Verses",
+    path: "advanced",
+    number: 33.5,
+    title: "Unit 10 Review - Mutashabihat Mastery",
+    description: "Consolidate strategies for similar verses",
+    surah: 93,
+    ayahStart: 1,
+    ayahEnd: 8,
+    estimatedMinutes: 15,
+    xpReward: 150,
+    isUnitReview: true,
+    steps: [
+      {
+        id: "u10r-intro",
+        type: "instruction",
+        title: "Mutashabihat Review 🔍",
+        content: `**You've learned to tackle similar verses!**
+
+**Key strategies:**
+1. Create a dedicated mutashabihat notebook
+2. Understand the context - WHY does each version appear?
+3. Focus on the DISTINGUISHING words
+4. Use numerical associations
+5. Recite pairs side-by-side`
+      },
+      {
+        id: "u10r-quiz",
+        type: "exercise",
+        title: "Quick Distinction Test",
+        content: "Apply your mutashabihat skills:",
+        exercise: {
+          type: "word_match",
+          question: "How do you distinguish Ad-Duha (93) from Al-Inshirah (94) openings?",
+          options: [
+            "They're identical - no distinction needed",
+            "Duha uses يَجِدْكَ (He found you), Inshirah uses نَشْرَحْ (We expanded)",
+            "Duha is longer than Inshirah",
+            "Inshirah comes before Duha in order"
+          ],
+          correctAnswer: 1,
+          explanation: "Ad-Duha asks 'أَلَمْ يَجِدْكَ' (Did He not FIND you) - third person. Al-Inshirah asks 'أَلَمْ نَشْرَحْ' (Did WE not EXPAND) - first person. Person and verb differ!"
+        }
+      },
+      {
+        id: "u10r-summary",
+        type: "instruction",
+        title: "Mutashabihat Strategies Mastered! ✅",
+        content: `**You can now handle similar verses!**
+
+**Remember:**
+- Mutashabihat require EXTRA review time
+- Context is your best friend
+- Test specifically on the differences
+- Teach others to cement your knowledge
+
+**Ready for Revision Strategies!**`
+      }
+    ],
+    memorizationTechniques: [
+      "Dedicated mutashabihat notebook",
+      "Context determines which version",
+      "Test specifically on differences"
+    ],
+    keyVocabulary: []
+  }
+];
+
 /**
  * ═══════════════════════════════════════════════════════════════════════════
  * UNIT 11: REVISION STRATEGIES (Lessons 34-36)
@@ -1244,6 +1532,7 @@ const UNIT_11_LESSONS: Lesson[] = [
     ayahEnd: 7,
     estimatedMinutes: 30,
     xpReward: 125,
+    mastery_required: 75, // Must understand mutashabihat before revision strategies
     steps: [
       {
         id: "adv6-intro",
@@ -2133,6 +2422,81 @@ Allah made it easy. It can be recovered. Start today!`
   }
 ];
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // UNIT 11 REVIEW: Revision Systems Consolidation
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    id: "adv-unit11-review",
+    unit: 11,
+    unitTitle: "Revision Strategies",
+    path: "advanced",
+    number: 36.5,
+    title: "Unit 11 Review - Revision Systems Mastery",
+    description: "Consolidate your revision strategies",
+    surah: 1,
+    ayahStart: 1,
+    ayahEnd: 7,
+    estimatedMinutes: 15,
+    xpReward: 150,
+    isUnitReview: true,
+    steps: [
+      {
+        id: "u11r-intro",
+        type: "instruction",
+        title: "Revision Systems Review 📊",
+        content: `**You've built a complete revision system!**
+
+**Key principles learned:**
+1. **Forgetting curve** - Review at optimal intervals
+2. **Spaced repetition** - Increasing gaps between reviews
+3. **3:1 ratio** - 3 parts revision to 1 part new memorization
+4. **Level-appropriate systems** - Different amounts need different strategies
+5. **Troubleshooting** - Solutions for common problems`
+      },
+      {
+        id: "u11r-quiz",
+        type: "exercise",
+        title: "Revision Strategy Check",
+        content: "Test your system knowledge:",
+        exercise: {
+          type: "word_match",
+          question: "If you've stopped revising for months and want to restart, what's the BEST first step?",
+          options: [
+            "Try to recite everything at once",
+            "Start memorizing new material to build momentum",
+            "Assess what's retained, start with strong portions",
+            "Wait until you feel motivated"
+          ],
+          correctAnswer: 2,
+          explanation: "Assess first, then start with strong portions! Building confidence with retained material creates momentum. Never wait for motivation - systems beat willpower."
+        }
+      },
+      {
+        id: "u11r-summary",
+        type: "instruction",
+        title: "Revision Master! 📈",
+        content: `**You have the tools to maintain your hifdh!**
+
+**Your daily system:**
+- Morning: New + Fresh revision
+- Midday: Quick test
+- Evening: Old + Deep revision
+
+**Weekly:** Complete portion review + Mutashabihat
+**Monthly:** Assessment + adjust
+
+**Ready for Long Surah Strategies!**`
+      }
+    ],
+    memorizationTechniques: [
+      "3:1 ratio - revision:memorization",
+      "Morning for new, evening for old",
+      "Test yourself, don't just read"
+    ],
+    keyVocabulary: []
+  }
+];
+
 /**
  * ═══════════════════════════════════════════════════════════════════════════
  * UNIT 12: LONG SURAH STRATEGIES (Lessons 37-42)
@@ -2268,6 +2632,7 @@ Apply this to your revision schedule!`
     ayahEnd: 5,
     estimatedMinutes: 40,
     xpReward: 150,
+    mastery_required: 80, // Must master revision strategies before tackling Al-Baqarah
     steps: [
       {
         id: "adv10-intro",
@@ -2410,6 +2775,23 @@ The essence of tawheed (monotheism) and Allah's attributes.`
 10. وَهُوَ الْعَلِيُّ الْعَظِيمُ - And He is the Most High, the Most Great
 
 **Memorize sentence by sentence!**`
+      },
+      {
+        id: "adv11-checkpoint",
+        type: "checkpoint",
+        title: "Halfway Through! ⭐",
+        content: `**Excellent! You've learned the 10 sentences of Ayat al-Kursi.**
+
+**Key concepts so far:**
+1. لَا إِلَٰهَ إِلَّا هُوَ - No god except Him
+2. الْحَيُّ الْقَيُّومُ - Ever-Living, Self-Sustaining
+3. لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ - Neither drowsiness nor sleep
+4. Everything in heavens and earth belongs to Him
+5. No intercession except by His permission
+
+This is THE most powerful verse. Continue to memorize it!`,
+        progressPercent: 50,
+        offerBreak: true
       },
       {
         id: "adv11-audio",
@@ -2857,8 +3239,8 @@ export const ALL_ADVANCED_LESSONS: Lesson[] = [
 ];
 
 export const ADVANCED_UNITS = [
-  { number: 9, title: "Advanced Tajweed", lessons: 3, description: "Qalqalah, advanced idgham, complete madd system" },
-  { number: 10, title: "Mutashabihat - Similar Verses", lessons: 2, description: "Strategies for distinguishing similar verses" },
-  { number: 11, title: "Revision Strategies", lessons: 3, description: "Science-backed systems for maintaining memorization" },
+  { number: 9, title: "Advanced Tajweed", lessons: 4, description: "Qalqalah, advanced idgham, complete madd system, + Review", hasReview: true },
+  { number: 10, title: "Mutashabihat - Similar Verses", lessons: 3, description: "Strategies for distinguishing similar verses, + Review", hasReview: true },
+  { number: 11, title: "Revision Strategies", lessons: 4, description: "Science-backed systems for maintaining memorization, + Review", hasReview: true },
   { number: 12, title: "Long Surah Strategies", lessons: 7, description: "Manzil system, Al-Baqarah key passages, speed, teaching" }
 ];

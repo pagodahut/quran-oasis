@@ -21,18 +21,43 @@ export type ExerciseType =
   | "letter_forms"       // Match letter forms
   | "comprehension";     // Answer questions about meaning
 
+export interface AudioConfig {
+  surah: number;
+  ayahStart: number;
+  ayahEnd?: number;
+  reciterId?: string;
+  repeat?: number;
+  loopAyah?: boolean;
+  pauseBetweenAyahs?: number;
+  playbackRate?: number;
+}
+
+export interface ListenRepeatConfig extends AudioConfig {
+  mode: 'listen-first' | 'listen-repeat' | 'repeat-only';
+  repeatCount: number;
+  showTransliteration?: boolean;
+  showTranslation?: boolean;
+}
+
 export interface LessonStep {
   id: string;
-  type: "instruction" | "audio" | "exercise" | "explanation" | "practice";
+  type: "instruction" | "audio" | "exercise" | "explanation" | "practice" | "checkpoint" | "listen-repeat";
   title: string;
   content: string;
   arabicContent?: string;
+  /** Legacy audio segment config */
   audioSegment?: {
     surah: number;
     ayahStart: number;
     ayahEnd: number;
     repeat?: number;
   };
+  /** Enhanced audio configuration for Quranic content */
+  audioConfig?: AudioConfig;
+  /** Audio URL for non-Quranic audio (letters, words) */
+  audioUrl?: string;
+  /** Listen-repeat exercise configuration */
+  listenRepeatConfig?: ListenRepeatConfig;
   exercise?: {
     type: ExerciseType;
     question: string;
@@ -40,6 +65,10 @@ export interface LessonStep {
     correctAnswer: string | number;
     explanation?: string;
   };
+  /** For checkpoint steps - percentage of lesson completed */
+  progressPercent?: number;
+  /** For checkpoint steps - whether to offer save & exit option */
+  offerBreak?: boolean;
 }
 
 export interface Lesson {
@@ -56,6 +85,10 @@ export interface Lesson {
   estimatedMinutes: number;
   xpReward: number;
   prerequisites?: string[]; // EMPTY for testing - all lessons unlocked
+  /** Minimum score (%) required on previous lessons to unlock this one */
+  mastery_required?: number;
+  /** Whether this is a unit review/consolidation lesson */
+  isUnitReview?: boolean;
   steps: LessonStep[];
   memorizationTechniques: string[];
   keyVocabulary: Array<{
