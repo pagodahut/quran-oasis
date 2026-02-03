@@ -134,13 +134,6 @@ export const RECITERS = [
     description: 'Classic Egyptian style, excellent for learning tajweed',
   },
   { 
-    id: 'minshawi', 
-    name: 'Mohamed Siddiq El-Minshawi', 
-    arabicName: 'محمد صديق المنشاوي',
-    style: 'Mujawwad',
-    description: 'Melodious, emotional recitation',
-  },
-  { 
     id: 'sudais', 
     name: 'Abdul Rahman Al-Sudais', 
     arabicName: 'عبدالرحمن السديس',
@@ -148,11 +141,26 @@ export const RECITERS = [
     description: 'Imam of Masjid Al-Haram, powerful recitation',
   },
   { 
-    id: 'shuraim', 
-    name: 'Saood bin Ibraaheem Ash-Shuraym', 
-    arabicName: 'سعود الشريم',
+    id: 'abdul_basit', 
+    name: 'Abdul Basit Abdul Samad', 
+    arabicName: 'عبدالباسط عبدالصمد',
+    style: 'Mujawwad',
+    description: 'Legendary Egyptian reciter, melodious style',
+  },
+  { 
+    id: 'ghamadi', 
+    name: 'Saad Al-Ghamdi', 
+    arabicName: 'سعد الغامدي',
     style: 'Murattal',
-    description: 'Imam of Masjid Al-Haram, clear pronunciation',
+    description: 'Saudi reciter, clear and steady pace',
+  },
+  { 
+    id: 'hazza', 
+    name: 'Hazza Al Balushi', 
+    arabicName: 'هزاع البلوشي',
+    style: 'Murattal',
+    description: 'Young Emirati reciter, beautiful voice',
+    listenOnly: true,
   },
 ];
 

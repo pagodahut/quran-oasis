@@ -5,6 +5,7 @@ import type { Metadata, Viewport } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import { SyncProvider, SyncIndicator } from '@/components/SyncProvider';
+import { ToastProvider } from '@/components/Toast';
 import InstallPrompt from '@/components/InstallPrompt';
 import OfflineIndicator from '@/components/OfflineIndicator';
 import SkipToContent from '@/components/SkipToContent';
@@ -143,15 +144,17 @@ export default function RootLayout({
       </head>
       <body className="bg-night-950 text-night-100 antialiased standalone-tweaks">
         <SkipToContent />
-        <SyncProvider>
-          <ServiceWorkerRegistration />
-          <OfflineIndicator />
-          <main id="main-content" tabIndex={-1} className="outline-none">
-            {children}
-          </main>
-          <InstallPrompt />
-          <SyncIndicator />
-        </SyncProvider>
+        <ToastProvider>
+          <SyncProvider>
+            <ServiceWorkerRegistration />
+            <OfflineIndicator />
+            <main id="main-content" tabIndex={-1} className="outline-none">
+              {children}
+            </main>
+            <InstallPrompt />
+            <SyncIndicator />
+          </SyncProvider>
+        </ToastProvider>
       </body>
     </html>
   );

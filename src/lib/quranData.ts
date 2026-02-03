@@ -178,6 +178,8 @@ export interface Reciter {
   arabicName: string;
   style: string;
   folder: string;
+  listenOnly?: boolean; // Full surah only, no per-ayah audio
+  surahAudioUrl?: string; // URL pattern for full surah (use {surah} placeholder)
 }
 
 export const RECITERS: Reciter[] = [
@@ -216,7 +218,37 @@ export const RECITERS: Reciter[] = [
     style: 'Murattal',
     folder: 'Ghamadi_40kbps',
   },
+  {
+    id: 'hazza',
+    name: 'Hazza Al Balushi',
+    arabicName: 'هزاع البلوشي',
+    style: 'Murattal',
+    folder: '', // No EveryAyah folder
+    listenOnly: true,
+    surahAudioUrl: 'https://ia801208.us.archive.org/33/items/Quran-Huzza-Al_Baloushi/{surah}.mp3',
+  },
 ];
+
+// Default reciter for fallback when listen-only reciter can't be used
+export const DEFAULT_RECITER_ID = 'alafasy';
+
+/**
+ * Check if a reciter supports per-ayah audio
+ */
+export function supportsPerAyah(reciterId: string): boolean {
+  const reciter = RECITERS.find(r => r.id === reciterId);
+  return reciter ? !reciter.listenOnly : true;
+}
+
+/**
+ * Get full surah audio URL for listen-only reciters
+ */
+export function getSurahAudioUrl(surah: number, reciterId: string): string | null {
+  const reciter = RECITERS.find(r => r.id === reciterId);
+  if (!reciter?.surahAudioUrl) return null;
+  const surahStr = surah.toString().padStart(3, '0');
+  return reciter.surahAudioUrl.replace('{surah}', surahStr);
+}
 
 /**
  * Get audio URL for an ayah

@@ -129,7 +129,14 @@ function ReciterOption({
     >
       <div className="flex items-center justify-between">
         <div>
-          <p className="font-medium text-night-100">{reciter.name}</p>
+          <div className="flex items-center gap-2">
+            <p className="font-medium text-night-100">{reciter.name}</p>
+            {reciter.listenOnly && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-medium uppercase tracking-wide">
+                Listen Only
+              </span>
+            )}
+          </div>
           <p className="text-sm text-night-500 mt-0.5">
             <span 
               className="text-gold-400/70"
@@ -140,8 +147,8 @@ function ReciterOption({
             <span className="mx-2">•</span>
             {reciter.style}
           </p>
-          {reciter.description && (
-            <p className="text-xs text-night-600 mt-1">{reciter.description}</p>
+          {reciter.listenOnly && (
+            <p className="text-xs text-amber-500/70 mt-1">Full surah playback only</p>
           )}
         </div>
         {selected && (
