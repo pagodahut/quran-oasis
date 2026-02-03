@@ -501,7 +501,7 @@ export default function HomePage() {
             <div className="liquid-glass rounded-2xl">
               <div className="px-4 sm:px-6 py-3 sm:py-4 max-w-7xl mx-auto">
                 <div className="flex items-center justify-between">
-                  <HifzLogo size={32} animated={true} />
+                  <HifzLogo iconSize={32} animated={true} />
                   
                   <motion.nav
                     initial={{ opacity: 0, x: 20 }}
@@ -629,10 +629,10 @@ export default function HomePage() {
               className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-sm"
             >
               {[
-                { icon: BookOpen, label: '114 Surahs', color: 'text-sage-400' },
-                { icon: Headphones, label: '5 Reciters', color: 'text-gold-400' },
+                { icon: BookOpen, label: 'Complete Quran', color: 'text-sage-400' },
+                { icon: Headphones, label: 'Multiple Reciters', color: 'text-gold-400' },
                 { icon: Brain, label: 'AI-Powered', color: 'text-purple-400' },
-                { icon: Heart, label: 'Free Forever', color: 'text-rose-400' },
+                { icon: Sparkles, label: 'Personalized Learning', color: 'text-rose-400' },
               ].map((stat, i, arr) => (
                 <motion.div
                   key={stat.label}

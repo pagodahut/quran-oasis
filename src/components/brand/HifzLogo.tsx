@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 interface LogoProps {
   size?: number;
@@ -12,101 +13,37 @@ interface LogoProps {
 /**
  * HIFZ Logo - Moon + Book Chevrons
  * 
- * Design Philosophy:
- * - Crescent moon = Islamic identity
- * - Book chevrons = knowledge, progression, learning
- * - Gold/night color palette matches the app
- * - Works at all sizes
+ * Design: Crescent moon with stacked book chevrons
+ * representing Islamic identity and knowledge/learning
  */
+
+// Main icon using the PNG image
 export function HifzIcon({ size = 40, className = '', animated = true }: LogoProps) {
-  const Icon = animated ? motion.svg : 'svg';
+  const Container = animated ? motion.div : 'div';
   
   return (
-    <Icon
-      viewBox="0 0 100 100"
-      width={size}
-      height={size}
-      className={className}
+    <Container
+      className={`relative ${className}`}
+      style={{ width: size, height: size }}
       {...(animated && {
         initial: { opacity: 0, scale: 0.9 },
         animate: { opacity: 1, scale: 1 },
         transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] }
       })}
     >
-      <defs>
-        {/* Premium gold gradient */}
-        <linearGradient id="hifz-gold" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#f4d47c" />
-          <stop offset="50%" stopColor="#c9a227" />
-          <stop offset="100%" stopColor="#8b6914" />
-        </linearGradient>
-        
-        {/* Dark night background */}
-        <linearGradient id="hifz-night" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#1a1f25" />
-          <stop offset="100%" stopColor="#0f1419" />
-        </linearGradient>
-      </defs>
-      
-      {/* Background circle */}
-      <circle cx="50" cy="50" r="48" fill="url(#hifz-night)" />
-      
-      {/* Subtle border */}
-      <circle 
-        cx="50" cy="50" r="46" 
-        fill="none" 
-        stroke="url(#hifz-gold)" 
-        strokeWidth="1.5"
-        opacity="0.4"
+      <Image
+        src="/hifz-logo.png"
+        alt="HIFZ"
+        width={size}
+        height={size}
+        className="object-contain"
+        priority={size > 100}
       />
-      
-      {/* Crescent Moon - top left */}
-      <path
-        d="M 35 15
-           C 22 15, 15 28, 15 38
-           C 15 48, 22 58, 35 58
-           C 25 55, 20 45, 20 38
-           C 20 31, 25 21, 35 15
-           Z"
-        fill="url(#hifz-gold)"
-      />
-      
-      {/* Book shape with chevrons */}
-      {/* Top page/chevron - open book shape */}
-      <path
-        d="M 50 35
-           C 40 38, 30 42, 20 48
-           L 50 60
-           L 80 48
-           C 70 42, 60 38, 50 35
-           Z"
-        fill="url(#hifz-gold)"
-      />
-      
-      {/* Middle chevron */}
-      <path
-        d="M 20 58 L 50 72 L 80 58"
-        fill="none"
-        stroke="url(#hifz-gold)"
-        strokeWidth="6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      
-      {/* Bottom chevron */}
-      <path
-        d="M 20 70 L 50 84 L 80 70"
-        fill="none"
-        stroke="url(#hifz-gold)"
-        strokeWidth="6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </Icon>
+    </Container>
   );
 }
 
-// Simple icon for small contexts (nav, tabs) - Moon + Book
+// Simple icon for small contexts (nav, tabs) - uses same logo
 export function HifzIconSimple({ 
   size = 24, 
   className = '' 
@@ -115,51 +52,17 @@ export function HifzIconSimple({
   className?: string;
 }) {
   return (
-    <svg
-      viewBox="0 0 24 24"
+    <Image
+      src="/hifz-logo.png"
+      alt="HIFZ"
       width={size}
       height={size}
-      className={className}
-      fill="none"
-    >
-      <defs>
-        <linearGradient id="simple-gold" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#f4d47c" />
-          <stop offset="50%" stopColor="#c9a227" />
-          <stop offset="100%" stopColor="#8b6914" />
-        </linearGradient>
-      </defs>
-      
-      {/* Crescent Moon - smaller, top left */}
-      <path
-        d="M 7 2
-           C 4 2, 2 5, 2 8
-           C 2 11, 4 14, 7 14
-           C 5 13, 4 10.5, 4 8
-           C 4 5.5, 5 3, 7 2
-           Z"
-        fill="url(#simple-gold)"
-      />
-      
-      {/* Book chevron */}
-      <path
-        d="M 12 9 C 9 10, 6 11, 4 13 L 12 17 L 20 13 C 18 11, 15 10, 12 9 Z"
-        fill="url(#simple-gold)"
-      />
-      
-      {/* Bottom chevrons */}
-      <path
-        d="M 4 16 L 12 20 L 20 16"
-        stroke="url(#simple-gold)"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+      className={`object-contain ${className}`}
+    />
   );
 }
 
-// The HIFZ wordmark
+// The HIFZ wordmark (text logo)
 export function HifzWordmark({ 
   size = 24, 
   className = '',
@@ -171,6 +74,8 @@ export function HifzWordmark({
 }) {
   const height = size;
   const width = size * 2.8;
+  
+  const isGradient = color === 'gradient';
   
   return (
     <svg
@@ -184,19 +89,18 @@ export function HifzWordmark({
         <linearGradient id="wordmark-gold" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#f4d47c" />
           <stop offset="50%" stopColor="#c9a227" />
-          <stop offset="100%" stopColor="#d4af37" />
+          <stop offset="100%" stopColor="#8b6914" />
         </linearGradient>
       </defs>
-      
       <text
         x="70"
         y="38"
         textAnchor="middle"
-        fontFamily="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+        fill={isGradient ? 'url(#wordmark-gold)' : color}
+        fontSize="42"
         fontWeight="700"
-        fontSize="38"
-        letterSpacing="0.08em"
-        fill={color === 'gradient' ? 'url(#wordmark-gold)' : color}
+        fontFamily="system-ui, -apple-system, sans-serif"
+        letterSpacing="4"
       >
         HIFZ
       </text>
@@ -204,83 +108,70 @@ export function HifzWordmark({
   );
 }
 
-// Full logo - icon + wordmark
+// Full logo: Icon + Wordmark
 export function HifzLogo({ 
-  size = 40, 
+  iconSize = 40,
+  wordmarkSize = 24,
   className = '',
   animated = true,
-  variant = 'horizontal'
-}: LogoProps & { variant?: 'horizontal' | 'vertical' | 'icon-only' }) {
-  if (variant === 'icon-only') {
-    return <HifzIcon size={size} className={className} animated={animated} />;
-  }
-  
-  const Container = animated ? motion.div : 'div';
-  
-  if (variant === 'vertical') {
-    return (
-      <Container
-        className={`flex flex-col items-center gap-2 ${className}`}
-        {...(animated && {
-          initial: { opacity: 0, y: -10 },
-          animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.5 }
-        })}
-      >
-        <HifzIcon size={size} animated={animated} />
-        <HifzWordmark size={size * 0.5} color="gradient" />
-      </Container>
-    );
-  }
-  
-  // Horizontal (default)
+}: {
+  iconSize?: number;
+  wordmarkSize?: number;
+  className?: string;
+  animated?: boolean;
+}) {
   return (
-    <Container
-      className={`flex items-center gap-3 ${className}`}
-      {...(animated && {
-        initial: { opacity: 0, x: -20 },
-        animate: { opacity: 1, x: 0 },
-        transition: { duration: 0.5 }
-      })}
-    >
-      <HifzIcon size={size} animated={animated} />
-      <span 
-        className="font-display text-xl font-bold tracking-wider"
-        style={{
-          background: 'linear-gradient(135deg, #f4d47c 0%, #c9a227 50%, #d4af37 100%)',
-          backgroundClip: 'text',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-        }}
-      >
-        HIFZ
-      </span>
-    </Container>
+    <div className={`flex items-center gap-3 ${className}`}>
+      <HifzIcon size={iconSize} animated={animated} />
+      <HifzWordmark size={wordmarkSize} color="gradient" />
+    </div>
   );
 }
 
-// Animated logo for loading screens
-export function HifzLogoAnimated({ size = 80 }: { size?: number }) {
+// Stage icons for learning progression
+export function StageIcon({ 
+  stage, 
+  size = 24, 
+  active = false 
+}: { 
+  stage: 1 | 2 | 3 | 4 | 5;
+  size?: number;
+  active?: boolean;
+}) {
+  const fillColor = active ? '#c9a227' : '#374151';
+  
+  // Different moon phases for different stages
+  const phases: Record<number, JSX.Element> = {
+    1: ( // New moon - beginning
+      <circle cx="12" cy="12" r="8" fill={fillColor} opacity="0.3" />
+    ),
+    2: ( // Crescent - early learning
+      <path d="M 16 6 C 10 6, 6 12, 6 18 C 12 16, 14 12, 16 6" fill={fillColor} />
+    ),
+    3: ( // Half moon - midway
+      <path d="M 12 4 A 8 8 0 0 1 12 20 L 12 4" fill={fillColor} />
+    ),
+    4: ( // Gibbous - almost there
+      <path d="M 12 4 A 8 8 0 0 1 12 20 A 4 8 0 0 0 12 4" fill={fillColor} />
+    ),
+    5: ( // Full moon - mastered
+      <circle cx="12" cy="12" r="8" fill={fillColor} />
+    ),
+  };
+  
   return (
-    <motion.div
-      className="relative"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <motion.div
-        animate={{ 
-          scale: [1, 1.05, 1],
-        }}
-        transition={{ 
-          duration: 2, 
-          repeat: Infinity, 
-          ease: "easeInOut" 
-        }}
-        className="absolute inset-0 rounded-full bg-gold-500/20 blur-xl"
+    <svg width={size} height={size} viewBox="0 0 24 24">
+      {phases[stage]}
+      {/* Book chevron at bottom */}
+      <path
+        d="M 6 18 L 12 22 L 18 18"
+        fill="none"
+        stroke={fillColor}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
-      <HifzIcon size={size} animated={true} />
-    </motion.div>
+    </svg>
   );
 }
 

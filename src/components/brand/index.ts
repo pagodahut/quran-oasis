@@ -6,7 +6,7 @@ export {
   HifzIcon, 
   HifzIconSimple, 
   HifzWordmark,
-  HifzLogoAnimated,
+  StageIcon,
 } from './HifzLogo';
 
 // Brand colors for use in JavaScript/TypeScript
