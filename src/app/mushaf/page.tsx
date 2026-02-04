@@ -358,14 +358,14 @@ export default function MushafPage() {
                     )}
 
                     {/* Verse Meta */}
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-night-800/20">
-                      <div className="flex items-center gap-4 text-xs text-night-500">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-3 pt-3 border-t border-night-800/20 gap-2">
+                      <div className="flex items-center gap-3 text-[10px] sm:text-xs text-night-500">
                         <span>Juz {ayah.juz}</span>
-                        <span>Page {ayah.page}</span>
+                        <span>Pg {ayah.page}</span>
                         <span>Ruku {ayah.ruku}</span>
                         {ayah.sajda && <span className="text-gold-400">۩ Sajda</span>}
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5 sm:gap-2">
                         {/* Practice Tajweed Button */}
                         <button
                           onClick={(e) => {
@@ -374,9 +374,10 @@ export default function MushafPage() {
                             setShowTajweedPractice(true);
                           }}
                           className="text-xs text-sage-500 hover:text-sage-400 transition-colors flex items-center gap-1 bg-sage-500/10 px-2 py-1 rounded-lg"
+                          title="Practice"
                         >
                           <Mic className="w-3.5 h-3.5" />
-                          Practice
+                          <span className="hidden sm:inline">Practice</span>
                         </button>
                         <button
                           onClick={(e) => {
@@ -395,9 +396,10 @@ export default function MushafPage() {
                               ? 'text-gold-400 bg-gold-500/20'
                               : 'text-night-500 hover:text-gold-400 bg-night-800/50'
                           }`}
+                          title={isBookmarked(surahNumber, ayah.numberInSurah) ? 'Saved' : 'Save'}
                         >
                           <Bookmark className={`w-3.5 h-3.5 ${isBookmarked(surahNumber, ayah.numberInSurah) ? 'fill-gold-400' : ''}`} />
-                          {isBookmarked(surahNumber, ayah.numberInSurah) ? 'Saved' : 'Save'}
+                          <span className="hidden sm:inline">{isBookmarked(surahNumber, ayah.numberInSurah) ? 'Saved' : 'Save'}</span>
                         </button>
                         <button
                           onClick={(e) => {
@@ -405,9 +407,10 @@ export default function MushafPage() {
                             router.push(`/memorize/${surahNumber}/${ayah.numberInSurah}`);
                           }}
                           className="text-xs text-gold-500 hover:text-gold-400 transition-colors flex items-center gap-1 bg-gold-500/10 px-2 py-1 rounded-lg"
+                          title="Memorize"
                         >
                           <Brain className="w-3.5 h-3.5" />
-                          Memorize
+                          <span className="hidden sm:inline">Memorize</span>
                         </button>
                         <button
                           onClick={(e) => {
@@ -415,10 +418,11 @@ export default function MushafPage() {
                             setTafsirAyah(ayah.numberInSurah);
                             setShowTafsir(true);
                           }}
-                          className="text-xs text-night-500 hover:text-gold-400 transition-colors flex items-center gap-1"
+                          className="text-xs text-night-500 hover:text-gold-400 transition-colors flex items-center gap-1 bg-night-800/30 px-2 py-1 rounded-lg"
+                          title="Tafsir"
                         >
                           <BookOpen className="w-3.5 h-3.5" />
-                          Tafsir
+                          <span className="hidden sm:inline">Tafsir</span>
                         </button>
                       </div>
                     </div>
