@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useLearningMode } from '@/hooks/useLearningMode';
 
 // Custom geometric icons - cohesive Islamic-inspired design
 function HomeIcon({ className = "", strokeWidth = 2 }: { className?: string; strokeWidth?: number }) {
@@ -60,6 +61,7 @@ export default function BottomNav() {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const { showLearn, showPractice, isLoaded } = useLearningMode();
 
   // Collapse nav on scroll down, expand on scroll up (iOS-style)
   // Using useCallback for better performance
@@ -81,13 +83,22 @@ export default function BottomNav() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
-  const navItems = [
-    { href: '/', Icon: HomeIcon, label: 'Home', ariaLabel: 'Go to Home' },
-    { href: '/practice', Icon: PracticeIcon, label: 'Practice', ariaLabel: 'Go to Practice' },
-    { href: '/mushaf', Icon: QuranIcon, label: 'Quran', ariaLabel: 'Read Quran' },
-    { href: '/lessons', Icon: LearnIcon, label: 'Learn', ariaLabel: 'Go to Lessons' },
-    { href: '/profile', Icon: ProfileIcon, label: 'Profile', ariaLabel: 'View Profile' },
-  ];
+  // Build nav items based on learning mode
+  // Navigation Updates:
+  // - Beginner: Home, Learn, Practice, Quran, Profile
+  // - Intermediate: Home, Practice, Quran, Profile
+  // - Hafiz: Home, Quran, Profile
+  const navItems = useMemo(() => {
+    const items = [
+      { href: '/dashboard', Icon: HomeIcon, label: 'Home', ariaLabel: 'Go to Dashboard', show: true },
+      { href: '/lessons', Icon: LearnIcon, label: 'Learn', ariaLabel: 'Go to Lessons', show: showLearn },
+      { href: '/practice', Icon: PracticeIcon, label: 'Practice', ariaLabel: 'Go to Practice', show: showPractice },
+      { href: '/mushaf', Icon: QuranIcon, label: 'Quran', ariaLabel: 'Read Quran', show: true },
+      { href: '/profile', Icon: ProfileIcon, label: 'Profile', ariaLabel: 'View Profile', show: true },
+    ];
+    
+    return items.filter(item => item.show);
+  }, [showLearn, showPractice]);
 
   return (
     <nav 
@@ -124,7 +135,7 @@ export default function BottomNav() {
         >
           {navItems.map((item) => {
             const isActive = pathname === item.href || 
-              (item.href !== '/' && pathname.startsWith(item.href));
+              (item.href !== '/' && item.href !== '/dashboard' && pathname.startsWith(item.href));
             
             return (
               <Link

@@ -24,8 +24,14 @@ import {
   Search
 } from 'lucide-react';
 import { RECITERS, getAudioUrl } from '@/lib/quranData';
+import { 
+  LearningMode, 
+  LEARNING_MODE_OPTIONS, 
+  setLearningMode as persistLearningMode,
+  inferLearningModeFromOnboarding 
+} from '@/lib/learningMode';
 
-type Step = 'arabic' | 'memorization' | 'goal' | 'time' | 'starting' | 'reciter' | 'complete';
+type Step = 'arabic' | 'memorization' | 'experience' | 'goal' | 'time' | 'starting' | 'reciter' | 'complete';
 
 const ARABIC_LEVELS = [
   { value: 'none' as const, label: "I can't read Arabic yet", desc: "Starting from scratch", icon: <BookOpen className="w-5 h-5" /> },
@@ -116,6 +122,7 @@ const POPULAR_SURAHS = [
 interface OnboardingData {
   arabicLevel: 'none' | 'letters' | 'basic' | 'intermediate' | 'fluent';
   priorMemorization: 'none' | 'some_surahs' | 'juz_amma' | 'multiple_juz' | 'significant';
+  learningMode: LearningMode;
   goal: 'full_hifz' | 'juz_amma' | 'selected_surahs' | 'daily_connection';
   dailyTimeMinutes: number;
   preferredReciter: string;
@@ -144,6 +151,7 @@ export default function OnboardingPage() {
   const [data, setData] = useState<OnboardingData>({
     arabicLevel: 'none',
     priorMemorization: 'none',
+    learningMode: 'beginner',
     goal: 'daily_connection',
     dailyTimeMinutes: 20,
     preferredReciter: 'alafasy',
@@ -156,9 +164,9 @@ export default function OnboardingPage() {
   const [surahSearch, setSurahSearch] = useState('');
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Build steps dynamically - include 'starting' step for all goals
+  // Build steps dynamically - include 'experience' step for learning mode selection
   const steps: Step[] = useMemo(() => {
-    return ['arabic', 'memorization', 'goal', 'time', 'starting', 'reciter', 'complete'];
+    return ['arabic', 'memorization', 'experience', 'goal', 'time', 'starting', 'reciter', 'complete'];
   }, []);
   
   const currentIndex = steps.indexOf(step);
@@ -233,6 +241,10 @@ export default function OnboardingPage() {
           dailyMinutes: data.dailyTimeMinutes,
         }));
       }
+      
+      // Always persist learning mode to localStorage (works even if API fails)
+      persistLearningMode(data.learningMode);
+      
     } catch (error) {
       console.error('Onboarding submission error:', error);
       // Fallback to localStorage
@@ -241,6 +253,8 @@ export default function OnboardingPage() {
         reciter: data.preferredReciter,
         dailyMinutes: data.dailyTimeMinutes,
       }));
+      // Still persist learning mode
+      persistLearningMode(data.learningMode);
     }
     setIsSubmitting(false);
   };
@@ -455,6 +469,55 @@ export default function OnboardingPage() {
                     desc={option.desc}
                   />
                 ))}
+              </div>
+              
+              <div className="mt-auto">
+                <ContinueButton onClick={goNext} />
+              </div>
+            </StepContainer>
+          )}
+
+          {/* Experience Level / Learning Mode */}
+          {step === 'experience' && (
+            <StepContainer key="experience">
+              <h2 className="text-2xl font-semibold text-night-100 mb-2">
+                What's your current level?
+              </h2>
+              <p className="text-night-400 mb-8">
+                This helps us show you the right features
+              </p>
+              
+              <div className="space-y-3 mb-8">
+                {LEARNING_MODE_OPTIONS.map((option) => (
+                  <OptionCard
+                    key={option.id}
+                    selected={data.learningMode === option.id}
+                    onClick={() => setData({ ...data, learningMode: option.id })}
+                    icon={
+                      option.id === 'beginner' ? <BookOpen className="w-5 h-5" /> :
+                      option.id === 'intermediate' ? <Brain className="w-5 h-5" /> :
+                      <Star className="w-5 h-5" />
+                    }
+                    label={option.label}
+                    desc={option.shortDesc}
+                  />
+                ))}
+              </div>
+              
+              {/* Info about what each mode shows */}
+              <div className="p-4 rounded-xl mb-6" style={{
+                background: 'linear-gradient(135deg, rgba(201,162,39,0.08) 0%, rgba(201,162,39,0.02) 100%)',
+                border: '1px solid rgba(201,162,39,0.15)',
+              }}>
+                <p className="text-sm text-night-400">
+                  <span className="text-gold-400">💡 </span>
+                  {data.learningMode === 'beginner' && "You'll see all learning features: Lessons to learn Arabic & Tajweed, Practice for memorization drills, and the full Quran."}
+                  {data.learningMode === 'intermediate' && "You'll see Practice for memorization drills and the full Quran. The Learn section will be hidden since you know the basics."}
+                  {data.learningMode === 'hafiz' && "You'll see the Quran with per-ayah memorization tools. Perfect for revision without the clutter."}
+                </p>
+                <p className="text-xs text-night-500 mt-2">
+                  You can change this anytime in Settings.
+                </p>
               </div>
               
               <div className="mt-auto">

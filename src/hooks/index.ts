@@ -3,3 +3,4 @@
  */
 
 export * from './useAppliedPreferences';
+export * from './useLearningMode';

@@ -31,6 +31,9 @@ import {
   ChevronRight,
   Sparkles,
   BookOpen,
+  GraduationCap,
+  Brain,
+  Star,
 } from 'lucide-react';
 import { 
   usePreferences,
@@ -50,6 +53,8 @@ import {
 } from '@/lib/preferencesStore';
 import BottomNav from '@/components/BottomNav';
 import { setDailyGoal } from '@/lib/motivationStore';
+import { useLearningMode } from '@/hooks/useLearningMode';
+import { LearningMode, LEARNING_MODE_OPTIONS } from '@/lib/learningMode';
 
 // ============================================
 // Components
@@ -254,6 +259,7 @@ function SelectGrid<T extends string | number>({
 
 export default function SettingsPage() {
   const { preferences, update, reset, isLoaded } = usePreferences();
+  const { mode: learningMode, setMode: setLearningMode, config: learningModeConfig } = useLearningMode();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showClearDataConfirm, setShowClearDataConfirm] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -671,6 +677,76 @@ export default function SettingsPage() {
                 <span className="px-3 py-1 rounded-lg bg-night-700 text-night-300 text-sm">
                   Dark
                 </span>
+              </div>
+            </div>
+          </div>
+        </SettingSection>
+
+        <div className="liquid-divider" />
+
+        {/* ============ LEARNING MODE ============ */}
+        <SettingSection 
+          icon={GraduationCap} 
+          title="Learning Mode"
+          description="Control which features are shown"
+          iconColor="text-gold-400"
+          iconBg="bg-gold-500/10"
+        >
+          <div className="space-y-4">
+            <p className="text-sm text-night-400 mb-3">
+              Choose your experience level to show only the features you need.
+            </p>
+            
+            <div className="space-y-3">
+              {LEARNING_MODE_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  onClick={() => {
+                    setLearningMode(option.id);
+                    showSuccess(`Learning mode changed to ${option.label}`);
+                  }}
+                  className={`w-full p-4 rounded-xl text-left transition-all ${
+                    learningMode === option.id 
+                      ? 'bg-gold-500/10 border-2 border-gold-500/50' 
+                      : 'bg-night-800/50 border-2 border-transparent hover:border-night-700'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                        learningMode === option.id ? 'bg-gold-500/20' : 'bg-night-700/50'
+                      }`}>
+                        {option.id === 'beginner' && <BookOpen className={`w-5 h-5 ${learningMode === option.id ? 'text-gold-400' : 'text-night-400'}`} />}
+                        {option.id === 'intermediate' && <Brain className={`w-5 h-5 ${learningMode === option.id ? 'text-gold-400' : 'text-night-400'}`} />}
+                        {option.id === 'hafiz' && <Star className={`w-5 h-5 ${learningMode === option.id ? 'text-gold-400' : 'text-night-400'}`} />}
+                      </div>
+                      <div>
+                        <p className="font-medium text-night-100">{option.label}</p>
+                        <p className="text-xs text-night-500 mt-0.5">{option.shortDesc}</p>
+                      </div>
+                    </div>
+                    {learningMode === option.id && (
+                      <div className="w-6 h-6 rounded-full bg-gold-500 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-4 h-4 text-night-950" />
+                      </div>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+            
+            {/* Info about current mode */}
+            <div className="flex items-start gap-2 p-3 rounded-xl bg-gold-500/10 border border-gold-500/20 mt-4">
+              <Info className="w-4 h-4 text-gold-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-gold-400">
+                  {learningModeConfig.description}
+                </p>
+                <p className="text-xs text-night-500 mt-1">
+                  {learningMode === 'beginner' && "All navigation tabs are visible: Home, Learn, Practice, Quran, Profile."}
+                  {learningMode === 'intermediate' && "Navigation shows: Home, Practice, Quran, Profile. Learn tab is hidden."}
+                  {learningMode === 'hafiz' && "Streamlined navigation: Home, Quran, Profile. Learn and Practice tabs are hidden."}
+                </p>
               </div>
             </div>
           </div>
