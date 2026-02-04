@@ -1,32 +1,27 @@
 /**
- * Enhanced Arabic Audio Service
+ * Arabic Audio Service
  * 
- * Priority order:
- * 1. ElevenLabs API (highest quality, requires API key)
- * 2. Pre-recorded audio files (free, high quality for letters)
- * 3. Web Speech API (fallback, poor quality)
+ * Priority order (NO AI voices):
+ * 1. Pre-recorded audio files (letters from IslamCan.com)
+ * 2. Quran.com human-recited word audio (for vocabulary)
+ * 3. Web Speech API (fallback only - not ideal for Arabic)
  */
+
+import { getVocabularyAudioUrl, playVocabulary, stopVocabularyAudio } from './vocabularyAudioService';
 
 // ============================================
 // Configuration
 // ============================================
 
-const ELEVENLABS_API_KEY = process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY;
-
-// Arabic voice ID for ElevenLabs - "Rachel" supports Arabic well
-// You can change this to a native Arabic speaker voice
-const ELEVENLABS_VOICE_ID = process.env.NEXT_PUBLIC_ELEVENLABS_VOICE_ID || 'EXAVITQu4vr4xnSDxMaL';
-
 // Pre-recorded audio URLs for Arabic letters
 // Using IslamCan.com free educational audio (with attribution)
-// These are actual letter SOUNDS, not letter names being read by TTS
 const ISLAMCAN_AUDIO_BASE = 'https://islamcan.com/learn-arabic/arabic-alphabets/';
 
 // ============================================
 // Types
 // ============================================
 
-export type AudioProvider = 'elevenlabs' | 'recorded' | 'webspeech';
+export type AudioProvider = 'recorded' | 'quran' | 'webspeech';
 
 export interface AudioOptions {
   onStart?: () => void;
@@ -49,7 +44,6 @@ interface LetterAudioMap {
 // Letter Audio Mapping
 // ============================================
 
-// Mapping to IslamCan.com audio files (actual letter sounds)
 export const LETTER_AUDIO: LetterAudioMap = {
   'أ': { name: 'Alif', nameArabic: 'أَلِف', soundFile: '001-alif.mp3', phonetic: 'a' },
   'ا': { name: 'Alif', nameArabic: 'أَلِف', soundFile: '001-alif.mp3', phonetic: 'aa' },
@@ -97,92 +91,22 @@ export function stopAllAudio(): void {
     currentAudio.currentTime = 0;
     currentAudio = null;
   }
+  stopVocabularyAudio();
   if (typeof window !== 'undefined' && window.speechSynthesis) {
     window.speechSynthesis.cancel();
   }
 }
 
 // ============================================
-// ElevenLabs TTS
-// ============================================
-
-async function playWithElevenLabs(
-  text: string,
-  options: AudioOptions = {}
-): Promise<boolean> {
-  if (!ELEVENLABS_API_KEY) {
-    return false;
-  }
-
-  try {
-    options.onStart?.();
-    
-    const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'audio/mpeg',
-        'Content-Type': 'application/json',
-        'xi-api-key': ELEVENLABS_API_KEY,
-      },
-      body: JSON.stringify({
-        text,
-        model_id: 'eleven_multilingual_v2',
-        voice_settings: {
-          stability: 0.75,
-          similarity_boost: 0.75,
-          style: 0.5,
-          use_speaker_boost: true,
-        },
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`ElevenLabs API error: ${response.status}`);
-    }
-
-    const audioBlob = await response.blob();
-    const audioUrl = URL.createObjectURL(audioBlob);
-    
-    return new Promise((resolve) => {
-      const audio = new Audio(audioUrl);
-      currentAudio = audio;
-      
-      audio.onended = () => {
-        URL.revokeObjectURL(audioUrl);
-        currentAudio = null;
-        options.onEnd?.();
-        resolve(true);
-      };
-      
-      audio.onerror = () => {
-        URL.revokeObjectURL(audioUrl);
-        currentAudio = null;
-        options.onError?.('Audio playback failed');
-        resolve(false);
-      };
-      
-      audio.play().catch((e) => {
-        options.onError?.(e.message);
-        resolve(false);
-      });
-    });
-  } catch (error) {
-    options.onError?.(error instanceof Error ? error.message : 'Unknown error');
-    return false;
-  }
-}
-
-// ============================================
-// Pre-recorded Audio
+// Pre-recorded Audio (Letters)
 // ============================================
 
 function getLetterAudioUrl(letter: string): string | null {
-  const cleanLetter = letter.replace(/[\u064B-\u0652]/g, ''); // Remove tashkeel
+  const cleanLetter = letter.replace(/[\u064B-\u0652]/g, '');
   const letterData = LETTER_AUDIO[cleanLetter];
   
   if (!letterData) return null;
   
-  // Use IslamCan.com audio CDN for actual letter sounds
   return `${ISLAMCAN_AUDIO_BASE}${letterData.soundFile}`;
 }
 
@@ -209,7 +133,6 @@ async function playRecordedAudio(
     
     audio.onerror = () => {
       currentAudio = null;
-      // Silent fail - will fallback to other methods
       resolve(false);
     };
     
@@ -260,7 +183,7 @@ function playWithWebSpeech(
 // ============================================
 
 /**
- * Play a single Arabic letter with best available audio
+ * Play a single Arabic letter with pre-recorded audio
  */
 export async function playLetter(
   letter: string,
@@ -268,34 +191,20 @@ export async function playLetter(
 ): Promise<boolean> {
   stopAllAudio();
   
-  // Clean the letter (remove tashkeel for lookup)
   const cleanLetter = letter.replace(/[\u064B-\u0652]/g, '');
-  const letterData = LETTER_AUDIO[cleanLetter];
   
-  // Try recorded audio first (best for letters)
+  // Try pre-recorded audio first (best for letters)
   if (await playRecordedAudio(cleanLetter, options)) {
     return true;
   }
   
-  // For TTS fallback, use the letter with fatha vowel for proper pronunciation
-  // This makes the TTS say the letter SOUND (e.g., "ba") not the letter NAME
-  const letterWithVowel = letterData 
-    ? cleanLetter + '\u064E' // Add fatha (short 'a' sound)
-    : letter;
-  
-  // Try ElevenLabs for high quality
-  if (ELEVENLABS_API_KEY) {
-    if (await playWithElevenLabs(letterWithVowel, options)) {
-      return true;
-    }
-  }
-  
-  // Fallback to Web Speech API - use letter with vowel for sound, not name
+  // Fallback to Web Speech with vowel for pronunciation
+  const letterWithVowel = cleanLetter + '\u064E';
   return playWithWebSpeech(letterWithVowel, { ...options, rate: 0.5 });
 }
 
 /**
- * Play an Arabic word
+ * Play an Arabic word using Quran.com human audio
  */
 export async function playWord(
   word: string,
@@ -303,11 +212,9 @@ export async function playWord(
 ): Promise<boolean> {
   stopAllAudio();
   
-  // Try ElevenLabs first for words (best quality)
-  if (ELEVENLABS_API_KEY) {
-    if (await playWithElevenLabs(word, options)) {
-      return true;
-    }
+  // Try Quran.com human audio first
+  if (await playVocabulary(word, options)) {
+    return true;
   }
   
   // Fallback to Web Speech API
@@ -316,7 +223,7 @@ export async function playWord(
 
 /**
  * Play a phrase or Quranic verse
- * For Quran, prefer using the EveryAyah.com audio instead
+ * For Quran verses, prefer using EveryAyah.com audio directly
  */
 export async function playPhrase(
   phrase: string,
@@ -324,14 +231,8 @@ export async function playPhrase(
 ): Promise<boolean> {
   stopAllAudio();
   
-  // Try ElevenLabs for phrases
-  if (ELEVENLABS_API_KEY) {
-    if (await playWithElevenLabs(phrase, options)) {
-      return true;
-    }
-  }
-  
-  // Fallback to Web Speech API
+  // For phrases, use Web Speech as fallback
+  // (Full verse audio should use EveryAyah.com via quranData.ts)
   return playWithWebSpeech(phrase, { ...options, rate: 0.8 });
 }
 
@@ -347,7 +248,7 @@ export async function playArabic(
   
   if (charCount <= 2) {
     return playLetter(text, options);
-  } else if (charCount <= 10 && !text.includes(' ')) {
+  } else if (charCount <= 15 && !text.includes(' ')) {
     return playWord(text, options);
   } else {
     return playPhrase(text, options);
@@ -363,12 +264,9 @@ export function getLetterInfo(letter: string) {
   return LETTER_AUDIO[cleanLetter] || null;
 }
 
-export function hasElevenLabsKey(): boolean {
-  return !!ELEVENLABS_API_KEY;
-}
-
 /**
  * Check what audio providers are available
+ * No longer includes ElevenLabs - all human audio now
  */
 export async function checkAudioProviders(): Promise<{
   elevenlabs: boolean;
@@ -380,8 +278,13 @@ export async function checkAudioProviders(): Promise<{
     window.speechSynthesis.getVoices().some(v => v.lang.startsWith('ar'));
   
   return {
-    elevenlabs: !!ELEVENLABS_API_KEY,
-    recorded: true, // We have the URLs mapped
+    elevenlabs: false, // Removed - using human audio only
+    recorded: true,
     webspeech: hasWebSpeech,
   };
+}
+
+// Legacy export for compatibility
+export function hasElevenLabsKey(): boolean {
+  return false; // No longer used
 }
