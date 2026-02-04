@@ -679,10 +679,104 @@ export default function HomePage() {
               <div className="absolute bottom-3 left-3 w-8 h-8 border-b-2 border-l-2 border-gold-500/40 rounded-bl-lg" />
               <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-gold-500/40 rounded-br-lg" />
               
+              {/* Scroll-Triggered Opening Animation */}
+              <motion.div 
+                className="flex justify-center mb-8"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-50px" }}
+              >
+                <motion.svg
+                  width="300"
+                  height="60"
+                  viewBox="0 0 300 60"
+                  className="overflow-visible"
+                >
+                  <defs>
+                    <linearGradient id="revealGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#c9a227" />
+                      <stop offset="50%" stopColor="#d4af37" />
+                      <stop offset="100%" stopColor="#c9a227" />
+                    </linearGradient>
+                    <filter id="revealGlow">
+                      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                      <feMerge>
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                      </feMerge>
+                    </filter>
+                  </defs>
+                  {/* Left line drawing in */}
+                  <motion.line
+                    x1="150" y1="30" x2="20" y2="30"
+                    stroke="url(#revealGradient)"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    filter="url(#revealGlow)"
+                    variants={{
+                      hidden: { pathLength: 0, opacity: 0 },
+                      visible: { pathLength: 1, opacity: 1, transition: { duration: 0.8, ease: "easeOut" } }
+                    }}
+                  />
+                  {/* Right line drawing in */}
+                  <motion.line
+                    x1="150" y1="30" x2="280" y2="30"
+                    stroke="url(#revealGradient)"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    filter="url(#revealGlow)"
+                    variants={{
+                      hidden: { pathLength: 0, opacity: 0 },
+                      visible: { pathLength: 1, opacity: 1, transition: { duration: 0.8, ease: "easeOut" } }
+                    }}
+                  />
+                  {/* Left decorative end */}
+                  <motion.path
+                    d="M 20 20 L 10 30 L 20 40"
+                    stroke="url(#revealGradient)"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    filter="url(#revealGlow)"
+                    variants={{
+                      hidden: { opacity: 0, scale: 0 },
+                      visible: { opacity: 1, scale: 1, transition: { delay: 0.6, duration: 0.3 } }
+                    }}
+                  />
+                  {/* Right decorative end */}
+                  <motion.path
+                    d="M 280 20 L 290 30 L 280 40"
+                    stroke="url(#revealGradient)"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    filter="url(#revealGlow)"
+                    variants={{
+                      hidden: { opacity: 0, scale: 0 },
+                      visible: { opacity: 1, scale: 1, transition: { delay: 0.6, duration: 0.3 } }
+                    }}
+                  />
+                  {/* Center star/diamond */}
+                  <motion.path
+                    d="M 150 15 L 158 30 L 150 45 L 142 30 Z"
+                    fill="#c9a227"
+                    filter="url(#revealGlow)"
+                    variants={{
+                      hidden: { scale: 0, opacity: 0, rotate: -180 },
+                      visible: { 
+                        scale: 1, 
+                        opacity: 1, 
+                        rotate: 0,
+                        transition: { delay: 0.3, duration: 0.5, type: "spring", stiffness: 200 } 
+                      }
+                    }}
+                  />
+                </motion.svg>
+              </motion.div>
+
               <motion.div variants={fadeInUp} className="text-center mb-12">
-                <div className="flex items-center justify-center mb-4">
-                  <GeometricDivider className="text-gold-500" />
-                </div>
                 <h2 id="features" className="font-display text-3xl md:text-5xl text-night-100 mb-4 heading-illuminated">
                   The Path to Memorization
                 </h2>
@@ -691,68 +785,8 @@ export default function HomePage() {
                 </p>
               </motion.div>
 
-              {/* Animated Pathway */}
+              {/* Feature Cards */}
               <div className="relative">
-                {/* SVG Path that draws itself */}
-                <motion.svg
-                  className="absolute inset-0 w-full h-full pointer-events-none hidden md:block"
-                  viewBox="0 0 1200 200"
-                  preserveAspectRatio="none"
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-50px" }}
-                >
-                  <defs>
-                    <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#c9a227" />
-                      <stop offset="50%" stopColor="#a855f7" />
-                      <stop offset="100%" stopColor="#86a971" />
-                    </linearGradient>
-                    <filter id="glow">
-                      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                      <feMerge>
-                        <feMergeNode in="coloredBlur"/>
-                        <feMergeNode in="SourceGraphic"/>
-                      </feMerge>
-                    </filter>
-                  </defs>
-                  {/* Connecting path */}
-                  <motion.path
-                    d="M 200 100 C 350 100, 450 100, 600 100 C 750 100, 850 100, 1000 100"
-                    fill="none"
-                    stroke="url(#pathGradient)"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    filter="url(#glow)"
-                    variants={{
-                      hidden: { pathLength: 0, opacity: 0 },
-                      visible: { 
-                        pathLength: 1, 
-                        opacity: 1,
-                        transition: { duration: 1.5, ease: "easeInOut" }
-                      }
-                    }}
-                  />
-                  {/* Node dots */}
-                  {[200, 600, 1000].map((x, i) => (
-                    <motion.circle
-                      key={x}
-                      cx={x}
-                      cy={100}
-                      r={8}
-                      fill={i === 0 ? "#c9a227" : i === 1 ? "#a855f7" : "#86a971"}
-                      filter="url(#glow)"
-                      variants={{
-                        hidden: { scale: 0, opacity: 0 },
-                        visible: { 
-                          scale: 1, 
-                          opacity: 1,
-                          transition: { delay: 0.5 + i * 0.3, duration: 0.4, type: "spring" }
-                        }
-                      }}
-                    />
-                  ))}
-                </motion.svg>
 
                 {/* Feature Cards with staggered animation */}
                 <div className="grid md:grid-cols-3 gap-6 relative z-10">
