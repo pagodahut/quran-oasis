@@ -232,13 +232,10 @@ export async function analyzeRecitation(
   ayah: number
 ): Promise<TajweedFeedback> {
   try {
-    // Check for OpenAI API key (for Whisper transcription)
-    const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+    // Use server-side API route for transcription (protects API key)
+    const transcription = await transcribeViaServer(audioBlob);
     
-    if (apiKey) {
-      // Use OpenAI Whisper for transcription
-      const transcription = await transcribeWithWhisper(audioBlob, apiKey);
-      
+    if (transcription) {
       // Try Claude API for advanced tajweed analysis
       try {
         const claudeAnalysis = await analyzeWithClaude(transcription, expectedText, surah, ayah);
@@ -340,26 +337,30 @@ function mapRuleToKey(ruleName?: string): TajweedRule {
 /**
  * Transcribe audio using OpenAI Whisper
  */
-async function transcribeWithWhisper(audioBlob: Blob, apiKey: string): Promise<string> {
-  const formData = new FormData();
-  formData.append('file', audioBlob, 'recitation.webm');
-  formData.append('model', 'whisper-1');
-  formData.append('language', 'ar');
-  formData.append('response_format', 'text');
-  
-  const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: formData,
-  });
-  
-  if (!response.ok) {
-    throw new Error(`Whisper API error: ${response.status}`);
+/**
+ * Transcribe audio via server-side API route (protects API key)
+ */
+async function transcribeViaServer(audioBlob: Blob): Promise<string | null> {
+  try {
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'recitation.webm');
+    
+    const response = await fetch('/api/transcribe', {
+      method: 'POST',
+      body: formData,
+    });
+    
+    if (!response.ok) {
+      console.error('Transcription API error:', response.status);
+      return null;
+    }
+    
+    const data = await response.json();
+    return data.transcription || null;
+  } catch (error) {
+    console.error('Transcription error:', error);
+    return null;
   }
-  
-  return response.text();
 }
 
 /**

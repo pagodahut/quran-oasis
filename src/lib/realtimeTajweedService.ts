@@ -682,10 +682,16 @@ export class RealtimeTajweedService {
   }
   
   /**
-   * Check if Deepgram API key is configured
+   * Check if Deepgram API key is configured (via server)
    */
-  static isConfigured(): boolean {
-    return !!process.env.NEXT_PUBLIC_DEEPGRAM_API_KEY;
+  static async isConfigured(): Promise<boolean> {
+    try {
+      const response = await fetch('/api/deepgram/token');
+      const data = await response.json();
+      return data.configured === true;
+    } catch {
+      return false;
+    }
   }
 }
 

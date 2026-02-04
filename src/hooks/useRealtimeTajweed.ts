@@ -91,9 +91,26 @@ export function useRealtimeTajweed(
   const serviceRef = useRef<RealtimeTajweedService | null>(null);
   const audioLevelIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Check if Deepgram is configured
-  const isConfigured = typeof window !== 'undefined' && 
-    !!process.env.NEXT_PUBLIC_DEEPGRAM_API_KEY;
+  // Track if Deepgram is configured (checked via API)
+  const [isConfigured, setIsConfigured] = useState(false);
+  const [apiKey, setApiKey] = useState<string | null>(null);
+  
+  // Check if Deepgram is configured via server
+  useEffect(() => {
+    async function checkConfig() {
+      try {
+        const response = await fetch('/api/deepgram/token');
+        const data = await response.json();
+        if (data.configured && data.apiKey) {
+          setIsConfigured(true);
+          setApiKey(data.apiKey);
+        }
+      } catch {
+        setIsConfigured(false);
+      }
+    }
+    checkConfig();
+  }, []);
   
   // Initialize state when expected text changes
   useEffect(() => {
@@ -126,7 +143,7 @@ export function useRealtimeTajweed(
   }, []);
   
   const start = useCallback(async () => {
-    if (!isConfigured) {
+    if (!isConfigured || !apiKey) {
       onError?.('Deepgram API key not configured');
       return;
     }
@@ -137,9 +154,9 @@ export function useRealtimeTajweed(
     }
     
     try {
-      // Create new service instance
+      // Create new service instance with server-provided API key
       serviceRef.current = new RealtimeTajweedService({
-        apiKey: process.env.NEXT_PUBLIC_DEEPGRAM_API_KEY!,
+        apiKey,
         expectedText,
       });
       
@@ -169,7 +186,7 @@ export function useRealtimeTajweed(
       onError?.(message);
       setState(prev => ({ ...prev, error: message }));
     }
-  }, [expectedText, isConfigured, browserSupport, onWord, onError]);
+  }, [expectedText, isConfigured, apiKey, browserSupport, onWord, onError]);
   
   const stop = useCallback(async (): Promise<RealtimeSessionResult | null> => {
     // Stop audio level monitoring
