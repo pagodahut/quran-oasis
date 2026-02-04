@@ -262,6 +262,14 @@ export function supportsPerAyah(reciterId: string): boolean {
 }
 
 /**
+ * Get the effective reciter ID for per-ayah playback.
+ * Falls back to DEFAULT_RECITER_ID for listen-only reciters.
+ */
+export function getEffectiveReciterForPerAyah(reciterId: string): string {
+  return supportsPerAyah(reciterId) ? reciterId : DEFAULT_RECITER_ID;
+}
+
+/**
  * Get full surah audio URL for listen-only reciters
  */
 export function getSurahAudioUrl(surah: number, reciterId: string): string | null {
@@ -272,10 +280,12 @@ export function getSurahAudioUrl(surah: number, reciterId: string): string | nul
 }
 
 /**
- * Get audio URL for an ayah
+ * Get audio URL for an ayah.
+ * Automatically falls back to DEFAULT_RECITER_ID for listen-only reciters.
  */
 export function getAudioUrl(surah: number, ayah: number, reciterId: string = 'alafasy'): string {
-  const reciter = RECITERS.find(r => r.id === reciterId) || RECITERS[0];
+  const effectiveId = getEffectiveReciterForPerAyah(reciterId);
+  const reciter = RECITERS.find(r => r.id === effectiveId) || RECITERS[0];
   const surahStr = surah.toString().padStart(3, '0');
   const ayahStr = ayah.toString().padStart(3, '0');
   return `https://everyayah.com/data/${reciter.folder}/${surahStr}${ayahStr}.mp3`;

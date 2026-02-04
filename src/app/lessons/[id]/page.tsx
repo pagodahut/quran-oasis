@@ -785,12 +785,11 @@ export default function LessonDetailPage() {
           i++;
         }
         result.push(
-          <ul key={`ul-${i}`} className="my-3 space-y-2">
+          <ul key={`ul-${i}`} className="my-3 space-y-2.5 pl-5">
             {bullets.map((bullet, bi) => {
               const isArabic = /[\u0600-\u06FF]/.test(bullet);
               return (
-                <li key={bi} className="flex items-start gap-2 text-night-300">
-                  <span className="text-gold-500/60 mt-1.5">•</span>
+                <li key={bi} className="text-night-300 list-disc marker:text-gold-500/60 pl-1">
                   <span className={isArabic ? 'text-night-200' : ''}>
                     {renderInline(bullet, bi)}
                   </span>

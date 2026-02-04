@@ -69,22 +69,42 @@ interface UseRealtimeTajweedReturn {
   reset: () => void;
 }
 
-const initialState: RealtimeState = {
-  isConnected: false,
-  isRecording: false,
-  currentWordIndex: -1,
-  transcription: '',
-  words: [],
-  alignments: [],
-  error: null,
-};
+/**
+ * Parse expected text into word alignments
+ */
+function buildInitialAlignments(text: string): RealtimeState['alignments'] {
+  const words = text
+    .replace(/[\u06DD\u0660-\u0669۰-۹]+/g, '')
+    .split(/\s+/)
+    .filter(w => w.length > 0);
+  
+  return words.map((word, i) => ({
+    expectedIndex: i,
+    expectedWord: word,
+    status: 'pending' as const,
+    confidence: 0,
+  }));
+}
+
+function buildInitialState(expectedText: string): RealtimeState {
+  return {
+    isConnected: false,
+    isRecording: false,
+    currentWordIndex: -1,
+    transcription: '',
+    words: [],
+    alignments: buildInitialAlignments(expectedText),
+    error: null,
+  };
+}
 
 export function useRealtimeTajweed(
   options: UseRealtimeTajweedOptions
 ): UseRealtimeTajweedReturn {
   const { expectedText, onWord, onComplete, onError } = options;
   
-  const [state, setState] = useState<RealtimeState>(initialState);
+  // Initialize state WITH alignments immediately (fixes blank screen bug)
+  const [state, setState] = useState<RealtimeState>(() => buildInitialState(expectedText));
   const [audioLevel, setAudioLevel] = useState(0);
   const [browserSupport] = useState(() => checkBrowserSupport());
   
@@ -100,10 +120,16 @@ export function useRealtimeTajweed(
     async function checkConfig() {
       try {
         const response = await fetch('/api/deepgram/token');
+        if (!response.ok) {
+          setIsConfigured(false);
+          return;
+        }
         const data = await response.json();
         if (data.configured && data.apiKey) {
           setIsConfigured(true);
           setApiKey(data.apiKey);
+        } else {
+          setIsConfigured(false);
         }
       } catch {
         setIsConfigured(false);
@@ -112,32 +138,21 @@ export function useRealtimeTajweed(
     checkConfig();
   }, []);
   
-  // Initialize state when expected text changes
+  // Re-initialize state when expected text changes
   useEffect(() => {
-    const words = expectedText
-      .replace(/[\u06DD\u0660-\u0669۰-۹]+/g, '')
-      .split(/\s+/)
-      .filter(w => w.length > 0);
-    
-    setState({
-      ...initialState,
-      alignments: words.map((word, i) => ({
-        expectedIndex: i,
-        expectedWord: word,
-        status: 'pending' as const,
-        confidence: 0,
-      })),
-    });
+    setState(buildInitialState(expectedText));
   }, [expectedText]);
   
-  // Cleanup on unmount
+  // Cleanup on unmount — ensure mic is released
   useEffect(() => {
     return () => {
-      if (serviceRef.current) {
-        serviceRef.current.stop().catch(console.error);
-      }
       if (audioLevelIntervalRef.current) {
         clearInterval(audioLevelIntervalRef.current);
+        audioLevelIntervalRef.current = null;
+      }
+      if (serviceRef.current) {
+        serviceRef.current.stop().catch(console.error);
+        serviceRef.current = null;
       }
     };
   }, []);
@@ -212,22 +227,18 @@ export function useRealtimeTajweed(
   }, [onComplete, onError]);
   
   const reset = useCallback(() => {
-    const words = expectedText
-      .replace(/[\u06DD\u0660-\u0669۰-۹]+/g, '')
-      .split(/\s+/)
-      .filter(w => w.length > 0);
+    // Stop any running service first
+    if (serviceRef.current) {
+      serviceRef.current.stop().catch(console.error);
+      serviceRef.current = null;
+    }
+    if (audioLevelIntervalRef.current) {
+      clearInterval(audioLevelIntervalRef.current);
+      audioLevelIntervalRef.current = null;
+    }
     
-    setState({
-      ...initialState,
-      alignments: words.map((word, i) => ({
-        expectedIndex: i,
-        expectedWord: word,
-        status: 'pending' as const,
-        confidence: 0,
-      })),
-    });
+    setState(buildInitialState(expectedText));
     setAudioLevel(0);
-    serviceRef.current = null;
   }, [expectedText]);
   
   return {

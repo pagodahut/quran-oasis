@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import {
   initializeRecording,
+  checkMicPermission,
   startRecording,
   stopRecording,
   getAudioLevel,
@@ -119,13 +120,19 @@ export default function TajweedPractice({
   // Check if real-time mode is available
   const canUseRealtime = isRealtimeSupported && isDeepgramConfigured;
 
-  // Initialize recording on mount
+  // Check mic permission status on mount (without requesting it)
+  // Actual mic access is deferred to user gesture (Start Recording click)
   useEffect(() => {
-    async function init() {
-      const hasPermission = await initializeRecording();
-      setMicPermission(hasPermission ? 'granted' : 'denied');
+    async function checkPermission() {
+      const permState = await checkMicPermission();
+      if (permState === 'granted') {
+        setMicPermission('granted');
+      } else if (permState === 'denied') {
+        setMicPermission('denied');
+      }
+      // 'prompt' → leave as 'pending', will request on user gesture
     }
-    init();
+    checkPermission();
     
     return () => {
       cleanupRecording();
@@ -167,16 +174,15 @@ export default function TajweedPractice({
     }
   }, [audioBlob, isPlayingRecording]);
 
-  // Start recording (standard mode)
+  // Start recording (standard mode) — always initializes mic on user gesture
   const handleStartRecording = useCallback(async () => {
-    if (micPermission !== 'granted') {
-      const granted = await initializeRecording();
-      if (!granted) {
-        setMicPermission('denied');
-        return;
-      }
-      setMicPermission('granted');
+    // Always (re-)initialize recording on user gesture to ensure mic access
+    const granted = await initializeRecording();
+    if (!granted) {
+      setMicPermission('denied');
+      return;
     }
+    setMicPermission('granted');
     
     const success = startRecording();
     if (success) {
@@ -194,9 +200,9 @@ export default function TajweedPractice({
         setAudioLevel(getAudioLevel());
       }, 50);
     }
-  }, [micPermission]);
+  }, []);
 
-  // Stop recording (standard mode)
+  // Stop recording (standard mode) — stops mic stream tracks
   const handleStopRecording = useCallback(async () => {
     if (recordingTimerRef.current) {
       clearInterval(recordingTimerRef.current);
@@ -210,6 +216,7 @@ export default function TajweedPractice({
     setIsRecording(false);
     setAudioLevel(0);
     
+    // stopRecording() now also stops stream tracks to release the mic
     const blob = await stopRecording();
     if (blob) {
       setAudioBlob(blob);
@@ -604,8 +611,7 @@ export default function TajweedPractice({
                         setStep('record');
                       }
                     }}
-                    disabled={micPermission === 'denied'}
-                    className="flex-1 liquid-btn flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="flex-1 liquid-btn flex items-center justify-center gap-2"
                   >
                     {mode === 'realtime' ? (
                       <>

@@ -23,6 +23,7 @@ import {
   type AudioQuality as SettingsAudioQuality 
 } from '@/lib/settings';
 import { playReciterPreview, stopReciterPreview, isPreviewPlaying } from '@/lib/quranAudioService';
+import { supportsPerAyah, DEFAULT_RECITER_ID, RECITERS as QuranReciters } from '@/lib/quranData';
 
 // ============================================
 // Types
@@ -58,8 +59,10 @@ export function AudioPlayer({
   const audioRef = useRef<HTMLAudioElement>(null);
   const { settings, update } = useSettings();
   
-  // Use prop reciter or settings
-  const reciter = propReciter || settings.reciter;
+  // Use prop reciter or settings, with listen-only fallback
+  const selectedReciter = propReciter || settings.reciter;
+  const isListenOnly = !supportsPerAyah(selectedReciter);
+  const reciter = isListenOnly ? DEFAULT_RECITER_ID : selectedReciter;
   
   // State
   const [isPlaying, setIsPlaying] = useState(false);
@@ -242,11 +245,11 @@ export function AudioPlayer({
       animate={{ opacity: 1, y: 0 }}
       className="rounded-3xl p-5 relative overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, rgba(28,33,40,0.92) 0%, rgba(22,27,34,0.96) 100%)',
-        backdropFilter: 'blur(48px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(48px) saturate(180%)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.15), 0 12px 40px rgba(0,0,0,0.12)',
+        background: 'linear-gradient(180deg, rgba(28,33,40,0.60) 0%, rgba(22,27,34,0.70) 100%)',
+        backdropFilter: 'blur(64px) saturate(200%)',
+        WebkitBackdropFilter: 'blur(64px) saturate(200%)',
+        border: '1px solid rgba(255,255,255,0.10)',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.18), 0 12px 40px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.06)',
       }}
     >
       {/* Animated background glow when playing */}
@@ -299,6 +302,17 @@ export function AudioPlayer({
 
       {showControls && (
         <div className="relative z-10">
+          {/* Listen-only reciter fallback notice */}
+          {isListenOnly && (
+            <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <Volume2 className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+              <p className="text-xs text-amber-300/80">
+                Per-ayah audio uses <span className="font-medium text-amber-300">Al-Afasy</span> (
+                {QuranReciters.find(r => r.id === selectedReciter)?.name || selectedReciter} is full surah only)
+              </p>
+            </div>
+          )}
+
           {/* Reciter & Quality Info Bar */}
           <div className="flex items-center justify-between mb-4 text-sm">
             {/* Reciter Selector */}

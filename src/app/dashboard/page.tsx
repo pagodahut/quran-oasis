@@ -143,6 +143,10 @@ function DailyFocusCard({
         border ${borderClass}
         transition-all duration-300
       `}
+      style={{
+        backdropFilter: 'blur(24px) saturate(160%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+      }}
     >
       {/* Subtle pattern overlay */}
       <div className="absolute inset-0 opacity-30 pattern-arabesque" />

@@ -86,15 +86,37 @@ export interface PracticeSession {
 // ============================================
 
 let mediaRecorder: MediaRecorder | null = null;
+let mediaStream: MediaStream | null = null;
 let audioChunks: Blob[] = [];
 let audioContext: AudioContext | null = null;
 let analyser: AnalyserNode | null = null;
+
+/**
+ * Check if microphone permission is available (without requesting it)
+ */
+export async function checkMicPermission(): Promise<'granted' | 'denied' | 'prompt'> {
+  try {
+    if (navigator.permissions) {
+      const result = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+      return result.state as 'granted' | 'denied' | 'prompt';
+    }
+    return 'prompt'; // Can't check, assume prompt needed
+  } catch {
+    return 'prompt';
+  }
+}
 
 /**
  * Request microphone permission and initialize recording
  */
 export async function initializeRecording(): Promise<boolean> {
   try {
+    // Clean up any existing stream first
+    if (mediaStream) {
+      mediaStream.getTracks().forEach(track => track.stop());
+      mediaStream = null;
+    }
+    
     const stream = await navigator.mediaDevices.getUserMedia({ 
       audio: {
         echoCancellation: true,
@@ -103,6 +125,9 @@ export async function initializeRecording(): Promise<boolean> {
         sampleRate: 16000, // Optimal for speech recognition
       }
     });
+    
+    // Store stream reference for cleanup
+    mediaStream = stream;
     
     // Create audio context for visualization
     audioContext = new AudioContext();
@@ -165,6 +190,7 @@ export function startRecording(): boolean {
 
 /**
  * Stop recording and return audio blob
+ * Also stops the media stream tracks to release the microphone
  */
 export async function stopRecording(): Promise<Blob | null> {
   return new Promise((resolve) => {
@@ -177,6 +203,13 @@ export async function stopRecording(): Promise<Blob | null> {
       const mimeType = mediaRecorder?.mimeType || 'audio/webm';
       const audioBlob = new Blob(audioChunks, { type: mimeType });
       audioChunks = [];
+      
+      // Stop all stream tracks to release the microphone
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+        mediaStream = null;
+      }
+      
       resolve(audioBlob);
     };
     
@@ -199,15 +232,27 @@ export function getAudioLevel(): number {
 }
 
 /**
- * Cleanup recording resources
+ * Cleanup recording resources - stops mic stream tracks to release hardware
  */
 export function cleanupRecording(): void {
   if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-    mediaRecorder.stop();
+    try {
+      mediaRecorder.stop();
+    } catch (e) {
+      // Ignore errors on stop
+    }
+  }
+  
+  // CRITICAL: Stop all media stream tracks to release the microphone
+  if (mediaStream) {
+    mediaStream.getTracks().forEach(track => {
+      track.stop();
+    });
+    mediaStream = null;
   }
   
   if (audioContext) {
-    audioContext.close();
+    audioContext.close().catch(() => {});
     audioContext = null;
   }
   

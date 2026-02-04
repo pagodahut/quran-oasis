@@ -353,6 +353,7 @@ export class RealtimeTajweedService {
   
   private websocket: WebSocket | null = null;
   private mediaRecorder: MediaRecorder | null = null;
+  private mediaStream: MediaStream | null = null;
   private audioContext: AudioContext | null = null;
   private analyser: AnalyserNode | null = null;
   
@@ -445,6 +446,12 @@ export class RealtimeTajweedService {
   // ============================================
   
   private async initializeAudio(): Promise<MediaStream> {
+    // Clean up any existing stream first
+    if (this.mediaStream) {
+      this.mediaStream.getTracks().forEach(track => track.stop());
+      this.mediaStream = null;
+    }
+    
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: {
         echoCancellation: true,
@@ -453,6 +460,9 @@ export class RealtimeTajweedService {
         sampleRate: 16000,
       },
     });
+    
+    // Store stream reference for cleanup
+    this.mediaStream = stream;
     
     // Set up audio context for visualization
     this.audioContext = new AudioContext({ sampleRate: 16000 });
@@ -634,17 +644,37 @@ export class RealtimeTajweedService {
   async stop(): Promise<RealtimeSessionResult> {
     // Stop recording
     if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
-      this.mediaRecorder.stop();
+      try {
+        this.mediaRecorder.stop();
+      } catch (e) {
+        // Ignore errors on stop
+      }
+    }
+    
+    // CRITICAL: Stop all media stream tracks to release the microphone
+    if (this.mediaStream) {
+      this.mediaStream.getTracks().forEach(track => {
+        track.stop();
+      });
+      this.mediaStream = null;
     }
     
     // Close WebSocket
     if (this.websocket) {
-      this.websocket.close();
+      try {
+        this.websocket.close();
+      } catch (e) {
+        // Ignore
+      }
     }
     
     // Close audio context
     if (this.audioContext) {
-      await this.audioContext.close();
+      try {
+        await this.audioContext.close();
+      } catch (e) {
+        // Ignore
+      }
     }
     
     this.state.isRecording = false;

@@ -118,11 +118,11 @@ export default function BottomNav() {
             : 'max-w-sm rounded-2xl'
         }`}
         style={{
-          background: 'rgba(22, 27, 34, 0.8)',
-          backdropFilter: 'blur(48px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(48px) saturate(180%)',
-          border: '1px solid rgba(255, 255, 255, 0.06)',
-          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.2), 0 8px 32px rgba(0, 0, 0, 0.12)',
+          background: 'rgba(22, 27, 34, 0.60)',
+          backdropFilter: 'blur(64px) saturate(200%)',
+          WebkitBackdropFilter: 'blur(64px) saturate(200%)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: '0 -2px 20px rgba(0, 0, 0, 0.15), 0 4px 24px rgba(0, 0, 0, 0.25), 0 8px 32px rgba(0, 0, 0, 0.12)',
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >

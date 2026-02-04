@@ -26,7 +26,7 @@ import {
   Grid3X3,
 } from 'lucide-react';
 import WordByWordInline from '@/components/WordByWordInline';
-import { getSurah, getAudioUrl, RECITERS, cleanAyahText, type Ayah } from '@/lib/quranData';
+import { getSurah, getAudioUrl, RECITERS, cleanAyahText, getEffectiveReciterForPerAyah, supportsPerAyah, type Ayah } from '@/lib/quranData';
 import { 
   startMemorizingVerse, 
   markVerseMemorized, 
@@ -584,6 +584,16 @@ export default function MemorizePage() {
           </div>
         </div>
       </header>
+
+      {/* Listen-only reciter fallback notice */}
+      {!supportsPerAyah(prefs.reciter) && (
+        <div className="mx-4 mt-2 flex items-center gap-2 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
+          <Headphones className="w-4 h-4 text-amber-400 flex-shrink-0" />
+          <p className="text-xs text-amber-300/80">
+            Per-verse audio uses <span className="font-medium text-amber-300">Al-Afasy</span> — your reciter is full surah only
+          </p>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto px-4 py-6">

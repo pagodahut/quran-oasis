@@ -414,6 +414,20 @@ export default function SettingsPage() {
                   />
                 ))}
               </div>
+
+              {/* Listen-only reciter fallback notice */}
+              {RECITERS.find(r => r.id === preferences.audio.reciter)?.listenOnly && (
+                <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 mt-3">
+                  <Info className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-amber-300">Full surah audio only</p>
+                    <p className="text-xs text-amber-400/70 mt-1 leading-relaxed">
+                      This reciter only supports full surah playback. Individual verse playback 
+                      will automatically use <span className="font-medium text-amber-300">Mishary Rashid Alafasy</span> as a fallback.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Playback Speed */}
