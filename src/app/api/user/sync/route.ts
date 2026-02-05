@@ -2,6 +2,22 @@ import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+interface SyncBookmark {
+  surah: number;
+  ayah: number;
+  note?: string;
+}
+
+interface SyncVerse {
+  easeFactor?: number;
+  interval?: number;
+  totalReviews?: number;
+  nextReview?: string | number;
+  lastReview?: string | number | null;
+  status?: string;
+  confidence?: number;
+}
+
 // GET - Load user data from server
 export async function GET() {
   try {
@@ -60,7 +76,7 @@ export async function GET() {
       };
     }
 
-    const bookmarks = user.bookmarks.map(b => ({
+    const bookmarks = user.bookmarks.map((b: typeof user.bookmarks[number]) => ({
       id: b.id,
       surah: b.surahNumber,
       ayah: b.ayahNumber,
@@ -79,7 +95,7 @@ export async function GET() {
       },
       progress: {
         verses,
-        dailyActivity: user.dailyActivity.map(d => ({
+        dailyActivity: user.dailyActivity.map((d: typeof user.dailyActivity[number]) => ({
           date: d.date.toISOString().split('T')[0],
           versesMemorized: d.versesLearned,
           versesReviewed: d.versesReviewed,
@@ -113,7 +129,11 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { progress, bookmarks, settings } = body;
+    const { progress, bookmarks, settings } = body as {
+      progress?: { verses?: Record<string, SyncVerse> };
+      bookmarks?: SyncBookmark[];
+      settings?: { preferredReciter?: string; showTranslation?: boolean };
+    };
 
     // Find or create user
     let user = await prisma.user.findUnique({
@@ -128,7 +148,7 @@ export async function POST(request: NextRequest) {
 
     // Sync progress (verses)
     if (progress?.verses) {
-      for (const [key, verse] of Object.entries(progress.verses) as [string, any][]) {
+      for (const [key, verse] of Object.entries(progress.verses) as [string, SyncVerse][]) {
         const [surah, ayah] = key.split(':').map(Number);
         
         await prisma.memorizationProgress.upsert({
@@ -168,8 +188,8 @@ export async function POST(request: NextRequest) {
       const existingBookmarks = await prisma.bookmark.findMany({
         where: { userId: user.id },
       });
-      const existingKeys = new Set(existingBookmarks.map(b => `${b.surahNumber}:${b.ayahNumber}`));
-      const newKeys = new Set(bookmarks.map((b: any) => `${b.surah}:${b.ayah}`));
+      const existingKeys = new Set(existingBookmarks.map((b: typeof existingBookmarks[number]) => `${b.surahNumber}:${b.ayahNumber}`));
+      const newKeys = new Set(bookmarks.map((b: SyncBookmark) => `${b.surah}:${b.ayah}`));
 
       // Delete removed bookmarks
       for (const eb of existingBookmarks) {

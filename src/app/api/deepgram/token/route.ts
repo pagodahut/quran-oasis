@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 
 /**
  * Deepgram Token API Route
  * Returns API key for client-side WebSocket connection
- * 
+ *
  * NOTE: In production, this should:
  * 1. Generate temporary/scoped tokens via Deepgram's API
  * 2. Implement rate limiting per user
  * 3. Log usage for monitoring
- * 
+ *
  * For now, returns the key directly (still better than NEXT_PUBLIC_)
  */
 
@@ -23,15 +24,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // TODO: Add authentication check here
-    // const session = await getSession(request);
-    // if (!session) return unauthorized();
+    // Authentication check - require signed-in user
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
 
-    // TODO: Add rate limiting
-    // const canProceed = await checkRateLimit(session.userId);
-    // if (!canProceed) return tooManyRequests();
-
-    return NextResponse.json({ 
+    return NextResponse.json({
       apiKey: DEEPGRAM_API_KEY,
       configured: true,
       // Indicate this is a full key (not scoped) - for monitoring

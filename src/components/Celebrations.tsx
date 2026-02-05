@@ -317,9 +317,12 @@ export function CelebrationOverlay({
     }
     
     if (navigator.share) {
-      navigator.share({ text });
+      navigator.share({ text }).catch(() => {
+        // User cancelled share or share failed - fall through to clipboard
+        navigator.clipboard?.writeText(text).catch(() => {});
+      });
     } else {
-      navigator.clipboard.writeText(text);
+      navigator.clipboard?.writeText(text).catch(() => {});
     }
   };
   

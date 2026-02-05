@@ -77,22 +77,37 @@ function useAudio(src: string) {
     const audio = new Audio(src);
     audioRef.current = audio;
 
-    audio.addEventListener('loadstart', () => setIsLoading(true));
-    audio.addEventListener('canplay', () => setIsLoading(false));
-    audio.addEventListener('play', () => setIsPlaying(true));
-    audio.addEventListener('pause', () => setIsPlaying(false));
-    audio.addEventListener('ended', () => {
+    const onLoadStart = () => setIsLoading(true);
+    const onCanPlay = () => setIsLoading(false);
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
+    const onEnded = () => {
       setIsPlaying(false);
       setProgress(0);
-    });
-    audio.addEventListener('timeupdate', () => {
+    };
+    const onTimeUpdate = () => {
       setProgress((audio.currentTime / audio.duration) * 100 || 0);
-    });
-    audio.addEventListener('loadedmetadata', () => {
+    };
+    const onLoadedMetadata = () => {
       setDuration(audio.duration);
-    });
+    };
+
+    audio.addEventListener('loadstart', onLoadStart);
+    audio.addEventListener('canplay', onCanPlay);
+    audio.addEventListener('play', onPlay);
+    audio.addEventListener('pause', onPause);
+    audio.addEventListener('ended', onEnded);
+    audio.addEventListener('timeupdate', onTimeUpdate);
+    audio.addEventListener('loadedmetadata', onLoadedMetadata);
 
     return () => {
+      audio.removeEventListener('loadstart', onLoadStart);
+      audio.removeEventListener('canplay', onCanPlay);
+      audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('pause', onPause);
+      audio.removeEventListener('ended', onEnded);
+      audio.removeEventListener('timeupdate', onTimeUpdate);
+      audio.removeEventListener('loadedmetadata', onLoadedMetadata);
       audio.pause();
       audio.src = '';
     };

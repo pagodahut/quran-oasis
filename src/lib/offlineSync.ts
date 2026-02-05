@@ -219,25 +219,33 @@ export async function registerBackgroundSync(): Promise<boolean> {
 // Queue progress update
 export async function queueProgressUpdate(progress: any): Promise<void> {
   await addToSyncQueue('progress', progress);
-  
+
   // Try to register background sync
   if (navigator.onLine) {
     // If online, sync immediately
-    processSyncQueue();
+    processSyncQueue().catch((err) => {
+      logger.error('[OfflineSync] Failed to process sync queue:', err);
+    });
   } else {
     // If offline, register for background sync
-    registerBackgroundSync();
+    registerBackgroundSync().catch((err) => {
+      logger.error('[OfflineSync] Failed to register background sync:', err);
+    });
   }
 }
 
 // Queue bookmark update
 export async function queueBookmarkUpdate(bookmark: any): Promise<void> {
   await addToSyncQueue('bookmark', bookmark);
-  
+
   if (navigator.onLine) {
-    processSyncQueue();
+    processSyncQueue().catch((err) => {
+      logger.error('[OfflineSync] Failed to process sync queue:', err);
+    });
   } else {
-    registerBackgroundSync();
+    registerBackgroundSync().catch((err) => {
+      logger.error('[OfflineSync] Failed to register background sync:', err);
+    });
   }
 }
 

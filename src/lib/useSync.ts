@@ -123,7 +123,7 @@ export function useSync() {
   const saveToServer = useCallback(async (): Promise<boolean> => {
     if (!isSignedIn) return false;
 
-    setSyncState(s => ({ ...s, isSyncing: true, error: null }));
+    setSyncState((s: SyncState) => ({ ...s, isSyncing: true, error: null }));
 
     try {
       const progress = getProgress();
@@ -148,11 +148,11 @@ export function useSync() {
         localStorage.setItem(LAST_SYNC_KEY, now.toISOString());
       }
 
-      setSyncState(s => ({ ...s, isSyncing: false, lastSynced: now }));
+      setSyncState((s: SyncState) => ({ ...s, isSyncing: false, lastSynced: now }));
       return true;
     } catch (error) {
       console.error('Save to server failed:', error);
-      setSyncState(s => ({ ...s, isSyncing: false, error: 'Sync failed' }));
+      setSyncState((s: SyncState) => ({ ...s, isSyncing: false, error: 'Sync failed' }));
       return false;
     }
   }, [isSignedIn]);
@@ -177,9 +177,9 @@ export function useSync() {
     hasSyncedRef.current = true;
     
     const doInitialSync = async () => {
-      setSyncState(s => ({ ...s, isSyncing: true }));
+      setSyncState((s: SyncState) => ({ ...s, isSyncing: true }));
       await loadFromServer();
-      setSyncState(s => ({ ...s, isSyncing: false, lastSynced: new Date() }));
+      setSyncState((s: SyncState) => ({ ...s, isSyncing: false, lastSynced: new Date() }));
     };
 
     doInitialSync();
@@ -204,8 +204,8 @@ export function useSync() {
 
   // Track online status
   useEffect(() => {
-    const handleOnline = () => setSyncState(s => ({ ...s, isOnline: true }));
-    const handleOffline = () => setSyncState(s => ({ ...s, isOnline: false }));
+    const handleOnline = () => setSyncState((s: SyncState) => ({ ...s, isOnline: true }));
+    const handleOffline = () => setSyncState((s: SyncState) => ({ ...s, isOnline: false }));
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
