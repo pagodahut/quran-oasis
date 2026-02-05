@@ -48,6 +48,18 @@ function PracticeIcon({ className = "", strokeWidth = 2 }: { className?: string;
   );
 }
 
+function ReciteIcon({ className = "", strokeWidth = 2 }: { className?: string; strokeWidth?: number }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} strokeWidth={strokeWidth} stroke="currentColor" aria-hidden="true">
+      {/* Microphone */}
+      <rect x="9" y="2" width="6" height="11" rx="3" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M5 10a7 7 0 0014 0" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 17v4" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 21h8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function ProfileIcon({ className = "", strokeWidth = 2 }: { className?: string; strokeWidth?: number }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} strokeWidth={strokeWidth} stroke="currentColor" aria-hidden="true">
@@ -93,6 +105,7 @@ export default function BottomNav() {
       { href: '/dashboard', Icon: HomeIcon, label: 'Home', ariaLabel: 'Go to Dashboard', show: true },
       { href: '/lessons', Icon: LearnIcon, label: 'Learn', ariaLabel: 'Go to Lessons', show: showLearn },
       { href: '/practice', Icon: PracticeIcon, label: 'Practice', ariaLabel: 'Go to Practice', show: showPractice },
+      { href: '/recite', Icon: ReciteIcon, label: 'Recite', ariaLabel: 'Live Recitation', show: true },
       { href: '/mushaf', Icon: QuranIcon, label: 'Quran', ariaLabel: 'Read Quran', show: true },
       { href: '/profile', Icon: ProfileIcon, label: 'Profile', ariaLabel: 'View Profile', show: true },
     ];
