@@ -380,9 +380,19 @@ export default function LiveRecitation({
       const tokenRes = await fetch('/api/deepgram/token');
       const tokenData = await tokenRes.json();
 
-      if (!tokenData.configured || !tokenData.apiKey) {
+      // Handle authentication errors
+      if (tokenRes.status === 401) {
         setErrorMessage(
-          'Deepgram is not configured. Please add DEEPGRAM_API_KEY to your environment.'
+          'Please sign in to use live recitation. This feature requires an account.'
+        );
+        setPhase('error');
+        return;
+      }
+
+      // Handle configuration errors
+      if (tokenRes.status === 503 || !tokenData.configured || !tokenData.apiKey) {
+        setErrorMessage(
+          'Live recitation is not available. Please try again later.'
         );
         setPhase('error');
         return;
