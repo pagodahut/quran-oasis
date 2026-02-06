@@ -2732,3 +2732,538 @@ select:focus-visible {
 a {
   text-decoration: none;
 }
+
+/* ============================================
+   LIGHT MODE THEME
+   A complete light theme for daytime reading
+   ============================================ */
+
+/* Light Mode Variables */
+html.light {
+  --hifz-night-deep: #f5f6f8;
+  --hifz-night: #e5e7ec;
+  --hifz-gold: #a68220;
+  --hifz-gold-light: #c9a227;
+  --hifz-teal: #0d5454;
+  --hifz-teal-light: #1a7676;
+  --hifz-cream: #f5f0e1;
+  
+  /* Gold for light mode - slightly darker for contrast */
+  --gold-leaf-light: #d4af37;
+  --gold-leaf: #a68220;
+  --gold-leaf-dark: #845c1a;
+  --gold-leaf-shadow: #5a4410;
+}
+
+/* Base light mode styles */
+html.light body {
+  @apply bg-night-50 text-night-800;
+}
+
+/* Selection in light mode */
+html.light ::selection {
+  @apply bg-gold-300/50 text-night-900;
+}
+
+/* Scrollbar in light mode */
+html.light ::-webkit-scrollbar-track {
+  @apply bg-night-100;
+}
+
+html.light ::-webkit-scrollbar-thumb {
+  @apply bg-night-300;
+}
+
+html.light ::-webkit-scrollbar-thumb:hover {
+  @apply bg-night-400;
+}
+
+/* Light mode typography overrides */
+html.light .quran-text {
+  @apply text-night-900;
+}
+
+html.light .bismillah {
+  @apply text-gold-600;
+}
+
+html.light .surah-header {
+  @apply text-gold-600;
+}
+
+html.light .verse-number {
+  @apply bg-gold-200/40 text-gold-700;
+}
+
+html.light .gold-accent {
+  @apply text-gold-600;
+}
+
+/* Light mode gradient text */
+html.light .text-gold-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--gold-leaf) 0%,
+    var(--gold-leaf-dark) 50%,
+    var(--gold-leaf) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Light mode buttons */
+html.light .btn-primary {
+  @apply bg-gold-500 text-white hover:bg-gold-600;
+}
+
+html.light .btn-outline {
+  @apply border-night-300 text-night-700 hover:border-night-400 hover:bg-night-100;
+}
+
+html.light .btn-ghost {
+  @apply text-night-600 hover:text-night-800 hover:bg-night-100;
+}
+
+html.light .btn-icon {
+  @apply text-night-500 hover:text-night-700 hover:bg-night-100;
+}
+
+/* Light mode cards */
+html.light .card,
+html.light .verse-card {
+  @apply bg-white/80 border-night-200/50;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+html.light .verse-card:hover {
+  @apply border-gold-300/50 bg-white/90;
+}
+
+html.light .verse-card.active {
+  @apply border-gold-400/60;
+  background: linear-gradient(135deg, rgba(201,162,39,0.08) 0%, rgba(201,162,39,0.02) 100%);
+}
+
+html.light .card-gold {
+  @apply border-gold-300/40;
+  background: linear-gradient(135deg, rgba(201,162,39,0.08) 0%, rgba(255,255,255,0.9) 100%);
+}
+
+/* Light mode liquid glass */
+html.light .liquid-glass {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+html.light .liquid-glass::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.03) 30%,
+    rgba(0, 0, 0, 0.05) 50%,
+    rgba(0, 0, 0, 0.03) 70%,
+    transparent 100%
+  );
+}
+
+html.light .liquid-glass-subtle {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(0, 0, 0, 0.04);
+}
+
+html.light .liquid-glass-strong {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 12px 40px rgba(0, 0, 0, 0.06);
+}
+
+html.light .liquid-glass-gold {
+  background: linear-gradient(
+    135deg,
+    rgba(201, 162, 39, 0.1) 0%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(201, 162, 39, 0.06) 100%
+  );
+  border-color: rgba(201, 162, 39, 0.2);
+}
+
+html.light .liquid-glass-gold-premium {
+  background: 
+    radial-gradient(ellipse 60% 40% at 30% 0%, rgba(201, 162, 39, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 70% 100%, rgba(201, 162, 39, 0.08) 0%, transparent 50%),
+    rgba(255, 255, 255, 0.9);
+  border-color: rgba(201, 162, 39, 0.25);
+}
+
+/* Light mode liquid card */
+html.light .liquid-card {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+html.light .liquid-card-interactive:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Light mode buttons */
+html.light .liquid-btn {
+  background: linear-gradient(135deg, #c9a227 0%, #a68220 100%);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(166, 130, 32, 0.3);
+}
+
+html.light .liquid-btn:hover {
+  box-shadow: 0 4px 16px rgba(166, 130, 32, 0.4);
+}
+
+html.light .liquid-btn-outline {
+  background: rgba(0, 0, 0, 0.02);
+  color: #3e4354;
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+html.light .liquid-btn-outline:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Light mode icon button */
+html.light .liquid-icon-btn {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
+  color: #5d6579;
+}
+
+html.light .liquid-icon-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #2a2f3d;
+}
+
+html.light .liquid-icon-btn.active {
+  background: rgba(201, 162, 39, 0.12);
+  border-color: rgba(201, 162, 39, 0.25);
+  color: #a68220;
+}
+
+/* Light mode inputs */
+html.light .liquid-input {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #2a2f3d;
+}
+
+html.light .liquid-input::placeholder {
+  color: #788294;
+}
+
+html.light .liquid-input:focus {
+  border-color: rgba(201, 162, 39, 0.5);
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.12);
+}
+
+/* Light mode progress bar */
+html.light .liquid-progress {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.04);
+}
+
+html.light .liquid-progress-fill {
+  background: linear-gradient(90deg, #c9a227 0%, #d4af37 100%);
+  box-shadow: 0 0 8px rgba(201, 162, 39, 0.4);
+}
+
+/* Light mode badges */
+html.light .liquid-badge {
+  background: rgba(201, 162, 39, 0.15);
+  color: #845c1a;
+  border-color: rgba(201, 162, 39, 0.25);
+}
+
+/* Light mode divider */
+html.light .liquid-divider {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.1) 50%,
+    transparent 100%
+  );
+}
+
+/* Light mode modal */
+html.light .liquid-modal {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.15);
+}
+
+/* Light mode sheet */
+html.light .liquid-sheet {
+  background: rgba(255, 255, 255, 0.98);
+  border-top-color: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.08);
+}
+
+html.light .sheet-handle {
+  @apply bg-night-300;
+}
+
+/* Light mode tabs */
+html.light .liquid-tabs {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+html.light .liquid-tab {
+  @apply text-night-500;
+}
+
+html.light .liquid-tab:hover {
+  @apply text-night-700;
+}
+
+html.light .liquid-tab.active {
+  @apply text-night-900;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Light mode chips */
+html.light .liquid-chip {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #5d6579;
+}
+
+html.light .liquid-chip:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #2a2f3d;
+}
+
+html.light .liquid-chip.selected {
+  background: rgba(201, 162, 39, 0.15);
+  border-color: rgba(201, 162, 39, 0.3);
+  color: #845c1a;
+}
+
+/* Light mode stat card */
+html.light .liquid-stat {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+html.light .liquid-stat-value {
+  @apply text-night-800;
+}
+
+html.light .liquid-stat-label {
+  @apply text-night-500;
+}
+
+/* Light mode backgrounds */
+html.light .bg-gradient-divine {
+  background: 
+    radial-gradient(ellipse at 20% 0%, rgba(201, 162, 39, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(78, 122, 81, 0.06) 0%, transparent 50%),
+    linear-gradient(180deg, #f5f6f8 0%, #e5e7ec 100%);
+}
+
+html.light .bg-gradient-divine-warm {
+  background: 
+    radial-gradient(ellipse at 30% 0%, rgba(201, 162, 39, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, #fefdfb 0%, #f5f0e1 100%);
+}
+
+/* Light mode text colors */
+html.light .text-night-100 {
+  @apply text-night-800;
+}
+
+html.light .text-night-200 {
+  @apply text-night-700;
+}
+
+html.light .text-night-300 {
+  @apply text-night-600;
+}
+
+html.light .text-night-400 {
+  @apply text-night-500;
+}
+
+html.light .text-gold-400 {
+  @apply text-gold-600;
+}
+
+html.light .text-gold-300 {
+  @apply text-gold-500;
+}
+
+html.light .text-sage-400 {
+  @apply text-sage-600;
+}
+
+/* Light mode background colors */
+html.light .bg-night-800 {
+  @apply bg-night-100;
+}
+
+html.light .bg-night-800\/50,
+html.light .bg-night-800\/60 {
+  background-color: rgba(200, 203, 213, 0.5);
+}
+
+html.light .bg-night-900 {
+  @apply bg-night-50;
+}
+
+html.light .bg-night-900\/50,
+html.light .bg-night-900\/60 {
+  background-color: rgba(229, 231, 236, 0.6);
+}
+
+html.light .bg-night-950 {
+  @apply bg-white;
+}
+
+/* Light mode border colors */
+html.light .border-night-700 {
+  @apply border-night-200;
+}
+
+html.light .border-night-800 {
+  @apply border-night-200;
+}
+
+html.light .border-night-800\/50 {
+  border-color: rgba(200, 203, 213, 0.5);
+}
+
+/* Light mode patterns - subtle */
+html.light .pattern-arabesque {
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23a68220' stroke-width='0.4' opacity='0.1'%3E%3Ccircle cx='40' cy='40' r='30'/%3E%3Ccircle cx='40' cy='40' r='20'/%3E%3Ccircle cx='40' cy='40' r='10'/%3E%3Cpath d='M10 40 Q25 25 40 40 Q55 55 70 40'/%3E%3Cpath d='M40 10 Q25 25 40 40 Q55 55 40 70'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Light mode range input */
+html.light input[type="range"] {
+  @apply bg-night-200;
+}
+
+html.light input[type="range"]::-webkit-slider-thumb {
+  @apply bg-gold-500;
+}
+
+html.light input[type="range"]::-moz-range-thumb {
+  @apply bg-gold-500;
+}
+
+/* Light mode focus states */
+html.light .focus-visible-ring:focus-visible {
+  outline-color: rgba(166, 130, 32, 0.8);
+  box-shadow: 0 0 0 4px rgba(166, 130, 32, 0.15);
+}
+
+html.light button:focus-visible,
+html.light a:focus-visible,
+html.light [role="button"]:focus-visible,
+html.light [tabindex]:focus-visible,
+html.light input:focus-visible,
+html.light textarea:focus-visible,
+html.light select:focus-visible {
+  outline-color: rgba(166, 130, 32, 0.8);
+}
+
+/* Light mode glow effects - more subtle */
+html.light .shadow-glow-gold {
+  box-shadow: 0 0 15px rgba(166, 130, 32, 0.15);
+}
+
+html.light .text-glow-gold {
+  text-shadow: 0 0 10px rgba(166, 130, 32, 0.2);
+}
+
+/* Light mode specific component overrides */
+html.light .verse-card p.text-night-400 {
+  @apply text-night-500;
+}
+
+/* Light mode reciter preview */
+html.light .reciter-preview {
+  @apply bg-white border-night-200;
+}
+
+html.light .reciter-preview.selected {
+  @apply border-gold-400 bg-gold-50;
+}
+
+/* Light mode option cards */
+html.light .option-card {
+  @apply bg-white border-night-200;
+}
+
+html.light .option-card.selected {
+  @apply border-gold-400 bg-gold-50;
+}
+
+html.light .option-card:hover {
+  @apply border-night-300 bg-night-50;
+}
+
+/* Light mode lesson cards */
+html.light .lesson-card {
+  @apply bg-white border-night-200;
+}
+
+html.light .lesson-card.completed {
+  @apply border-sage-300 bg-sage-50;
+}
+
+/* Light mode exercise options */
+html.light .exercise-option {
+  @apply bg-white border-night-200;
+}
+
+html.light .exercise-option.selected {
+  @apply border-gold-400 bg-gold-50;
+}
+
+html.light .exercise-option.correct {
+  @apply border-green-400 bg-green-50;
+}
+
+html.light .exercise-option.incorrect {
+  @apply border-red-400 bg-red-50;
+}
+
+/* Light mode offline indicator */
+html.light .offline-badge {
+  @apply bg-amber-100 text-amber-700;
+}
+
+/* Light mode onboarding */
+html.light .onboarding-option {
+  @apply bg-white border-night-200;
+}
+
+html.light .onboarding-option.selected {
+  @apply border-gold-400 bg-gold-50;
+}
+
+/* Transition for theme switching */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html * {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.15s ease;
+}
+
+/* Disable transition on page load */
+html.no-transitions * {
+  transition: none !important;
+}

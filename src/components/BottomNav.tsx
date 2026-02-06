@@ -96,17 +96,17 @@ export default function BottomNav() {
   }, [handleScroll]);
 
   // Build nav items based on learning mode
-  // Navigation Updates:
-  // - Beginner: Home, Learn, Practice, Quran, Profile
-  // - Intermediate: Home, Practice, Quran, Profile
-  // - Hafiz: Home, Quran, Profile
+  // Navigation Updates - Quran centered:
+  // - Beginner (6 items): Home, Learn, Quran, Practice, Recite, Profile
+  // - Intermediate (5 items): Home, Quran, Practice, Recite, Profile
+  // - Hafiz (4 items): Home, Quran, Recite, Profile
   const navItems = useMemo(() => {
     const items = [
       { href: '/dashboard', Icon: HomeIcon, label: 'Home', ariaLabel: 'Go to Dashboard', show: true },
       { href: '/lessons', Icon: LearnIcon, label: 'Learn', ariaLabel: 'Go to Lessons', show: showLearn },
+      { href: '/mushaf', Icon: QuranIcon, label: 'Quran', ariaLabel: 'Read Quran', show: true },
       { href: '/practice', Icon: PracticeIcon, label: 'Practice', ariaLabel: 'Go to Practice', show: showPractice },
       { href: '/recite', Icon: ReciteIcon, label: 'Recite', ariaLabel: 'Live Recitation', show: true },
-      { href: '/mushaf', Icon: QuranIcon, label: 'Quran', ariaLabel: 'Read Quran', show: true },
       { href: '/profile', Icon: ProfileIcon, label: 'Profile', ariaLabel: 'View Profile', show: true },
     ];
     
@@ -122,14 +122,19 @@ export default function BottomNav() {
       }`}
       style={{ paddingBottom: `max(${isCollapsed ? '0.75rem' : '1.25rem'}, env(safe-area-inset-bottom))` }}
     >
-      {/* Premium frosted glass floating nav - narrower for centered icons */}
+      {/* Premium frosted glass floating nav - dynamic width based on item count */}
       <motion.div 
         layout
         className={`mx-auto overflow-hidden ${
           isCollapsed 
-            ? 'max-w-[280px] rounded-full' 
+            ? `rounded-full` 
             : 'max-w-sm rounded-2xl'
         }`}
+        style={{
+          maxWidth: isCollapsed 
+            ? `${Math.min(navItems.length * 52 + 32, 340)}px` // Dynamic width: items * min-width + padding
+            : undefined,
+        }}
         style={{
           background: 'rgba(22, 27, 34, 0.60)',
           backdropFilter: 'blur(64px) saturate(200%)',
@@ -158,8 +163,8 @@ export default function BottomNav() {
                 aria-current={isActive ? 'page' : undefined}
                 className={`
                   relative flex flex-col items-center gap-0.5 sm:gap-1 
-                  min-w-[52px] min-h-[48px]
-                  ${isCollapsed ? 'px-2 py-1.5' : 'px-3 sm:px-4 py-1.5'}
+                  ${isCollapsed ? 'min-w-[44px] min-h-[40px]' : 'min-w-[52px] min-h-[48px]'}
+                  ${isCollapsed ? 'px-1.5 py-1' : 'px-3 sm:px-4 py-1.5'}
                   touch-manipulation
                   focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/50 
                   focus-visible:ring-offset-2 focus-visible:ring-offset-night-950

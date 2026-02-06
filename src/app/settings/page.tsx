@@ -15,6 +15,7 @@ import {
   Info,
   Heart,
   Moon,
+  Sun,
   Type,
   Volume2,
   Play,
@@ -34,6 +35,9 @@ import {
   GraduationCap,
   Brain,
   Star,
+  Bug,
+  HelpCircle,
+  Shield,
 } from 'lucide-react';
 import { 
   usePreferences,
@@ -55,6 +59,7 @@ import BottomNav from '@/components/BottomNav';
 import { setDailyGoal } from '@/lib/motivationStore';
 import { useLearningMode } from '@/hooks/useLearningMode';
 import { LearningMode, LEARNING_MODE_OPTIONS } from '@/lib/learningMode';
+import { useTheme, type Theme } from '@/hooks/useTheme';
 
 // ============================================
 // Components
@@ -260,6 +265,7 @@ function SelectGrid<T extends string | number>({
 export default function SettingsPage() {
   const { preferences, update, reset, isLoaded } = usePreferences();
   const { mode: learningMode, setMode: setLearningMode, config: learningModeConfig } = useLearningMode();
+  const { theme, resolvedTheme, setTheme, isLoaded: themeLoaded } = useTheme();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showClearDataConfirm, setShowClearDataConfirm] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -681,17 +687,29 @@ export default function SettingsPage() {
             </SettingRow>
 
             {/* Theme */}
-            <div className="p-4 rounded-xl bg-night-800/50">
-              <div className="flex items-center gap-3">
-                <Moon className="w-5 h-5 text-night-400" />
-                <div className="flex-1">
-                  <p className="text-night-100">Theme</p>
-                  <p className="text-xs text-night-500">Dark mode only (light mode coming soon)</p>
-                </div>
-                <span className="px-3 py-1 rounded-lg bg-night-700 text-night-300 text-sm">
-                  Dark
-                </span>
-              </div>
+            <div>
+              <label className="text-sm text-night-400 mb-3 block flex items-center gap-2">
+                <Moon className="w-4 h-4" />
+                Theme
+              </label>
+              <SelectGrid
+                options={[
+                  { value: 'light' as const, label: '☀️ Light', description: 'Bright mode' },
+                  { value: 'dark' as const, label: '🌙 Dark', description: 'Night mode' },
+                  { value: 'system' as const, label: '🖥️ System', description: 'Auto' },
+                ]}
+                value={theme}
+                onChange={(newTheme) => {
+                  setTheme(newTheme as Theme);
+                  showSuccess(`Theme changed to ${newTheme}`);
+                }}
+                columns={3}
+              />
+              <p className="text-xs text-night-500 mt-2 px-1">
+                {theme === 'system' 
+                  ? `Following system preference (currently ${resolvedTheme})` 
+                  : `Using ${theme} mode`}
+              </p>
             </div>
           </div>
         </SettingSection>
@@ -921,6 +939,91 @@ export default function SettingsPage() {
               <div className="text-left">
                 <p className="font-medium">Clear All Local Data</p>
                 <p className="text-xs opacity-70">Remove all progress, bookmarks, and settings</p>
+              </div>
+            </button>
+          </div>
+        </SettingSection>
+
+        <div className="liquid-divider" />
+
+        {/* ============ SUPPORT ============ */}
+        <SettingSection 
+          icon={HelpCircle} 
+          title="Support & Feedback"
+          description="Get help or report issues"
+          iconColor="text-teal-400"
+          iconBg="bg-teal-500/10"
+        >
+          <div className="space-y-3">
+            {/* Bug Report Button */}
+            <button
+              onClick={() => {
+                const subject = encodeURIComponent('HIFZ Bug Report');
+                const body = encodeURIComponent(`
+Bug Report
+==========
+
+Description:
+[Describe the bug here]
+
+Steps to Reproduce:
+1. 
+2. 
+3. 
+
+Expected Behavior:
+[What should happen]
+
+Actual Behavior:
+[What actually happens]
+
+Device Info:
+- Browser: ${typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A'}
+- Screen: ${typeof window !== 'undefined' ? `${window.innerWidth}x${window.innerHeight}` : 'N/A'}
+- Theme: ${resolvedTheme}
+- Learning Mode: ${learningMode}
+
+Additional Context:
+[Any other relevant information]
+                `.trim());
+                window.open(`mailto:support@hifz.app?subject=${subject}&body=${body}`, '_blank');
+                showSuccess('Opening email client...');
+              }}
+              className="w-full p-4 rounded-xl bg-night-800/50 hover:bg-night-800 transition-colors flex items-center gap-3 text-left"
+            >
+              <Bug className="w-5 h-5 text-red-400" />
+              <div>
+                <p className="text-night-100 font-medium">Report a Bug</p>
+                <p className="text-xs text-night-500">Send us a bug report via email</p>
+              </div>
+            </button>
+
+            {/* Feature Request */}
+            <button
+              onClick={() => {
+                const subject = encodeURIComponent('HIFZ Feature Request');
+                const body = encodeURIComponent(`
+Feature Request
+===============
+
+Feature Description:
+[Describe the feature you'd like]
+
+Use Case:
+[Why would this feature be helpful?]
+
+Additional Notes:
+[Any other relevant information]
+                `.trim());
+                window.open(`mailto:support@hifz.app?subject=${subject}&body=${body}`, '_blank');
+                showSuccess('Opening email client...');
+              }}
+              className="w-full p-4 rounded-xl bg-night-800/50 hover:bg-night-800 transition-colors flex items-center gap-3 text-left"
+            >
+              <Sparkles className="w-5 h-5 text-purple-400" />
+              <div>
+                <p className="text-night-100 font-medium">Request a Feature</p>
+                <p className="text-xs text-night-500">Suggest improvements</p>
               </div>
             </button>
           </div>
