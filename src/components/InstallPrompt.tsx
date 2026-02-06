@@ -82,31 +82,34 @@ export default function InstallPrompt() {
 
   // Listen for beforeinstallprompt event (Chrome/Android)
   useEffect(() => {
+    const timers: ReturnType<typeof setTimeout>[] = [];
+
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      
+
       // Delay showing prompt
-      setTimeout(() => {
+      timers.push(setTimeout(() => {
         if (shouldShowPrompt()) {
           setShowPrompt(true);
         }
-      }, 3000);
+      }, 3000));
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
 
     // Check for iOS after delay
     if (platform === 'ios' && !isInstalled) {
-      setTimeout(() => {
+      timers.push(setTimeout(() => {
         if (shouldShowPrompt()) {
           setShowPrompt(true);
         }
-      }, 5000);
+      }, 5000));
     }
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+      timers.forEach(clearTimeout);
     };
   }, [platform, isInstalled, shouldShowPrompt]);
 

@@ -14,13 +14,25 @@ export default function ServiceWorkerRegistration() {
       return;
     }
 
+    let updateInterval: ReturnType<typeof setInterval> | null = null;
+
+    const handleOnline = () => {
+      navigator.serviceWorker.getRegistration().then(reg => {
+        reg?.update().catch(console.error);
+      });
+    };
+
+    const handleControllerChange = () => {
+      window.location.reload();
+    };
+
     // Register service worker
     const registerSW = async () => {
       try {
         const reg = await navigator.serviceWorker.register('/sw.js', {
           scope: '/',
         });
-        
+
         logger.debug('[App] Service Worker registered:', reg.scope);
         setRegistration(reg);
 
@@ -39,14 +51,12 @@ export default function ServiceWorkerRegistration() {
         });
 
         // Check for updates periodically (every hour)
-        setInterval(() => {
+        updateInterval = setInterval(() => {
           reg.update().catch(console.error);
         }, 60 * 60 * 1000);
 
         // Check for updates when coming back online
-        window.addEventListener('online', () => {
-          reg.update().catch(console.error);
-        });
+        window.addEventListener('online', handleOnline);
 
       } catch (error) {
         console.error('[App] Service Worker registration failed:', error);
@@ -54,12 +64,17 @@ export default function ServiceWorkerRegistration() {
     };
 
     // Listen for controller change (means SW took over)
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      // Reload to get new version
-      window.location.reload();
-    });
+    navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
 
     registerSW();
+
+    return () => {
+      if (updateInterval) {
+        clearInterval(updateInterval);
+      }
+      window.removeEventListener('online', handleOnline);
+      navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
+    };
   }, []);
 
   const handleUpdate = useCallback(() => {

@@ -117,9 +117,11 @@ export function useRealtimeTajweed(
   
   // Check if Deepgram is configured via server
   useEffect(() => {
+    const controller = new AbortController();
+
     async function checkConfig() {
       try {
-        const response = await fetch('/api/deepgram/token');
+        const response = await fetch('/api/deepgram/token', { signal: controller.signal });
         if (!response.ok) {
           setIsConfigured(false);
           return;
@@ -131,11 +133,15 @@ export function useRealtimeTajweed(
         } else {
           setIsConfigured(false);
         }
-      } catch {
-        setIsConfigured(false);
+      } catch (err) {
+        if (!controller.signal.aborted) {
+          setIsConfigured(false);
+        }
       }
     }
     checkConfig();
+
+    return () => controller.abort();
   }, []);
   
   // Re-initialize state when expected text changes

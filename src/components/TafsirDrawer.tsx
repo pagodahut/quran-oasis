@@ -81,22 +81,23 @@ export default function TafsirDrawer({ isOpen, onClose, surahNumber, ayahNumber 
       setSurahName(surah?.englishName || '');
       setShowDetailedTafsir(false);
       setLoading(false);
-      
-      // Fetch tafsir
-      loadTafsir(selectedTafsir);
+
+      // Fetch tafsir with cancellation guard
+      let cancelled = false;
+      setTafsirLoading(true);
+      fetchTafsir(surahNumber, ayahNumber, selectedTafsir).then((content) => {
+        if (!cancelled) {
+          setTafsirContent(content);
+          setTafsirLoading(false);
+        }
+      });
+
+      return () => { cancelled = true; };
     }
-  }, [isOpen, surahNumber, ayahNumber]);
-  
-  const loadTafsir = async (tafsirId: number) => {
-    setTafsirLoading(true);
-    const content = await fetchTafsir(surahNumber, ayahNumber, tafsirId);
-    setTafsirContent(content);
-    setTafsirLoading(false);
-  };
-  
+  }, [isOpen, surahNumber, ayahNumber, selectedTafsir]);
+
   const handleTafsirChange = (tafsirId: number) => {
     setSelectedTafsir(tafsirId);
-    loadTafsir(tafsirId);
   };
   
   return (
