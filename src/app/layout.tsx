@@ -102,20 +102,59 @@ const clerkAppearance = {
     colorPrimary: '#c9a227',
     colorBackground: '#0f1419',
     colorText: '#e5e5e5',
+    colorTextSecondary: '#a3a3a3',
     colorInputBackground: '#1a1f25',
     colorInputText: '#e5e5e5',
     borderRadius: '1rem',
   },
   elements: {
-    formButtonPrimary: 'bg-gold-500 hover:bg-gold-400 text-night-950',
-    card: 'bg-night-900/90 backdrop-blur-xl border border-night-800',
+    // General
+    rootBox: 'text-night-100',
+    card: 'bg-night-900/95 backdrop-blur-xl border border-night-800',
+    
+    // Headers
     headerTitle: 'text-night-100',
     headerSubtitle: 'text-night-400',
-    socialButtonsBlockButton: 'bg-night-800 border-night-700 hover:bg-night-700 text-night-100',
-    socialButtonsBlockButtonText: 'text-night-100',
+    
+    // Form elements
+    formButtonPrimary: 'bg-gold-500 hover:bg-gold-400 text-night-950',
     formFieldLabel: 'text-night-300',
     formFieldInput: 'bg-night-800 border-night-700 text-night-100',
+    
+    // Social buttons (Apple/Google)
+    socialButtonsBlockButton: 'bg-night-800 border-night-700 hover:bg-night-700 text-night-100',
+    socialButtonsBlockButtonText: 'text-night-100',
+    socialButtonsBlockButtonArrow: 'text-night-100',
+    
+    // User button dropdown menu
+    userButtonPopoverCard: 'bg-night-900/95 backdrop-blur-xl border border-night-800',
+    userButtonPopoverMain: 'text-night-100',
+    userButtonPopoverActions: 'text-night-100',
+    userButtonPopoverActionButton: 'text-night-100 hover:bg-night-800',
+    userButtonPopoverActionButtonText: 'text-night-100',
+    userButtonPopoverActionButtonIcon: 'text-night-300',
+    userButtonPopoverFooter: 'text-night-400',
+    userPreviewMainIdentifier: 'text-night-100',
+    userPreviewSecondaryIdentifier: 'text-night-400',
+    
+    // Menu items
+    menuButton: 'text-night-100',
+    menuItem: 'text-night-100 hover:bg-night-800',
+    menuList: 'bg-night-900 border-night-800',
+    
+    // Footer
+    footer: 'text-night-400',
+    footerAction: 'text-night-400',
     footerActionLink: 'text-gold-400 hover:text-gold-300',
+    footerPages: 'text-night-400',
+    footerPagesLink: 'text-night-400 hover:text-night-300',
+    
+    // Badge (Development mode)
+    badge: 'text-gold-400 bg-night-800/50',
+    
+    // Identifiers
+    identityPreviewText: 'text-night-100',
+    identityPreviewEditButton: 'text-gold-400',
   },
 };
 
