@@ -2672,7 +2672,7 @@ input[type="range"]::-moz-range-thumb {
   
   .text-night-400,
   .text-night-500 {
-    @apply text-night-300 !important;
+    color: #a4a9b8 !important; /* night-300 - more visible */
   }
   
   button, a, [role="button"] {
@@ -3079,38 +3079,38 @@ html.light .bg-gradient-divine-warm {
     linear-gradient(180deg, #fefdfb 0%, #f5f0e1 100%);
 }
 
-/* Light mode text colors */
+/* Light mode text colors - use direct color values to avoid circular @apply */
 html.light .text-night-100 {
-  @apply text-night-800;
+  color: #2a2f3d; /* night-800 */
 }
 
 html.light .text-night-200 {
-  @apply text-night-700;
+  color: #3e4354; /* night-700 */
 }
 
 html.light .text-night-300 {
-  @apply text-night-600;
+  color: #4a5164; /* night-600 */
 }
 
 html.light .text-night-400 {
-  @apply text-night-500;
+  color: #5d6579; /* night-500 */
 }
 
 html.light .text-gold-400 {
-  @apply text-gold-600;
+  color: #a68220; /* gold-600 */
 }
 
 html.light .text-gold-300 {
-  @apply text-gold-500;
+  color: #c9a227; /* gold-500 */
 }
 
 html.light .text-sage-400 {
-  @apply text-sage-600;
+  color: #3a6140; /* sage-600 */
 }
 
 /* Light mode background colors */
 html.light .bg-night-800 {
-  @apply bg-night-100;
+  background-color: #e5e7ec; /* night-100 */
 }
 
 html.light .bg-night-800\/50,
@@ -3119,7 +3119,7 @@ html.light .bg-night-800\/60 {
 }
 
 html.light .bg-night-900 {
-  @apply bg-night-50;
+  background-color: #f5f6f8; /* night-50 */
 }
 
 html.light .bg-night-900\/50,
@@ -3128,16 +3128,16 @@ html.light .bg-night-900\/60 {
 }
 
 html.light .bg-night-950 {
-  @apply bg-white;
+  background-color: #ffffff; /* white */
 }
 
 /* Light mode border colors */
 html.light .border-night-700 {
-  @apply border-night-200;
+  border-color: #c8cbd5; /* night-200 */
 }
 
 html.light .border-night-800 {
-  @apply border-night-200;
+  border-color: #c8cbd5; /* night-200 */
 }
 
 html.light .border-night-800\/50 {

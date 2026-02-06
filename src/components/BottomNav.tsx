@@ -134,8 +134,6 @@ export default function BottomNav() {
           maxWidth: isCollapsed 
             ? `${Math.min(navItems.length * 52 + 32, 340)}px` // Dynamic width: items * min-width + padding
             : undefined,
-        }}
-        style={{
           background: 'rgba(22, 27, 34, 0.60)',
           backdropFilter: 'blur(64px) saturate(200%)',
           WebkitBackdropFilter: 'blur(64px) saturate(200%)',
