@@ -117,6 +117,16 @@ function ScrollAnimatedStar() {
       className="flex items-center justify-center my-8"
     >
       <div className="relative w-24 h-24">
+        {/* Glow effect - positioned outside container to avoid clipping */}
+        <motion.div
+          className="absolute -inset-8 rounded-full pointer-events-none"
+          style={{ 
+            opacity: starGlow,
+            background: 'radial-gradient(circle, rgba(201, 162, 39, 0.35) 0%, rgba(201, 162, 39, 0.15) 30%, transparent 60%)',
+            filter: 'blur(16px)',
+          }}
+        />
+        
         {/* Animated circle forming around star */}
         <svg 
           viewBox="0 0 100 100" 
@@ -150,13 +160,6 @@ function ScrollAnimatedStar() {
           className="absolute inset-0 flex items-center justify-center"
           style={{ scale: starScale }}
         >
-          <motion.div
-            className="absolute inset-0 rounded-full blur-xl"
-            style={{ 
-              opacity: starGlow,
-              background: 'radial-gradient(circle, rgba(201, 162, 39, 0.4) 0%, transparent 70%)'
-            }}
-          />
           <svg 
             viewBox="0 0 24 24" 
             width={40} 
@@ -424,18 +427,15 @@ function MethodCard({
   return (
     <motion.div
       variants={fadeInUp}
-      whileHover={{ scale: 1.02 }}
-      className="flex gap-5 p-5 liquid-card-interactive"
+      className="flex gap-5 p-5 liquid-card"
     >
-      <motion.div 
+      <div 
         className="flex-shrink-0 w-20 h-20 rounded-2xl liquid-glass-gold flex items-center justify-center relative overflow-hidden"
-        whileHover={{ rotate: [0, -3, 3, 0] }}
-        transition={{ duration: 0.4 }}
       >
         <span className={`text-gold-400 font-display text-xl font-bold ${isArabic ? 'font-arabic' : ''}`}>
           {number}
         </span>
-      </motion.div>
+      </div>
       <div>
         <h3 className="font-semibold text-night-100 text-lg mb-2">{title}</h3>
         <p className="text-night-400 text-sm leading-relaxed">{description}</p>
