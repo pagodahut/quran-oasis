@@ -44,6 +44,7 @@ import QuranSearch from '@/components/QuranSearch';
 import TafsirDrawer from '@/components/TafsirDrawer';
 import WordByWord from '@/components/WordByWord';
 import TajweedPractice from '@/components/TajweedPractice';
+import AskSheikhButton from '@/components/AskSheikhButton';
 import { useBookmarks } from '@/lib/bookmarks';
 import { useReadingPreferences } from '@/hooks/useAppliedPreferences';
 
@@ -841,6 +842,26 @@ export default function MushafPage() {
           />
         )}
       </AnimatePresence>
+      
+      {/* AI Sheikh - Ask about the current ayah */}
+      {currentSurah && (
+        <AskSheikhButton
+          ayahContext={{
+            surahNumber: surahNumber,
+            surahName: currentSurah.englishName,
+            surahNameArabic: currentSurah.name,
+            ayahNumber: currentAyah,
+            arabicText: cleanAyahText(
+              currentSurah.ayahs.find(a => a.numberInSurah === currentAyah)?.text.arabic || '', 
+              surahNumber, 
+              currentAyah
+            ),
+            translation: currentSurah.ayahs.find(a => a.numberInSurah === currentAyah)?.text.translations[translationEdition] || '',
+            juz: currentSurah.ayahs.find(a => a.numberInSurah === currentAyah)?.juz,
+          }}
+          userLevel="beginner"
+        />
+      )}
     </div>
   );
 }

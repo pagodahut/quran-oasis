@@ -18,6 +18,7 @@ import {
   Star,
   Zap,
   Award,
+  MessageCircle,
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 import { StreakDisplay } from '@/components/Celebrations';
@@ -597,6 +598,39 @@ export default function DashboardPage() {
                 href="/practice"
               />
             </div>
+          </motion.section>
+          
+          {/* AI Sheikh - Personal Quran Teacher */}
+          <motion.section variants={fadeInUp}>
+            <Link href="/sheikh">
+              <motion.div
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                className="relative overflow-hidden rounded-2xl p-5 cursor-pointer group"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(201, 162, 39, 0.15) 0%, rgba(201, 162, 39, 0.05) 100%)',
+                  border: '1px solid rgba(201, 162, 39, 0.2)',
+                }}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-gold-500/20 flex items-center justify-center text-2xl">
+                    📖
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-night-100 font-semibold flex items-center gap-2">
+                      Ask Sheikh
+                      <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-gold-500/20 text-gold-400">
+                        AI
+                      </span>
+                    </h3>
+                    <p className="text-night-400 text-sm mt-0.5">
+                      Your personal Quran teacher — ask about tafsir, tajweed, or memorization
+                    </p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-night-600 group-hover:text-gold-400 transition-colors" />
+                </div>
+              </motion.div>
+            </Link>
           </motion.section>
           
           {/* Continue Where You Left Off */}
