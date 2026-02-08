@@ -1,36 +1,46 @@
 'use client';
 
 /**
- * SheikhChat Component
+ * SheikhChat V2 — Context-Aware AI Quran Teacher Panel
  * 
- * The AI Quran Teacher chat interface. This is the V1 killer feature.
+ * Now integrates with SheikhContext for automatic awareness of:
+ * - Current ayah/surah the user is studying
+ * - Which page they're on (mushaf, lesson, recite, practice)
+ * - User level (beginner/intermediate/advanced)
+ * - Pending questions (auto-sent when panel opens)
  * 
  * Features:
- * - Streaming responses with real-time text appearance
- * - Suggested question chips for quick starts
- * - Beautiful Islamic-inspired glass morphism design
- * - Auto-scroll during streaming
- * - Markdown-lite rendering (bold, Arabic text detection)
+ * - Streaming responses with real-time text
+ * - Suggested question chips (contextual to current ayah/page)
+ * - Auto-sends pending question from SheikhContext
+ * - Glass morphism overlay that preserves underlying page
+ * - Drag handle to close panel
+ * - Arabic text detection with RTL rendering
  * - Mobile-first responsive layout
- * - Slide-up panel or full-page mode
  * 
- * Usage:
- *   <SheikhChat
- *     ayahContext={{ surahNumber: 1, surahName: 'Al-Fatiha', ... }}
- *     userLevel="beginner"
- *   />
+ * Usage (standalone — reads context from SheikhProvider):
+ *   <SheikhChat />
+ * 
+ * Usage (with overrides):
+ *   <SheikhChat ayahContext={...} userLevel="intermediate" />
  */
 
 import { useState, useRef, useEffect, type FormEvent, type KeyboardEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSheikhChat, type AyahContext, type ChatMessage } from '@/hooks/useSheikhChat';
+import { useSheikh } from '@/contexts/SheikhContext';
 
 // ─── Props ───────────────────────────────────────────────────────────
 interface SheikhChatProps {
+  /** Override ayah context (if not using SheikhContext) */
   ayahContext?: AyahContext;
+  /** Override user level */
   userLevel?: 'beginner' | 'intermediate' | 'advanced';
+  /** Override open state (if not using SheikhContext) */
   isOpen?: boolean;
+  /** Override close handler */
   onClose?: () => void;
+  /** Display mode */
   mode?: 'panel' | 'fullpage' | 'inline';
 }
 
@@ -46,7 +56,6 @@ function renderMessageContent(content: string): JSX.Element[] {
   return lines.map((line, i) => {
     if (!line.trim()) return <br key={i} />;
 
-    // Process inline formatting
     const parts: JSX.Element[] = [];
     let remaining = line;
     let keyIdx = 0;
@@ -55,10 +64,8 @@ function renderMessageContent(content: string): JSX.Element[] {
     while (remaining.includes('**')) {
       const startIdx = remaining.indexOf('**');
       const endIdx = remaining.indexOf('**', startIdx + 2);
-
       if (endIdx === -1) break;
 
-      // Text before bold
       if (startIdx > 0) {
         const beforeText = remaining.slice(0, startIdx);
         parts.push(
@@ -68,7 +75,6 @@ function renderMessageContent(content: string): JSX.Element[] {
         );
       }
 
-      // Bold text
       const boldText = remaining.slice(startIdx + 2, endIdx);
       parts.push(
         <strong key={`${i}-${keyIdx++}`} className={`font-semibold ${containsArabic(boldText) ? 'font-arabic text-right dir-rtl' : ''}`}>
@@ -79,7 +85,6 @@ function renderMessageContent(content: string): JSX.Element[] {
       remaining = remaining.slice(endIdx + 2);
     }
 
-    // Remaining text
     if (remaining) {
       parts.push(
         <span key={`${i}-${keyIdx++}`} className={containsArabic(remaining) ? 'font-arabic text-right dir-rtl text-lg leading-loose' : ''}>
@@ -107,18 +112,14 @@ function MessageBubble({ message }: { message: ChatMessage }) {
       transition={{ duration: 0.25, ease: 'easeOut' }}
       className={`flex gap-2.5 ${isUser ? 'flex-row-reverse' : 'flex-row'} items-start`}
     >
-      {/* Avatar */}
       <div
         className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm ${
-          isUser
-            ? 'bg-emerald-500/20 text-emerald-400'
-            : 'bg-amber-500/20 text-amber-400'
+          isUser ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
         }`}
       >
         {isUser ? '👤' : '📖'}
       </div>
 
-      {/* Bubble */}
       <div
         className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
           isUser
@@ -130,25 +131,12 @@ function MessageBubble({ message }: { message: ChatMessage }) {
           <div className="space-y-0.5">{renderMessageContent(message.content)}</div>
         ) : message.isStreaming ? (
           <div className="flex items-center gap-1.5 py-1">
-            <motion.div
-              className="w-1.5 h-1.5 bg-amber-400 rounded-full"
-              animate={{ opacity: [0.3, 1, 0.3] }}
-              transition={{ duration: 1.2, repeat: Infinity, delay: 0 }}
-            />
-            <motion.div
-              className="w-1.5 h-1.5 bg-amber-400 rounded-full"
-              animate={{ opacity: [0.3, 1, 0.3] }}
-              transition={{ duration: 1.2, repeat: Infinity, delay: 0.2 }}
-            />
-            <motion.div
-              className="w-1.5 h-1.5 bg-amber-400 rounded-full"
-              animate={{ opacity: [0.3, 1, 0.3] }}
-              transition={{ duration: 1.2, repeat: Infinity, delay: 0.4 }}
-            />
+            <motion.div className="w-1.5 h-1.5 bg-amber-400 rounded-full" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.2, repeat: Infinity, delay: 0 }} />
+            <motion.div className="w-1.5 h-1.5 bg-amber-400 rounded-full" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.2, repeat: Infinity, delay: 0.2 }} />
+            <motion.div className="w-1.5 h-1.5 bg-amber-400 rounded-full" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.2, repeat: Infinity, delay: 0.4 }} />
           </div>
         ) : null}
 
-        {/* Streaming cursor */}
         {message.isStreaming && message.content && (
           <motion.span
             className="inline-block w-0.5 h-4 bg-amber-400 ml-0.5 align-middle"
@@ -162,15 +150,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
 }
 
 // ─── Suggested Question Chip ─────────────────────────────────────────
-function QuestionChip({
-  question,
-  onClick,
-  delay,
-}: {
-  question: string;
-  onClick: () => void;
-  delay: number;
-}) {
+function QuestionChip({ question, onClick, delay }: { question: string; onClick: () => void; delay: number }) {
   return (
     <motion.button
       initial={{ opacity: 0, y: 8 }}
@@ -191,12 +171,21 @@ function QuestionChip({
 
 // ─── Main Component ──────────────────────────────────────────────────
 export default function SheikhChat({
-  ayahContext,
-  userLevel = 'beginner',
-  isOpen = true,
-  onClose,
+  ayahContext: ayahContextProp,
+  userLevel: userLevelProp,
+  isOpen: isOpenProp,
+  onClose: onCloseProp,
   mode = 'panel',
 }: SheikhChatProps) {
+  // Read from context (with prop overrides)
+  const sheikh = useSheikh();
+
+  const ayahContext = ayahContextProp ?? sheikh.ayahContext;
+  const userLevel = userLevelProp ?? sheikh.userLevel;
+  const isOpen = isOpenProp ?? sheikh.isSheikhOpen;
+  const onClose = onCloseProp ?? sheikh.closeSheikh;
+  const { pendingQuestion, clearPendingQuestion, pageContext } = sheikh;
+
   const {
     messages,
     sendMessage,
@@ -210,7 +199,7 @@ export default function SheikhChat({
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const pendingQuestionSent = useRef(false);
 
   // Auto-scroll on new messages
   useEffect(() => {
@@ -224,7 +213,26 @@ export default function SheikhChat({
     if (isOpen && inputRef.current) {
       setTimeout(() => inputRef.current?.focus(), 300);
     }
+    // Reset pending question tracking when panel opens/closes
+    if (!isOpen) {
+      pendingQuestionSent.current = false;
+    }
   }, [isOpen]);
+
+  // Auto-send pending question from context
+  useEffect(() => {
+    if (
+      isOpen &&
+      pendingQuestion &&
+      !pendingQuestionSent.current &&
+      !isLoading &&
+      messages.length === 0
+    ) {
+      pendingQuestionSent.current = true;
+      sendMessage(pendingQuestion);
+      clearPendingQuestion();
+    }
+  }, [isOpen, pendingQuestion, isLoading, messages.length, sendMessage, clearPendingQuestion]);
 
   const handleSubmit = (e?: FormEvent) => {
     e?.preventDefault();
@@ -240,11 +248,40 @@ export default function SheikhChat({
     }
   };
 
-  const handleSuggestedQuestion = (question: string) => {
-    sendMessage(question);
+  // ─── Context-Aware Subtitle ────────────────────────────────────
+  const getSubtitle = (): string => {
+    if (ayahContext) {
+      return `${ayahContext.surahName} · Ayah ${ayahContext.ayahNumber}`;
+    }
+    switch (pageContext.page) {
+      case 'lesson':
+        return pageContext.lessonTitle || 'Lesson Mode';
+      case 'recite':
+        return 'Recitation Mode';
+      case 'practice':
+        return 'Practice Mode';
+      default:
+        return 'Your AI Quran Teacher';
+    }
   };
 
-  // ─── Wrapper Styles ──────────────────────────────────────────────
+  // ─── Context-Aware Welcome Message ─────────────────────────────
+  const getWelcomeMessage = (): string => {
+    if (ayahContext) {
+      return `Ask me anything about ${ayahContext.surahName}, Ayah ${ayahContext.ayahNumber} — meaning, tajweed, grammar, or memorization tips.`;
+    }
+    switch (pageContext.page) {
+      case 'lesson':
+        return "I can help you understand and memorize what you're learning. Ask about meaning, pronunciation, or memorization techniques.";
+      case 'recite':
+        return "I can help with tajweed rules, pronunciation tips, and explain any recitation challenges you're facing.";
+      case 'practice':
+        return "Need help with your review? I can quiz you, explain meanings, or help you strengthen weak areas.";
+      default:
+        return "I'm your personal Quran teacher. Ask me anything about the Quran — tafsir, tajweed, Arabic, or memorization.";
+    }
+  };
+
   const wrapperClasses = {
     panel: 'fixed bottom-0 left-0 right-0 z-50 max-h-[85vh]',
     fullpage: 'fixed inset-0 z-50',
@@ -262,7 +299,7 @@ export default function SheikhChat({
         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
         className={`${wrapperClasses[mode]} flex flex-col`}
       >
-        {/* Backdrop for panel mode */}
+        {/* Backdrop */}
         {mode === 'panel' && onClose && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -283,7 +320,6 @@ export default function SheikhChat({
         >
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/5">
-            {/* Drag handle for panel mode */}
             {mode === 'panel' && (
               <div className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-white/20 rounded-full" />
             )}
@@ -294,11 +330,7 @@ export default function SheikhChat({
               </div>
               <div>
                 <h3 className="text-sm font-semibold text-white">Sheikh HIFZ</h3>
-                <p className="text-[11px] text-amber-400/70">
-                  {ayahContext
-                    ? `${ayahContext.surahName} · Ayah ${ayahContext.ayahNumber}`
-                    : 'Your AI Quran Teacher'}
-                </p>
+                <p className="text-[11px] text-amber-400/70">{getSubtitle()}</p>
               </div>
             </div>
 
@@ -324,12 +356,11 @@ export default function SheikhChat({
 
           {/* Messages Area */}
           <div
-            ref={chatContainerRef}
             className="flex-1 overflow-y-auto px-4 py-4 space-y-4 min-h-[200px] scroll-smooth"
             style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}
           >
             {/* Welcome State */}
-            {messages.length === 0 && (
+            {messages.length === 0 && !pendingQuestion && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -343,18 +374,15 @@ export default function SheikhChat({
                   بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
                 </h4>
                 <p className="text-sm text-gray-400 mb-6 max-w-xs">
-                  {ayahContext
-                    ? `Ask me anything about ${ayahContext.surahName}, Ayah ${ayahContext.ayahNumber} — meaning, tajweed, grammar, or memorization tips.`
-                    : "I'm your personal Quran teacher. Ask me anything about the Quran — tafsir, tajweed, Arabic, or memorization."}
+                  {getWelcomeMessage()}
                 </p>
 
-                {/* Suggested Questions */}
                 <div className="flex flex-wrap gap-2 justify-center max-w-sm">
                   {suggestedQuestions.map((q, i) => (
                     <QuestionChip
                       key={q}
                       question={q}
-                      onClick={() => handleSuggestedQuestion(q)}
+                      onClick={() => sendMessage(q)}
                       delay={i * 0.08}
                     />
                   ))}
@@ -392,7 +420,6 @@ export default function SheikhChat({
 
           {/* Input Area */}
           <div className="border-t border-white/5 px-4 py-3 bg-black/20">
-            {/* Streaming stop button */}
             {isLoading && (
               <div className="flex justify-center mb-2">
                 <button
@@ -416,6 +443,8 @@ export default function SheikhChat({
                   placeholder={
                     ayahContext
                       ? 'Ask about this ayah...'
+                      : pageContext.page === 'recite'
+                      ? 'Ask about tajweed...'
                       : 'Ask the sheikh anything...'
                   }
                   rows={1}
@@ -441,12 +470,7 @@ export default function SheikhChat({
                                : 'bg-white/5 text-gray-600 cursor-not-allowed'
                            }`}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="w-4 h-4"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                   <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
                 </svg>
               </button>

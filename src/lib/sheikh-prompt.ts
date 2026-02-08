@@ -1,16 +1,33 @@
 /**
- * AI Sheikh System Prompt
+ * AI Sheikh System Prompt V2 — Context-Aware
  * 
- * This is the core personality and knowledge framework for the HIFZ AI teacher.
- * It instructs Claude to behave as a learned, patient Quran teacher (sheikh/ustadh)
- * who adapts to the student's level and teaches with wisdom, warmth, and accuracy.
+ * Upgrades from V1:
+ * - buildPageContext(): Tells the sheikh which page the user is on and what they're doing
+ * - buildTajweedContext(): Passes recent tajweed analysis results so sheikh can reference them
+ * - buildFullSystemPrompt(): Combines all context pieces into one system prompt
  * 
- * IMPORTANT: This prompt has been carefully engineered for:
- * - Theological accuracy (references mainstream Sunni scholarship)
- * - Pedagogical soundness (scaffolded learning, not info-dumping)
- * - Cultural sensitivity (respectful of Islamic adab)
- * - Engaging conversation (not dry, not preachy)
+ * The core personality prompt is unchanged — only the context injection is new.
  */
+
+// ─── Types ───────────────────────────────────────────────────────────
+
+export interface PageContext {
+  page: 'mushaf' | 'lesson' | 'recite' | 'practice' | 'dashboard' | 'techniques' | 'profile' | 'other';
+  lessonId?: string;
+  lessonTitle?: string;
+  isReciting?: boolean;
+  replayCount?: number;
+  failedAttempts?: number;
+  tajweedResults?: TajweedResult[];
+}
+
+export interface TajweedResult {
+  rule: string;
+  location: string;
+  feedback: string;
+}
+
+// ─── Core System Prompt (unchanged from V1) ──────────────────────────
 
 export const SHEIKH_SYSTEM_PROMPT = `You are Sheikh HIFZ — a wise, warm, and deeply knowledgeable Quran teacher who serves as a personal guide for students on their journey to understand and memorize the Quran.
 
@@ -109,9 +126,8 @@ When the student asks a general question (not ayah-specific), respond conversati
 
 Remember: You are not a search engine. You are a TEACHER. Every interaction should leave the student feeling they learned something meaningful and are inspired to continue their journey with the Quran.`;
 
-/**
- * Build context-aware prompt for a specific ayah
- */
+// ─── Ayah Context Builder (unchanged from V1) ───────────────────────
+
 export function buildAyahContext(ayah: {
   surahNumber: number;
   surahName: string;
@@ -144,9 +160,8 @@ ${ayah.translation}
 Use this context to ground your teaching. Reference this specific ayah when relevant to the student's question.`;
 }
 
-/**
- * Build user level context
- */
+// ─── User Context Builder (unchanged from V1) ───────────────────────
+
 export function buildUserContext(user: {
   level: 'beginner' | 'intermediate' | 'advanced';
   memorizedSurahs?: string[];
@@ -170,18 +185,181 @@ Adapt your teaching style to this student's level. ${
   }`;
 }
 
-/**
- * Conversation starters based on context
- */
-export function getSuggestedQuestions(surahNumber: number, ayahNumber: number): string[] {
-  const general = [
-    'What does this ayah mean?',
-    'What are the tajweed rules here?',
-    'Help me memorize this ayah',
-    'Break down the Arabic word by word',
+// ─── NEW: Page Context Builder ───────────────────────────────────────
+
+export function buildPageContext(ctx: PageContext): string {
+  const parts: string[] = ['## Current App Context'];
+
+  switch (ctx.page) {
+    case 'mushaf':
+      parts.push(
+        'The student is currently **browsing the Quran (Mushaf)**.',
+        'They may be reading, exploring surahs, or looking for something specific.',
+        'Prioritize: explaining meaning, pointing out interesting features of the ayah, and inviting deeper exploration.'
+      );
+      break;
+
+    case 'lesson':
+      parts.push(
+        `The student is in an **active lesson**${ctx.lessonTitle ? ` — "${ctx.lessonTitle}"` : ''}.`,
+        'They are using the 10-3 memorization method (listen 10 times, recite 3 times from memory).',
+        'Prioritize: memorization tips, breaking down difficult phrases, pronunciation guidance.'
+      );
+      if ((ctx.replayCount || 0) >= 5) {
+        parts.push(
+          `⚠️ The student has replayed the audio ${ctx.replayCount} times — they may be struggling.`,
+          'Be extra patient. Offer to break the section into smaller chunks. Suggest meaning-based memory anchors.'
+        );
+      }
+      if ((ctx.failedAttempts || 0) >= 3) {
+        parts.push(
+          `⚠️ The student has failed recitation ${ctx.failedAttempts} times.`,
+          'Encourage them warmly. Offer specific help with the tricky parts. Suggest listening one more time before trying again.'
+        );
+      }
+      break;
+
+    case 'recite':
+      parts.push(
+        'The student is in **Recitation Mode** — they are recording themselves reciting.',
+        ctx.isReciting
+          ? 'They are currently mid-recitation.'
+          : 'They are about to recite or just finished.',
+        'Prioritize: tajweed guidance, pronunciation tips, and encouraging feedback.'
+      );
+      break;
+
+    case 'practice':
+      parts.push(
+        'The student is in **Practice Mode** — reviewing previously memorized material.',
+        'Prioritize: testing recall, strengthening weak spots, connecting meanings to memory.'
+      );
+      break;
+
+    case 'dashboard':
+      parts.push(
+        'The student is on the **Dashboard** — they just opened the app.',
+        'Be welcoming. You can reference their progress, suggest what to study next, or answer general questions.'
+      );
+      break;
+
+    case 'techniques':
+      parts.push(
+        'The student is on the **Techniques Page** — reading about memorization methods.',
+        'You can explain the 10-3 method, Sabaq system, 70/30 approach, or any other method in more detail.'
+      );
+      break;
+
+    default:
+      parts.push('The student is browsing the app. Respond helpfully to whatever they ask.');
+  }
+
+  return parts.join('\n');
+}
+
+// ─── NEW: Tajweed Context Builder ────────────────────────────────────
+
+export function buildTajweedContext(results: TajweedResult[]): string {
+  if (!results || results.length === 0) return '';
+
+  const lines = [
+    '## Recent Tajweed Analysis',
+    "The student just recited and here are the tajweed points identified in their recitation. Reference these naturally in your feedback — don't just list them. Be encouraging first, then gently correct.",
+    '',
   ];
 
-  // Add contextual suggestions based on well-known surahs
+  for (const r of results) {
+    lines.push(`- **${r.rule}** at "${r.location}": ${r.feedback}`);
+  }
+
+  return lines.join('\n');
+}
+
+// ─── NEW: Full System Prompt Builder ─────────────────────────────────
+
+/**
+ * Build the complete system prompt with all available context.
+ * This is what the API route should use instead of manually concatenating.
+ */
+export function buildFullSystemPrompt(options: {
+  ayahContext?: Parameters<typeof buildAyahContext>[0];
+  userProfile?: Parameters<typeof buildUserContext>[0];
+  userLevel?: 'beginner' | 'intermediate' | 'advanced';
+  pageContext?: PageContext;
+  tajweedResults?: TajweedResult[];
+}): string {
+  const parts: string[] = [SHEIKH_SYSTEM_PROMPT];
+
+  if (options.pageContext) {
+    parts.push(buildPageContext(options.pageContext));
+  }
+
+  if (options.ayahContext) {
+    parts.push(buildAyahContext(options.ayahContext));
+  }
+
+  if (options.tajweedResults && options.tajweedResults.length > 0) {
+    parts.push(buildTajweedContext(options.tajweedResults));
+  }
+
+  if (options.userProfile) {
+    parts.push(buildUserContext(options.userProfile));
+  } else if (options.userLevel) {
+    parts.push(buildUserContext({ level: options.userLevel }));
+  }
+
+  return parts.join('\n\n');
+}
+
+// ─── Suggested Questions (unchanged + new page-aware ones) ───────────
+
+export function getSuggestedQuestions(
+  surahNumber?: number,
+  ayahNumber?: number,
+  page?: string
+): string[] {
+  // Page-specific defaults (when no ayah is selected)
+  if (!surahNumber) {
+    switch (page) {
+      case 'recite':
+        return [
+          'How do I improve my tajweed?',
+          'What is ghunnah and how do I pronounce it?',
+          "What's the difference between Idgham and Ikhfa?",
+          'Tips for reciting with proper makhaarij',
+        ];
+      case 'practice':
+        return [
+          'How do I stop forgetting what I memorized?',
+          'What is the Sabaq revision system?',
+          'How often should I review old surahs?',
+          'Quiz me on what I know',
+        ];
+      case 'lesson':
+        return [
+          'Help me memorize this section',
+          'Break down the Arabic word by word',
+          'What does this passage mean?',
+          "What's a good mnemonic for this?",
+        ];
+      case 'dashboard':
+        return [
+          'What should I study today?',
+          'How do I start memorizing the Quran?',
+          'Which surah should a beginner start with?',
+          'What is the 10-3 memorization method?',
+        ];
+      default:
+        return [
+          'How do I start memorizing the Quran?',
+          'What is tajweed and why is it important?',
+          'Which surah should a beginner start with?',
+          'What is the 10-3 memorization method?',
+        ];
+    }
+  }
+
+  // Ayah-specific suggestions (from V1, enhanced)
   if (surahNumber === 1) {
     return [
       'Why is Al-Fatiha called the Opening?',
@@ -194,7 +372,7 @@ export function getSuggestedQuestions(surahNumber: number, ayahNumber: number): 
   if (surahNumber === 2 && ayahNumber === 255) {
     return [
       'Why is Ayatul Kursi so special?',
-      'What are the names of Allah mentioned here?',
+      "What are the names of Allah mentioned here?",
       'Help me memorize Ayatul Kursi',
       'What are the tajweed rules here?',
     ];
@@ -203,14 +381,18 @@ export function getSuggestedQuestions(surahNumber: number, ayahNumber: number): 
   if (surahNumber === 36) {
     return [
       'Why is Yaseen called the heart of the Quran?',
-      ...general.slice(0, 3),
+      'What does this ayah mean?',
+      'What are the tajweed rules here?',
+      'Help me memorize this ayah',
     ];
   }
 
   if (surahNumber === 67) {
     return [
       'What are the virtues of Surah Al-Mulk?',
-      ...general.slice(0, 3),
+      'What does this ayah mean?',
+      'What are the tajweed rules here?',
+      'Help me memorize this ayah',
     ];
   }
 
@@ -223,5 +405,10 @@ export function getSuggestedQuestions(surahNumber: number, ayahNumber: number): 
     ];
   }
 
-  return general;
+  return [
+    'What does this ayah mean?',
+    'What are the tajweed rules here?',
+    'Help me memorize this ayah',
+    'Break down the Arabic word by word',
+  ];
 }

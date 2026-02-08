@@ -9,6 +9,7 @@ import { ToastProvider } from '@/components/Toast';
 import InstallPrompt from '@/components/InstallPrompt';
 import OfflineIndicator from '@/components/OfflineIndicator';
 import SkipToContent from '@/components/SkipToContent';
+import SheikhProvider from '@/components/SheikhProvider';
 import { fontVariables } from '@/lib/fonts';
 import JsonLd from '@/components/JsonLd';
 import { 
@@ -186,13 +187,15 @@ export default function RootLayout({
         <SkipToContent />
         <ToastProvider>
           <SyncProvider>
-            <ServiceWorkerRegistration />
-            <OfflineIndicator />
-            <main id="main-content" tabIndex={-1} className="outline-none">
-              {children}
-            </main>
-            <InstallPrompt />
-            <SyncIndicator />
+            <SheikhProvider>
+              <ServiceWorkerRegistration />
+              <OfflineIndicator />
+              <main id="main-content" tabIndex={-1} className="outline-none">
+                {children}
+              </main>
+              <InstallPrompt />
+              <SyncIndicator />
+            </SheikhProvider>
           </SyncProvider>
         </ToastProvider>
       </body>

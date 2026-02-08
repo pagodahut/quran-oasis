@@ -1,21 +1,21 @@
 /**
- * useSheikhChat Hook
+ * useSheikhChat Hook V2 — Context-Aware
  * 
- * React hook for managing AI Sheikh conversations.
- * Handles streaming responses, message history, loading states,
- * and error handling with a clean API.
+ * Now sends pageContext and tajweedResults to the API for full situational awareness.
+ * Suggested questions adapt to the current page when no ayah is selected.
  * 
  * Usage:
- *   const { messages, sendMessage, isLoading, error, clearChat, suggestedQuestions } = useSheikhChat({
+ *   const { messages, sendMessage, isLoading } = useSheikhChat({
  *     ayahContext: { surahNumber: 1, surahName: 'Al-Fatiha', ... },
  *     userLevel: 'beginner',
  *   });
  */
 
 import { useState, useCallback, useRef } from 'react';
-import { getSuggestedQuestions } from '@/lib/sheikh-prompt';
+import { getSuggestedQuestions, type PageContext, type TajweedResult } from '@/lib/sheikh-prompt';
 
-// Types
+// ─── Types ───────────────────────────────────────────────────────────
+
 export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
@@ -46,6 +46,8 @@ interface UseSheikhChatOptions {
   ayahContext?: AyahContext;
   userLevel?: 'beginner' | 'intermediate' | 'advanced';
   userProfile?: UserProfile;
+  pageContext?: PageContext;
+  tajweedResults?: TajweedResult[];
   onError?: (error: string) => void;
 }
 
@@ -63,23 +65,29 @@ function generateId(): string {
   return `msg_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 }
 
+// ─── Hook ────────────────────────────────────────────────────────────
+
 export function useSheikhChat(options: UseSheikhChatOptions = {}): UseSheikhChatReturn {
-  const { ayahContext, userLevel = 'beginner', userProfile, onError } = options;
+  const {
+    ayahContext,
+    userLevel = 'beginner',
+    userProfile,
+    pageContext,
+    tajweedResults,
+    onError,
+  } = options;
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Generate suggested questions based on current ayah
-  const suggestedQuestions = ayahContext
-    ? getSuggestedQuestions(ayahContext.surahNumber, ayahContext.ayahNumber)
-    : [
-        'How do I start memorizing the Quran?',
-        'What is tajweed and why is it important?',
-        'Which surah should a beginner start with?',
-        'What is the 10-3 memorization method?',
-      ];
+  // Context-aware suggested questions
+  const suggestedQuestions = getSuggestedQuestions(
+    ayahContext?.surahNumber,
+    ayahContext?.ayahNumber,
+    pageContext?.page
+  );
 
   const stopStreaming = useCallback(() => {
     if (abortControllerRef.current) {
@@ -87,7 +95,6 @@ export function useSheikhChat(options: UseSheikhChatOptions = {}): UseSheikhChat
       abortControllerRef.current = null;
     }
     setIsLoading(false);
-    // Mark any streaming message as complete
     setMessages((prev) =>
       prev.map((msg) => (msg.isStreaming ? { ...msg, isStreaming: false } : msg))
     );
@@ -99,7 +106,6 @@ export function useSheikhChat(options: UseSheikhChatOptions = {}): UseSheikhChat
 
       setError(null);
 
-      // Add user message
       const userMessage: ChatMessage = {
         id: generateId(),
         role: 'user',
@@ -107,7 +113,6 @@ export function useSheikhChat(options: UseSheikhChatOptions = {}): UseSheikhChat
         timestamp: new Date(),
       };
 
-      // Add placeholder for assistant response
       const assistantMessage: ChatMessage = {
         id: generateId(),
         role: 'assistant',
@@ -119,13 +124,11 @@ export function useSheikhChat(options: UseSheikhChatOptions = {}): UseSheikhChat
       setMessages((prev) => [...prev, userMessage, assistantMessage]);
       setIsLoading(true);
 
-      // Build messages array for API (without IDs/timestamps)
       const apiMessages = [...messages, userMessage].map((msg) => ({
         role: msg.role,
         content: msg.content,
       }));
 
-      // Create abort controller for this request
       abortControllerRef.current = new AbortController();
 
       try {
@@ -137,28 +140,24 @@ export function useSheikhChat(options: UseSheikhChatOptions = {}): UseSheikhChat
             ayahContext,
             userLevel,
             userProfile,
+            pageContext,
+            tajweedResults,
           }),
           signal: abortControllerRef.current.signal,
         });
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          const errorMsg =
-            errorData.error || 'The sheikh is unavailable right now. Please try again.';
+          const errorMsg = errorData.error || 'The sheikh is unavailable right now. Please try again.';
           setError(errorMsg);
           onError?.(errorMsg);
-
-          // Remove the empty assistant message
           setMessages((prev) => prev.filter((msg) => msg.id !== assistantMessage.id));
           setIsLoading(false);
           return;
         }
 
-        // Read the streaming response
         const reader = response.body?.getReader();
-        if (!reader) {
-          throw new Error('No response stream');
-        }
+        if (!reader) throw new Error('No response stream');
 
         const decoder = new TextDecoder();
         let buffer = '';
@@ -175,7 +174,6 @@ export function useSheikhChat(options: UseSheikhChatOptions = {}): UseSheikhChat
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               const data = line.slice(6).trim();
-
               if (data === '[DONE]') continue;
 
               try {
@@ -183,13 +181,9 @@ export function useSheikhChat(options: UseSheikhChatOptions = {}): UseSheikhChat
 
                 if (parsed.text) {
                   fullContent += parsed.text;
-
-                  // Update the assistant message with new content
                   setMessages((prev) =>
                     prev.map((msg) =>
-                      msg.id === assistantMessage.id
-                        ? { ...msg, content: fullContent }
-                        : msg
+                      msg.id === assistantMessage.id ? { ...msg, content: fullContent } : msg
                     )
                   );
                 }
@@ -205,7 +199,6 @@ export function useSheikhChat(options: UseSheikhChatOptions = {}): UseSheikhChat
           }
         }
 
-        // Mark streaming as complete
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === assistantMessage.id
@@ -214,23 +207,18 @@ export function useSheikhChat(options: UseSheikhChatOptions = {}): UseSheikhChat
           )
         );
       } catch (err: unknown) {
-        if (err instanceof Error && err.name === 'AbortError') {
-          // User cancelled — that's fine
-          return;
-        }
+        if (err instanceof Error && err.name === 'AbortError') return;
 
         const errorMsg = 'Connection lost. Please check your internet and try again.';
         setError(errorMsg);
         onError?.(errorMsg);
-
-        // Remove the empty assistant message
         setMessages((prev) => prev.filter((msg) => msg.id !== assistantMessage.id));
       } finally {
         setIsLoading(false);
         abortControllerRef.current = null;
       }
     },
-    [messages, isLoading, ayahContext, userLevel, userProfile, onError]
+    [messages, isLoading, ayahContext, userLevel, userProfile, pageContext, tajweedResults, onError]
   );
 
   const clearChat = useCallback(() => {

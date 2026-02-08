@@ -1,30 +1,27 @@
 /**
- * AI Sheikh API Route
+ * AI Sheikh API Route V2 — Context-Aware
  * 
  * POST /api/sheikh
  * 
- * Handles conversational AI teaching powered by Claude.
- * Supports streaming responses for real-time chat experience.
+ * Now accepts pageContext and tajweedResults for full situational awareness.
+ * Uses buildFullSystemPrompt() to combine all context into one system prompt.
  * 
  * Request body:
  * {
  *   messages: Array<{ role: 'user' | 'assistant', content: string }>,
- *   ayahContext?: { surahNumber, surahName, surahNameArabic, ayahNumber, arabicText, translation, transliteration, juz },
+ *   ayahContext?: AyahContext,
  *   userLevel?: 'beginner' | 'intermediate' | 'advanced',
- *   userProfile?: { memorizedSurahs, currentStreak, totalVersesMemorized }
+ *   userProfile?: UserProfile,
+ *   pageContext?: PageContext,        // NEW: which page + metadata
+ *   tajweedResults?: TajweedResult[], // NEW: recent tajweed analysis
  * }
- * 
- * Returns: Streaming text response
  */
 
 import { NextRequest } from 'next/server';
-import {
-  SHEIKH_SYSTEM_PROMPT,
-  buildAyahContext,
-  buildUserContext,
-} from '@/lib/sheikh-prompt';
+import { buildFullSystemPrompt, type PageContext, type TajweedResult } from '@/lib/sheikh-prompt';
 
-// Types
+// ─── Types ───────────────────────────────────────────────────────────
+
 interface AyahContext {
   surahNumber: number;
   surahName: string;
@@ -55,11 +52,14 @@ interface SheikhRequest {
   ayahContext?: AyahContext;
   userLevel?: 'beginner' | 'intermediate' | 'advanced';
   userProfile?: UserProfile;
+  pageContext?: PageContext;
+  tajweedResults?: TajweedResult[];
 }
+
+// ─── Route Handler ───────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
   try {
-    // Validate API key exists
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
       return new Response(
@@ -71,11 +71,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse request
     const body: SheikhRequest = await request.json();
-    const { messages, ayahContext, userLevel, userProfile } = body;
+    const { messages, ayahContext, userLevel, userProfile, pageContext, tajweedResults } = body;
 
-    // Validate messages
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return new Response(
         JSON.stringify({ error: 'Messages array is required', code: 'INVALID_REQUEST' }),
@@ -83,22 +81,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Limit conversation length to manage token usage
     const MAX_MESSAGES = 20;
     const trimmedMessages = messages.slice(-MAX_MESSAGES);
 
-    // Build the system prompt with context
-    let systemPrompt = SHEIKH_SYSTEM_PROMPT;
-
-    if (ayahContext) {
-      systemPrompt += '\n\n' + buildAyahContext(ayahContext);
-    }
-
-    if (userProfile) {
-      systemPrompt += '\n\n' + buildUserContext(userProfile);
-    } else if (userLevel) {
-      systemPrompt += '\n\n' + buildUserContext({ level: userLevel });
-    }
+    // Build the full context-aware system prompt
+    const systemPrompt = buildFullSystemPrompt({
+      ayahContext,
+      userProfile,
+      userLevel,
+      pageContext,
+      tajweedResults,
+    });
 
     // Call Claude API with streaming
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -153,7 +146,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Stream the response back to the client
+    // Stream the response
     const encoder = new TextEncoder();
     const decoder = new TextDecoder();
 
@@ -179,19 +172,13 @@ export async function POST(request: NextRequest) {
             for (const line of lines) {
               if (line.startsWith('data: ')) {
                 const data = line.slice(6).trim();
-
                 if (data === '[DONE]') continue;
 
                 try {
                   const parsed = JSON.parse(data);
 
-                  // Handle different event types from Claude's streaming API
-                  if (
-                    parsed.type === 'content_block_delta' &&
-                    parsed.delta?.type === 'text_delta'
-                  ) {
-                    const text = parsed.delta.text;
-                    controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text })}\n\n`));
+                  if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
+                    controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: parsed.delta.text })}\n\n`));
                   }
 
                   if (parsed.type === 'message_stop') {
@@ -200,25 +187,17 @@ export async function POST(request: NextRequest) {
 
                   if (parsed.type === 'error') {
                     console.error('Stream error:', parsed.error);
-                    controller.enqueue(
-                      encoder.encode(
-                        `data: ${JSON.stringify({ error: 'Stream interrupted' })}\n\n`
-                      )
-                    );
+                    controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: 'Stream interrupted' })}\n\n`));
                   }
                 } catch {
-                  // Skip unparseable lines (event type headers, etc.)
+                  // Skip unparseable lines
                 }
               }
             }
           }
         } catch (error) {
           console.error('Stream reading error:', error);
-          controller.enqueue(
-            encoder.encode(
-              `data: ${JSON.stringify({ error: 'Connection lost' })}\n\n`
-            )
-          );
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: 'Connection lost' })}\n\n`));
         } finally {
           controller.close();
         }

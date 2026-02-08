@@ -44,13 +44,14 @@ import QuranSearch from '@/components/QuranSearch';
 import TafsirDrawer from '@/components/TafsirDrawer';
 import WordByWord from '@/components/WordByWord';
 import TajweedPractice from '@/components/TajweedPractice';
-import AskSheikhButton from '@/components/AskSheikhButton';
+import { useSheikh } from '@/contexts/SheikhContext';
 import { useBookmarks } from '@/lib/bookmarks';
 import { useReadingPreferences } from '@/hooks/useAppliedPreferences';
 
 export default function MushafPage() {
   const router = useRouter();
   const { toggle: toggleBookmark, check: isBookmarked } = useBookmarks();
+  const { setPageContext, setAyahContext } = useSheikh();
   
   // Get preferences
   const prefs = useReadingPreferences();
@@ -108,6 +109,30 @@ export default function MushafPage() {
     setCurrentAyah(1);
     setLoading(false);
   }, [surahNumber]);
+
+  // Set Sheikh context — tell the AI which page we're on and what ayah is selected
+  useEffect(() => {
+    setPageContext({ page: 'mushaf' });
+    return () => setAyahContext(undefined);
+  }, [setPageContext, setAyahContext]);
+
+  // Update Sheikh ayah context when current ayah changes
+  useEffect(() => {
+    if (currentSurah) {
+      const ayah = currentSurah.ayahs.find(a => a.numberInSurah === currentAyah);
+      if (ayah) {
+        setAyahContext({
+          surahNumber: surahNumber,
+          surahName: currentSurah.englishName,
+          surahNameArabic: currentSurah.name,
+          ayahNumber: currentAyah,
+          arabicText: cleanAyahText(ayah.text.arabic, surahNumber, currentAyah),
+          translation: ayah.text.translations[translationEdition] || '',
+          juz: ayah.juz,
+        });
+      }
+    }
+  }, [currentSurah, currentAyah, surahNumber, translationEdition, setAyahContext]);
 
   // Audio handlers
   const playAyah = (ayahNum: number) => {
@@ -843,25 +868,7 @@ export default function MushafPage() {
         )}
       </AnimatePresence>
       
-      {/* AI Sheikh - Ask about the current ayah */}
-      {currentSurah && (
-        <AskSheikhButton
-          ayahContext={{
-            surahNumber: surahNumber,
-            surahName: currentSurah.englishName,
-            surahNameArabic: currentSurah.name,
-            ayahNumber: currentAyah,
-            arabicText: cleanAyahText(
-              currentSurah.ayahs.find(a => a.numberInSurah === currentAyah)?.text.arabic || '', 
-              surahNumber, 
-              currentAyah
-            ),
-            translation: currentSurah.ayahs.find(a => a.numberInSurah === currentAyah)?.text.translations[translationEdition] || '',
-            juz: currentSurah.ayahs.find(a => a.numberInSurah === currentAyah)?.juz,
-          }}
-          userLevel="beginner"
-        />
-      )}
+      {/* AI Sheikh FAB is now rendered globally via SheikhOverlay in layout */}
     </div>
   );
 }
