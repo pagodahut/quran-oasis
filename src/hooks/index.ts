@@ -4,3 +4,4 @@
 
 export * from './useAppliedPreferences';
 export * from './useLearningMode';
+export * from './useSheikhGenerate';

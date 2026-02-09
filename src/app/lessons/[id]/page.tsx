@@ -56,6 +56,8 @@ import {
   ContentBlock,
 } from '@/components/LessonContentRenderer';
 import MemorizationPractice from '@/components/MemorizationPractice';
+import PreLessonBriefing from '@/components/PreLessonBriefing';
+import PostLessonReflection from '@/components/PostLessonReflection';
 import { playAyah, stopPlayback } from '@/lib/quranAudioService';
 import { CelebrationOverlay, useCelebration } from '@/components/Celebrations';
 import { 
@@ -530,6 +532,13 @@ export default function LessonDetailPage() {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
   
+  // Lesson flow state
+  const [lessonStarted, setLessonStarted] = useState(false);
+  const [showLessonComplete, setShowLessonComplete] = useState(false);
+  const [lessonStartTime] = useState(Date.now());
+  const [attemptCount, setAttemptCount] = useState(0);
+  const [perfectCount, setPerfectCount] = useState(0);
+  
   // Exercise state
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -615,7 +624,7 @@ export default function LessonDetailPage() {
   };
 
   const completeLesson = () => {
-    // Show XP animation
+    // Show XP animation first
     setShowXP(true);
     setTimeout(() => setShowXP(false), 2000);
     
@@ -639,21 +648,31 @@ export default function LessonDetailPage() {
       []  // completedJuz - would need to track this
     );
     
-    // Trigger celebration based on results
+    // Show PostLessonReflection instead of navigating immediately
+    setTimeout(() => {
+      setShowLessonComplete(true);
+    }, 2000);
+    
+    // Trigger celebration based on results (after reflection closes)
     if (streakResult.newMilestone) {
       setTimeout(() => {
         triggerCelebration({ type: 'streak_milestone', days: streakResult.newMilestone! });
-      }, 2500);
+      }, 5000);
     } else if (goalResult.goalMet) {
       setTimeout(() => {
         triggerCelebration({ type: 'daily_goal_met' });
-      }, 2500);
+      }, 5000);
     }
-    
-    // Navigate after animation
-    setTimeout(() => {
-      router.push('/lessons?completed=' + lessonId);
-    }, streakResult.newMilestone || goalResult.goalMet ? 5000 : 1500);
+  };
+  
+  const handleLessonContinue = () => {
+    router.push('/lessons?completed=' + lessonId);
+  };
+  
+  const handleLessonReview = () => {
+    setShowLessonComplete(false);
+    setCurrentStepIndex(0);
+    setLessonStarted(true);
   };
 
   // Render step content with proper formatting and smart detection
@@ -854,6 +873,63 @@ export default function LessonDetailPage() {
           <div className="w-12 h-12 border-2 border-gold-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-night-400">Loading lesson...</p>
         </motion.div>
+      </div>
+    );
+  }
+  
+  // Build ayahs array for Sheikh components
+  const lessonAyahs = lesson.steps
+    .filter(step => step.audioSegment || step.audioConfig)
+    .map(step => {
+      const audio = step.audioSegment || step.audioConfig;
+      return {
+        surahNumber: audio?.surah || 1,
+        surahName: lesson.unitTitle || 'Lesson',
+        surahNameArabic: '',
+        ayahNumberStart: audio?.ayahStart || 1,
+        ayahNumberEnd: audio?.ayahEnd || audio?.ayahStart || 1,
+        arabicText: step.arabicContent || '',
+        translation: '',
+      };
+    });
+  
+  // Show PostLessonReflection when complete
+  if (showLessonComplete) {
+    const timeSpent = Math.round((Date.now() - lessonStartTime) / 60000);
+    return (
+      <div className="min-h-screen bg-night-950 flex items-center justify-center">
+        <PostLessonReflection
+          lessonTitle={lesson.title}
+          ayahs={lessonAyahs}
+          userLevel="beginner"
+          performance={{
+            ayahsMemorized: lessonAyahs.length,
+            totalAttempts: attemptCount || lesson.steps.length,
+            perfectRecitations: perfectCount || Math.floor(lesson.steps.length * 0.8),
+            timeSpentMinutes: timeSpent || 5,
+            struggles: [],
+          }}
+          xpEarned={lesson.xpReward}
+          streakDays={1}
+          onContinue={handleLessonContinue}
+          onReview={handleLessonReview}
+        />
+      </div>
+    );
+  }
+  
+  // Show PreLessonBriefing before lesson starts
+  if (!lessonStarted && lessonAyahs.length > 0) {
+    return (
+      <div className="min-h-screen bg-night-950 px-4 py-8">
+        <PreLessonBriefing
+          lessonTitle={lesson.title}
+          ayahs={lessonAyahs}
+          userLevel="beginner"
+          isReview={false}
+          onStart={() => setLessonStarted(true)}
+          onDismiss={() => setLessonStarted(true)}
+        />
       </div>
     );
   }
