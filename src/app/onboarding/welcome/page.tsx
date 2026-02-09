@@ -17,6 +17,8 @@ import {
   ArrowRight,
   LogIn,
 } from 'lucide-react';
+import OnboardingCalibration from '@/components/OnboardingCalibration';
+import { useSheikh } from '@/contexts/SheikhContext';
 
 const JOURNEY_STAGES = [
   {
@@ -77,8 +79,19 @@ const JOURNEY_STAGES = [
 
 export default function OnboardingWelcomePage() {
   const router = useRouter();
+  const { setUserLevel } = useSheikh();
   const [showJourney, setShowJourney] = useState(false);
+  const [showCalibration, setShowCalibration] = useState(false);
   const [currentStage, setCurrentStage] = useState(0);
+  const [userName, setUserName] = useState<string | undefined>(undefined);
+  
+  // Try to get user name from localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('quranOasis_userName');
+      if (stored) setUserName(stored);
+    }
+  }, []);
   
   useEffect(() => {
     if (showJourney) {
@@ -94,6 +107,43 @@ export default function OnboardingWelcomePage() {
       return () => clearInterval(interval);
     }
   }, [showJourney]);
+  
+  // Handle calibration completion
+  const handleCalibrationComplete = (assessment: {
+    level: 'beginner' | 'intermediate' | 'advanced';
+    arabicReading: string;
+    tajweedKnowledge: string;
+    memorizationCount: number;
+    understanding: string;
+    summary: string;
+    recommendation: string;
+  }) => {
+    // Save the assessment
+    setUserLevel(assessment.level);
+    
+    // Save to localStorage for persistence
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('quranOasis_userLevel', assessment.level);
+      localStorage.setItem('quranOasis_calibration', JSON.stringify(assessment));
+    }
+    
+    // Navigate to dashboard
+    router.push('/dashboard');
+  };
+  
+  // Show calibration screen
+  if (showCalibration) {
+    return (
+      <OnboardingCalibration
+        userName={userName}
+        onComplete={handleCalibrationComplete}
+        onSkip={() => {
+          setUserLevel('beginner');
+          router.push('/dashboard');
+        }}
+      />
+    );
+  }
   
   return (
     <div className="min-h-screen bg-night-950 flex flex-col">
@@ -235,7 +285,7 @@ export default function OnboardingWelcomePage() {
                 ))}
               </motion.div>
               
-              {/* CTA */}
+              {/* CTA - Meet Sheikh First */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -244,30 +294,35 @@ export default function OnboardingWelcomePage() {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => setShowJourney(true)}
+                  onClick={() => setShowCalibration(true)}
                   className="w-full py-4 rounded-2xl flex items-center justify-center gap-2 text-base font-semibold"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(201,162,39,0.95) 0%, rgba(180,140,30,1) 100%)',
-                    color: '#0a0a0f',
-                    boxShadow: '0 8px 32px rgba(201,162,39,0.4), inset 0 1px 0 rgba(255,255,255,0.3)',
-                    border: '1px solid rgba(255,255,255,0.2)',
+                    background: 'linear-gradient(135deg, rgba(45, 212, 150, 0.9) 0%, rgba(26, 122, 84, 1) 100%)',
+                    color: '#fff',
+                    boxShadow: '0 8px 32px rgba(45, 212, 150, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
+                    border: '1px solid rgba(255,255,255,0.15)',
                   }}
                 >
-                  See Your Journey
+                  <span className="text-lg">🕌</span>
+                  Meet Sheikh HIFZ
                   <ChevronRight className="w-5 h-5" />
                 </motion.button>
+                
+                <p className="text-center text-night-500 text-xs mt-2 mb-4">
+                  Your AI teacher will assess your level through a quick conversation
+                </p>
                 
                 <motion.button
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
-                  onClick={() => router.push('/onboarding')}
-                  className="w-full py-3 mt-3 rounded-xl flex items-center justify-center text-sm text-night-400 hover:text-night-200 transition-colors"
+                  onClick={() => setShowJourney(true)}
+                  className="w-full py-3 rounded-xl flex items-center justify-center text-sm text-night-400 hover:text-night-200 transition-colors"
                   style={{
                     background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
                     border: '1px solid rgba(255,255,255,0.05)',
                   }}
                 >
-                  Skip to setup
+                  See the journey overview first
                 </motion.button>
                 
                 {/* Sign In Link */}
@@ -422,16 +477,17 @@ export default function OnboardingWelcomePage() {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => router.push('/onboarding')}
+                  onClick={() => setShowCalibration(true)}
                   className="w-full py-4 rounded-2xl flex items-center justify-center gap-2 text-base font-semibold"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(201,162,39,0.95) 0%, rgba(180,140,30,1) 100%)',
-                    color: '#0a0a0f',
-                    boxShadow: '0 8px 32px rgba(201,162,39,0.4), inset 0 1px 0 rgba(255,255,255,0.3)',
-                    border: '1px solid rgba(255,255,255,0.2)',
+                    background: 'linear-gradient(135deg, rgba(45, 212, 150, 0.9) 0%, rgba(26, 122, 84, 1) 100%)',
+                    color: '#fff',
+                    boxShadow: '0 8px 32px rgba(45, 212, 150, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
+                    border: '1px solid rgba(255,255,255,0.15)',
                   }}
                 >
-                  Begin My Journey
+                  <span className="text-lg">🕌</span>
+                  Meet Sheikh HIFZ
                   <ArrowRight className="w-5 h-5" />
                 </motion.button>
               </motion.div>

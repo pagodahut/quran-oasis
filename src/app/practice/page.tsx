@@ -36,6 +36,8 @@ import {
 import { type VerseProgress } from '@/lib/memorizationSystem';
 import { getSurah, formatVerseRef } from '@/lib/quranData';
 import BottomNav from '@/components/BottomNav';
+import SheikhReviewSession from '@/components/SheikhReviewSession';
+import type { ReviewAyah } from '@/hooks/useSheikhReview';
 
 // ============ COMPONENTS ============
 
@@ -475,6 +477,8 @@ export default function PracticePage() {
   const [todayActivity, setTodayActivity] = useState<ReturnType<typeof getTodayActivity> | null>(null);
   const [recentActivity, setRecentActivity] = useState<ReturnType<typeof getRecentActivity>>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showSheikhReview, setShowSheikhReview] = useState(false);
+  const [userName, setUserName] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     // Load all data
@@ -484,7 +488,40 @@ export default function PracticePage() {
     setTodayActivity(getTodayActivity());
     setRecentActivity(getRecentActivity(7));
     setIsLoading(false);
+    
+    // Try to get user name
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('quranOasis_userName');
+      if (stored) setUserName(stored);
+    }
   }, []);
+  
+  // Convert VerseProgress to ReviewAyah format
+  const convertToReviewAyahs = (verses: VerseProgress[]): ReviewAyah[] => {
+    return verses.slice(0, 5).map(v => {
+      const surah = getSurah(v.surah);
+      const daysSince = v.lastReview 
+        ? Math.floor((Date.now() - new Date(v.lastReview).getTime()) / (1000 * 60 * 60 * 24))
+        : undefined;
+      return {
+        surahNumber: v.surah,
+        surahName: surah?.englishName || `Surah ${v.surah}`,
+        surahNameArabic: surah?.name || '',
+        ayahNumber: v.ayah,
+        arabicText: '', // Would need to fetch from API
+        translation: '', // Would need to fetch from API
+        daysSinceReview: daysSince,
+        lastAccuracy: v.confidence,
+      };
+    });
+  };
+  
+  // Get due verses by category
+  const getDueByCategory = (verses: VerseProgress[]) => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    return verses.filter(v => new Date(v.nextReview) <= now);
+  };
 
   const startReview = (category: 'sabaq' | 'sabqi' | 'manzil') => {
     const verses = categories[category].filter(v => {
@@ -494,7 +531,8 @@ export default function PracticePage() {
     });
     
     if (verses.length > 0) {
-      router.push(`/memorize/${verses[0].surah}/${verses[0].ayah}`);
+      // Show Sheikh-guided review instead of direct navigation
+      setShowSheikhReview(true);
     }
   };
 
@@ -525,6 +563,25 @@ export default function PracticePage() {
       <div className="min-h-screen bg-night-950 flex items-center justify-center">
         <div className="w-12 h-12 border-2 border-gold-500 border-t-transparent rounded-full animate-spin" />
       </div>
+    );
+  }
+  
+  // Show Sheikh-guided review session
+  if (showSheikhReview) {
+    return (
+      <SheikhReviewSession
+        sabaqAyahs={convertToReviewAyahs(getDueByCategory(categories.sabaq))}
+        sabqiAyahs={convertToReviewAyahs(getDueByCategory(categories.sabqi))}
+        manzilAyahs={convertToReviewAyahs(getDueByCategory(categories.manzil))}
+        userLevel="beginner"
+        userName={userName}
+        streakDays={stats?.streak}
+        onComplete={(type, result) => {
+          console.log('Review complete:', type, result);
+          // Could save review results here
+        }}
+        onExit={() => setShowSheikhReview(false)}
+      />
     );
   }
 
