@@ -27,6 +27,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import SheikhButton from '@/components/ui/SheikhButton';
 import { useSheikh } from '@/contexts/SheikhContext';
 import {
   useSheikhGenerate,
@@ -219,27 +220,35 @@ export default function PostLessonReflection({
           </>
         ) : null}
 
-        <button className="sheikh-reflection__ask" onClick={handleAskSheikh}>
+        <SheikhButton
+          variant="secondary"
+          breathe
+          onClick={handleAskSheikh}
+          style={{ width: '100%', marginTop: 14 }}
+        >
           💬 Ask Sheikh about this
-        </button>
+        </SheikhButton>
       </div>
 
       {/* Actions */}
       <div className="sheikh-reflection__actions">
         {onReview && (
-          <button
-            className="sheikh-reflection__btn sheikh-reflection__btn--secondary"
+          <SheikhButton
+            variant="secondary"
+            breathe
             onClick={onReview}
+            style={{ flex: 1 }}
           >
             🔄 Review Again
-          </button>
+          </SheikhButton>
         )}
-        <button
-          className="sheikh-reflection__btn sheikh-reflection__btn--primary"
+        <SheikhButton
+          variant="primary"
           onClick={onContinue}
+          style={{ flex: 1 }}
         >
           Continue →
-        </button>
+        </SheikhButton>
       </div>
 
       {/* ─── Styles ──────────────────────────────────────────────── */}
@@ -437,27 +446,6 @@ export default function PostLessonReflection({
           font-style: italic;
         }
 
-        .sheikh-reflection__ask {
-          display: block;
-          width: 100%;
-          margin-top: 14px;
-          padding: 10px;
-          background: rgba(255, 255, 255, 0.04);
-          border: 1px solid rgba(45, 212, 150, 0.12);
-          border-radius: 10px;
-          color: #6bb89a;
-          font-size: 13px;
-          cursor: pointer;
-          text-align: center;
-          transition: all 0.2s;
-        }
-
-        .sheikh-reflection__ask:hover {
-          background: rgba(45, 212, 150, 0.08);
-          color: #2dd496;
-          border-color: rgba(45, 212, 150, 0.25);
-        }
-
         /* Skeleton */
         .sheikh-reflection__skeleton {
           display: flex;
@@ -493,36 +481,6 @@ export default function PostLessonReflection({
           gap: 10px;
         }
 
-        .sheikh-reflection__btn {
-          flex: 1;
-          border: none;
-          border-radius: 12px;
-          padding: 14px 20px;
-          font-size: 15px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .sheikh-reflection__btn--secondary {
-          background: rgba(255, 255, 255, 0.06);
-          color: #6bb89a;
-          border: 1px solid rgba(45, 212, 150, 0.15);
-        }
-
-        .sheikh-reflection__btn--secondary:hover {
-          background: rgba(255, 255, 255, 0.1);
-        }
-
-        .sheikh-reflection__btn--primary {
-          background: linear-gradient(135deg, #2dd496, #1a7a54);
-          color: #fff;
-        }
-
-        .sheikh-reflection__btn--primary:hover {
-          background: linear-gradient(135deg, #3de4a6, #219964);
-          transform: translateY(-1px);
-        }
       `}</style>
     </div>
   );

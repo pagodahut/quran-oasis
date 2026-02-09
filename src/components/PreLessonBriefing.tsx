@@ -22,6 +22,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import SheikhButton from '@/components/ui/SheikhButton';
 import { useSheikh } from '@/contexts/SheikhContext';
 import {
   useSheikhGenerate,
@@ -152,13 +153,14 @@ export default function PreLessonBriefing({
             {isReview ? 'Review Session' : 'Pre-Lesson Briefing'}
           </span>
         </div>
-        <button
-          className="sheikh-briefing__dismiss"
+        <SheikhButton
+          variant="ghost"
+          size="sm"
           onClick={handleDismiss}
           aria-label="Dismiss briefing"
         >
           ✕
-        </button>
+        </SheikhButton>
       </div>
 
       {/* Content */}
@@ -189,18 +191,19 @@ export default function PreLessonBriefing({
 
       {/* Actions */}
       <div className="sheikh-briefing__actions">
-        <button
-          className="sheikh-briefing__btn sheikh-briefing__btn--secondary"
+        <SheikhButton
+          variant="secondary"
+          breathe
           onClick={handleLearnMore}
         >
           Learn more
-        </button>
-        <button
-          className="sheikh-briefing__btn sheikh-briefing__btn--primary"
+        </SheikhButton>
+        <SheikhButton
+          variant="primary"
           onClick={handleStart}
         >
           {isReview ? '🔄 Start Review' : '﷽ Let\u2019s Start'}
-        </button>
+        </SheikhButton>
       </div>
 
       {/* ─── Styles ──────────────────────────────────────────────── */}
@@ -383,41 +386,6 @@ export default function PreLessonBriefing({
           justify-content: flex-end;
         }
 
-        .sheikh-briefing__btn {
-          border: none;
-          border-radius: 10px;
-          padding: 10px 18px;
-          font-size: 14px;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .sheikh-briefing__btn--secondary {
-          background: rgba(255, 255, 255, 0.06);
-          color: #6bb89a;
-          border: 1px solid rgba(45, 212, 150, 0.15);
-        }
-
-        .sheikh-briefing__btn--secondary:hover {
-          background: rgba(255, 255, 255, 0.1);
-          color: #2dd496;
-        }
-
-        .sheikh-briefing__btn--primary {
-          background: linear-gradient(135deg, #2dd496, #1a7a54);
-          color: #fff;
-          font-weight: 600;
-        }
-
-        .sheikh-briefing__btn--primary:hover {
-          background: linear-gradient(135deg, #3de4a6, #219964);
-          transform: translateY(-1px);
-        }
-
-        .sheikh-briefing__btn--primary:active {
-          transform: translateY(0);
-        }
       `}</style>
     </div>
   );

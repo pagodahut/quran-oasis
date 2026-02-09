@@ -20,6 +20,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
+import SheikhButton from '@/components/ui/SheikhButton';
 import { useSheikh } from '@/contexts/SheikhContext';
 import {
   useSheikhGenerate,
@@ -166,14 +167,15 @@ export default function DashboardGreeting({
         className={`dashboard-greeting__chips ${chipsVisible ? 'dashboard-greeting__chips--visible' : ''}`}
       >
         {displayQuestions.map((q, i) => (
-          <button
+          <SheikhButton
             key={i}
-            className="dashboard-greeting__chip"
+            variant="chip"
+            breathe
             onClick={() => handleQuestionTap(q)}
             style={{ animationDelay: `${i * 100}ms` }}
           >
             {q}
-          </button>
+          </SheikhButton>
         ))}
       </div>
 
@@ -329,41 +331,6 @@ export default function DashboardGreeting({
 
         .dashboard-greeting__chips--visible {
           opacity: 1;
-          transform: translateY(0);
-        }
-
-        .dashboard-greeting__chip {
-          background: rgba(45, 212, 150, 0.06);
-          border: 1px solid rgba(45, 212, 150, 0.12);
-          border-radius: 20px;
-          padding: 8px 14px;
-          font-size: 13px;
-          color: #6bb89a;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          white-space: nowrap;
-          animation: chipFadeIn 0.3s ease both;
-        }
-
-        @keyframes chipFadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(4px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .dashboard-greeting__chip:hover {
-          background: rgba(45, 212, 150, 0.12);
-          border-color: rgba(45, 212, 150, 0.25);
-          color: #2dd496;
-          transform: translateY(-1px);
-        }
-
-        .dashboard-greeting__chip:active {
           transform: translateY(0);
         }
       `}</style>

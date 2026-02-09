@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import SheikhButton from '@/components/ui/SheikhButton';
 import { useSheikh } from '@/contexts/SheikhContext';
 import {
   useSheikhGenerate,
@@ -176,17 +177,17 @@ export default function TajweedSheikhFeedback({
 
       {/* Actions */}
       <div className="tajweed-feedback__actions">
-        <button className="tajweed-btn tajweed-btn--secondary" onClick={handleAskSheikh}>
+        <SheikhButton variant="secondary" breathe onClick={handleAskSheikh} style={{ flex: 1 }}>
           💬 Ask Sheikh
-        </button>
+        </SheikhButton>
         {shouldRetry && onRetry ? (
-          <button className="tajweed-btn tajweed-btn--primary" onClick={onRetry}>
+          <SheikhButton variant="primary" onClick={onRetry} style={{ flex: 1 }}>
             🎙️ Try Again
-          </button>
+          </SheikhButton>
         ) : onContinue ? (
-          <button className="tajweed-btn tajweed-btn--primary" onClick={onContinue}>
+          <SheikhButton variant="primary" onClick={onContinue} style={{ flex: 1 }}>
             Continue →
-          </button>
+          </SheikhButton>
         ) : null}
       </div>
 
@@ -268,22 +269,6 @@ export default function TajweedSheikhFeedback({
         }
 
         .tajweed-feedback__actions { display: flex; gap: 10px; }
-        .tajweed-btn {
-          flex: 1; border: none; border-radius: 12px; padding: 14px 20px;
-          font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
-        }
-        .tajweed-btn--secondary {
-          background: rgba(255,255,255,0.06); color: #6bb89a;
-          border: 1px solid rgba(45,212,150,0.15);
-        }
-        .tajweed-btn--secondary:hover { background: rgba(255,255,255,0.1); }
-        .tajweed-btn--primary {
-          background: linear-gradient(135deg, #2dd496, #1a7a54); color: #fff;
-        }
-        .tajweed-btn--primary:hover {
-          background: linear-gradient(135deg, #3de4a6, #219964); transform: translateY(-1px);
-        }
-        .tajweed-btn--primary:active { transform: translateY(0); }
       `}</style>
     </div>
   );
