@@ -85,12 +85,19 @@ export default function TafsirDrawer({ isOpen, onClose, surahNumber, ayahNumber 
       // Fetch tafsir with cancellation guard
       let cancelled = false;
       setTafsirLoading(true);
-      fetchTafsir(surahNumber, ayahNumber, selectedTafsir).then((content) => {
-        if (!cancelled) {
-          setTafsirContent(content);
-          setTafsirLoading(false);
-        }
-      });
+      fetchTafsir(surahNumber, ayahNumber, selectedTafsir)
+        .then((content) => {
+          if (!cancelled) {
+            setTafsirContent(content);
+            setTafsirLoading(false);
+          }
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setTafsirContent(null);
+            setTafsirLoading(false);
+          }
+        });
 
       return () => { cancelled = true; };
     }

@@ -18,7 +18,7 @@ export default function ServiceWorkerRegistration() {
 
     const handleOnline = () => {
       navigator.serviceWorker.getRegistration().then(reg => {
-        reg?.update().catch(console.error);
+        reg?.update().catch(logger.error);
       });
     };
 
@@ -52,14 +52,14 @@ export default function ServiceWorkerRegistration() {
 
         // Check for updates periodically (every hour)
         updateInterval = setInterval(() => {
-          reg.update().catch(console.error);
+          reg.update().catch(logger.error);
         }, 60 * 60 * 1000);
 
         // Check for updates when coming back online
         window.addEventListener('online', handleOnline);
 
       } catch (error) {
-        console.error('[App] Service Worker registration failed:', error);
+        logger.error('[App] Service Worker registration failed:', error);
       }
     };
 

@@ -5,6 +5,8 @@
  * Uses Web Audio API for recording and OpenAI Whisper for transcription
  */
 
+import logger from '@/lib/logger';
+
 // Tajweed rules for feedback
 export const TAJWEED_RULES = {
   noon_sakinah: {
@@ -149,7 +151,7 @@ export async function initializeRecording(): Promise<boolean> {
     
     return true;
   } catch (error) {
-    console.error('Failed to initialize recording:', error);
+    logger.error('Failed to initialize recording:', error);
     return false;
   }
 }
@@ -297,7 +299,7 @@ export async function analyzeRecitation(
       return generateBasicFeedback(expectedText, surah, ayah);
     }
   } catch (error) {
-    console.error('Error analyzing recitation:', error);
+    logger.error('Error analyzing recitation:', error);
     return generateBasicFeedback(expectedText, surah, ayah);
   }
 }
@@ -336,7 +338,7 @@ async function analyzeWithClaude(
       overall: data.overall,
       accuracy: data.accuracy,
       transcription,
-      rulesAnalysis: (data.pronunciationFeedback || []).map((pf: any) => ({
+      rulesAnalysis: (data.pronunciationFeedback || []).map((pf: { rule?: string; issue?: string; correction?: string }) => ({
         rule: mapRuleToKey(pf.rule),
         status: pf.issue ? 'needs_work' : 'correct',
         feedback: pf.correction || pf.issue || 'Good pronunciation',
@@ -345,7 +347,7 @@ async function analyzeWithClaude(
       specificTips: data.specificTips,
     };
   } catch (error) {
-    console.error('Claude API error:', error);
+    logger.error('Claude API error:', error);
     return null;
   }
 }
@@ -396,14 +398,14 @@ async function transcribeViaServer(audioBlob: Blob): Promise<string | null> {
     });
     
     if (!response.ok) {
-      console.error('Transcription API error:', response.status);
+      logger.error('Transcription API error:', response.status);
       return null;
     }
     
     const data = await response.json();
     return data.transcription || null;
   } catch (error) {
-    console.error('Transcription error:', error);
+    logger.error('Transcription error:', error);
     return null;
   }
 }
@@ -794,7 +796,7 @@ export function savePracticeSession(session: Omit<PracticeSession, 'id' | 'times
   try {
     localStorage.setItem(PRACTICE_STORAGE_KEY, JSON.stringify(trimmed));
   } catch (e) {
-    console.error('Failed to save practice session:', e);
+    logger.error('Failed to save practice session:', e);
   }
 }
 
@@ -806,13 +808,14 @@ export function getPracticeSessions(): PracticeSession[] {
     const stored = localStorage.getItem(PRACTICE_STORAGE_KEY);
     if (!stored) return [];
     
-    const sessions = JSON.parse(stored);
-    return sessions.map((s: any) => ({
+    const sessions = JSON.parse(stored) as Array<Omit<PracticeSession, 'timestamp'> & { timestamp: string }>;
+    if (!Array.isArray(sessions)) return [];
+    return sessions.map((s) => ({
       ...s,
       timestamp: new Date(s.timestamp),
     }));
   } catch (e) {
-    console.error('Failed to load practice sessions:', e);
+    logger.error('Failed to load practice sessions:', e);
     return [];
   }
 }

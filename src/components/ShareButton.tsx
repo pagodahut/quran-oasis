@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Share2, Twitter, Copy, Check, X, MessageCircle } from 'lucide-react';
 import { SITE_URL } from '@/lib/seo';
+import logger from '@/lib/logger';
 
 interface ShareButtonProps {
   surahName?: string;
@@ -88,7 +89,7 @@ export default function ShareButton({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      console.error('Failed to copy');
+      logger.error('Failed to copy');
     }
   };
 

@@ -1,9 +1,21 @@
 /**
  * Word Timing Service for Quran Recitation
- * 
+ *
  * Provides word-level timing data for synchronized highlighting
  * Uses Quran.com API for word data and estimates timing based on audio duration
  */
+
+import logger from '@/lib/logger';
+
+/** Raw word object from Quran.com API v4 */
+interface QuranComApiWord {
+  char_type_name: string;
+  position: number;
+  text: string;
+  text_uthmani: string;
+  translation?: { text: string };
+  transliteration?: { text: string };
+}
 
 export interface WordData {
   position: number;
@@ -115,12 +127,12 @@ export async function getAyahWordTiming(
     }
     
     // Filter out non-word elements (like verse numbers)
-    const wordObjects = verse.words.filter((w: any) => w.char_type_name === 'word');
-    
+    const wordObjects = (verse.words as QuranComApiWord[]).filter((w) => w.char_type_name === 'word');
+
     // Default duration if not provided (estimate ~0.8 sec per word)
     const duration = audioDuration || wordObjects.length * 0.8;
-    
-    const words = wordObjects.map((w: any) => w.text_uthmani);
+
+    const words = wordObjects.map((w) => w.text_uthmani);
     const wordTimings = estimateWordTimings(words, duration);
     
     // Enhance with additional data
@@ -142,7 +154,7 @@ export async function getAyahWordTiming(
     
     return result;
   } catch (error) {
-    console.error('Error fetching word timing:', error);
+    logger.error('Error fetching word timing:', error);
     return null;
   }
 }

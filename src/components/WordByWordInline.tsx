@@ -17,6 +17,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Volume2, Loader2 } from 'lucide-react';
 import { usePreferences, ARABIC_FONT_STYLE_OPTIONS } from '@/lib/preferencesStore';
+import logger from '@/lib/logger';
 
 // Types
 interface WordData {
@@ -174,7 +175,7 @@ export default function WordByWordInline({
     try {
       await playWordAudio(word.audioUrl);
     } catch (e) {
-      console.error('Word audio failed:', e);
+      logger.error('Word audio failed:', e);
     }
     setPlayingWord(null);
   }, [onWordTap]);

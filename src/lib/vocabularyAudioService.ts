@@ -1,15 +1,28 @@
 /**
  * Vocabulary Audio Service
- * 
+ *
  * Provides human-recited audio for Quranic vocabulary using:
  * - Quran.com Word-by-Word API (77k+ words with human audio)
  * 
  * NO AI/TTS - all audio is from authentic human reciters
  */
 
+import logger from '@/lib/logger';
+
 // ============================================
 // Types
 // ============================================
+
+/** Raw word object from Quran.com API v4 */
+interface QuranComApiWord {
+  char_type_name: string;
+  position: number;
+  text: string;
+  text_uthmani: string;
+  translation?: { text: string };
+  transliteration?: { text: string };
+  audio_url?: string;
+}
 
 export interface QuranWord {
   position: number;
@@ -195,9 +208,9 @@ export async function fetchVerseWords(surah: number, ayah: number): Promise<Qura
       return [];
     }
     
-    const words: QuranWord[] = verse.words
-      .filter((w: any) => w.char_type_name === 'word')
-      .map((w: any) => ({
+    const words: QuranWord[] = (verse.words as QuranComApiWord[])
+      .filter((w) => w.char_type_name === 'word')
+      .map((w) => ({
         position: w.position,
         text: w.text,
         textUthmani: w.text_uthmani,
@@ -224,7 +237,7 @@ export async function fetchVerseWords(surah: number, ayah: number): Promise<Qura
     
     return words;
   } catch (error) {
-    console.error('Failed to fetch verse words:', error);
+    logger.error('Failed to fetch verse words:', error);
     return [];
   }
 }

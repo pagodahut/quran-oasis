@@ -268,12 +268,23 @@ function getAudioUrlWithQuality(
 // Network Quality Detection
 // ============================================
 
+/** Network Information API (not in standard TypeScript lib) */
+interface NetworkInformation {
+  effectiveType?: string;
+  downlink?: number;
+}
+
+interface NavigatorWithConnection extends Navigator {
+  connection?: NetworkInformation;
+  mozConnection?: NetworkInformation;
+  webkitConnection?: NetworkInformation;
+}
+
 export function detectNetworkQuality(): AudioQuality {
   if (typeof navigator === 'undefined') return 'high';
 
-  const connection = (navigator as any).connection || 
-                    (navigator as any).mozConnection || 
-                    (navigator as any).webkitConnection;
+  const nav = navigator as NavigatorWithConnection;
+  const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
 
   if (!connection) return 'high';
 

@@ -26,6 +26,7 @@ import {
   type TranscribedWord,
 } from '@/lib/realtimeTajweedService';
 import { SURAH_METADATA } from '@/lib/surahMetadata';
+import logger from '@/lib/logger';
 
 // ============ Types ============
 
@@ -290,7 +291,7 @@ export default function LiveRecitation({
         setPhase('ready');
       } catch (err) {
         if (cancelled) return;
-        console.error('Failed to load tajweed data:', err);
+        logger.error('Failed to load tajweed data:', err);
         setErrorMessage('Failed to load Quran text. Please check your connection.');
         setPhase('error');
       }
@@ -439,7 +440,7 @@ export default function LiveRecitation({
       });
 
       service.onError((error) => {
-        console.error('Deepgram error:', error);
+        logger.error('Deepgram error:', error);
       });
 
       // Start
@@ -452,7 +453,7 @@ export default function LiveRecitation({
         setElapsedTime((prev) => prev + 1);
       }, 1000);
     } catch (err) {
-      console.error('Failed to start recording:', err);
+      logger.error('Failed to start recording:', err);
       setErrorMessage(
         err instanceof Error
           ? err.message
@@ -507,7 +508,7 @@ export default function LiveRecitation({
 
       setPhase('complete');
     } catch (err) {
-      console.error('Error stopping recording:', err);
+      logger.error('Error stopping recording:', err);
       setPhase('complete');
     }
   }, [tajweedData, elapsedTime]);

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Volume2, Pause } from 'lucide-react';
 import { playWord } from '@/lib/audioService';
+import logger from '@/lib/logger';
 import {
   getAyahWordTiming,
   getWordTimingFromText,
@@ -64,7 +65,7 @@ export default function WordByWord({
           return;
         }
       } catch (e) {
-        console.warn('Failed to fetch word timing from API:', e);
+        logger.warn('Failed to fetch word timing from API:', e);
       }
       
       // Fallback to local text parsing

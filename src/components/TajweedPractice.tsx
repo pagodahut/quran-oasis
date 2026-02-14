@@ -41,6 +41,7 @@ import {
 import { useRealtimeTajweed } from '@/hooks/useRealtimeTajweed';
 import WordTracker, { AudioLevelIndicator, RealtimeError } from '@/components/WordTracker';
 import type { RealtimeSessionResult } from '@/lib/realtimeTajweedService';
+import logger from '@/lib/logger';
 
 interface TajweedPracticeProps {
   surah: number;
@@ -295,7 +296,7 @@ export default function TajweedPractice({
         onComplete(enhancedFeedback);
       }
     } catch (error) {
-      console.error('Analysis failed:', error);
+      logger.error('Analysis failed:', error);
       // Show error feedback with real-time accuracy
       setFeedback({
         overall: result.accuracy >= 80 ? 'excellent' : result.accuracy >= 60 ? 'good' : 'needs_practice',
@@ -338,7 +339,7 @@ export default function TajweedPractice({
         onComplete(result);
       }
     } catch (error) {
-      console.error('Analysis failed:', error);
+      logger.error('Analysis failed:', error);
       // Show error feedback
       setFeedback({
         overall: 'good',

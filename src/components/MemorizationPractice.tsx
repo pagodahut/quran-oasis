@@ -28,6 +28,7 @@ import {
 } from '@/lib/quranAudioService';
 import { markVerseMemorized, getVerseProgress } from '@/lib/progressStore';
 import { useAudioPreferences } from '@/lib/preferencesStore';
+import logger from '@/lib/logger';
 
 interface MemorizationPracticeProps {
   surah: number;
@@ -126,12 +127,12 @@ export default function MemorizationPractice({
           }
         },
         onError: (error) => {
-          console.error('Audio error:', error);
+          logger.error('Audio error:', error);
           setIsPlaying(false);
         },
       });
     } catch (error) {
-      console.error('Failed to play audio:', error);
+      logger.error('Failed to play audio:', error);
       setIsPlaying(false);
     }
   }, [isPlaying, surah, ayah, effectiveReciterId, phase]);

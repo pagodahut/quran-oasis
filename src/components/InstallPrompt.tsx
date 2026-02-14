@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { X, Download, Smartphone, Share, Plus, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import logger from '@/lib/logger';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -144,7 +145,7 @@ export default function InstallPrompt() {
         setIsInstalled(true);
       }
     } catch (error) {
-      console.error('Install prompt error:', error);
+      logger.error('Install prompt error:', error);
     }
 
     setDeferredPrompt(null);

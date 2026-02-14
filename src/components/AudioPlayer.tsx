@@ -24,6 +24,7 @@ import {
 } from '@/lib/settings';
 import { playReciterPreview, stopReciterPreview, isPreviewPlaying } from '@/lib/quranAudioService';
 import { supportsPerAyah, DEFAULT_RECITER_ID, RECITERS as QuranReciters } from '@/lib/quranData';
+import logger from '@/lib/logger';
 
 // ============================================
 // Types
@@ -776,7 +777,7 @@ export function DownloadSurahButton({
         setProgress({ loaded: status.loaded, total: status.total });
       });
     } catch (error) {
-      console.error('Download failed:', error);
+      logger.error('Download failed:', error);
     } finally {
       setIsDownloading(false);
     }

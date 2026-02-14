@@ -14,6 +14,8 @@
  * @see /docs/TAJWEED_ARCHITECTURE.md for full design
  */
 
+import logger from '@/lib/logger';
+
 // ============================================
 // Types
 // ============================================
@@ -529,17 +531,31 @@ export class RealtimeTajweedService {
     });
   }
   
-  private handleTranscript(data: any): void {
+  /** Deepgram WebSocket transcript message */
+  private handleTranscript(data: {
+    channel?: {
+      alternatives?: Array<{
+        transcript: string;
+        words?: Array<{
+          word: string;
+          start: number;
+          end: number;
+          confidence: number;
+        }>;
+      }>;
+    };
+    is_final: boolean;
+  }): void {
     if (!data.channel?.alternatives?.[0]) return;
-    
+
     const alternative = data.channel.alternatives[0];
     const transcript = alternative.transcript;
     const isFinal = data.is_final;
-    
+
     if (!transcript) return;
-    
+
     // Extract words with timestamps
-    const words: TranscribedWord[] = (alternative.words || []).map((w: any) => ({
+    const words: TranscribedWord[] = (alternative.words || []).map((w) => ({
       word: w.word,
       start: w.start,
       end: w.end,
@@ -771,6 +787,6 @@ export async function transcribeWithLocalWhisper(
 ): Promise<TranscribedWord[]> {
   // TODO: Implement using @xenova/transformers
   // This would enable offline mode
-  console.warn('Local Whisper not yet implemented');
+  logger.warn('Local Whisper not yet implemented');
   return [];
 }

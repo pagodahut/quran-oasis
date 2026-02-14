@@ -9,11 +9,33 @@ const DB_NAME = 'hifz-offline';
 const DB_VERSION = 1;
 const STORE_NAME = 'sync-queue';
 
+interface ProgressSyncData {
+  surah: number;
+  ayah: number;
+  easeFactor?: number;
+  interval?: number;
+  repetitions?: number;
+  status?: string;
+}
+
+interface BookmarkSyncData {
+  surah: number;
+  ayah: number;
+  note?: string;
+}
+
+interface SettingSyncData {
+  preferredReciter?: string;
+  showTranslation?: boolean;
+}
+
+type SyncData = ProgressSyncData | BookmarkSyncData | SettingSyncData;
+
 interface SyncItem {
   id: string;
   timestamp: number;
   type: 'progress' | 'bookmark' | 'setting';
-  data: any;
+  data: SyncData;
   attempts: number;
 }
 
@@ -40,7 +62,7 @@ function openDB(): Promise<IDBDatabase> {
 // Add item to sync queue
 export async function addToSyncQueue(
   type: SyncItem['type'],
-  data: any
+  data: SyncData
 ): Promise<string> {
   const db = await openDB();
   
@@ -217,7 +239,7 @@ export async function registerBackgroundSync(): Promise<boolean> {
 }
 
 // Queue progress update
-export async function queueProgressUpdate(progress: any): Promise<void> {
+export async function queueProgressUpdate(progress: ProgressSyncData): Promise<void> {
   await addToSyncQueue('progress', progress);
 
   // Try to register background sync
@@ -235,7 +257,7 @@ export async function queueProgressUpdate(progress: any): Promise<void> {
 }
 
 // Queue bookmark update
-export async function queueBookmarkUpdate(bookmark: any): Promise<void> {
+export async function queueBookmarkUpdate(bookmark: BookmarkSyncData): Promise<void> {
   await addToSyncQueue('bookmark', bookmark);
 
   if (navigator.onLine) {

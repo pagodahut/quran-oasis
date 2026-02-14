@@ -561,24 +561,28 @@ export function createTajweedLessonDrills(
   
   if (!rules) return drills;
   
+  type RuleObj = { name: string; description: string; examples?: string[] };
+
+  const isRuleObject = (r: unknown): r is RuleObj =>
+    typeof r === 'object' && r !== null && 'name' in r && 'description' in r;
+
+  const ruleNames: string[] = [];
+  for (const val of Object.values(rules)) {
+    if (isRuleObject(val)) ruleNames.push(val.name);
+  }
+
   Object.entries(rules).forEach(([ruleKey, rule], index) => {
-    if (typeof rule === 'object' && 'name' in rule) {
+    if (isRuleObject(rule)) {
       // Rule identification
       drills.push({
         id: `tajweed-id-${ruleCategory}-${index}`,
         type: "tajweed_identify",
         difficulty: "medium",
-        question: `What tajweed rule applies in "${(rule as any).examples?.[0] || ''}"?`,
-        questionArabic: (rule as any).examples?.[0],
-        options: Object.values(rules)
-          .filter(r => typeof r === 'object' && 'name' in r)
-          .map(r => (r as any).name)
-          .slice(0, 4),
-        correctAnswer: Object.values(rules)
-          .filter(r => typeof r === 'object' && 'name' in r)
-          .map(r => (r as any).name)
-          .indexOf((rule as any).name),
-        explanation: (rule as any).description || '',
+        question: `What tajweed rule applies in "${rule.examples?.[0] || ''}"?`,
+        questionArabic: rule.examples?.[0],
+        options: ruleNames.slice(0, 4),
+        correctAnswer: ruleNames.indexOf(rule.name),
+        explanation: rule.description || '',
         xpValue: 15
       });
     }
