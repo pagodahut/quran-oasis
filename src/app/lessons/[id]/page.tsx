@@ -94,7 +94,9 @@ function AudioButton({
   
   useEffect(() => {
     checkAudioProviders().then(providers => {
-      setHasVoice(providers.elevenlabs || providers.recorded || providers.webspeech);
+      // Human audio: pre-recorded letters + Quran.com/EveryAyah human reciters
+      // Note: webspeech only for letter fallback, not for Quran content
+      setHasVoice(providers.recorded || providers.quranHumanAudio);
     });
   }, []);
   
@@ -313,7 +315,8 @@ function NoVoiceWarning() {
   
   useEffect(() => {
     checkAudioProviders().then(providers => {
-      setHasVoice(providers.elevenlabs || providers.recorded || providers.webspeech);
+      // Human audio available: pre-recorded letters + Quran.com/EveryAyah reciters
+      setHasVoice(providers.recorded || providers.quranHumanAudio);
     });
   }, []);
   

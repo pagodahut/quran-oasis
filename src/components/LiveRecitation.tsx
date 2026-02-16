@@ -18,13 +18,13 @@ import {
 } from 'lucide-react';
 import TajweedText, { type WordState } from '@/components/TajweedText';
 import { fetchTajweedSurah, type TajweedSurahData } from '@/lib/quranTajweedApi';
+import { RealtimeTajweedService, type TranscribedWord } from '@/lib/realtimeTajweedService';
 import {
-  RealtimeTajweedService,
+  TarteelService,
   normalizeArabic,
   arabicSimilarity,
   checkBrowserSupport,
-  type TranscribedWord,
-} from '@/lib/realtimeTajweedService';
+} from '@/lib/tarteelService';
 import { SURAH_METADATA } from '@/lib/surahMetadata';
 
 // ============ Types ============
@@ -57,7 +57,7 @@ function formatTime(seconds: number): string {
 
 // ============ Audio Visualizer ============
 
-function AudioVisualizer({ service }: { service: RealtimeTajweedService | null }) {
+function AudioVisualizer({ service }: { service: TarteelService | null }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
 
@@ -243,7 +243,7 @@ export default function LiveRecitation({
   const [elapsedTime, setElapsedTime] = useState(0);
 
   // Refs
-  const serviceRef = useRef<RealtimeTajweedService | null>(null);
+  const serviceRef = useRef<TarteelService | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const wordElementsRef = useRef<Map<number, HTMLElement>>(new Map());
@@ -303,85 +303,18 @@ export default function LiveRecitation({
     };
   }, [surahNumber, startAyah, effectiveEndAyah]);
 
-  // ============ Word Alignment Logic ============
-
-  const processTranscribedWords = useCallback(
-    (transcribedWords: TranscribedWord[], isFinal: boolean) => {
-      if (!tajweedData) return;
-
-      const expected = tajweedData.plainWords;
-
-      setWordStates((prev) => {
-        const newStates = [...prev];
-        let expectedIdx = 0;
-
-        // Find where we left off (first 'hidden' word)
-        for (let i = 0; i < newStates.length; i++) {
-          if (newStates[i] === 'hidden' || newStates[i] === 'current') {
-            expectedIdx = i;
-            break;
-          }
-          if (i === newStates.length - 1) {
-            expectedIdx = newStates.length;
-          }
-        }
-
-        for (const trans of transcribedWords) {
-          if (expectedIdx >= expected.length) break;
-
-          // Look ahead up to 4 words for best match
-          let bestMatch = -1;
-          let bestSim = 0;
-
-          for (
-            let j = expectedIdx;
-            j < Math.min(expectedIdx + 4, expected.length);
-            j++
-          ) {
-            const sim = arabicSimilarity(trans.word, expected[j]);
-            if (sim > bestSim && sim > 0.4) {
-              bestMatch = j;
-              bestSim = sim;
-            }
-          }
-
-          if (bestMatch >= 0) {
-            // Mark skipped words as missed
-            for (let j = expectedIdx; j < bestMatch; j++) {
-              if (newStates[j] === 'hidden' || newStates[j] === 'current') {
-                newStates[j] = 'missed';
-              }
-            }
-
-            // Mark the matched word
-            if (isFinal) {
-              newStates[bestMatch] = bestSim > 0.75 ? 'revealed' : 'error';
-            } else {
-              newStates[bestMatch] = 'current';
-            }
-
-            expectedIdx = bestMatch + 1;
-          }
-        }
-
-        return newStates;
-      });
-    },
-    [tajweedData]
-  );
-
-  // ============ Deepgram Integration ============
+  // ============ Tarteel Integration ============
 
   const startRecording = useCallback(async () => {
     if (!tajweedData) return;
 
     try {
-      // Get Deepgram API key
-      const tokenRes = await fetch('/api/deepgram/token');
-      const tokenData = await tokenRes.json();
+      // Check authentication via Tarteel API
+      const checkRes = await fetch('/api/tarteel');
+      const checkData = await checkRes.json();
 
       // Handle authentication errors
-      if (tokenRes.status === 401) {
+      if (checkRes.status === 401) {
         setErrorMessage(
           'Please sign in to use live recitation. This feature requires an account.'
         );
@@ -390,7 +323,7 @@ export default function LiveRecitation({
       }
 
       // Handle configuration errors
-      if (tokenRes.status === 503 || !tokenData.configured || !tokenData.apiKey) {
+      if (checkRes.status === 503 || !checkData.configured) {
         setErrorMessage(
           'Live recitation is not available. Please try again later.'
         );
@@ -401,56 +334,50 @@ export default function LiveRecitation({
       // Build expected text from tajweed data
       const expectedText = tajweedData.plainWords.join(' ');
 
-      // Create service
-      const service = new RealtimeTajweedService({
-        apiKey: tokenData.apiKey,
+      // Create Tarteel service (uses Modal endpoint)
+      const service = new TarteelService({
         expectedText,
+        chunkIntervalMs: 2500, // Send chunks every 2.5 seconds
+        onStateChange: (state) => {
+          // Update word states based on alignments
+          setWordStates((prev) => {
+            const newStates = [...prev];
+            state.alignments.forEach((alignment, idx) => {
+              if (alignment.status === 'matched') {
+                newStates[idx] = 'revealed';
+              } else if (alignment.status === 'partial') {
+                newStates[idx] = 'error';
+              } else if (alignment.status === 'missed') {
+                newStates[idx] = 'missed';
+              }
+            });
+            return newStates;
+          });
+
+          // Update current word index
+          if (state.currentWordIndex >= 0) {
+            setCurrentWordIndex(state.currentWordIndex);
+          }
+        },
+        onWord: (index, word, confidence) => {
+          setCurrentWordIndex(index);
+
+          setWordStates((prev) => {
+            const newStates = [...prev];
+            if (index >= 0 && index < newStates.length) {
+              if (newStates[index] === 'hidden' || newStates[index] === 'current') {
+                newStates[index] = confidence > 0.75 ? 'revealed' : 'error';
+              }
+            }
+            return newStates;
+          });
+        },
+        onError: (error) => {
+          console.error('Tarteel error:', error);
+        },
       });
 
       serviceRef.current = service;
-
-      // Handle state changes from the service
-      service.onStateChange((state) => {
-        if (state.words.length > 0) {
-          processTranscribedWords(state.words, true);
-        }
-
-        // Update current word index
-        const lastMatched = state.alignments
-          .filter(
-            (a) => a.status === 'matched' || a.status === 'partial' || a.status === 'current'
-          )
-          .map((a) => a.expectedIndex)
-          .filter((i) => i >= 0);
-
-        if (lastMatched.length > 0) {
-          const maxIdx = Math.max(...lastMatched);
-          setCurrentWordIndex(maxIdx);
-        }
-      });
-
-      // Handle individual word events
-      service.onWord((index, word) => {
-        setCurrentWordIndex(index);
-
-        setWordStates((prev) => {
-          const newStates = [...prev];
-          if (index >= 0 && index < newStates.length) {
-            if (newStates[index] === 'hidden' || newStates[index] === 'current') {
-              const sim = arabicSimilarity(
-                word.word,
-                tajweedData.plainWords[index] || ''
-              );
-              newStates[index] = sim > 0.75 ? 'revealed' : 'error';
-            }
-          }
-          return newStates;
-        });
-      });
-
-      service.onError((error) => {
-        console.error('Deepgram error:', error);
-      });
 
       // Start
       await service.start();
@@ -470,7 +397,7 @@ export default function LiveRecitation({
       );
       setPhase('error');
     }
-  }, [tajweedData, processTranscribedWords]);
+  }, [tajweedData]);
 
   const stopRecording = useCallback(async () => {
     // Stop timer

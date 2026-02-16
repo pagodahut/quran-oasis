@@ -249,7 +249,12 @@ export async function playWord(
 
 /**
  * Play a phrase or Quranic verse
- * For Quran verses, prefer using EveryAyah.com audio directly
+ * 
+ * WARNING: This function cannot play Quranic phrases properly!
+ * For Quran verses, use quranAudioService.playAyah() instead.
+ * 
+ * This returns false to indicate no audio is available.
+ * The UI should show the reciter audio button for verse playback.
  */
 export async function playPhrase(
   phrase: string,
@@ -257,9 +262,12 @@ export async function playPhrase(
 ): Promise<boolean> {
   stopAllAudio();
   
-  // For phrases, use Web Speech as fallback
-  // (Full verse audio should use EveryAyah.com via quranData.ts)
-  return playWithWebSpeech(phrase, { ...options, rate: 0.8 });
+  // NO AI/TTS for Quranic phrases - this is strictly forbidden
+  // The proper way to play Quran audio is via quranAudioService.playAyah()
+  // which uses EveryAyah.com human reciters
+  console.warn('[AudioService] playPhrase() called - use quranAudioService.playAyah() for verses');
+  options.onError?.('Use the reciter audio button for verse playback');
+  return false;
 }
 
 /**
@@ -292,21 +300,30 @@ export function getLetterInfo(letter: string) {
 
 /**
  * Check what audio providers are available
- * No longer includes ElevenLabs - all human audio now
+ * 
+ * POLICY: Only human-recited audio for Quranic content
+ * - ElevenLabs: DISABLED (AI voice)
+ * - Web Speech: DISABLED for Quran (only allowed for letter pronunciation)
+ * - Recorded: IslamCan.com letter audio (human)
+ * - Quran.com: Word-by-word human audio
+ * - EveryAyah.com: Full verse human reciters (via quranAudioService)
  */
 export async function checkAudioProviders(): Promise<{
   elevenlabs: boolean;
   recorded: boolean;
   webspeech: boolean;
+  quranHumanAudio: boolean;
 }> {
+  // Web Speech check - only for letter fallback info
   const hasWebSpeech = typeof window !== 'undefined' && 
     !!window.speechSynthesis &&
     window.speechSynthesis.getVoices().some(v => v.lang.startsWith('ar'));
   
   return {
-    elevenlabs: false, // Removed - using human audio only
-    recorded: true,
-    webspeech: hasWebSpeech,
+    elevenlabs: false, // DISABLED - AI voice not allowed for Quran
+    recorded: true,    // IslamCan.com letter audio
+    webspeech: hasWebSpeech, // Only used for letter fallback
+    quranHumanAudio: true, // Quran.com + EveryAyah.com human reciters
   };
 }
 

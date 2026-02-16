@@ -1,19 +1,60 @@
-import { clerkMiddleware } from '@clerk/nextjs/server';
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
 
 // Only use Clerk middleware if configured
 const clerkPubKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
-export default function middleware(request: NextRequest) {
-  // If Clerk is not configured, pass through
+// Define protected routes that require authentication
+const isProtectedRoute = createRouteMatcher([
+  '/dashboard(.*)',
+  '/profile(.*)',
+  '/practice(.*)',
+  '/lessons(.*)',
+  '/memorize(.*)',
+  '/progress(.*)',
+  '/recite(.*)',
+  '/api/user(.*)',
+  '/api/progress(.*)',
+  '/api/feedback(.*)',
+]);
+
+// Public routes that don't need auth (even if user is logged in)
+const isPublicRoute = createRouteMatcher([
+  '/',
+  '/mushaf(.*)',
+  '/surahs(.*)',
+  '/techniques(.*)',
+  '/onboarding(.*)',
+  '/api/sheikh(.*)',
+  '/api/deepgram(.*)',
+  '/api/transcribe(.*)',
+  '/api/tajweed(.*)',
+  '/api/og(.*)',
+  '/api/onboarding(.*)',
+]);
+
+export default clerkMiddleware(async (auth, req) => {
+  // If Clerk is not configured, allow all routes
   if (!clerkPubKey) {
     return NextResponse.next();
   }
-  
-  // Otherwise use Clerk middleware
-  return clerkMiddleware()(request, {} as any);
-}
+
+  // Allow public routes without auth
+  if (isPublicRoute(req)) {
+    return NextResponse.next();
+  }
+
+  // For protected routes, require authentication
+  if (isProtectedRoute(req)) {
+    const { userId, redirectToSignIn } = await auth();
+    
+    if (!userId) {
+      return redirectToSignIn();
+    }
+  }
+
+  return NextResponse.next();
+});
 
 export const config = {
   matcher: [
