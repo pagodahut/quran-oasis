@@ -78,7 +78,6 @@ export function OfflineModelLoader({
         ) : (
           <button
             onClick={handleDownload}
-            disabled={status === 'loading'}
             className="text-sm text-blue-400 hover:text-blue-300 underline"
           >
             Enable Offline

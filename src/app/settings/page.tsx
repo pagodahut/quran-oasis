@@ -60,6 +60,7 @@ import { setDailyGoal } from '@/lib/motivationStore';
 import { useLearningMode } from '@/hooks/useLearningMode';
 import { LearningMode, LEARNING_MODE_OPTIONS } from '@/lib/learningMode';
 import { useTheme, type Theme } from '@/hooks/useTheme';
+import { OfflineModelLoader } from '@/components/OfflineModelLoader';
 
 // ============================================
 // Components
@@ -117,6 +118,27 @@ function SettingSection({
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+function OfflineModelSection() {
+  return (
+    <div className="p-4 rounded-xl bg-night-800/50 border border-night-700/50">
+      <div className="flex items-start gap-3 mb-3">
+        <div className="w-10 h-10 rounded-xl bg-sage-500/10 flex items-center justify-center">
+          <Download className="w-5 h-5 text-sage-400" />
+        </div>
+        <div className="flex-1">
+          <p className="text-night-100 font-medium">Offline AI Transcription</p>
+          <p className="text-xs text-night-500">
+            Download the Quran-optimized AI model (~74MB) to practice without internet
+          </p>
+        </div>
+      </div>
+      <OfflineModelLoader 
+        onReady={() => console.log('Offline model ready!')}
+      />
     </div>
   );
 }
@@ -908,6 +930,9 @@ export default function SettingsPage() {
                 </span>
               </div>
             </div>
+
+            {/* Offline AI Model */}
+            <OfflineModelSection />
 
             {/* Export/Import */}
             <div className="grid grid-cols-2 gap-3">
