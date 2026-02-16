@@ -383,14 +383,31 @@ function mapRuleToKey(ruleName?: string): TajweedRule {
  * Transcribe audio using OpenAI Whisper
  */
 /**
- * Transcribe audio via server-side API route (protects API key)
+ * Transcribe audio via server-side API route
+ * Uses Tarteel Whisper (Quran-optimized) with fallback to Deepgram
  */
 async function transcribeViaServer(audioBlob: Blob): Promise<string | null> {
   try {
     const formData = new FormData();
     formData.append('audio', audioBlob, 'recitation.webm');
     
-    const response = await fetch('/api/transcribe', {
+    // Try Tarteel first (Quran-optimized, preserves diacritics)
+    let response = await fetch('/api/transcribe-tarteel', {
+      method: 'POST',
+      body: formData,
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (data.text) {
+        console.log('[Transcription] Using Tarteel Whisper');
+        return data.text;
+      }
+    }
+    
+    // Fallback to legacy Deepgram endpoint
+    console.warn('[Transcription] Tarteel failed, falling back to Deepgram');
+    response = await fetch('/api/transcribe', {
       method: 'POST',
       body: formData,
     });
@@ -401,7 +418,7 @@ async function transcribeViaServer(audioBlob: Blob): Promise<string | null> {
     }
     
     const data = await response.json();
-    return data.transcription || null;
+    return data.transcription || data.text || null;
   } catch (error) {
     console.error('Transcription error:', error);
     return null;
