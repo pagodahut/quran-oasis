@@ -1,6 +1,15 @@
 /**
  * Arabic Audio Utility
- * Provides audio playback for Arabic letters, words, and Quranic verses
+ * 
+ * ⚠️ DEPRECATED: This file uses Web Speech API which is NOT suitable for Quranic content.
+ * 
+ * USE INSTEAD:
+ * - For letters: audioService.playLetter() (uses IslamCan.com pre-recorded audio)
+ * - For words: audioService.playWord() (uses Quran.com human audio)
+ * - For verses: quranAudioService.playAyah() (uses EveryAyah.com human reciters)
+ * 
+ * The Web Speech API produces inaccurate Arabic pronunciation and should
+ * NEVER be used for Quran recitation. Only human-recited audio is acceptable.
  */
 
 // ============================================

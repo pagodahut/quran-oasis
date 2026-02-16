@@ -18,11 +18,8 @@ import {
 } from 'lucide-react';
 import TajweedText, { type WordState } from '@/components/TajweedText';
 import { fetchTajweedSurah, type TajweedSurahData } from '@/lib/quranTajweedApi';
-import { RealtimeTajweedService, type TranscribedWord } from '@/lib/realtimeTajweedService';
 import {
   TarteelService,
-  normalizeArabic,
-  arabicSimilarity,
   checkBrowserSupport,
 } from '@/lib/tarteelService';
 import { SURAH_METADATA } from '@/lib/surahMetadata';
