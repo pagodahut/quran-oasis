@@ -275,11 +275,10 @@ function ArabicDisplay({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="mt-4 flex items-center gap-3 text-night-400"
+            className="mt-4 flex flex-col items-center gap-1"
           >
-            <span className="text-lg font-medium text-gold-500/80">{letterData.name}</span>
-            <span className="text-night-600">•</span>
-            <span className="text-base italic">/{letterData.phonetic}/</span>
+            <span className="text-xl font-semibold text-gold-400">{letterData.name}</span>
+            <span className="text-sm font-mono text-night-400 tracking-wide">/{letterData.phonetic}/</span>
           </motion.div>
         )}
         
@@ -617,7 +616,10 @@ export default function LessonDetailPage() {
     setIsCorrect(correct);
     setShowFeedback(true);
     
+    // Track attempts and perfect scores for lesson stats
+    setAttemptCount(prev => prev + 1);
     if (correct) {
+      setPerfectCount(prev => prev + 1);
       setShowCelebration(true);
       setTimeout(() => setShowCelebration(false), 800);
     }
@@ -727,9 +729,32 @@ export default function LessonDetailPage() {
         continue;
       }
       
-      // Practice/Try blocks
-      if (line.toLowerCase().includes('practice:') || line.toLowerCase().startsWith('**practice')) {
-        const practiceContent = line.replace(/\*\*practice:?\*\*:?/i, '').replace(/practice:?/i, '').trim();
+      // Practice/Try blocks - handle "Practice:" and "Practice technique:" patterns
+      if (line.toLowerCase().includes('practice') && (line.includes(':') || line.includes('**'))) {
+        // Remove various practice header patterns from first line
+        let practiceContent = line
+          .replace(/\*\*practice\s*technique:?\*\*:?/i, '')  // **Practice technique:**
+          .replace(/\*\*practice:?\*\*:?/i, '')              // **Practice:**
+          .replace(/practice\s*technique:?/i, '')            // Practice technique:
+          .replace(/practice:?/i, '')                        // Practice:
+          .trim();
+        
+        // Collect multi-line content (numbered lists, etc.) until next section header
+        const practiceLines: string[] = [];
+        if (practiceContent) practiceLines.push(practiceContent);
+        
+        let j = i + 1;
+        while (j < lines.length) {
+          const nextLine = lines[j].trim();
+          // Stop at empty line followed by section header, or at new bold header
+          if (!nextLine || nextLine.startsWith('**')) break;
+          practiceLines.push(nextLine);
+          j++;
+        }
+        
+        // Update index to skip consumed lines
+        i = j - 1;
+        
         result.push(
           <div key={i} className="my-4 bg-sage-900/20 border border-sage-700/30 rounded-xl p-4">
             <div className="flex items-start gap-3">
@@ -738,7 +763,11 @@ export default function LessonDetailPage() {
               </div>
               <div>
                 <h5 className="font-semibold text-sage-400 mb-1">🎯 Practice</h5>
-                <p className="text-night-300 text-sm leading-relaxed">{practiceContent || lines[++i]}</p>
+                <div className="text-night-300 text-sm leading-relaxed space-y-1">
+                  {practiceLines.map((pLine, pIdx) => (
+                    <p key={pIdx}>{pLine}</p>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -903,10 +932,10 @@ export default function LessonDetailPage() {
           ayahs={lessonAyahs}
           userLevel="beginner"
           performance={{
-            ayahsMemorized: lessonAyahs.length,
-            totalAttempts: attemptCount || lesson.steps.length,
-            perfectRecitations: perfectCount || Math.floor(lesson.steps.length * 0.8),
-            timeSpentMinutes: timeSpent || 5,
+            ayahsMemorized: lessonAyahs.length > 0 ? lessonAyahs.length : 0, // 0 for alphabet lessons
+            totalAttempts: attemptCount > 0 ? attemptCount : 1, // Avoid division by zero
+            perfectRecitations: perfectCount, // Use actual tracked count, no fake fallback
+            timeSpentMinutes: timeSpent || 1,
             struggles: [],
           }}
           xpEarned={lesson.xpReward}
@@ -1164,6 +1193,13 @@ export default function LessonDetailPage() {
                         const isArabicOption = /[\u0600-\u06FF]/.test(option);
                         // Extract only Arabic characters for audio playback
                         const arabicOnly = option.match(/[\u0600-\u06FF\u064B-\u0652]+/g)?.join('') || '';
+                        
+                        // For letter_identify quizzes, hide Latin names to make it a real shape recognition test
+                        const isLetterIdentifyQuiz = currentStep.exercise?.type === 'letter_identify';
+                        const displayOption = isLetterIdentifyQuiz && isArabicOption
+                          ? arabicOnly  // Show only the Arabic letter, not "(Jeem)" etc.
+                          : option;     // Show full option for other quiz types
+                        
                         return (
                           <motion.button
                             key={index}
@@ -1202,10 +1238,10 @@ export default function LessonDetailPage() {
                                 )}
                               </span>
                               <span 
-                                className={`text-lg ${isArabicOption ? 'font-arabic text-2xl' : ''}`}
+                                className={`text-lg ${isArabicOption ? 'font-arabic text-3xl' : ''}`}
                                 style={isArabicOption ? { direction: 'rtl' } : undefined}
                               >
-                                {option}
+                                {displayOption}
                               </span>
                               {/* Audio button - only plays Arabic characters, not Latin transliteration */}
                               {isArabicOption && arabicOnly && !showFeedback && (

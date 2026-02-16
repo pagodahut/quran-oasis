@@ -601,7 +601,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
+              className="flex flex-col sm:flex-row gap-4 justify-center mb-8"
             >
               <Link href="/onboarding/welcome" className="group relative">
                 <motion.div
@@ -618,6 +618,30 @@ export default function HomePage() {
               <Link href="/mushaf" className="liquid-btn-outline text-base px-10 py-4 flex items-center gap-3">
                 <BookOpen className="w-5 h-5" />
                 Explore the Quran
+              </Link>
+            </motion.div>
+            
+            {/* Browse Surahs - Garden Entry */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1 }}
+              className="mb-16"
+            >
+              <Link 
+                href="/surahs" 
+                className="inline-flex items-center gap-2 text-night-400 hover:text-gold-400 transition-colors text-sm group"
+              >
+                <span className="w-8 h-8 rounded-lg bg-night-800/50 flex items-center justify-center group-hover:bg-gold-500/10 transition-colors">
+                  <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4" stroke="currentColor" strokeWidth={1.5}>
+                    <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                    <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                    <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                    <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                  </svg>
+                </span>
+                Browse all 114 Surahs
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </motion.div>
 
@@ -1018,6 +1042,7 @@ export default function HomePage() {
             </p>
             <div className="flex items-center gap-6 text-sm text-night-500">
               <Link href="/lessons" className="hover:text-gold-400 transition-colors">Lessons</Link>
+              <Link href="/surahs" className="hover:text-gold-400 transition-colors">Surahs</Link>
               <Link href="/techniques" className="hover:text-gold-400 transition-colors">Techniques</Link>
               <Link href="/mushaf" className="hover:text-gold-400 transition-colors">Quran</Link>
             </div>

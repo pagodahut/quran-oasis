@@ -28,6 +28,18 @@ function QuranIcon({ className = "", strokeWidth = 2 }: { className?: string; st
   );
 }
 
+function BrowseIcon({ className = "", strokeWidth = 2 }: { className?: string; strokeWidth?: number }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} strokeWidth={strokeWidth} stroke="currentColor" aria-hidden="true">
+      {/* Grid/garden layout representing surah collection */}
+      <rect x="3" y="3" width="7" height="7" rx="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="14" y="3" width="7" height="7" rx="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="3" y="14" width="7" height="7" rx="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="14" y="14" width="7" height="7" rx="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function LearnIcon({ className = "", strokeWidth = 2 }: { className?: string; strokeWidth?: number }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} strokeWidth={strokeWidth} stroke="currentColor" aria-hidden="true">
@@ -96,17 +108,18 @@ export default function BottomNav() {
   }, [handleScroll]);
 
   // Build nav items based on learning mode
-  // Navigation Updates - Quran centered:
-  // - Beginner (6 items): Home, Learn, Quran, Practice, Recite, Profile
-  // - Intermediate (5 items): Home, Quran, Practice, Recite, Profile
-  // - Hafiz (4 items): Home, Quran, Recite, Profile
+  // Navigation Updates - Quran centered with Browse:
+  // - Beginner (6 items): Home, Learn, Browse, Quran, Practice, Profile
+  // - Intermediate (5 items): Home, Browse, Quran, Practice, Profile  
+  // - Hafiz (4 items): Home, Browse, Quran, Profile
+  // Note: Recite moved out to make room for Browse (surah discovery)
   const navItems = useMemo(() => {
     const items = [
       { href: '/dashboard', Icon: HomeIcon, label: 'Home', ariaLabel: 'Go to Dashboard', show: true },
       { href: '/lessons', Icon: LearnIcon, label: 'Learn', ariaLabel: 'Go to Lessons', show: showLearn },
+      { href: '/surahs', Icon: BrowseIcon, label: 'Surahs', ariaLabel: 'Browse Surahs', show: true },
       { href: '/mushaf', Icon: QuranIcon, label: 'Quran', ariaLabel: 'Read Quran', show: true },
       { href: '/practice', Icon: PracticeIcon, label: 'Practice', ariaLabel: 'Go to Practice', show: showPractice },
-      { href: '/recite', Icon: ReciteIcon, label: 'Recite', ariaLabel: 'Live Recitation', show: true },
       { href: '/profile', Icon: ProfileIcon, label: 'Profile', ariaLabel: 'View Profile', show: true },
     ];
     

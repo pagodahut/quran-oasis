@@ -145,13 +145,18 @@ export default function PostLessonReflection({
 
       {/* Stats row */}
       <div className={`sheikh-reflection__stats ${showStats ? 'sheikh-reflection__stats--visible' : ''}`}>
-        <div className="sheikh-reflection__stat">
-          <span className="sheikh-reflection__stat-value">{performance.ayahsMemorized}</span>
-          <span className="sheikh-reflection__stat-label">
-            Ayah{performance.ayahsMemorized !== 1 ? 's' : ''}
-          </span>
-        </div>
-        <div className="sheikh-reflection__stat-divider" />
+        {/* Only show Ayahs stat for Quran lessons, not alphabet */}
+        {performance.ayahsMemorized > 0 && (
+          <>
+            <div className="sheikh-reflection__stat">
+              <span className="sheikh-reflection__stat-value">{performance.ayahsMemorized}</span>
+              <span className="sheikh-reflection__stat-label">
+                Ayah{performance.ayahsMemorized !== 1 ? 's' : ''}
+              </span>
+            </div>
+            <div className="sheikh-reflection__stat-divider" />
+          </>
+        )}
         <div className="sheikh-reflection__stat">
           <span className="sheikh-reflection__stat-value">{accuracy}%</span>
           <span className="sheikh-reflection__stat-label">Accuracy</span>

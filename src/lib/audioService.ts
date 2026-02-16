@@ -1,10 +1,17 @@
 /**
  * Arabic Audio Service
  * 
- * Priority order (NO AI voices):
- * 1. Pre-recorded audio files (letters from IslamCan.com)
- * 2. Quran.com human-recited word audio (for vocabulary)
- * 3. Web Speech API (fallback only - not ideal for Arabic)
+ * STRICT HUMAN-ONLY AUDIO POLICY:
+ * - Quran verses and Arabic words MUST use human-recited audio
+ * - NO AI/TTS (ElevenLabs, OpenAI) for Quranic content
+ * - NO Web Speech API for Quranic content (inaccurate for Arabic)
+ * 
+ * Audio sources (all human):
+ * 1. Pre-recorded letter audio (IslamCan.com) - for individual letters
+ * 2. Quran.com word-by-word audio - for vocabulary
+ * 3. EveryAyah.com reciters - for full verses (via quranAudioService)
+ * 
+ * If human audio unavailable: fail gracefully (no fallback to AI/TTS)
  */
 
 import { getVocabularyAudioUrl, playVocabulary, stopVocabularyAudio } from './vocabularyAudioService';
@@ -143,13 +150,26 @@ async function playRecordedAudio(
 }
 
 // ============================================
-// Web Speech API (Fallback)
+// Web Speech API (DISABLED for Quranic content)
 // ============================================
 
+/**
+ * Web Speech is ONLY allowed for individual letter pronunciation.
+ * NEVER use for words, phrases, or any Quranic text.
+ * The pronunciation is inaccurate and disrespectful to the Quran.
+ */
 function playWithWebSpeech(
   text: string,
-  options: AudioOptions = {}
+  options: AudioOptions = {},
+  allowedForLettersOnly: boolean = false
 ): boolean {
+  // Only allow for single letters as absolute last resort
+  if (!allowedForLettersOnly) {
+    console.warn('[AudioService] Web Speech blocked for non-letter content');
+    options.onError?.('Human audio not available');
+    return false;
+  }
+
   if (typeof window === 'undefined' || !window.speechSynthesis) {
     options.onError?.('Speech synthesis not available');
     return false;
@@ -184,6 +204,8 @@ function playWithWebSpeech(
 
 /**
  * Play a single Arabic letter with pre-recorded audio
+ * Letters use pre-recorded human audio from IslamCan.com
+ * Web Speech fallback allowed ONLY for individual letters (not Quran text)
  */
 export async function playLetter(
   letter: string,
@@ -199,12 +221,14 @@ export async function playLetter(
   }
   
   // Fallback to Web Speech with vowel for pronunciation
+  // This is ONLY allowed for individual letters, not Quran text
   const letterWithVowel = cleanLetter + '\u064E';
-  return playWithWebSpeech(letterWithVowel, { ...options, rate: 0.5 });
+  return playWithWebSpeech(letterWithVowel, { ...options, rate: 0.5 }, true);
 }
 
 /**
  * Play an Arabic word using Quran.com human audio
+ * NO Web Speech fallback - Quranic words must be human-recited
  */
 export async function playWord(
   word: string,
@@ -212,13 +236,15 @@ export async function playWord(
 ): Promise<boolean> {
   stopAllAudio();
   
-  // Try Quran.com human audio first
+  // Use Quran.com human audio ONLY
   if (await playVocabulary(word, options)) {
     return true;
   }
   
-  // Fallback to Web Speech API
-  return playWithWebSpeech(word, { ...options, rate: 0.7 });
+  // No fallback - fail gracefully
+  console.warn('[AudioService] No human audio available for word:', word);
+  options.onError?.('Human audio not available for this word');
+  return false;
 }
 
 /**

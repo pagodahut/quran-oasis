@@ -157,13 +157,16 @@ export default function SurahsPage() {
       <header className="liquid-glass sticky top-0 z-40 safe-area-top">
         <div className="px-4 py-3">
           <div className="flex items-center gap-3 mb-3">
-            <Link href="/" className="btn-icon">
+            <Link href="/dashboard" className="btn-icon">
               <ChevronLeft className="w-5 h-5" />
             </Link>
             <div className="flex-1">
-              <h1 className="font-display text-xl text-night-100">Surah Index</h1>
+              <h1 className="font-display text-xl text-night-100">Garden of Surahs</h1>
               <p className="text-xs text-night-500">114 Surahs • 6,236 Ayahs</p>
             </div>
+            <Link href="/mushaf" className="btn-icon text-gold-400" title="Open Quran Reader">
+              <BookOpen className="w-5 h-5" />
+            </Link>
             <button 
               onClick={() => setShowFilters(!showFilters)}
               className={`btn-icon ${showFilters ? 'text-gold-400' : ''}`}
