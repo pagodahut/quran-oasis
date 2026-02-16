@@ -24,6 +24,7 @@ import {
   Search
 } from 'lucide-react';
 import { RECITERS, getAudioUrl } from '@/lib/quranData';
+import logger from '@/lib/logger';
 import { 
   LearningMode, 
   LEARNING_MODE_OPTIONS, 
@@ -246,7 +247,7 @@ export default function OnboardingPage() {
       persistLearningMode(data.learningMode);
       
     } catch (error) {
-      console.error('Onboarding submission error:', error);
+      logger.error('Onboarding submission error:', error);
       // Fallback to localStorage
       localStorage.setItem('quranOasis_onboarding', JSON.stringify(data));
       localStorage.setItem('quranOasis_preferences', JSON.stringify({

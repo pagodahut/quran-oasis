@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play,
@@ -43,7 +44,7 @@ interface MemorizationPracticeProps {
 
 type Phase = 'intro' | 'listen' | 'read' | 'memorize' | 'recall' | 'complete';
 
-const PHASE_INFO: Record<Phase, { title: string; description: string; icon: any }> = {
+const PHASE_INFO: Record<Phase, { title: string; description: string; icon: LucideIcon }> = {
   intro: {
     title: 'Getting Ready',
     description: 'Prepare yourself to memorize this beautiful verse',

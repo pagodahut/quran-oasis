@@ -209,7 +209,7 @@ export async function processSyncQueue(): Promise<{
         failed++;
       }
     } catch (error) {
-      console.error('[OfflineSync] Failed to sync item:', item.id, error);
+      logger.error('[OfflineSync] Failed to sync item:', item.id, error);
       await incrementAttempt(item.id);
       failed++;
     }
@@ -233,7 +233,7 @@ export async function registerBackgroundSync(): Promise<boolean> {
     logger.debug('[OfflineSync] Background sync registered');
     return true;
   } catch (error) {
-    console.error('[OfflineSync] Background sync registration failed:', error);
+    logger.error('[OfflineSync] Background sync registration failed:', error);
     return false;
   }
 }

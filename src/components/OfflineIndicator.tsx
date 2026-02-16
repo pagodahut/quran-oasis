@@ -17,13 +17,15 @@ export default function OfflineIndicator() {
       setShowBanner(true);
     }
 
+    let dismissTimer: ReturnType<typeof setTimeout> | null = null;
+
     const handleOnline = () => {
       setIsOnline(true);
       if (wasOffline) {
         // Show "back online" message briefly
         setShowBanner(true);
         setDismissed(false);
-        setTimeout(() => {
+        dismissTimer = setTimeout(() => {
           setShowBanner(false);
         }, 3000);
       }
@@ -43,6 +45,7 @@ export default function OfflineIndicator() {
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      if (dismissTimer) clearTimeout(dismissTimer);
     };
   }, [wasOffline]);
 

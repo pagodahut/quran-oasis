@@ -10,6 +10,7 @@
  */
 
 import { getAyahAudioUrl } from './quran';
+import logger from '@/lib/logger';
 
 // ============================================
 // Configuration
@@ -170,7 +171,7 @@ async function cacheAudio(
       request.onerror = () => reject(request.error);
     });
   } catch (error) {
-    console.warn('Failed to cache audio:', error);
+    logger.warn('Failed to cache audio:', error);
   }
 }
 
@@ -354,7 +355,7 @@ export async function preloadAudio(
     
     return audio;
   } catch (error) {
-    console.warn(`Failed to preload ${surah}:${ayah}:`, error);
+    logger.warn(`Failed to preload ${surah}:${ayah}:`, error);
     return null;
   }
 }

@@ -8,6 +8,8 @@
  * Returns HTML with <tajweed class=RULE> tags
  */
 
+import logger from '@/lib/logger';
+
 // ============ Types ============
 
 export interface TajweedSegment {
@@ -104,7 +106,7 @@ export async function fetchTajweedVerses(
       verses.push(parsed);
     }
   } catch (error) {
-    console.error('Failed to fetch tajweed data:', error);
+    logger.error('Failed to fetch tajweed data:', error);
     throw error;
   }
   

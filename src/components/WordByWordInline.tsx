@@ -19,6 +19,18 @@ import { Volume2, Loader2 } from 'lucide-react';
 import { usePreferences, ARABIC_FONT_STYLE_OPTIONS } from '@/lib/preferencesStore';
 import logger from '@/lib/logger';
 
+/** Raw word object from Quran.com API v4 */
+interface QuranComApiWord {
+  char_type_name: string;
+  position: number;
+  text: string;
+  text_uthmani: string;
+  text_indopak?: string;
+  translation?: { text: string };
+  transliteration?: { text: string };
+  audio_url?: string;
+}
+
 // Types
 interface WordData {
   position: number;
@@ -77,9 +89,9 @@ async function fetchWordData(surah: number, ayah: number): Promise<WordData[]> {
   }
   
   // Filter to actual words (not verse numbers)
-  const words: WordData[] = verse.words
-    .filter((w: any) => w.char_type_name === 'word')
-    .map((w: any) => ({
+  const words: WordData[] = (verse.words as QuranComApiWord[])
+    .filter((w) => w.char_type_name === 'word')
+    .map((w) => ({
       position: w.position,
       text: w.text,
       textUthmani: w.text_uthmani,

@@ -114,6 +114,7 @@ export default function ServiceWorkerRegistration() {
               <button
                 onClick={handleDismiss}
                 className="p-2 text-gold-400/60 hover:text-gold-400"
+                aria-label="Dismiss update notification"
               >
                 <X className="w-4 h-4" />
               </button>

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getProgress, saveProgress, UserProgress } from './progressStore';
 import { getBookmarks, Bookmark } from './bookmarks';
+import logger from '@/lib/logger';
 
 const SYNC_DEBOUNCE_MS = 5000; // Wait 5 seconds after last change before syncing
 const LAST_SYNC_KEY = 'quranOasis_lastSync';
@@ -114,7 +115,7 @@ export function useSync() {
 
       return true;
     } catch (error) {
-      console.error('Load from server failed:', error);
+      logger.error('Load from server failed:', error);
       return false;
     }
   }, [isSignedIn]);
@@ -151,7 +152,7 @@ export function useSync() {
       setSyncState((s: SyncState) => ({ ...s, isSyncing: false, lastSynced: now }));
       return true;
     } catch (error) {
-      console.error('Save to server failed:', error);
+      logger.error('Save to server failed:', error);
       setSyncState((s: SyncState) => ({ ...s, isSyncing: false, error: 'Sync failed' }));
       return false;
     }

@@ -3,6 +3,8 @@
  * Fetches tafsir (commentary) from Quran.com API
  */
 
+import logger from '@/lib/logger';
+
 export interface TafsirInfo {
   id: number;
   name: string;
@@ -50,7 +52,7 @@ export async function fetchTafsir(
     );
 
     if (!response.ok) {
-      console.error(`Tafsir API error: ${response.status}`);
+      logger.error(`Tafsir API error: ${response.status}`);
       return null;
     }
 
@@ -67,7 +69,7 @@ export async function fetchTafsir(
 
     return null;
   } catch (error) {
-    console.error('Error fetching tafsir:', error);
+    logger.error('Error fetching tafsir:', error);
     return null;
   }
 }

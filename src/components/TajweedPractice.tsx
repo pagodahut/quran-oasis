@@ -104,9 +104,8 @@ export default function TajweedPractice({
     reset: resetRealtime,
   } = useRealtimeTajweed({
     expectedText: arabicText,
-    onWord: (index, word) => {
+    onWord: () => {
       // Could add haptic feedback or sounds here
-      // Debug: console.log(`Word ${index} matched:`, word.word);
     },
     onComplete: async (result) => {
       setRealtimeResult(result);

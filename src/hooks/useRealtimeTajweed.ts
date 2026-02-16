@@ -35,6 +35,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import logger from '@/lib/logger';
 import {
   RealtimeTajweedService,
   RealtimeState,
@@ -157,7 +158,7 @@ export function useRealtimeTajweed(
         audioLevelIntervalRef.current = null;
       }
       if (serviceRef.current) {
-        serviceRef.current.stop().catch(console.error);
+        serviceRef.current.stop().catch(logger.error);
         serviceRef.current = null;
       }
     };
@@ -235,7 +236,7 @@ export function useRealtimeTajweed(
   const reset = useCallback(() => {
     // Stop any running service first
     if (serviceRef.current) {
-      serviceRef.current.stop().catch(console.error);
+      serviceRef.current.stop().catch(logger.error);
       serviceRef.current = null;
     }
     if (audioLevelIntervalRef.current) {
