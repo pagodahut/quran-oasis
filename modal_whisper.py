@@ -22,6 +22,7 @@ whisper_image = modal.Image.debian_slim(python_version="3.11").pip_install(
     "soundfile>=0.12.0",
     "accelerate>=0.25.0",
     "numpy<2.0",  # Compatibility with older librosa
+    "fastapi[standard]",  # Required for web endpoints
 )
 
 
