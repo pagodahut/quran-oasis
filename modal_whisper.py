@@ -105,13 +105,11 @@ class QuranWhisper:
             )
             input_features = inputs.input_features.to(self.device)
             
-            # Generate transcription
+            # Generate transcription (model is fine-tuned for Arabic Quran)
             with torch.no_grad():
                 generated_ids = self.model.generate(
                     input_features,
                     max_length=448,
-                    language="ar",
-                    task="transcribe",
                 )
             
             # Decode
@@ -120,9 +118,13 @@ class QuranWhisper:
                 skip_special_tokens=True
             )[0]
             
+            # Clean up any remaining special tokens
+            import re
+            transcription = re.sub(r'<\|[^|]+\|>', '', transcription).strip()
+            
             return {
                 "success": True,
-                "text": transcription.strip(),
+                "text": transcription,
                 "duration_seconds": len(audio) / 16000,
             }
             
@@ -165,44 +167,17 @@ class QuranWhisper:
         }
 
 
-# Web endpoint for HTTP access
-@app.function(
-    image=whisper_image,
-    gpu="T4",
-    scaledown_window=300,
-    timeout=120,
-)
-@modal.fastapi_endpoint(method="POST")
-def transcribe_api(request: dict) -> dict:
-    """
-    HTTP endpoint for transcription.
-    
-    POST body (JSON):
-        - audio_base64: Base64-encoded audio data
-        
-    Returns:
-        - text: Transcribed Arabic text
-        - success: Boolean
-        - error: Error message if failed
-    """
+# Shared transcription logic
+def _transcribe_audio(audio_bytes: bytes) -> dict:
+    """Core transcription logic shared by all endpoints."""
     import torch
     from transformers import WhisperProcessor, WhisperForConditionalGeneration
     import librosa
     import numpy as np
     import soundfile as sf
     
-    audio_base64 = request.get("audio_base64", "")
-    
-    if not audio_base64:
-        return {"success": False, "error": "No audio_base64 provided"}
-    
     try:
-        # Decode base64
-        if "," in audio_base64:
-            audio_base64 = audio_base64.split(",")[1]
-        audio_bytes = base64.b64decode(audio_base64)
-        
-        # Load model (cached in container)
+        # Load model (cached after first load)
         model_name = "tarteel-ai/whisper-base-ar-quran"
         processor = WhisperProcessor.from_pretrained(model_name)
         model = WhisperForConditionalGeneration.from_pretrained(model_name)
@@ -229,18 +204,22 @@ def transcribe_api(request: dict) -> dict:
         input_features = inputs.input_features.to(device)
         
         with torch.no_grad():
+            # Model is already fine-tuned for Arabic Quran, no need to force language
             generated_ids = model.generate(
                 input_features,
                 max_length=448,
-                language="ar",
-                task="transcribe",
             )
         
         transcription = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
         
+        # Clean up any remaining special tokens
+        import re
+        transcription = re.sub(r'<\|[^|]+\|>', '', transcription).strip()
+        
         return {
             "success": True,
-            "text": transcription.strip(),
+            "text": transcription,
+            "model": "tarteel-ai/whisper-base-ar-quran",
         }
         
     except Exception as e:
@@ -248,6 +227,41 @@ def transcribe_api(request: dict) -> dict:
             "success": False,
             "error": str(e),
         }
+
+
+# Web endpoint for HTTP access (JSON with base64)
+@app.function(
+    image=whisper_image,
+    gpu="T4",
+    scaledown_window=300,
+    timeout=120,
+)
+@modal.fastapi_endpoint(method="POST")
+def transcribe_api(request: dict) -> dict:
+    """
+    HTTP endpoint for transcription (JSON body).
+    
+    POST body (JSON):
+        - audio_base64: Base64-encoded audio data
+        
+    Returns:
+        - text: Transcribed Arabic text
+        - success: Boolean
+        - error: Error message if failed
+    """
+    audio_base64 = request.get("audio_base64", "")
+    
+    if not audio_base64:
+        return {"success": False, "error": "No audio_base64 provided"}
+    
+    try:
+        # Decode base64
+        if "," in audio_base64:
+            audio_base64 = audio_base64.split(",")[1]
+        audio_bytes = base64.b64decode(audio_base64)
+        return _transcribe_audio(audio_bytes)
+    except Exception as e:
+        return {"success": False, "error": f"Base64 decode error: {str(e)}"}
 
 
 @app.local_entrypoint()

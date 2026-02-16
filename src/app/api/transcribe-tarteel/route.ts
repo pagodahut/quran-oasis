@@ -30,6 +30,18 @@ interface TranscriptionResponse {
 }
 
 /**
+ * Convert ArrayBuffer to base64 string
+ */
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+/**
  * Transcribe using Modal endpoint
  */
 async function transcribeWithModal(audioBuffer: ArrayBuffer): Promise<TranscriptionResponse> {
@@ -37,24 +49,36 @@ async function transcribeWithModal(audioBuffer: ArrayBuffer): Promise<Transcript
     throw new Error('MODAL_WHISPER_URL not configured');
   }
   
+  // Convert to base64 for Modal endpoint
+  const audioBase64 = arrayBufferToBase64(audioBuffer);
+  
   const response = await fetch(MODAL_WHISPER_URL, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/octet-stream',
+      'Content-Type': 'application/json',
     },
-    body: audioBuffer,
+    body: JSON.stringify({ audio_base64: audioBase64 }),
   });
   
   if (!response.ok) {
-    throw new Error(`Modal API error: ${response.status} ${response.statusText}`);
+    const errorText = await response.text();
+    throw new Error(`Modal API error: ${response.status} - ${errorText}`);
   }
   
   const data = await response.json();
   
+  if (!data.success) {
+    throw new Error(data.error || 'Transcription failed');
+  }
+  
+  // Clean up any special tokens that might be in the output
+  let text = data.text || '';
+  text = text.replace(/<\|[^|]+\|>/g, '').trim();
+  
   return {
-    text: data.text || data.transcription || '',
+    text,
     provider: 'modal',
-    model: 'tarteel-ai/whisper-base-ar-quran',
+    model: data.model || 'tarteel-ai/whisper-base-ar-quran',
     words: data.words,
   };
 }
