@@ -29,6 +29,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import WordByWordInline from '@/components/WordByWordInline';
+import VerseContext, { WhyThisMatters } from '@/components/VerseContext';
 import { getSurah, getAudioUrl, RECITERS, cleanAyahText, getEffectiveReciterForPerAyah, supportsPerAyah, type Ayah } from '@/lib/quranData';
 import { 
   startMemorizingVerse, 
@@ -420,6 +421,7 @@ export default function MemorizePage() {
   // UI state
   const [showCelebration, setShowCelebration] = useState(false);
   const [wordByWordMode, setWordByWordMode] = useState(false);
+  const [showReflection, setShowReflection] = useState(true);
   
   // Tarteel recall state
   const [isRecording, setIsRecording] = useState(false);
@@ -723,6 +725,14 @@ export default function MemorizePage() {
                   {verse.text.translations.sahih}
                 </p>
               </div>
+
+              {/* Verse Context — Understand before you memorize */}
+              <VerseContext
+                surahNumber={surahNum}
+                ayahNumber={ayahNum}
+                defaultExpanded
+                inline
+              />
 
               {/* Method explanation */}
               <div className="bg-gradient-to-r from-purple-900/20 to-night-900 rounded-2xl p-6 border border-purple-700/30">
@@ -1091,6 +1101,19 @@ export default function MemorizePage() {
                   )}
                 </div>
               </div>
+
+              {/* Why This Matters — Spiritual reflection */}
+              <AnimatePresence>
+                {showReflection && verse && (
+                  <WhyThisMatters
+                    surahNumber={surahNum}
+                    ayahNumber={ayahNum}
+                    translation={verse.text.translations.sahih}
+                    onDismiss={() => setShowReflection(false)}
+                    className="max-w-sm mx-auto"
+                  />
+                )}
+              </AnimatePresence>
 
               <VerseDisplay verse={verse} surahNumber={surahNum} size="medium" />
             </motion.div>

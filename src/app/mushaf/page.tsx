@@ -42,6 +42,7 @@ import {
 import BottomNav from '@/components/BottomNav';
 import QuranSearch from '@/components/QuranSearch';
 import TafsirDrawer from '@/components/TafsirDrawer';
+import VerseContext from '@/components/VerseContext';
 import WordByWord from '@/components/WordByWord';
 import TajweedPractice from '@/components/TajweedPractice';
 import { TajweedText, TajweedToggle, TajweedLegend } from '@/components/TajweedHighlighter';
@@ -458,6 +459,15 @@ export default function MushafPage() {
                           <span className="hidden sm:inline">Tafsir</span>
                         </button>
                       </div>
+                    </div>
+                    
+                    {/* Inline Verse Context */}
+                    <div className="mt-3" onClick={(e) => e.stopPropagation()}>
+                      <VerseContext
+                        surahNumber={surahNumber}
+                        ayahNumber={ayah.numberInSurah}
+                        compact
+                      />
                     </div>
                   </motion.div>
                 );
