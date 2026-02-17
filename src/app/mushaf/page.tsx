@@ -481,9 +481,9 @@ export default function MushafPage() {
         )}
       </main>
 
-      {/* Tajweed Legend */}
+      {/* Tajweed Legend — above audio player (z-50) */}
       {showTajweedColors && (
-        <div className="fixed bottom-44 left-4 right-4 z-41">
+        <div className="fixed bottom-44 left-4 right-4 z-50">
           <TajweedLegend show={showTajweedLegend} onClose={() => setShowTajweedLegend(false)} />
         </div>
       )}
