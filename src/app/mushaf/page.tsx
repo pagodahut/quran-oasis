@@ -44,6 +44,7 @@ import QuranSearch from '@/components/QuranSearch';
 import TafsirDrawer from '@/components/TafsirDrawer';
 import WordByWord from '@/components/WordByWord';
 import TajweedPractice from '@/components/TajweedPractice';
+import { TajweedText, TajweedToggle, TajweedLegend } from '@/components/TajweedHighlighter';
 import { useSheikh } from '@/contexts/SheikhContext';
 import { useBookmarks } from '@/lib/bookmarks';
 import { useReadingPreferences } from '@/hooks/useAppliedPreferences';
@@ -87,6 +88,8 @@ export default function MushafPage() {
   const [wordByWordMode, setWordByWordMode] = useState(false);
   const [showTajweedPractice, setShowTajweedPractice] = useState(false);
   const [tajweedPracticeAyah, setTajweedPracticeAyah] = useState(1);
+  const [showTajweedColors, setShowTajweedColors] = useState(false);
+  const [showTajweedLegend, setShowTajweedLegend] = useState(false);
   
   // Refs
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -371,7 +374,11 @@ export default function MushafPage() {
                         lang="ar"
                         dir="rtl"
                       >
-                        {cleanAyahText(ayah.text.arabic, surahNumber, ayah.numberInSurah)}
+                        <TajweedText
+                          text={cleanAyahText(ayah.text.arabic, surahNumber, ayah.numberInSurah)}
+                          enabled={showTajweedColors}
+                          className="quran-text"
+                        />
                         <span className="verse-number" aria-label={`Verse ${ayah.numberInSurah}`}>{ayah.numberInSurah}</span>
                       </p>
                     )}
@@ -464,6 +471,13 @@ export default function MushafPage() {
         )}
       </main>
 
+      {/* Tajweed Legend */}
+      {showTajweedColors && (
+        <div className="fixed bottom-44 left-4 right-4 z-41">
+          <TajweedLegend show={showTajweedLegend} onClose={() => setShowTajweedLegend(false)} />
+        </div>
+      )}
+
       {/* Audio Player - Premium Frosted Glass - positioned above BottomNav */}
       <div className="fixed bottom-20 left-2 right-2 z-40 liquid-glass-strong rounded-2xl">
         <div className="px-4 py-3.5 max-w-3xl mx-auto">
@@ -494,6 +508,14 @@ export default function MushafPage() {
                 <Type className="w-3 h-3" />
                 Word
               </button>
+              {/* Tajweed color toggle */}
+              <TajweedToggle
+                enabled={showTajweedColors}
+                onToggle={() => {
+                  setShowTajweedColors(!showTajweedColors);
+                  if (!showTajweedColors) setShowTajweedLegend(true);
+                }}
+              />
               {/* Multi-ayah loop button */}
               <button
                 onClick={() => setShowLoopPicker(!showLoopPicker)}

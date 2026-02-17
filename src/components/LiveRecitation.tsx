@@ -24,6 +24,8 @@ import {
   checkBrowserSupport,
 } from '@/lib/tarteelService';
 import { SURAH_METADATA } from '@/lib/surahMetadata';
+import TajweedReport from '@/components/TajweedReport';
+import { detectTajweedRules } from '@/lib/realtimeTajweedService';
 
 // ============ Types ============
 
@@ -42,6 +44,8 @@ interface SessionStats {
   errorWords: number;
   duration: number; // seconds
   practiceWords: Array<{ index: number; expected: string; confidence: number }>;
+  tajweedRules?: ReturnType<typeof detectTajweedRules>;
+  allWords?: string[];
 }
 
 type Phase = 'loading' | 'ready' | 'recording' | 'complete' | 'error';
@@ -215,6 +219,17 @@ function SessionSummary({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Tajweed Report */}
+      {stats.tajweedRules && stats.tajweedRules.length > 0 && stats.allWords && (
+        <TajweedReport
+          rulesDetected={stats.tajweedRules}
+          alignments={[]}
+          words={stats.allWords}
+          accuracy={stats.accuracy}
+          duration={stats.duration}
+        />
       )}
 
       {/* Actions */}
@@ -515,6 +530,10 @@ export default function LiveRecitation({
           }
         });
 
+        // Detect tajweed rules from the expected text
+        const fullText = tajweedData?.plainWords.join(' ') || '';
+        const tajweedRules = detectTajweedRules(fullText);
+
         setStats({
           accuracy,
           totalWords,
@@ -523,6 +542,8 @@ export default function LiveRecitation({
           errorWords,
           duration: elapsedTime,
           practiceWords,
+          tajweedRules,
+          allWords: tajweedData?.plainWords || [],
         });
 
         return finalStates;
