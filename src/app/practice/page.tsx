@@ -371,17 +371,19 @@ export default function PracticePage() {
             </div>
           </div>
 
-          {/* Add More */}
-          <div className="practice__section">
-            <SheikhButton
-              variant="secondary"
-              size="lg"
-              onClick={() => setView('add-ayahs')}
-              style={{ width: '100%' }}
-            >
-              + Add Ayahs to Memorize
-            </SheikhButton>
-          </div>
+          {/* Add More (only show when user already has ayahs) */}
+          {stats.totalAyahs > 0 && (
+            <div className="practice__section">
+              <SheikhButton
+                variant="secondary"
+                size="lg"
+                onClick={() => setView('add-ayahs')}
+                style={{ width: '100%' }}
+              >
+                + Add Ayahs to Memorize
+              </SheikhButton>
+            </div>
+          )}
 
           {/* Sheikh Nudge */}
           {dueCount.total === 0 && stats.totalAyahs > 0 && (
