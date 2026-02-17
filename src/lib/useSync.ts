@@ -143,6 +143,13 @@ export function useSync() {
 
       if (!res.ok) throw new Error('Failed to save to server');
 
+      // Also push SRS state to Clerk metadata for cross-device sync
+      try {
+        await fetch('/api/srs/sync', { method: 'POST' });
+      } catch (err) {
+        console.error('SRS metadata push failed (non-blocking):', err);
+      }
+
       const now = new Date();
       if (typeof window !== 'undefined') {
         localStorage.setItem(LAST_SYNC_KEY, now.toISOString());
@@ -178,6 +185,12 @@ export function useSync() {
     
     const doInitialSync = async () => {
       setSyncState((s: SyncState) => ({ ...s, isSyncing: true }));
+      // Pull SRS state from Clerk metadata first (cross-device sync)
+      try {
+        await fetch('/api/srs/sync');
+      } catch (err) {
+        console.error('SRS metadata pull failed (non-blocking):', err);
+      }
       await loadFromServer();
       setSyncState((s: SyncState) => ({ ...s, isSyncing: false, lastSynced: new Date() }));
     };

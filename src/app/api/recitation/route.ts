@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
 import { calculateDifficulty } from '@/lib/adaptiveDifficulty';
+import { pushSrsToClerk } from '@/lib/srsMetadataSync';
 
 // POST: Save a completed recitation session
 export async function POST(req: NextRequest) {
@@ -69,6 +70,17 @@ export async function POST(req: NextRequest) {
       );
     }
     await Promise.allSettled(difficultyPromises);
+
+    // Push updated SRS state to Clerk metadata (fire-and-forget for cross-device sync)
+    const user = await prisma.user.findUnique({ where: { clerkId } });
+    if (user) {
+      const cards = await prisma.memorizationProgress.findMany({
+        where: { userId: user.id, status: { not: 'not_started' } },
+      });
+      pushSrsToClerk(clerkId, cards).catch((err) => {
+        console.error('SRS metadata sync failed (non-blocking):', err);
+      });
+    }
 
     return NextResponse.json({ id: session.id }, { status: 201 });
   } catch (error) {
