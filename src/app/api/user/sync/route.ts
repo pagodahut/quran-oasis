@@ -110,6 +110,9 @@ export async function GET() {
         } : null,
       },
       bookmarks,
+      preferences: user.preferences ? {
+        emailNotifications: user.preferences.emailNotifications,
+      } : { emailNotifications: true },
       studyPlan: user.studyPlan,
       onboarding: user.onboarding,
     });
@@ -129,10 +132,11 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { progress, bookmarks, settings } = body as {
+    const { progress, bookmarks, settings, emailNotifications } = body as {
       progress?: { verses?: Record<string, SyncVerse> };
       bookmarks?: SyncBookmark[];
       settings?: { preferredReciter?: string; showTranslation?: boolean };
+      emailNotifications?: boolean;
     };
 
     // Find or create user
@@ -233,6 +237,20 @@ export async function POST(request: NextRequest) {
         update: {
           reciter: settings.preferredReciter,
           showTranslation: settings.showTranslation,
+        },
+      });
+    }
+
+    // Sync email notification preference
+    if (emailNotifications !== undefined) {
+      await prisma.userPreferences.upsert({
+        where: { userId: user.id },
+        create: {
+          userId: user.id,
+          emailNotifications,
+        },
+        update: {
+          emailNotifications,
         },
       });
     }

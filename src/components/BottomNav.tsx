@@ -147,10 +147,10 @@ export default function BottomNav() {
           maxWidth: isCollapsed 
             ? `${Math.min(navItems.length * 52 + 32, 340)}px` // Dynamic width: items * min-width + padding
             : undefined,
-          background: 'rgba(22, 27, 34, 0.60)',
+          background: 'var(--theme-glass-base)',
           backdropFilter: 'blur(64px) saturate(200%)',
           WebkitBackdropFilter: 'blur(64px) saturate(200%)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          border: '1px solid var(--theme-glass-border)',
           boxShadow: '0 -2px 20px rgba(0, 0, 0, 0.15), 0 4px 24px rgba(0, 0, 0, 0.25), 0 8px 32px rgba(0, 0, 0, 0.12)',
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         }}

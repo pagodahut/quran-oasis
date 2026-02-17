@@ -36,6 +36,46 @@
   --hifz-teal: #1a6b6b;
   --hifz-teal-light: #2d9191;
   --hifz-cream: #f5f0e1;
+  
+  /* Theme Variables (defaults = Dark Luxury) */
+  --theme-surface: #0f1419;
+  --theme-surface-alt: #1a1f2a;
+  --theme-card: rgba(22, 27, 34, 0.72);
+  --theme-card-hover: rgba(30, 35, 42, 0.80);
+  --theme-text: #E8E8E8;
+  --theme-text-secondary: #a4a9b8;
+  --theme-text-muted: #5d6579;
+  --theme-accent: #D4A342;
+  --theme-accent-light: #f4d47c;
+  --theme-accent-dark: #8b6914;
+  --theme-border: rgba(255, 255, 255, 0.08);
+  --theme-border-subtle: rgba(255, 255, 255, 0.04);
+  --theme-glass-base: rgba(22, 27, 34, 0.72);
+  --theme-glass-border: rgba(255, 255, 255, 0.06);
+}
+
+/* ============================================
+   Theme-specific Gold Leaf Overrides
+   ============================================ */
+[data-theme="light-cream"] {
+  --gold-leaf-light: #E07A5F;
+  --gold-leaf: #C85A3C;
+  --gold-leaf-dark: #9E4530;
+  --gold-leaf-shadow: #7A3525;
+}
+
+[data-theme="olive-earth"] {
+  --gold-leaf-light: #5A7038;
+  --gold-leaf: #3F4F28;
+  --gold-leaf-dark: #2A3518;
+  --gold-leaf-shadow: #1C2410;
+}
+
+[data-theme="pure-white"] {
+  --gold-leaf-light: #60A5FA;
+  --gold-leaf: #2563EB;
+  --gold-leaf-dark: #1D4ED8;
+  --gold-leaf-shadow: #1E40AF;
 }
 
 /* ============================================
@@ -53,7 +93,9 @@
   }
   
   body {
-    @apply bg-night-950 text-night-100 min-h-screen;
+    background-color: var(--theme-surface);
+    color: var(--theme-text);
+    @apply min-h-screen;
     font-family: var(--font-sans);
   }
   
@@ -581,10 +623,10 @@
   /* Primary liquid glass - Premium iOS-style smooth frosted glass */
   .liquid-glass {
     @apply relative overflow-hidden;
-    background: rgba(22, 27, 34, 0.72);
+    background: var(--theme-glass-base);
     backdrop-filter: blur(48px) saturate(180%);
     -webkit-backdrop-filter: blur(48px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--theme-glass-border);
     box-shadow: 
       0 1px 3px rgba(0, 0, 0, 0.12),
       0 8px 24px rgba(0, 0, 0, 0.16);

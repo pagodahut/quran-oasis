@@ -59,7 +59,7 @@ import BottomNav from '@/components/BottomNav';
 import { setDailyGoal } from '@/lib/motivationStore';
 import { useLearningMode } from '@/hooks/useLearningMode';
 import { LearningMode, LEARNING_MODE_OPTIONS } from '@/lib/learningMode';
-import { useTheme, type Theme } from '@/hooks/useTheme';
+import { useAppTheme, THEME_LIST, type ThemeId } from '@/contexts/ThemeContext';
 import { OfflineModelLoader } from '@/components/OfflineModelLoader';
 
 // ============================================
@@ -287,15 +287,40 @@ function SelectGrid<T extends string | number>({
 export default function SettingsPage() {
   const { preferences, update, reset, isLoaded } = usePreferences();
   const { mode: learningMode, setMode: setLearningMode, config: learningModeConfig } = useLearningMode();
-  const { theme, resolvedTheme, setTheme, isLoaded: themeLoaded } = useTheme();
+  const { themeId, theme: currentTheme, setTheme: setAppTheme, isLoaded: themeLoaded } = useAppTheme();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showClearDataConfirm, setShowClearDataConfirm] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [storageUsage, setStorageUsage] = useState({ used: 0, total: 0, percentage: 0 });
+  const [emailNotifications, setEmailNotifications] = useState(true);
 
   useEffect(() => {
     setStorageUsage(getStorageUsage());
+    // Load email notification preference from server
+    fetch('/api/user/sync')
+      .then(res => res.json())
+      .then(data => {
+        if (data?.preferences?.emailNotifications !== undefined) {
+          setEmailNotifications(data.preferences.emailNotifications);
+        }
+      })
+      .catch(() => {});
   }, []);
+
+  const handleEmailNotificationsToggle = async () => {
+    const newValue = !emailNotifications;
+    setEmailNotifications(newValue);
+    try {
+      await fetch('/api/user/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emailNotifications: newValue }),
+      });
+      showSuccess(newValue ? 'Weekly emails enabled' : 'Weekly emails disabled');
+    } catch {
+      setEmailNotifications(!newValue); // revert on error
+    }
+  };
 
   const showSuccess = (message: string) => {
     setSuccessMessage(message);
@@ -714,24 +739,67 @@ export default function SettingsPage() {
                 <Moon className="w-4 h-4" />
                 Theme
               </label>
-              <SelectGrid
-                options={[
-                  { value: 'light' as const, label: '☀️ Light', description: 'Bright mode' },
-                  { value: 'dark' as const, label: '🌙 Dark', description: 'Night mode' },
-                  { value: 'system' as const, label: '🖥️ System', description: 'Auto' },
-                ]}
-                value={theme}
-                onChange={(newTheme) => {
-                  setTheme(newTheme as Theme);
-                  showSuccess(`Theme changed to ${newTheme}`);
-                }}
-                columns={3}
-              />
-              <p className="text-xs text-night-500 mt-2 px-1">
-                {theme === 'system' 
-                  ? `Following system preference (currently ${resolvedTheme})` 
-                  : `Using ${theme} mode`}
-              </p>
+              <div className="grid grid-cols-2 gap-3">
+                {THEME_LIST.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => {
+                      setAppTheme(t.id);
+                      showSuccess(`Theme: ${t.name}`);
+                    }}
+                    className={`relative p-4 rounded-2xl text-left transition-all overflow-hidden ${
+                      themeId === t.id 
+                        ? 'ring-2 ring-offset-2 ring-offset-night-950 dark:ring-offset-night-950'
+                        : 'hover:scale-[1.02]'
+                    }`}
+                    style={{
+                      background: t.colors.surface,
+                      border: `2px solid ${themeId === t.id ? t.colors.accent : t.colors.border}`,
+                    } as React.CSSProperties}
+                  >
+                    {/* Mini preview */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-lg">{t.emoji}</span>
+                      <span 
+                        className="font-semibold text-sm"
+                        style={{ color: t.colors.text }}
+                      >
+                        {t.name}
+                      </span>
+                    </div>
+                    {/* Color swatches */}
+                    <div className="flex gap-1.5 mb-2">
+                      <div className="w-5 h-5 rounded-full border" style={{ background: t.colors.accent, borderColor: t.colors.border }} />
+                      <div className="w-5 h-5 rounded-full border" style={{ background: t.colors.surfaceAlt, borderColor: t.colors.border }} />
+                      <div className="w-5 h-5 rounded-full border" style={{ background: t.colors.text, borderColor: t.colors.border }} />
+                    </div>
+                    {/* Arabic preview */}
+                    <p 
+                      className="text-sm font-arabic" 
+                      dir="rtl" 
+                      lang="ar"
+                      style={{ color: t.colors.accent, fontFamily: 'var(--font-arabic)' }}
+                    >
+                      بِسْمِ اللَّهِ
+                    </p>
+                    <p 
+                      className="text-[10px] mt-1"
+                      style={{ color: t.colors.textMuted }}
+                    >
+                      {t.description}
+                    </p>
+                    {/* Selected indicator */}
+                    {themeId === t.id && (
+                      <div 
+                        className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center"
+                        style={{ background: t.colors.accent }}
+                      >
+                        <Check className="w-4 h-4" style={{ color: t.colors.isDark ? '#0a0a0f' : '#ffffff' }} />
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </SettingSection>
@@ -853,6 +921,18 @@ export default function SettingsPage() {
                 Your daily progress is tracked on your profile.
               </p>
             </div>
+
+            {/* Email Notifications */}
+            <SettingRow
+              label="Weekly Progress Email"
+              description="Receive a weekly summary of your Hifz progress"
+            >
+              <ToggleSwitch 
+                enabled={emailNotifications}
+                onToggle={handleEmailNotificationsToggle}
+                label="Weekly progress email"
+              />
+            </SettingRow>
 
             {/* Notifications (future) */}
             <div className="opacity-60">
@@ -1005,7 +1085,7 @@ Actual Behavior:
 Device Info:
 - Browser: ${typeof navigator !== 'undefined' ? navigator.userAgent : 'N/A'}
 - Screen: ${typeof window !== 'undefined' ? `${window.innerWidth}x${window.innerHeight}` : 'N/A'}
-- Theme: ${resolvedTheme}
+- Theme: ${themeId}
 - Learning Mode: ${learningMode}
 
 Additional Context:

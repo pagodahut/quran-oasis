@@ -42,6 +42,7 @@ model UserPreferences {
   showTranslation Boolean @default(true)
   autoPlayNext Boolean @default(false)
   repeatCount  Int     @default(3)          // Default repeat for memorization
+  emailNotifications Boolean @default(true) // Weekly progress email opt-in
 }
 
 // Onboarding responses

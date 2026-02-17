@@ -10,6 +10,7 @@ import InstallPrompt from '@/components/InstallPrompt';
 import OfflineIndicator from '@/components/OfflineIndicator';
 import SkipToContent from '@/components/SkipToContent';
 import SheikhProvider from '@/components/SheikhProvider';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { fontVariables } from '@/lib/fonts';
 import JsonLd from '@/components/JsonLd';
 import { 
@@ -183,21 +184,23 @@ export default function RootLayout({
         {/* Structured Data (JSON-LD) */}
         <JsonLd data={structuredData} />
       </head>
-      <body className="bg-night-950 text-night-100 antialiased standalone-tweaks">
+      <body className="antialiased standalone-tweaks">
         <SkipToContent />
-        <ToastProvider>
-          <SyncProvider>
-            <SheikhProvider>
-              <ServiceWorkerRegistration />
-              <OfflineIndicator />
-              <main id="main-content" tabIndex={-1} className="outline-none">
-                {children}
-              </main>
-              <InstallPrompt />
-              <SyncIndicator />
-            </SheikhProvider>
-          </SyncProvider>
-        </ToastProvider>
+        <ThemeProvider>
+          <ToastProvider>
+            <SyncProvider>
+              <SheikhProvider>
+                <ServiceWorkerRegistration />
+                <OfflineIndicator />
+                <main id="main-content" tabIndex={-1} className="outline-none">
+                  {children}
+                </main>
+                <InstallPrompt />
+                <SyncIndicator />
+              </SheikhProvider>
+            </SyncProvider>
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
