@@ -20,20 +20,14 @@
 import { useSheikh } from '@/contexts/SheikhContext';
 import FeedbackButton from '@/components/FeedbackButton';
 
-/** Pages where the feedback button should appear */
-const SHOW_FEEDBACK_ON: string[] = ['mushaf', 'lesson', 'recite', 'practice', 'dashboard'];
-
 export default function FeedbackOverlay() {
   const { pageContext } = useSheikh();
-  
-  const showFeedback = SHOW_FEEDBACK_ON.includes(pageContext.page);
 
-  if (!showFeedback) return null;
-
+  // Show feedback button on ALL pages — it's a global floating element
   return (
     <FeedbackButton
       currentPage={pageContext.page}
-      showOnPages={SHOW_FEEDBACK_ON}
+      showOnPages={[pageContext.page]} // Always include current page
     />
   );
 }

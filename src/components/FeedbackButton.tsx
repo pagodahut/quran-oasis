@@ -65,9 +65,6 @@ export default function FeedbackButton({
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
-  // Don't show on pages not in the list
-  if (!showOnPages.includes(currentPage)) return null;
-
   // Don't show if panel is open (panel handles closing)
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
