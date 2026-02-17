@@ -287,8 +287,8 @@ function ArabicDisplay({
           </motion.div>
         )}
         
-        {/* Audio button - Simple text link style */}
-        {showAudioButton && (
+        {/* Audio button - only for letters/words with available human audio */}
+        {showAudioButton && canPlayAudio && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
