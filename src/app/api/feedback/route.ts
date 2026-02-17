@@ -1,70 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { appendFile, mkdir } from 'fs/promises';
-import path from 'path';
+import { prisma } from '@/lib/prisma';
+import { auth } from '@clerk/nextjs/server';
 
 /**
  * POST /api/feedback
- * 
- * Collects user feedback and stores it as JSONL for easy analysis.
- * Each line is a JSON object with feedback data.
+ * Saves feedback to database (Prisma Feedback model).
+ * Accepts both authenticated and guest submissions.
  */
-
-interface FeedbackPayload {
-  rating?: number | null;
-  reaction?: 'love' | 'confused' | 'suggestion' | 'bug' | null;
-  message?: string;
-  page?: string;
-  timestamp?: string;
-  userAgent?: string | null;
-}
-
 export async function POST(request: NextRequest) {
   try {
-    const body: FeedbackPayload = await request.json();
+    const body = await request.json();
+    const { category, message, pageUrl, userAgent } = body;
 
-    // Validate
-    if (!body.rating && !body.reaction && !body.message?.trim()) {
+    if (!message?.trim()) {
       return NextResponse.json(
-        { error: 'Please provide rating, reaction, or message' },
+        { error: 'Message is required' },
         { status: 400 }
       );
     }
 
-    // Sanitize and structure
-    const feedbackEntry = {
-      id: `fb_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-      rating: body.rating ?? null,
-      reaction: body.reaction ?? null,
-      message: body.message?.trim().slice(0, 2000) ?? null, // Limit message length
-      page: body.page ?? 'unknown',
-      timestamp: body.timestamp ?? new Date().toISOString(),
-      userAgent: body.userAgent?.slice(0, 500) ?? null, // Limit UA length
-      ip: request.headers.get('x-forwarded-for')?.split(',')[0] ?? 
-          request.headers.get('x-real-ip') ?? 
-          'unknown',
-    };
+    const validCategories = ['bug', 'feature', 'general'];
+    const safeCategory = validCategories.includes(category) ? category : 'general';
 
-    // Store in data directory as JSONL
-    const dataDir = path.join(process.cwd(), 'data');
-    const feedbackFile = path.join(dataDir, 'feedback.jsonl');
-
-    // Ensure data directory exists
+    // Try to get authenticated user
+    let userId: string | null = null;
     try {
-      await mkdir(dataDir, { recursive: true });
+      const { userId: clerkId } = await auth();
+      if (clerkId) {
+        const user = await prisma.user.findUnique({ where: { clerkId } });
+        userId = user?.id ?? null;
+      }
     } catch {
-      // Directory exists
+      // Guest feedback is fine
     }
 
-    // Append feedback as JSONL
-    await appendFile(feedbackFile, JSON.stringify(feedbackEntry) + '\n');
+    const feedback = await prisma.feedback.create({
+      data: {
+        userId,
+        category: safeCategory,
+        message: message.trim().slice(0, 2000),
+        pageUrl: pageUrl?.slice(0, 500) ?? null,
+        userAgent: userAgent?.slice(0, 500) ?? null,
+      },
+    });
 
-    // Also log for immediate visibility during development
-    console.log('[Feedback]', feedbackEntry);
+    console.log('[Feedback]', feedback.id, safeCategory);
 
-    return NextResponse.json({ 
-      success: true, 
-      id: feedbackEntry.id,
-      message: 'JazakAllah Khair for your feedback!' 
+    return NextResponse.json({
+      success: true,
+      id: feedback.id,
+      message: 'JazakAllah Khair for your feedback!',
     });
   } catch (error) {
     console.error('[Feedback Error]', error);
@@ -77,42 +62,16 @@ export async function POST(request: NextRequest) {
 
 /**
  * GET /api/feedback
- * 
- * Returns recent feedback (for admin/review purposes).
- * In production, this should be protected.
+ * Returns recent feedback (admin/review purposes).
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const { readFile } = await import('fs/promises');
-    const dataDir = path.join(process.cwd(), 'data');
-    const feedbackFile = path.join(dataDir, 'feedback.jsonl');
-
-    let content: string;
-    try {
-      content = await readFile(feedbackFile, 'utf-8');
-    } catch {
-      return NextResponse.json({ feedback: [], total: 0 });
-    }
-
-    const lines = content.trim().split('\n').filter(Boolean);
-    const feedback = lines.map(line => {
-      try {
-        return JSON.parse(line);
-      } catch {
-        return null;
-      }
-    }).filter(Boolean);
-
-    // Return most recent first
-    feedback.reverse();
-
-    // Limit to last 100 entries
-    const limit = Math.min(100, feedback.length);
-
-    return NextResponse.json({
-      feedback: feedback.slice(0, limit),
-      total: feedback.length,
+    const feedback = await prisma.feedback.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 100,
     });
+
+    return NextResponse.json({ feedback, total: feedback.length });
   } catch (error) {
     console.error('[Feedback GET Error]', error);
     return NextResponse.json(

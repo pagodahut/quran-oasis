@@ -11,6 +11,7 @@ import OfflineIndicator from '@/components/OfflineIndicator';
 import SkipToContent from '@/components/SkipToContent';
 import SheikhProvider from '@/components/SheikhProvider';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { PremiumProvider } from '@/contexts/PremiumContext';
 import { fontVariables } from '@/lib/fonts';
 import JsonLd from '@/components/JsonLd';
 import { 
@@ -187,6 +188,7 @@ export default function RootLayout({
       <body className="antialiased standalone-tweaks">
         <SkipToContent />
         <ThemeProvider>
+          <PremiumProvider>
           <ToastProvider>
             <SyncProvider>
               <SheikhProvider>
@@ -200,6 +202,7 @@ export default function RootLayout({
               </SheikhProvider>
             </SyncProvider>
           </ToastProvider>
+          </PremiumProvider>
         </ThemeProvider>
       </body>
     </html>

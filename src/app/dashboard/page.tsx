@@ -661,6 +661,29 @@ export default function DashboardPage() {
             </div>
           </motion.section>
           
+          {/* Smart Review Card */}
+          <motion.section variants={fadeInUp}>
+            <Link href="/practice/review">
+              <motion.div
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                className="relative overflow-hidden rounded-2xl p-5 cursor-pointer bg-gradient-to-br from-purple-500/15 via-purple-500/5 to-purple-600/5 border border-purple-500/20 hover:border-purple-500/40 transition-all"
+                style={{ backdropFilter: 'blur(24px) saturate(160%)', WebkitBackdropFilter: 'blur(24px) saturate(160%)' }}
+              >
+                <div className="relative z-10 flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center">
+                    <Star className="w-6 h-6" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-night-100">Smart Review</h3>
+                    <p className="text-night-400 text-sm">AI-prioritized verses based on your performance</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-night-500" />
+                </div>
+              </motion.div>
+            </Link>
+          </motion.section>
+
           {/* Continue Where You Left Off */}
           {quranProgress.versesMemorized > 0 && (
             <motion.section variants={fadeInUp}>

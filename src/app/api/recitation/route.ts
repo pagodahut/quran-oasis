@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/lib/prisma';
+import { calculateDifficulty } from '@/lib/adaptiveDifficulty';
 
 // POST: Save a completed recitation session
 export async function POST(req: NextRequest) {
@@ -56,6 +57,18 @@ export async function POST(req: NextRequest) {
           : undefined,
       },
     });
+
+    // Update difficulty for each ayah in the range
+    const accuracyNormalized = Math.round(overallAccuracy) / 100;
+    const difficultyPromises = [];
+    for (let ayah = startAyah; ayah <= endAyah; ayah++) {
+      difficultyPromises.push(
+        calculateDifficulty(clerkId, surahNumber, ayah, accuracyNormalized).catch((err) => {
+          console.error(`Failed to update difficulty for ${surahNumber}:${ayah}:`, err);
+        })
+      );
+    }
+    await Promise.allSettled(difficultyPromises);
 
     return NextResponse.json({ id: session.id }, { status: 201 });
   } catch (error) {

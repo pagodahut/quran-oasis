@@ -334,6 +334,32 @@ export default function PracticePage() {
             </div>
           )}
 
+          {/* Smart Review Link */}
+          <div className="practice__section">
+            <a
+              href="/practice/review"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '16px 20px',
+                borderRadius: 16,
+                background: 'rgba(168, 85, 247, 0.1)',
+                border: '1px solid rgba(168, 85, 247, 0.2)',
+                textDecoration: 'none',
+                color: 'inherit',
+                transition: 'all 0.2s',
+              }}
+            >
+              <span style={{ fontSize: 24 }}>🧠</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 600, fontSize: 15 }}>Smart Review</div>
+                <div style={{ fontSize: 13, opacity: 0.6 }}>AI-prioritized verses based on difficulty</div>
+              </div>
+              <span style={{ opacity: 0.4, fontSize: 18 }}>→</span>
+            </a>
+          </div>
+
           {/* Stats */}
           <div className="practice__section">
             <h2 className="practice__section-title">Your Progress</h2>

@@ -4,17 +4,10 @@
  * FeedbackPanel — Slide-up Feedback Collection Panel
  * 
  * A modal/drawer that slides up from the bottom to collect user feedback.
- * Matches the app's liquid glass aesthetic.
- * 
- * Features:
- * - Star rating (1-5)
- * - Quick reaction buttons (emoji-based)
- * - Optional text feedback
- * - Page context for targeted improvements
- * - Smooth slide-up animation with backdrop
+ * Features: category selector, text input, auto-captured URL, success animation.
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface FeedbackPanelProps {
@@ -24,13 +17,12 @@ interface FeedbackPanelProps {
   currentPage: string;
 }
 
-type FeedbackType = 'love' | 'confused' | 'suggestion' | 'bug';
+type FeedbackCategory = 'bug' | 'feature' | 'general';
 
-const QUICK_REACTIONS: { type: FeedbackType; emoji: string; label: string }[] = [
-  { type: 'love', emoji: '💚', label: 'Love it' },
-  { type: 'confused', emoji: '😕', label: 'Confused' },
-  { type: 'suggestion', emoji: '💡', label: 'Suggestion' },
-  { type: 'bug', emoji: '🐛', label: 'Bug' },
+const CATEGORIES: { type: FeedbackCategory; emoji: string; label: string }[] = [
+  { type: 'bug', emoji: '🐛', label: 'Bug Report' },
+  { type: 'feature', emoji: '💡', label: 'Feature Request' },
+  { type: 'general', emoji: '💬', label: 'General' },
 ];
 
 export default function FeedbackPanel({
@@ -39,17 +31,21 @@ export default function FeedbackPanel({
   onSubmit,
   currentPage,
 }: FeedbackPanelProps) {
-  const [rating, setRating] = useState<number | null>(null);
-  const [selectedReaction, setSelectedReaction] = useState<FeedbackType | null>(null);
+  const [category, setCategory] = useState<FeedbackCategory>('general');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [pageUrl, setPageUrl] = useState('');
+
+  // Auto-capture current page URL
+  useEffect(() => {
+    if (isOpen && typeof window !== 'undefined') {
+      setPageUrl(window.location.href);
+    }
+  }, [isOpen]);
 
   const handleSubmit = async () => {
-    if (!rating && !selectedReaction && !message.trim()) {
-      // Need at least something
-      return;
-    }
+    if (!message.trim()) return;
 
     setIsSubmitting(true);
 
@@ -58,11 +54,10 @@ export default function FeedbackPanel({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          rating,
-          reaction: selectedReaction,
+          category,
           message: message.trim(),
+          pageUrl,
           page: currentPage,
-          timestamp: new Date().toISOString(),
           userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
         }),
       });
@@ -70,15 +65,12 @@ export default function FeedbackPanel({
       setSubmitted(true);
       setTimeout(() => {
         onSubmit();
-        // Reset state for next time
-        setRating(null);
-        setSelectedReaction(null);
+        setCategory('general');
         setMessage('');
         setSubmitted(false);
-      }, 1500);
+      }, 1800);
     } catch (error) {
       console.error('Failed to submit feedback:', error);
-      // Still close and mark as submitted for UX
       onSubmit();
     } finally {
       setIsSubmitting(false);
@@ -86,9 +78,7 @@ export default function FeedbackPanel({
   };
 
   const handleClose = () => {
-    if (!isSubmitting) {
-      onClose();
-    }
+    if (!isSubmitting) onClose();
   };
 
   return (
@@ -127,11 +117,18 @@ export default function FeedbackPanel({
               {submitted ? (
                 /* Success State */
                 <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
+                  initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   className="flex flex-col items-center justify-center py-12"
                 >
-                  <span className="text-5xl mb-4">🤲</span>
+                  <motion.span
+                    className="text-5xl mb-4"
+                    initial={{ rotate: -20 }}
+                    animate={{ rotate: 0 }}
+                    transition={{ type: 'spring', damping: 8 }}
+                  >
+                    🤲
+                  </motion.span>
                   <h3 className="text-xl font-semibold text-white mb-2">
                     JazakAllah Khair!
                   </h3>
@@ -162,80 +159,62 @@ export default function FeedbackPanel({
                     </button>
                   </div>
 
-                  {/* Star Rating */}
-                  <div className="mb-6">
-                    <p className="text-sm text-gray-300 mb-3">How's your experience?</p>
-                    <div className="flex gap-2 justify-center">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <motion.button
-                          key={star}
-                          whileHover={{ scale: 1.15 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => setRating(star)}
-                          className="p-2 transition-colors"
-                        >
-                          <span className={`text-3xl ${
-                            rating && star <= rating 
-                              ? 'grayscale-0' 
-                              : 'grayscale opacity-40'
-                          } transition-all`}>
-                            ⭐
-                          </span>
-                        </motion.button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Quick Reactions */}
-                  <div className="mb-6">
-                    <p className="text-sm text-gray-300 mb-3">What's on your mind?</p>
-                    <div className="flex flex-wrap gap-2 justify-center">
-                      {QUICK_REACTIONS.map(({ type, emoji, label }) => (
+                  {/* Category Selector */}
+                  <div className="mb-5">
+                    <p className="text-sm text-gray-300 mb-3">Category</p>
+                    <div className="flex gap-2">
+                      {CATEGORIES.map(({ type, emoji, label }) => (
                         <motion.button
                           key={type}
-                          whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          onClick={() => setSelectedReaction(
-                            selectedReaction === type ? null : type
-                          )}
-                          className={`flex items-center gap-2 px-4 py-2 rounded-xl
-                                     border transition-all
-                                     ${selectedReaction === type
+                          onClick={() => setCategory(type)}
+                          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl
+                                     border transition-all text-sm
+                                     ${category === type
                                        ? 'bg-amber-500/20 border-amber-500/50 text-amber-200'
                                        : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
                                      }`}
                         >
                           <span>{emoji}</span>
-                          <span className="text-sm">{label}</span>
+                          <span>{label}</span>
                         </motion.button>
                       ))}
                     </div>
                   </div>
 
                   {/* Text Input */}
-                  <div className="mb-6">
+                  <div className="mb-5">
                     <label className="block text-sm text-gray-300 mb-2">
-                      Tell us more (optional)
+                      {category === 'bug' ? 'What went wrong?' :
+                       category === 'feature' ? 'What would you like to see?' :
+                       'Your feedback'}
                     </label>
                     <textarea
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder={
-                        selectedReaction === 'bug'
-                          ? "What went wrong? Steps to reproduce help us fix it faster..."
-                          : selectedReaction === 'suggestion'
-                          ? "What would make this better for you?"
-                          : selectedReaction === 'confused'
-                          ? "What was confusing? We'll work on making it clearer..."
+                        category === 'bug'
+                          ? "Describe the issue and steps to reproduce..."
+                          : category === 'feature'
+                          ? "Describe the feature you'd like..."
                           : "Share your thoughts..."
                       }
-                      rows={3}
+                      rows={4}
                       className="w-full px-4 py-3 rounded-xl
                                 bg-white/5 border border-white/10
                                 text-white placeholder:text-gray-500
                                 focus:outline-none focus:ring-2 focus:ring-amber-500/50
                                 resize-none"
+                      autoFocus
                     />
+                  </div>
+
+                  {/* Page URL indicator */}
+                  <div className="mb-6 flex items-center gap-2 text-xs text-gray-500">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                    <span className="truncate">Page: {currentPage}</span>
                   </div>
 
                   {/* Submit Button */}
@@ -243,10 +222,10 @@ export default function FeedbackPanel({
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleSubmit}
-                    disabled={isSubmitting || (!rating && !selectedReaction && !message.trim())}
+                    disabled={isSubmitting || !message.trim()}
                     className={`w-full py-4 rounded-2xl font-semibold text-base
                                transition-all shadow-lg
-                               ${(rating || selectedReaction || message.trim())
+                               ${message.trim()
                                  ? 'bg-gradient-to-r from-amber-600 to-amber-500 text-black shadow-amber-500/25'
                                  : 'bg-white/10 text-gray-500 cursor-not-allowed'
                                }`}
@@ -264,7 +243,6 @@ export default function FeedbackPanel({
                     )}
                   </motion.button>
 
-                  {/* Privacy note */}
                   <p className="text-xs text-gray-500 text-center mt-4">
                     Feedback is anonymous and helps us improve the app.
                   </p>

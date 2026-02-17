@@ -151,6 +151,24 @@ model UserAchievement {
   @@unique([userId, achievementId])
 }
 
+// Verse difficulty tracking for adaptive review
+model VerseDifficulty {
+  id                  String   @id @default(cuid())
+  userId              String
+  surahNumber         Int
+  ayahNumber          Int
+  difficultyScore     Float    @default(0.5)  // 0 = easy, 1 = hard
+  lastAttemptAccuracy Float    @default(0)     // 0-1
+  attemptCount        Int      @default(0)
+  lastAttemptAt       DateTime @default(now())
+  nextReviewAt        DateTime @default(now())
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@unique([userId, surahNumber, ayahNumber])
+  @@index([userId, nextReviewAt])
+}
+
 // Recitation session history
 model RecitationSession {
   id              String   @id @default(cuid())
@@ -182,4 +200,18 @@ model RecitationWord {
   isCorrect       Boolean @default(false)
 
   @@index([sessionId])
+}
+
+// User feedback submissions
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String?  // Optional — guests can submit too
+  category  String   // bug, feature, general
+  message   String
+  pageUrl   String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([category])
 }
