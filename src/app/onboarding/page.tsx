@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { markCalibrationComplete, type UserLevel } from '@/lib/user-profile-sync';
 import { ChevronRight, Sparkles, Loader2, BookOpen, Target, Clock, Check } from 'lucide-react';
 import { HifzIcon } from '@/components/brand';
 
@@ -107,6 +108,12 @@ export default function OnboardingPage() {
         reciter: 'alafasy',
         dailyMinutes: data.dailyTime,
       }));
+      // Mark calibration complete so practice/memorize guards pass
+      const levelMap: Record<string, UserLevel> = {
+        none: 'beginner', letters: 'beginner', basic: 'beginner',
+        intermediate: 'intermediate', fluent: 'advanced',
+      };
+      await markCalibrationComplete(levelMap[data.arabicLevel] || 'beginner');
       try {
         await fetch('/api/onboarding', {
           method: 'POST',
@@ -181,15 +188,8 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          <button
-            onClick={() => {
-              localStorage.setItem('quranOasis_onboardingComplete', 'true');
-              router.push('/dashboard');
-            }}
-            className="text-sm text-night-600 hover:text-night-400 px-2 py-1 transition-colors"
-          >
-            Skip
-          </button>
+          {/* Skip removed — calibration is required */}
+          <div className="w-8" />
         </div>
       </header>
 

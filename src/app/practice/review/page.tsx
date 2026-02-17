@@ -16,6 +16,7 @@ import {
   BookOpen,
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
+import { useCalibrationGuard } from '@/hooks/useCalibrationGuard';
 import { SURAH_METADATA } from '@/lib/surahMetadata';
 import { getDifficultyLabel, getDifficultyColor } from '@/lib/adaptiveDifficulty';
 import { getReviewQueueLocal, type ReviewItem } from '@/lib/reviewQueue';
@@ -51,6 +52,7 @@ function getSurahName(num: number): string {
 
 export default function ReviewQueuePage() {
   const { isSignedIn } = useUser();
+  const { isChecking: isCheckingCalibration } = useCalibrationGuard();
   const [queue, setQueue] = useState<ReviewItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -79,6 +81,14 @@ export default function ReviewQueuePage() {
     }
     loadQueue();
   }, [isSignedIn]);
+
+  if (isCheckingCalibration) {
+    return (
+      <div className="min-h-screen bg-night-950 flex items-center justify-center">
+        <div className="w-12 h-12 border-2 border-gold-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-night-950 text-night-100 pb-24">

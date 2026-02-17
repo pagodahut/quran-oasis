@@ -63,15 +63,7 @@ export default function WelcomePage() {
           >
             ﷽ Let&apos;s Begin
           </SheikhButton>
-          <button
-            className="welcome__skip"
-            onClick={() => {
-              localStorage.setItem('quranOasis_onboardingComplete', 'true');
-              router.push('/dashboard');
-            }}
-          >
-            Skip for now →
-          </button>
+          {/* Skip removed — calibration is required before practicing */}
         </div>
       </div>
 

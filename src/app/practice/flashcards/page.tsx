@@ -26,11 +26,13 @@ import {
 } from '@/lib/flashcardSystem';
 import FlashcardSession, { SessionComplete } from '@/components/FlashcardSession';
 import BottomNav from '@/components/BottomNav';
+import { useCalibrationGuard } from '@/hooks/useCalibrationGuard';
 
 type ViewState = 'decks' | 'session' | 'complete';
 
 export default function FlashcardsPage() {
   const router = useRouter();
+  const { isChecking: isCheckingCalibration } = useCalibrationGuard();
   const searchParams = useSearchParams();
   const deckIdParam = searchParams.get('deck');
   
@@ -120,6 +122,14 @@ export default function FlashcardsPage() {
   }
   
   // Deck selection view
+  if (isCheckingCalibration) {
+    return (
+      <div className="min-h-screen bg-night-950 flex items-center justify-center">
+        <div className="w-12 h-12 border-2 border-gold-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-night-950">
       {/* Header */}

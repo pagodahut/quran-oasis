@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useCalibrationGuard } from '@/hooks/useCalibrationGuard';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
@@ -400,6 +401,7 @@ function AudioControls({
 export default function MemorizePage() {
   const params = useParams();
   const router = useRouter();
+  const { isChecking: isCheckingCalibration } = useCalibrationGuard();
   
   // Get preferences
   const prefs = useReadingPreferences();
@@ -622,7 +624,7 @@ export default function MemorizePage() {
     }
   };
 
-  if (!verse) {
+  if (isCheckingCalibration || !verse) {
     return (
       <div className="min-h-screen bg-night-950 flex items-center justify-center">
         <div className="w-12 h-12 border-2 border-gold-500 border-t-transparent rounded-full animate-spin" />
