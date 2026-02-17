@@ -1121,7 +1121,7 @@ Additional Notes:
             </button>
 
             {/* Admin: Bug Tracker */}
-            {process.env.NEXT_PUBLIC_ADMIN_USER_IDS && (
+            {(process.env.NEXT_PUBLIC_ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_USER_IDS) && (
               <Link
                 href="/admin/feedback"
                 className="w-full p-4 rounded-xl bg-night-800/50 hover:bg-night-800 transition-colors flex items-center gap-3 text-left"

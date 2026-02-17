@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
+import { isAdmin } from '@/lib/admin';
 
 /**
  * POST /api/feedback
@@ -65,10 +66,8 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // Check admin access
-    const adminIds = process.env.ADMIN_USER_IDS?.split(',').map(s => s.trim()) || [];
-    const { userId: clerkId } = await auth();
-    
-    if (!clerkId || (adminIds.length > 0 && !adminIds.includes(clerkId))) {
+    const { authorized } = await isAdmin();
+    if (!authorized) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -114,10 +113,8 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     // Check admin access
-    const adminIds = process.env.ADMIN_USER_IDS?.split(',').map(s => s.trim()) || [];
-    const { userId: clerkId } = await auth();
-    
-    if (!clerkId || (adminIds.length > 0 && !adminIds.includes(clerkId))) {
+    const { authorized } = await isAdmin();
+    if (!authorized) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
