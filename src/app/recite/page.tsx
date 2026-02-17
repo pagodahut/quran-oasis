@@ -10,6 +10,7 @@ import {
   ChevronRight,
   BookOpen,
   Star,
+  History,
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 import LiveRecitation from '@/components/LiveRecitation';
@@ -362,9 +363,14 @@ export default function RecitePage() {
                 Live recitation with tajweed tracking
               </p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-gold-500/10 flex items-center justify-center">
-              <Mic className="w-5 h-5 text-gold-500" />
-            </div>
+            <button
+              onClick={() => router.push('/recite/history')}
+              className="w-10 h-10 rounded-full bg-night-800/60 border border-night-700/30 
+                flex items-center justify-center hover:bg-night-700/60 transition"
+              title="Recitation History"
+            >
+              <History className="w-5 h-5 text-night-300" />
+            </button>
           </div>
 
           {/* Search */}

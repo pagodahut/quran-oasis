@@ -149,3 +149,36 @@ model UserAchievement {
 
   @@unique([userId, achievementId])
 }
+
+// Recitation session history
+model RecitationSession {
+  id              String   @id @default(cuid())
+  userId          String
+  surahNumber     Int
+  startAyah       Int
+  endAyah         Int
+  overallAccuracy Int      // 0-100
+  duration        Int      // seconds
+  totalWords      Int      @default(0)
+  matchedWords    Int      @default(0)
+  createdAt       DateTime @default(now())
+
+  words RecitationWord[]
+
+  @@index([userId, createdAt])
+  @@index([userId, surahNumber])
+}
+
+// Word-level recitation data
+model RecitationWord {
+  id              String  @id @default(cuid())
+  sessionId       String
+  session         RecitationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  wordIndex       Int
+  expectedWord    String
+  transcribedWord String?
+  confidence      Float   @default(0)
+  isCorrect       Boolean @default(false)
+
+  @@index([sessionId])
+}

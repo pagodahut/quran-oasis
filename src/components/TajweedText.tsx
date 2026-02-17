@@ -18,6 +18,8 @@ interface TajweedTextProps {
   }[];
   /** State for each word (indexed globally across all verses) */
   wordStates: WordState[];
+  /** Confidence value per word (0-1), used for color-coding */
+  wordConfidences?: number[];
   /** Currently active word index (global) */
   currentWordIndex: number;
   /** Callback when a word is tapped */
@@ -83,6 +85,7 @@ interface TajweedWordDisplayProps {
   state: WordState;
   isCurrent: boolean;
   globalIndex: number;
+  confidence?: number;
   onTap?: (index: number) => void;
 }
 
@@ -91,6 +94,7 @@ function TajweedWordDisplay({
   state,
   isCurrent,
   globalIndex,
+  confidence = 0,
   onTap,
 }: TajweedWordDisplayProps) {
   const opacity = useMemo(() => {
@@ -110,14 +114,23 @@ function TajweedWordDisplay({
     }
   }, [state]);
 
+  // Confidence-based color: green (>0.8), yellow (0.5-0.8), red (<0.5)
+  const confidenceColor = useMemo(() => {
+    if (state !== 'revealed' && state !== 'error') return null;
+    if (confidence > 0.8) return '#4ade80'; // green-400
+    if (confidence > 0.5) return '#facc15'; // yellow-400
+    return '#ef4444'; // red-500
+  }, [state, confidence]);
+
   const segments = useMemo(() => {
     return word.segments.map((seg, i) => {
       let color: string;
 
-      if (state === 'error') {
-        color = '#ef4444'; // red-500
-      } else if (state === 'missed') {
+      if (state === 'missed') {
         color = '#f97316'; // orange-500
+      } else if (confidenceColor) {
+        // Use confidence-based coloring for revealed/error words
+        color = confidenceColor;
       } else if (seg.rule) {
         color = getTajweedColor(seg.rule);
       } else {
@@ -130,7 +143,7 @@ function TajweedWordDisplay({
         </span>
       );
     });
-  }, [word.segments, state]);
+  }, [word.segments, state, confidenceColor]);
 
   return (
     <motion.span
@@ -148,8 +161,12 @@ function TajweedWordDisplay({
         scale: isCurrent ? 1.05 : 1,
         backgroundColor: isCurrent
           ? 'rgba(201, 162, 39, 0.12)'
-          : state === 'error'
+          : confidenceColor === '#ef4444'
           ? 'rgba(239, 68, 68, 0.15)'
+          : confidenceColor === '#facc15'
+          ? 'rgba(250, 204, 21, 0.1)'
+          : confidenceColor === '#4ade80'
+          ? 'rgba(74, 222, 128, 0.08)'
           : 'transparent',
       }}
       transition={{
@@ -181,6 +198,7 @@ function TajweedWordDisplay({
 export default function TajweedText({
   verses,
   wordStates,
+  wordConfidences,
   currentWordIndex,
   onWordTap,
   showAyahMarkers = true,
@@ -213,6 +231,7 @@ export default function TajweedText({
               state={state}
               isCurrent={isCurrent}
               globalIndex={idx}
+              confidence={wordConfidences?.[idx] ?? 0}
               onTap={onWordTap}
             />
           );

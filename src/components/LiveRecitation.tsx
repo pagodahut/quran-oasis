@@ -7,6 +7,7 @@ import {
   Square,
   RotateCcw,
   ChevronLeft,
+  ChevronRight,
   Loader2,
   AlertCircle,
   CheckCircle2,
@@ -40,6 +41,7 @@ interface SessionStats {
   missedWords: number;
   errorWords: number;
   duration: number; // seconds
+  practiceWords: Array<{ index: number; expected: string; confidence: number }>;
 }
 
 type Phase = 'loading' | 'ready' | 'recording' | 'complete' | 'error';
@@ -124,10 +126,12 @@ function SessionSummary({
   stats,
   onRetry,
   onBack,
+  onNextAyah,
 }: {
   stats: SessionStats;
   onRetry: () => void;
   onBack: () => void;
+  onNextAyah?: () => void;
 }) {
   const grade = useMemo(() => {
     if (stats.accuracy >= 95) return { label: 'Excellent!', emoji: '🌟', color: 'text-gold-400' };
@@ -181,6 +185,38 @@ function SessionSummary({
         </div>
       </div>
 
+      {/* Practice Words */}
+      {stats.practiceWords.length > 0 && (
+        <div className="mb-6">
+          <h3 className="text-xs font-semibold text-night-400 uppercase tracking-wider mb-3">
+            Words to Practice
+          </h3>
+          <div className="bg-night-900/60 rounded-xl p-4 border border-night-800/50">
+            <div className="flex flex-wrap gap-2" dir="rtl">
+              {stats.practiceWords.map((pw) => (
+                <span
+                  key={pw.index}
+                  className="inline-block px-3 py-1.5 rounded-lg text-sm font-arabic border"
+                  style={{
+                    color: pw.confidence < 0.5 ? '#ef4444' : '#facc15',
+                    borderColor:
+                      pw.confidence < 0.5
+                        ? 'rgba(239, 68, 68, 0.3)'
+                        : 'rgba(250, 204, 21, 0.3)',
+                    backgroundColor:
+                      pw.confidence < 0.5
+                        ? 'rgba(239, 68, 68, 0.1)'
+                        : 'rgba(250, 204, 21, 0.08)',
+                  }}
+                >
+                  {pw.expected}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Actions */}
       <div className="flex gap-3">
         <button
@@ -192,12 +228,23 @@ function SessionSummary({
         </button>
         <button
           onClick={onRetry}
-          className="flex-1 py-3 rounded-xl bg-gold-500/90 text-night-950 
-            font-semibold transition hover:bg-gold-400 flex items-center justify-center gap-2"
+          className="flex-1 py-3 rounded-xl bg-night-800 text-night-300 
+            border border-night-700 font-medium transition hover:bg-night-700
+            flex items-center justify-center gap-2"
         >
           <RotateCcw className="w-4 h-4" />
-          Try Again
+          Retry
         </button>
+        {onNextAyah && (
+          <button
+            onClick={onNextAyah}
+            className="flex-1 py-3 rounded-xl bg-gold-500/90 text-night-950 
+              font-semibold transition hover:bg-gold-400 flex items-center justify-center gap-2"
+          >
+            Next
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        )}
       </div>
     </motion.div>
   );
@@ -235,6 +282,7 @@ export default function LiveRecitation({
   const [tajweedData, setTajweedData] = useState<TajweedSurahData | null>(null);
   const [wordStates, setWordStates] = useState<WordState[]>([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(-1);
+  const [wordConfidences, setWordConfidences] = useState<number[]>([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [stats, setStats] = useState<SessionStats | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -244,6 +292,9 @@ export default function LiveRecitation({
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const wordElementsRef = useRef<Map<number, HTMLElement>>(new Map());
+
+  const [previousBest, setPreviousBest] = useState<number | null>(null);
+  const [saved, setSaved] = useState(false);
 
   // Surah metadata
   const surahMeta = useMemo(
@@ -283,6 +334,7 @@ export default function LiveRecitation({
 
         setTajweedData(data);
         setWordStates(new Array(data.allWords.length).fill('hidden'));
+        setWordConfidences(new Array(data.allWords.length).fill(0));
         setCurrentWordIndex(-1);
         setPhase('ready');
       } catch (err) {
@@ -343,12 +395,23 @@ export default function LiveRecitation({
               if (alignment.status === 'matched') {
                 newStates[idx] = 'revealed';
               } else if (alignment.status === 'partial') {
-                newStates[idx] = 'error';
+                newStates[idx] = 'revealed'; // color handled by confidence
               } else if (alignment.status === 'missed') {
                 newStates[idx] = 'missed';
               }
             });
             return newStates;
+          });
+
+          // Update confidences from alignments
+          setWordConfidences((prev) => {
+            const next = [...prev];
+            state.alignments.forEach((alignment, idx) => {
+              if (alignment.confidence > 0) {
+                next[idx] = alignment.confidence;
+              }
+            });
+            return next;
           });
 
           // Update current word index
@@ -359,11 +422,19 @@ export default function LiveRecitation({
         onWord: (index, word, confidence) => {
           setCurrentWordIndex(index);
 
+          setWordConfidences((prev) => {
+            const next = [...prev];
+            if (index >= 0 && index < next.length) {
+              next[index] = confidence;
+            }
+            return next;
+          });
+
           setWordStates((prev) => {
             const newStates = [...prev];
             if (index >= 0 && index < newStates.length) {
               if (newStates[index] === 'hidden' || newStates[index] === 'current') {
-                newStates[index] = confidence > 0.75 ? 'revealed' : 'error';
+                newStates[index] = 'revealed';
               }
             }
             return newStates;
@@ -422,10 +493,27 @@ export default function LiveRecitation({
         const missedWords = finalStates.filter(
           (s) => s === 'missed' || s === 'hidden' || s === 'current'
         ).length;
+
+        // Count high-confidence words for accuracy
+        const goodWords = wordConfidences.filter(
+          (c, i) => finalStates[i] === 'revealed' && c > 0.8
+        ).length;
         const accuracy =
           totalWords > 0
-            ? Math.round((matchedWords / totalWords) * 100)
+            ? Math.round((goodWords / totalWords) * 100)
             : 0;
+
+        // Collect words that need practice (low confidence or missed)
+        const practiceWords: SessionStats['practiceWords'] = [];
+        finalStates.forEach((s, i) => {
+          if (s === 'missed' || (s === 'revealed' && wordConfidences[i] <= 0.8)) {
+            practiceWords.push({
+              index: i,
+              expected: tajweedData!.plainWords[i] || '',
+              confidence: wordConfidences[i],
+            });
+          }
+        });
 
         setStats({
           accuracy,
@@ -434,6 +522,7 @@ export default function LiveRecitation({
           missedWords,
           errorWords,
           duration: elapsedTime,
+          practiceWords,
         });
 
         return finalStates;
@@ -451,6 +540,7 @@ export default function LiveRecitation({
   const resetSession = useCallback(() => {
     if (tajweedData) {
       setWordStates(new Array(tajweedData.allWords.length).fill('hidden'));
+      setWordConfidences(new Array(tajweedData.allWords.length).fill(0));
       setCurrentWordIndex(-1);
       setElapsedTime(0);
       setStats(null);
@@ -503,6 +593,18 @@ export default function LiveRecitation({
     }));
   }, [tajweedData]);
 
+  // ============ Running Accuracy ============
+
+  const runningAccuracy = useMemo(() => {
+    if (!tajweedData || tajweedData.allWords.length === 0) return 0;
+    const processed = wordStates.filter((s) => s === 'revealed' || s === 'missed').length;
+    if (processed === 0) return 100;
+    const goodWords = wordConfidences.filter(
+      (c, i) => wordStates[i] === 'revealed' && c > 0.8
+    ).length;
+    return Math.round((goodWords / processed) * 100);
+  }, [wordStates, wordConfidences, tajweedData]);
+
   // ============ Progress bar ============
 
   const progress = useMemo(() => {
@@ -544,16 +646,31 @@ export default function LiveRecitation({
             </p>
           </div>
 
-          {/* Timer */}
+          {/* Timer & Accuracy */}
           <div className="min-w-[60px] text-right">
             {phase === 'recording' && (
-              <motion.span
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-sm font-mono text-gold-400"
+                className="flex flex-col items-end gap-0.5"
               >
-                {formatTime(elapsedTime)}
-              </motion.span>
+                <span className="text-sm font-mono text-gold-400">
+                  {formatTime(elapsedTime)}
+                </span>
+                {currentWordIndex >= 0 && (
+                  <span
+                    className={`text-xs font-medium ${
+                      runningAccuracy >= 80
+                        ? 'text-green-400'
+                        : runningAccuracy >= 50
+                        ? 'text-yellow-400'
+                        : 'text-red-400'
+                    }`}
+                  >
+                    {runningAccuracy}%
+                  </span>
+                )}
+              </motion.div>
             )}
           </div>
         </div>
@@ -653,6 +770,7 @@ export default function LiveRecitation({
                   <TajweedText
                     verses={versesForDisplay}
                     wordStates={wordStates}
+                    wordConfidences={wordConfidences}
                     currentWordIndex={currentWordIndex}
                     showAyahMarkers={true}
                   />
