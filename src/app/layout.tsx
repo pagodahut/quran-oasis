@@ -213,7 +213,23 @@ export default function RootLayout({
   // Only wrap with ClerkProvider if configured
   if (clerkPubKey) {
     return (
-      <ClerkProvider appearance={clerkAppearance}>
+      <ClerkProvider
+        appearance={clerkAppearance}
+        localization={{
+          signIn: {
+            start: {
+              title: 'Sign in to HIFZ',
+              subtitle: 'Continue your Quran memorization journey',
+            },
+          },
+          signUp: {
+            start: {
+              title: 'Create your HIFZ account',
+              subtitle: 'Start your Quran memorization journey',
+            },
+          },
+        }}
+      >
         {content}
       </ClerkProvider>
     );

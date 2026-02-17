@@ -25,8 +25,6 @@ export default function SignUpPage() {
           layout: {
             socialButtonsPlacement: 'top',
             logoPlacement: 'none',
-            headerTitle: 'Create your HIFZ account',
-            headerSubtitle: 'Start your Quran memorization journey',
           },
           elements: {
             rootBox: 'w-full max-w-md',
