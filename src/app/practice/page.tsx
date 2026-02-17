@@ -3,13 +3,27 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import SheikhButton from '@/components/ui/SheikhButton';
-import { SheikhCardSkeleton } from '@/components/SheikhErrorBoundary';
+import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  ChevronLeft,
+  BookOpen,
+  Brain,
+  Target,
+  Plus,
+  ArrowRight,
+  Sparkles,
+  Calendar,
+  TreePine,
+  Sprout,
+  Leaf,
+} from 'lucide-react';
 import SheikhReviewSession from '@/components/SheikhReviewSession';
 import { useSheikh } from '@/contexts/SheikhContext';
 import { loadUserProfile, isCalibrationComplete } from '@/lib/user-profile-sync';
 import { srs, srsStateToDueRefs, type ReviewQuality } from '@/lib/spaced-repetition';
 import { enrichSRSRefs } from '@/lib/ayah-service';
+import BottomNav from '@/components/BottomNav';
 import type { ReviewType, SessionResult, ReviewAyah } from '@/hooks/useSheikhReview';
 
 // ─── Types ─────────────────────────────────────────────────────────
@@ -46,20 +60,17 @@ export default function PracticePage() {
     setPageContext({ page: 'practice' });
 
     async function init() {
-      // Check calibration
       const calibrated = await isCalibrationComplete();
       if (!calibrated) {
         router.push('/onboarding/welcome');
         return;
       }
 
-      // Load user level from profile
       const profile = await loadUserProfile();
       if (profile?.level) {
         setUserLevel(profile.level);
       }
 
-      // Refresh SRS counts
       srs.reload();
       setDueCount(srs.getDueCount());
       setStats(srs.getStats());
@@ -74,19 +85,14 @@ export default function PracticePage() {
     setStats(srs.getStats());
   }, []);
 
-  // Handle review session completion
   const handleReviewComplete = useCallback(
     (type: ReviewType, result: SessionResult) => {
-      // Record results back to SRS
-      // The session result gives us overall performance — map to quality
       const qualityMap: Record<string, ReviewQuality> = {
         excellent: 'easy',
         good: 'good',
         needs_work: 'hard',
       };
       const quality = qualityMap[result.overallPerformance] || 'good';
-
-      // Get the due ayahs for this type to know which ones were reviewed
       const due = srs.getDueAyahs();
       const reviewed = due[type].slice(0, result.ayahsCovered);
 
@@ -161,99 +167,106 @@ export default function PracticePage() {
 
   if (view === 'add-ayahs') {
     return (
-      <div className="practice practice--add">
-        <div className="practice__add-header">
-          <SheikhButton variant="ghost" size="sm" onClick={() => setView('dashboard')}>
-            ← Back
-          </SheikhButton>
-          <h2 className="practice__add-title">Add Ayahs to Memorize</h2>
-        </div>
+      <div className="min-h-screen bg-night-950">
+        <header className="liquid-glass sticky top-0 z-40 safe-area-top">
+          <div className="px-4 py-3 flex items-center gap-3">
+            <button onClick={() => setView('dashboard')} className="liquid-icon-btn">
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <h1 className="font-display text-lg text-night-100">Add Ayahs to Memorize</h1>
+          </div>
+        </header>
 
-        <div className="practice__add-form">
-          <div className="practice__add-sheikh">
-            <div className="practice__add-sheikh-avatar">🕌</div>
-            <p className="practice__add-sheikh-msg">
+        <main className="px-4 py-6 pb-32 max-w-lg mx-auto space-y-6">
+          {/* Sheikh message */}
+          <div className="liquid-card p-4 flex gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gold-500/10 flex items-center justify-center flex-shrink-0">
+              <span className="text-lg">🕌</span>
+            </div>
+            <p className="text-night-300 text-sm leading-relaxed">
               Which ayahs are you working on? I&apos;ll schedule them into your daily review cycle.
             </p>
           </div>
 
-          <div className="practice__add-field">
-            <label>Surah Number (1-114)</label>
-            <input
-              type="number"
-              min="1"
-              max="114"
-              value={addSurah}
-              onChange={(e) => setAddSurah(e.target.value)}
-              placeholder="e.g. 67 (Al-Mulk)"
-              className="practice__add-input"
-            />
-          </div>
-
-          <div className="practice__add-row">
-            <div className="practice__add-field" style={{ flex: 1 }}>
-              <label>Start Ayah</label>
+          {/* Form */}
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm text-night-400 mb-2 block font-medium">Surah Number (1-114)</label>
               <input
                 type="number"
                 min="1"
-                value={addStart}
-                onChange={(e) => setAddStart(e.target.value)}
-                placeholder="1"
-                className="practice__add-input"
+                max="114"
+                value={addSurah}
+                onChange={(e) => setAddSurah(e.target.value)}
+                placeholder="e.g. 67 (Al-Mulk)"
+                className="w-full bg-night-800/50 border border-night-700/50 rounded-xl px-4 py-3 text-night-100 placeholder-night-600 focus:outline-none focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/20 transition-colors"
               />
             </div>
-            <div className="practice__add-field" style={{ flex: 1 }}>
-              <label>End Ayah</label>
-              <input
-                type="number"
-                min="1"
-                value={addEnd}
-                onChange={(e) => setAddEnd(e.target.value)}
-                placeholder="(same)"
-                className="practice__add-input"
-              />
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-sm text-night-400 mb-2 block font-medium">Start Ayah</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={addStart}
+                  onChange={(e) => setAddStart(e.target.value)}
+                  placeholder="1"
+                  className="w-full bg-night-800/50 border border-night-700/50 rounded-xl px-4 py-3 text-night-100 placeholder-night-600 focus:outline-none focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/20 transition-colors"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-night-400 mb-2 block font-medium">End Ayah</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={addEnd}
+                  onChange={(e) => setAddEnd(e.target.value)}
+                  placeholder="(same)"
+                  className="w-full bg-night-800/50 border border-night-700/50 rounded-xl px-4 py-3 text-night-100 placeholder-night-600 focus:outline-none focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/20 transition-colors"
+                />
+              </div>
+            </div>
+
+            <button
+              onClick={handleAddAyahs}
+              disabled={!addSurah || !addStart}
+              className="w-full liquid-btn py-3.5 text-base disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Add to Review Queue
+            </button>
+          </div>
+
+          {/* Quick Add Presets */}
+          <div className="pt-4 border-t border-night-800/50">
+            <p className="text-xs text-night-500 mb-3 uppercase tracking-wider font-medium">Quick add popular surahs</p>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { name: 'Al-Fatiha', surah: 1, start: 1, end: 7 },
+                { name: 'Al-Ikhlas', surah: 112, start: 1, end: 4 },
+                { name: 'Al-Falaq', surah: 113, start: 1, end: 5 },
+                { name: 'An-Nas', surah: 114, start: 1, end: 6 },
+                { name: 'Al-Mulk', surah: 67, start: 1, end: 30 },
+                { name: 'Ya-Sin', surah: 36, start: 1, end: 83 },
+              ].map((preset) => (
+                <button
+                  key={preset.surah}
+                  onClick={() => {
+                    srs.addAyahs(preset.surah, preset.start, preset.end);
+                    refreshCounts();
+                    setView('dashboard');
+                  }}
+                  className="px-3 py-1.5 rounded-lg bg-night-800/50 border border-night-700/50 text-night-300 text-sm hover:bg-gold-500/10 hover:border-gold-500/30 hover:text-gold-400 transition-all"
+                >
+                  {preset.name}
+                </button>
+              ))}
             </div>
           </div>
+        </main>
 
-          <SheikhButton
-            variant="primary"
-            size="lg"
-            onClick={handleAddAyahs}
-            disabled={!addSurah || !addStart}
-            style={{ width: '100%', marginTop: 8 }}
-          >
-            Add to Review Queue
-          </SheikhButton>
-        </div>
-
-        {/* Quick Add Presets */}
-        <div className="practice__presets">
-          <p className="practice__presets-label">Quick add popular surahs:</p>
-          <div className="practice__presets-grid">
-            {[
-              { name: 'Al-Fatiha', surah: 1, start: 1, end: 7 },
-              { name: 'Al-Ikhlas', surah: 112, start: 1, end: 4 },
-              { name: 'Al-Falaq', surah: 113, start: 1, end: 5 },
-              { name: 'An-Nas', surah: 114, start: 1, end: 6 },
-              { name: 'Al-Mulk', surah: 67, start: 1, end: 30 },
-              { name: 'Ya-Sin', surah: 36, start: 1, end: 83 },
-            ].map((preset) => (
-              <SheikhButton
-                key={preset.surah}
-                variant="chip"
-                onClick={() => {
-                  srs.addAyahs(preset.surah, preset.start, preset.end);
-                  refreshCounts();
-                  setView('dashboard');
-                }}
-              >
-                {preset.name}
-              </SheikhButton>
-            ))}
-          </div>
-        </div>
-
-        <style jsx>{`${addStyles}`}</style>
+        <BottomNav />
       </div>
     );
   }
@@ -261,231 +274,183 @@ export default function PracticePage() {
   // ─── Dashboard View ──────────────────────────────────────────────
 
   return (
-    <div className="practice">
+    <div className="min-h-screen bg-night-950">
       {/* Header */}
-      <div className="practice__header">
-        <div>
-          <h1 className="practice__title">
-            {getGreeting()}, {user?.firstName || 'Student'}
-          </h1>
-          <p className="practice__subtitle">
-            {dueCount.total > 0
-              ? `${dueCount.total} ayah${dueCount.total !== 1 ? 's' : ''} waiting for review`
-              : 'All caught up! Add more ayahs to memorize.'}
-          </p>
+      <header className="liquid-glass sticky top-0 z-40 safe-area-top">
+        <div className="px-4 py-3 flex items-center justify-between">
+          <div>
+            <h1 className="font-display text-xl text-night-100">
+              {getGreeting()}, {user?.firstName || 'Student'}
+            </h1>
+            <p className="text-sm text-night-500">
+              {dueCount.total > 0
+                ? `${dueCount.total} ayah${dueCount.total !== 1 ? 's' : ''} waiting for review`
+                : 'All caught up! Add more ayahs to memorize.'}
+            </p>
+          </div>
+          <div className="flex flex-col items-center px-3 py-2 rounded-xl bg-gold-500/10 border border-gold-500/20">
+            <span className="text-lg font-bold text-gold-400">{stats.longestStreak}</span>
+            <span className="text-[10px] text-gold-500/70 uppercase tracking-wider">day streak</span>
+          </div>
         </div>
-        <div className="practice__streak">
-          <span className="practice__streak-num">{stats.longestStreak}</span>
-          <span className="practice__streak-label">day streak</span>
-        </div>
-      </div>
+      </header>
 
-      {isLoading ? (
-        <div style={{ padding: '0 20px' }}>
-          <SheikhCardSkeleton />
-          <SheikhCardSkeleton />
-        </div>
-      ) : (
-        <>
-          {/* Review Cards */}
-          {dueCount.total > 0 && (
-            <div className="practice__section">
-              <h2 className="practice__section-title">Today&apos;s Review</h2>
-              <div className="practice__review-cards">
-                {dueCount.sabaq > 0 && (
-                  <ReviewCard
-                    emoji="🌱"
-                    label="Sabaq"
-                    description="New lesson review"
-                    count={dueCount.sabaq}
-                    color="#2dd496"
-                  />
-                )}
-                {dueCount.sabqi > 0 && (
-                  <ReviewCard
-                    emoji="🌿"
-                    label="Sabqi"
-                    description="Recent review"
-                    count={dueCount.sabqi}
-                    color="#40b8e0"
-                  />
-                )}
-                {dueCount.manzil > 0 && (
-                  <ReviewCard
-                    emoji="🌳"
-                    label="Manzil"
-                    description="Long-term review"
-                    count={dueCount.manzil}
-                    color="#d4a844"
-                  />
-                )}
+      <main className="px-4 py-6 pb-32 max-w-lg mx-auto space-y-6">
+        {isLoading ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="liquid-card p-6 animate-pulse">
+                <div className="h-4 bg-night-800 rounded w-1/3 mb-3" />
+                <div className="h-3 bg-night-800 rounded w-2/3" />
               </div>
+            ))}
+          </div>
+        ) : (
+          <>
+            {/* Review Cards */}
+            {dueCount.total > 0 && (
+              <section>
+                <h2 className="text-xs font-semibold text-night-500 uppercase tracking-wider mb-3">Today&apos;s Review</h2>
+                <div className="space-y-2">
+                  {dueCount.sabaq > 0 && (
+                    <ReviewCard emoji="🌱" icon={Sprout} label="Sabaq" description="New lesson review" count={dueCount.sabaq} accent="text-sage-400" accentBg="bg-sage-500/10" />
+                  )}
+                  {dueCount.sabqi > 0 && (
+                    <ReviewCard emoji="🌿" icon={Leaf} label="Sabqi" description="Recent review" count={dueCount.sabqi} accent="text-blue-400" accentBg="bg-blue-500/10" />
+                  )}
+                  {dueCount.manzil > 0 && (
+                    <ReviewCard emoji="🌳" icon={TreePine} label="Manzil" description="Long-term review" count={dueCount.manzil} accent="text-gold-400" accentBg="bg-gold-500/10" />
+                  )}
+                </div>
 
-              <SheikhButton
-                variant="primary"
-                size="lg"
-                breathe
-                onClick={startReview}
-                disabled={loadingReview}
-                style={{ width: '100%', marginTop: 16 }}
-              >
-                {loadingReview ? 'Loading...' : `Start Review Session (${dueCount.total} ayahs)`}
-              </SheikhButton>
-            </div>
-          )}
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={startReview}
+                  disabled={loadingReview}
+                  className="w-full mt-4 liquid-btn py-3.5 text-base disabled:opacity-50"
+                >
+                  {loadingReview ? (
+                    <span className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-night-950 border-t-transparent rounded-full animate-spin" />
+                      Loading...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <BookOpen className="w-5 h-5" />
+                      Start Review Session ({dueCount.total} ayahs)
+                    </span>
+                  )}
+                </motion.button>
+              </section>
+            )}
 
-          {/* Smart Review Link */}
-          <div className="practice__section">
-            <a
+            {/* Smart Review Link */}
+            <Link
               href="/practice/review"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                padding: '16px 20px',
-                borderRadius: 16,
-                background: 'rgba(168, 85, 247, 0.1)',
-                border: '1px solid rgba(168, 85, 247, 0.2)',
-                textDecoration: 'none',
-                color: 'inherit',
-                transition: 'all 0.2s',
-              }}
+              className="liquid-card p-4 flex items-center gap-3 hover:bg-white/[0.04] transition-colors"
             >
-              <span style={{ fontSize: 24 }}>🧠</span>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600, fontSize: 15 }}>Smart Review</div>
-                <div style={{ fontSize: 13, opacity: 0.6 }}>AI-prioritized verses based on difficulty</div>
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                <Brain className="w-5 h-5 text-purple-400" />
               </div>
-              <span style={{ opacity: 0.4, fontSize: 18 }}>→</span>
-            </a>
-          </div>
+              <div className="flex-1">
+                <p className="text-night-100 font-medium">Smart Review</p>
+                <p className="text-xs text-night-500">AI-prioritized verses based on difficulty</p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-night-600" />
+            </Link>
 
-          {/* Stats */}
-          <div className="practice__section">
-            <h2 className="practice__section-title">Your Progress</h2>
-            <div className="practice__stats-grid">
-              <StatCard label="Total Ayahs" value={stats.totalAyahs} icon="📖" />
-              <StatCard label="In Manzil" value={stats.manzilCount} icon="🌳" />
-              <StatCard label="Accuracy" value={`${Math.round(stats.averageAccuracy * 100)}%`} icon="🎯" />
-              <StatCard label="Days Active" value={stats.daysSinceStart} icon="📅" />
-            </div>
-          </div>
+            {/* Stats */}
+            <section>
+              <h2 className="text-xs font-semibold text-night-500 uppercase tracking-wider mb-3">Your Progress</h2>
+              <div className="grid grid-cols-2 gap-3">
+                <StatCard label="Total Ayahs" value={stats.totalAyahs} icon="📖" />
+                <StatCard label="In Manzil" value={stats.manzilCount} icon="🌳" />
+                <StatCard label="Accuracy" value={`${Math.round(stats.averageAccuracy * 100)}%`} icon="🎯" />
+                <StatCard label="Days Active" value={stats.daysSinceStart} icon="📅" />
+              </div>
+            </section>
 
-          {/* Add More (only show when user already has ayahs) */}
-          {stats.totalAyahs > 0 && (
-            <div className="practice__section">
-              <SheikhButton
-                variant="secondary"
-                size="lg"
+            {/* Add More */}
+            {stats.totalAyahs > 0 && (
+              <button
                 onClick={() => setView('add-ayahs')}
-                style={{ width: '100%' }}
+                className="w-full liquid-card p-4 flex items-center justify-center gap-2 text-gold-400 hover:bg-gold-500/5 transition-colors"
               >
-                + Add Ayahs to Memorize
-              </SheikhButton>
-            </div>
-          )}
+                <Plus className="w-5 h-5" />
+                <span className="font-medium">Add Ayahs to Memorize</span>
+              </button>
+            )}
 
-          {/* Sheikh Nudge */}
-          {dueCount.total === 0 && stats.totalAyahs > 0 && (
-            <div className="practice__sheikh-nudge">
-              <div className="practice__sheikh-nudge-avatar">🕌</div>
-              <p>
-                Masha&apos;Allah, you&apos;re all caught up! Consider adding new ayahs
-                or reviewing your manzil for extra retention.
-              </p>
-            </div>
-          )}
+            {/* Sheikh Nudge */}
+            {dueCount.total === 0 && stats.totalAyahs > 0 && (
+              <div className="liquid-card p-4 flex gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gold-500/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-lg">🕌</span>
+                </div>
+                <p className="text-night-400 text-sm leading-relaxed">
+                  Masha&apos;Allah, you&apos;re all caught up! Consider adding new ayahs
+                  or reviewing your manzil for extra retention.
+                </p>
+              </div>
+            )}
 
-          {stats.totalAyahs === 0 && (
-            <div className="practice__empty-state">
-              <div className="practice__empty-icon">📖</div>
-              <h3>Start Your Memorization Journey</h3>
-              <p>
-                Add the ayahs you&apos;re working on, and Sheikh HIFZ will schedule
-                daily reviews using proven spaced repetition techniques.
-              </p>
-              <SheikhButton
-                variant="primary"
-                size="lg"
-                breathe
-                onClick={() => setView('add-ayahs')}
-                style={{ marginTop: 16 }}
-              >
-                Add Your First Ayahs
-              </SheikhButton>
-            </div>
-          )}
-        </>
-      )}
+            {/* Empty State */}
+            {stats.totalAyahs === 0 && (
+              <div className="text-center py-12">
+                <div className="text-5xl mb-4">📖</div>
+                <h3 className="text-xl font-semibold text-night-100 mb-2">Start Your Memorization Journey</h3>
+                <p className="text-night-400 text-sm leading-relaxed mb-6 max-w-xs mx-auto">
+                  Add the ayahs you&apos;re working on, and Sheikh HIFZ will schedule
+                  daily reviews using proven spaced repetition techniques.
+                </p>
+                <button
+                  onClick={() => setView('add-ayahs')}
+                  className="liquid-btn py-3 px-8 text-base"
+                >
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Add Your First Ayahs
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </main>
 
-      <style jsx>{`${dashboardStyles}`}</style>
+      <BottomNav />
     </div>
   );
 }
 
 // ─── Sub-components ────────────────────────────────────────────────
 
-function ReviewCard({ emoji, label, description, count, color }: {
-  emoji: string; label: string; description: string; count: number; color: string;
+function ReviewCard({ emoji, icon: Icon, label, description, count, accent, accentBg }: {
+  emoji: string; icon: React.ElementType; label: string; description: string; count: number; accent: string; accentBg: string;
 }) {
   return (
-    <div className="review-card">
-      <div className="review-card__left">
-        <span className="review-card__emoji">{emoji}</span>
+    <div className="liquid-card p-4 flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <div className={`w-10 h-10 rounded-xl ${accentBg} flex items-center justify-center`}>
+          <Icon className={`w-5 h-5 ${accent}`} />
+        </div>
         <div>
-          <span className="review-card__label" style={{ color }}>{label}</span>
-          <span className="review-card__desc">{description}</span>
+          <p className={`font-medium ${accent}`}>{label}</p>
+          <p className="text-xs text-night-500">{description}</p>
         </div>
       </div>
-      <div className="review-card__count">
-        <span className="review-card__num" style={{ color }}>{count}</span>
-        <span className="review-card__unit">due</span>
+      <div className="text-right">
+        <span className={`text-xl font-bold ${accent}`}>{count}</span>
+        <p className="text-[10px] text-night-600 uppercase tracking-wider">due</p>
       </div>
-
-      <style jsx>{`
-        .review-card {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 14px 16px;
-          background: linear-gradient(135deg, #0c1f1a, #132e25);
-          border: 1px solid rgba(45, 212, 150, 0.08);
-          border-radius: 14px;
-        }
-        .review-card__left { display: flex; align-items: center; gap: 12px; }
-        .review-card__emoji { font-size: 24px; }
-        .review-card__label { display: block; font-size: 14px; font-weight: 600; }
-        .review-card__desc { display: block; font-size: 11px; color: #6bb89a; margin-top: 1px; }
-        .review-card__count { text-align: center; }
-        .review-card__num { display: block; font-size: 20px; font-weight: 700; }
-        .review-card__unit { font-size: 10px; color: #4a7a66; text-transform: uppercase; }
-      `}</style>
     </div>
   );
 }
 
 function StatCard({ label, value, icon }: { label: string; value: string | number; icon: string }) {
   return (
-    <div className="stat-card">
-      <span className="stat-card__icon">{icon}</span>
-      <span className="stat-card__value">{value}</span>
-      <span className="stat-card__label">{label}</span>
-
-      <style jsx>{`
-        .stat-card {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 4px;
-          padding: 16px 12px;
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(45, 212, 150, 0.06);
-          border-radius: 14px;
-        }
-        .stat-card__icon { font-size: 20px; }
-        .stat-card__value { font-size: 18px; font-weight: 700; color: #2dd496; }
-        .stat-card__label { font-size: 11px; color: #4a7a66; text-transform: uppercase; letter-spacing: 0.5px; }
-      `}</style>
+    <div className="liquid-card p-4 flex flex-col items-center gap-1.5 text-center">
+      <span className="text-xl">{icon}</span>
+      <span className="text-lg font-bold text-gold-400">{value}</span>
+      <span className="text-[10px] text-night-500 uppercase tracking-wider">{label}</span>
     </div>
   );
 }
@@ -498,231 +463,3 @@ function getGreeting(): string {
   if (hour < 21) return 'Good evening';
   return 'Assalamu alaikum';
 }
-
-// ─── Styles ────────────────────────────────────────────────────────
-
-const dashboardStyles = `
-  .practice {
-    min-height: 100vh;
-    min-height: 100dvh;
-    max-width: 520px;
-    margin: 0 auto;
-    background: #080f0c;
-    padding-bottom: 40px;
-  }
-
-  .practice__header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    padding: 24px 20px 16px;
-  }
-  .practice__title {
-    font-size: 20px;
-    font-weight: 700;
-    color: #e8f5f0;
-    margin: 0 0 4px;
-  }
-  .practice__subtitle {
-    font-size: 13px;
-    color: #6bb89a;
-    margin: 0;
-  }
-  .practice__streak {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 8px 14px;
-    background: linear-gradient(135deg, rgba(45, 212, 150, 0.1), rgba(45, 212, 150, 0.05));
-    border: 1px solid rgba(45, 212, 150, 0.15);
-    border-radius: 14px;
-  }
-  .practice__streak-num {
-    font-size: 20px;
-    font-weight: 800;
-    color: #2dd496;
-  }
-  .practice__streak-label {
-    font-size: 9px;
-    color: #4a7a66;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .practice__section {
-    padding: 0 20px;
-    margin-bottom: 24px;
-  }
-  .practice__section-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: #8ab8a4;
-    margin: 0 0 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .practice__review-cards {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .practice__stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .practice__sheikh-nudge {
-    display: flex;
-    gap: 12px;
-    margin: 0 20px;
-    padding: 16px;
-    background: linear-gradient(135deg, #0c1f1a, #132e25);
-    border: 1px solid rgba(45, 212, 150, 0.12);
-    border-radius: 16px;
-  }
-  .practice__sheikh-nudge-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #2dd496, #1a7a54);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-  .practice__sheikh-nudge p {
-    margin: 0;
-    font-size: 13px;
-    color: #a8c8bc;
-    line-height: 1.55;
-  }
-
-  .practice__empty-state {
-    text-align: center;
-    padding: 40px 32px;
-  }
-  .practice__empty-icon { font-size: 48px; margin-bottom: 12px; }
-  .practice__empty-state h3 {
-    font-size: 18px;
-    font-weight: 700;
-    color: #e8f5f0;
-    margin: 0 0 8px;
-  }
-  .practice__empty-state p {
-    font-size: 14px;
-    color: #6bb89a;
-    line-height: 1.55;
-    margin: 0;
-  }
-`;
-
-const addStyles = `
-  .practice--add {
-    min-height: 100vh;
-    min-height: 100dvh;
-    max-width: 520px;
-    margin: 0 auto;
-    background: #080f0c;
-    padding: 16px 20px;
-  }
-
-  .practice__add-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-  .practice__add-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #e8f5f0;
-    margin: 0;
-  }
-
-  .practice__add-sheikh {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-  .practice__add-sheikh-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #2dd496, #1a7a54);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-  .practice__add-sheikh-msg {
-    margin: 0;
-    font-size: 14px;
-    color: #c8e6dc;
-    line-height: 1.55;
-    padding: 12px 16px;
-    background: linear-gradient(135deg, #0c1f1a, #132e25);
-    border: 1px solid rgba(45, 212, 150, 0.12);
-    border-radius: 16px;
-    border-top-left-radius: 4px;
-  }
-
-  .practice__add-form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-bottom: 32px;
-  }
-
-  .practice__add-field label {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: #6bb89a;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
-  }
-
-  .practice__add-input {
-    width: 100%;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(45, 212, 150, 0.12);
-    border-radius: 12px;
-    padding: 12px 14px;
-    font-size: 15px;
-    color: #e8f5f0;
-    outline: none;
-    font-family: inherit;
-    transition: border-color 0.2s ease;
-    box-sizing: border-box;
-  }
-  .practice__add-input::placeholder { color: #4a7a66; }
-  .practice__add-input:focus {
-    border-color: rgba(45, 212, 150, 0.35);
-    box-shadow: 0 0 12px rgba(45, 212, 150, 0.1);
-  }
-
-  .practice__add-row {
-    display: flex;
-    gap: 12px;
-  }
-
-  .practice__presets {
-    padding-top: 8px;
-    border-top: 1px solid rgba(45, 212, 150, 0.06);
-  }
-  .practice__presets-label {
-    font-size: 12px;
-    color: #4a7a66;
-    margin: 0 0 10px;
-  }
-  .practice__presets-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-`;
