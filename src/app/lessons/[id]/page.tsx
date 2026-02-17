@@ -237,6 +237,9 @@ function ArabicDisplay({
   const isSingleLetter = charCount <= 2;
   const isWord = charCount <= 10 && !content.includes(' ');
   
+  // Only show audio button for letters and single words (phrase audio is not available)
+  const canPlayAudio = isSingleLetter || isWord;
+  
   // Get letter data if it's a single letter
   const letterData = isSingleLetter ? getLetterInfo(cleanContent) : null;
   
