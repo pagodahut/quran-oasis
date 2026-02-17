@@ -1,8 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+const GardenOfSurahs = dynamic(() => import('@/components/GardenOfSurahs'), {
+  loading: () => <div className="flex items-center justify-center py-20"><div className="animate-pulse text-gold-400">Loading...</div></div>,
+});
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ChevronLeft, 
@@ -50,8 +55,18 @@ import { useSheikh } from '@/contexts/SheikhContext';
 import { useBookmarks } from '@/lib/bookmarks';
 import { useReadingPreferences } from '@/hooks/useAppliedPreferences';
 
+function MushafSearchParamsReader({ onView }: { onView: (v: 'read' | 'explore') => void }) {
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    const v = searchParams.get('view');
+    if (v === 'explore') onView('explore');
+  }, [searchParams, onView]);
+  return null;
+}
+
 export default function MushafPage() {
   const router = useRouter();
+  const [activeView, setActiveView] = useState<'read' | 'explore'>('read');
   const { toggle: toggleBookmark, check: isBookmarked } = useBookmarks();
   const { setPageContext, setAyahContext } = useSheikh();
   
@@ -231,8 +246,17 @@ export default function MushafPage() {
 
   const allSurahs = getAllSurahs();
 
+  const handleExploreSurahSelect = (surahId: number) => {
+    setSurahNumber(surahId);
+    setActiveView('read');
+  };
+
   return (
     <div className="min-h-screen bg-night-950">
+      <Suspense fallback={null}>
+        <MushafSearchParamsReader onView={setActiveView} />
+      </Suspense>
+
       {/* Audio Element */}
       <audio
         ref={audioRef}
@@ -279,8 +303,34 @@ export default function MushafPage() {
           </div>
         </div>
 
-        {/* Navigation - Smooth divider */}
-        <div className="flex items-center justify-between px-4 py-2.5 border-t border-white/[0.04] text-sm">
+        {/* View Switcher: Read / Explore */}
+        <div className="flex items-center justify-center gap-1 px-4 py-2 border-t border-white/[0.04]">
+          {(['read', 'explore'] as const).map((view) => (
+            <button
+              key={view}
+              onClick={() => setActiveView(view)}
+              className={`relative px-5 py-2 rounded-xl text-sm font-medium transition-all ${
+                activeView === view
+                  ? 'text-gold-400'
+                  : 'text-night-400 hover:text-night-200'
+              }`}
+            >
+              {activeView === view && (
+                <motion.div
+                  layoutId="mushaf-view-tab"
+                  className="absolute inset-0 rounded-xl bg-gold-500/10 border border-gold-500/20"
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                />
+              )}
+              <span className="relative z-10">
+                {view === 'read' ? '📖 Read' : '🌿 Explore'}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* Navigation - Smooth divider (Read mode only) */}
+        {activeView === 'read' && <div className="flex items-center justify-between px-4 py-2.5 border-t border-white/[0.04] text-sm">
           <button
             onClick={() => surahNumber > 1 && setSurahNumber(surahNumber - 1)}
             disabled={surahNumber === 1}
@@ -304,11 +354,29 @@ export default function MushafPage() {
             Next
             <ChevronRight className="w-4 h-4" />
           </button>
-        </div>
+        </div>}
       </header>
 
-      {/* Mushaf Content */}
-      <main className="pb-56">
+      {/* Explore View */}
+      <AnimatePresence mode="wait">
+        {activeView === 'explore' && (
+          <motion.div
+            key="explore"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2 }}
+          >
+            <GardenOfSurahs
+              onSelectSurah={handleExploreSurahSelect}
+              showHeader={true}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Mushaf Content (Read view) */}
+      {activeView === 'read' && <main className="pb-56">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="animate-pulse text-gold-400">Loading...</div>
@@ -479,17 +547,17 @@ export default function MushafPage() {
             <p className="text-night-400">Surah not found</p>
           </div>
         )}
-      </main>
+      </main>}
 
       {/* Tajweed Legend — above audio player (z-50) */}
-      {showTajweedColors && (
+      {activeView === 'read' && showTajweedColors && (
         <div className="fixed bottom-44 left-4 right-4 z-50">
           <TajweedLegend show={showTajweedLegend} onClose={() => setShowTajweedLegend(false)} />
         </div>
       )}
 
       {/* Audio Player - Premium Frosted Glass - positioned above BottomNav */}
-      <div className="fixed bottom-20 left-2 right-2 z-40 liquid-glass-strong rounded-2xl">
+      {activeView === 'read' && <div className="fixed bottom-20 left-2 right-2 z-40 liquid-glass-strong rounded-2xl">
         <div className="px-4 py-3.5 max-w-3xl mx-auto">
           {/* Now Playing */}
           <div className="flex items-center justify-between mb-3">
@@ -698,7 +766,7 @@ export default function MushafPage() {
             </select>
           </div>
         </div>
-      </div>
+      </div>}
 
       {/* Surah List Sheet */}
       <AnimatePresence>

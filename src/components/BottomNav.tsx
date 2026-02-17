@@ -108,16 +108,14 @@ export default function BottomNav() {
   }, [handleScroll]);
 
   // Build nav items based on learning mode
-  // Navigation Updates - Quran centered with Browse:
-  // - Beginner (6 items): Home, Learn, Browse, Quran, Practice, Profile
-  // - Intermediate (5 items): Home, Browse, Quran, Practice, Profile  
-  // - Hafiz (4 items): Home, Browse, Quran, Profile
-  // Note: Recite moved out to make room for Browse (surah discovery)
+  // Navigation: Browse/Surahs merged into Quran tab (Explore view)
+  // - Beginner (5 items): Home, Learn, Quran, Practice, Profile
+  // - Intermediate (4 items): Home, Quran, Practice, Profile  
+  // - Hafiz (3 items): Home, Quran, Profile
   const navItems = useMemo(() => {
     const items = [
       { href: '/dashboard', Icon: HomeIcon, label: 'Home', ariaLabel: 'Go to Dashboard', show: true },
       { href: '/lessons', Icon: LearnIcon, label: 'Learn', ariaLabel: 'Go to Lessons', show: showLearn },
-      { href: '/surahs', Icon: BrowseIcon, label: 'Surahs', ariaLabel: 'Browse Surahs', show: true },
       { href: '/mushaf', Icon: QuranIcon, label: 'Quran', ariaLabel: 'Read Quran', show: true },
       { href: '/practice', Icon: PracticeIcon, label: 'Practice', ariaLabel: 'Go to Practice', show: showPractice },
       { href: '/profile', Icon: ProfileIcon, label: 'Profile', ariaLabel: 'View Profile', show: true },
