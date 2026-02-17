@@ -29,6 +29,8 @@ import { useState, useRef, useEffect, type FormEvent, type KeyboardEvent } from 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSheikhChat, type AyahContext, type ChatMessage } from '@/hooks/useSheikhChat';
 import { useSheikh } from '@/contexts/SheikhContext';
+import { usePremium } from '@/contexts/PremiumContext';
+import { PremiumUpgradeModal } from '@/components/PremiumGate';
 
 // ─── Props ───────────────────────────────────────────────────────────
 interface SheikhChatProps {
@@ -186,15 +188,29 @@ export default function SheikhChat({
   const onClose = onCloseProp ?? sheikh.closeSheikh;
   const { pendingQuestion, clearPendingQuestion, pageContext } = sheikh;
 
+  // Premium gating
+  const premium = usePremium();
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+
   const {
     messages,
-    sendMessage,
+    sendMessage: rawSendMessage,
     isLoading,
     error,
     clearChat,
     suggestedQuestions,
     stopStreaming,
   } = useSheikhChat({ ayahContext, userLevel, pageContext });
+
+  // Wrap sendMessage with premium gate
+  const sendMessage = (msg: string) => {
+    if (!premium.canUsePremiumFeature('sheikh')) {
+      setShowPremiumModal(true);
+      return;
+    }
+    premium.incrementInteraction();
+    rawSendMessage(msg);
+  };
 
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -291,6 +307,7 @@ export default function SheikhChat({
   if (!isOpen) return null;
 
   return (
+    <>
     <AnimatePresence>
       <motion.div
         initial={mode === 'inline' ? {} : { y: '100%' }}
@@ -483,5 +500,15 @@ export default function SheikhChat({
         </div>
       </motion.div>
     </AnimatePresence>
+
+    {/* Premium Upgrade Modal */}
+    <PremiumUpgradeModal
+      isOpen={showPremiumModal}
+      onClose={() => setShowPremiumModal(false)}
+      feature="sheikh"
+      usedCount={premium.sheikInteractionsToday}
+      maxCount={premium.maxFreeInteractions}
+    />
+    </>
   );
 }
