@@ -78,7 +78,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     options?: { icon?: ReactNode; duration?: number }
   ) => {
     const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const duration = options?.duration ?? 3000;
+    const duration = options?.duration ?? 4000;
     
     setToasts(prev => [...prev, { id, message, type, icon: options?.icon, duration }]);
     
@@ -141,35 +141,51 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   );
 }
 
+function ToastItem({ toast, removeToast }: { toast: Toast; removeToast: (id: string) => void }) {
+  const duration = toast.duration || 4000;
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, x: 80, scale: 0.95, transition: { duration: 0.25, ease: 'easeIn' } }}
+      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+      className={`
+        pointer-events-auto relative overflow-hidden
+        flex items-center gap-3 px-4 py-3 rounded-xl
+        bg-night-900/95 backdrop-blur-lg border
+        shadow-lg shadow-black/20
+        ${TOAST_STYLES[toast.type]}
+      `}
+    >
+      {toast.icon || TOAST_ICONS[toast.type]}
+      <span className="text-sm text-night-100 font-medium">{toast.message}</span>
+      <button 
+        onClick={() => removeToast(toast.id)}
+        className="ml-2 text-night-500 hover:text-night-300 transition-colors"
+      >
+        <X className="w-4 h-4" />
+      </button>
+      {/* Progress bar */}
+      {duration > 0 && (
+        <motion.div
+          className="absolute bottom-0 left-0 h-0.5 bg-current opacity-30"
+          initial={{ width: '100%' }}
+          animate={{ width: '0%' }}
+          transition={{ duration: duration / 1000, ease: 'linear' }}
+        />
+      )}
+    </motion.div>
+  );
+}
+
 function ToastContainer({ toasts, removeToast }: { toasts: Toast[]; removeToast: (id: string) => void }) {
   return (
     <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none">
       <AnimatePresence mode="popLayout">
         {toasts.map(toast => (
-          <motion.div
-            key={toast.id}
-            layout
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className={`
-              pointer-events-auto
-              flex items-center gap-3 px-4 py-3 rounded-xl
-              bg-night-900/95 backdrop-blur-lg border
-              shadow-lg shadow-black/20
-              ${TOAST_STYLES[toast.type]}
-            `}
-          >
-            {toast.icon || TOAST_ICONS[toast.type]}
-            <span className="text-sm text-night-100 font-medium">{toast.message}</span>
-            <button 
-              onClick={() => removeToast(toast.id)}
-              className="ml-2 text-night-500 hover:text-night-300 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </motion.div>
+          <ToastItem key={toast.id} toast={toast} removeToast={removeToast} />
         ))}
       </AnimatePresence>
     </div>
