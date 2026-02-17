@@ -544,9 +544,75 @@ export default function LiveRecitation({
       setCurrentWordIndex(-1);
       setElapsedTime(0);
       setStats(null);
+      setSaved(false);
       setPhase('ready');
     }
   }, [tajweedData]);
+
+  // ============ Fetch Previous Best ============
+
+  useEffect(() => {
+    async function fetchBest() {
+      try {
+        const res = await fetch(`/api/recitation?surah=${surahNumber}&limit=100`);
+        if (res.ok) {
+          const data = await res.json();
+          const best = data.bestScores?.find((b: { surahNumber: number }) => b.surahNumber === surahNumber);
+          if (best) setPreviousBest(best.bestAccuracy);
+        }
+      } catch {
+        // Check localStorage for guests
+        try {
+          const stored = JSON.parse(localStorage.getItem('recitation-history') || '[]');
+          const surahSessions = stored.filter((s: { surahNumber: number }) => s.surahNumber === surahNumber);
+          if (surahSessions.length > 0) {
+            const best = Math.max(...surahSessions.map((s: { overallAccuracy: number }) => s.overallAccuracy));
+            setPreviousBest(best);
+          }
+        } catch { /* ignore */ }
+      }
+    }
+    fetchBest();
+  }, [surahNumber]);
+
+  // ============ Auto-Save Session ============
+
+  useEffect(() => {
+    if (phase !== 'complete' || !stats || saved) return;
+    setSaved(true);
+
+    const sessionData = {
+      surahNumber,
+      startAyah,
+      endAyah: effectiveEndAyah,
+      overallAccuracy: stats.accuracy,
+      duration: stats.duration,
+      totalWords: stats.totalWords,
+      matchedWords: stats.matchedWords,
+      words: tajweedData?.allWords.map((w, i) => ({
+        wordIndex: i,
+        expectedWord: w.text,
+        transcribedWord: null,
+        confidence: wordConfidences[i] || 0,
+        isCorrect: wordStates[i] === 'revealed',
+      })) || [],
+    };
+
+    // Save to API
+    fetch('/api/recitation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(sessionData),
+    }).catch(() => {
+      // If API fails (guest user), save to localStorage
+      try {
+        const stored = JSON.parse(localStorage.getItem('recitation-history') || '[]');
+        stored.unshift({ ...sessionData, createdAt: new Date().toISOString() });
+        // Keep last 50 local sessions
+        localStorage.setItem('recitation-history', JSON.stringify(stored.slice(0, 50)));
+      } catch { /* ignore */ }
+    });
+  }, [phase, stats, saved, surahNumber, startAyah, effectiveEndAyah, tajweedData, wordStates, wordConfidences]);
 
   // ============ Cleanup ============
 
@@ -802,10 +868,17 @@ export default function LiveRecitation({
                       <div className="p-4 flex items-center justify-center gap-6">
                         {phase === 'ready' && (
                           <>
-                            {/* Hint text */}
-                            <p className="text-xs text-night-500 mr-auto">
-                              Tap to start reciting
-                            </p>
+                            {/* Previous best & hint */}
+                            <div className="mr-auto">
+                              {previousBest !== null && (
+                                <p className="text-xs text-gold-400/80 mb-0.5">
+                                  Previous best: {previousBest}%
+                                </p>
+                              )}
+                              <p className="text-xs text-night-500">
+                                Tap to start reciting
+                              </p>
+                            </div>
 
                             {/* Start button */}
                             <motion.button
