@@ -10,7 +10,7 @@ export default function SignInPage() {
       {/* Logo */}
       <Link href="/" className="mb-8 flex items-center gap-2">
         <Image
-          src="/hifz-logo.svg"
+          src="/hifz-logo.png"
           alt="HIFZ"
           width={40}
           height={40}
@@ -22,6 +22,12 @@ export default function SignInPage() {
       {/* Sign In Component */}
       <SignIn
         appearance={{
+          layout: {
+            socialButtonsPlacement: 'top',
+            logoPlacement: 'none',
+            headerTitle: 'Sign in to HIFZ',
+            headerSubtitle: 'Continue your Quran memorization journey',
+          },
           elements: {
             rootBox: 'w-full max-w-md',
             card: 'bg-night-900/95 backdrop-blur-xl border border-night-800 shadow-xl',
