@@ -207,16 +207,27 @@ function ToggleSwitch({
   return (
     <button
       onClick={onToggle}
-      className={`relative w-12 h-7 rounded-full transition-colors focus-visible-ring ${
-        enabled ? 'bg-gold-500' : 'bg-night-700'
+      className={`relative w-14 h-8 rounded-full transition-all duration-300 ease-in-out focus-visible-ring ${
+        enabled 
+          ? 'bg-gold-500/80 shadow-[0_0_12px_rgba(201,162,39,0.3)]' 
+          : 'bg-white/10 backdrop-blur-md border border-white/10'
       }`}
       role="switch"
       aria-checked={enabled}
       aria-label={label}
     >
-      <div className={`absolute top-1 w-5 h-5 rounded-full bg-white transition-transform ${
-        enabled ? 'left-6' : 'left-1'
-      }`} />
+      <motion.div
+        layout
+        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+        className={`absolute top-1 w-6 h-6 rounded-full shadow-md ${
+          enabled 
+            ? 'left-7 bg-white' 
+            : 'left-1 bg-night-300'
+        }`}
+        style={{
+          backdropFilter: enabled ? undefined : 'blur(4px)',
+        }}
+      />
     </button>
   );
 }

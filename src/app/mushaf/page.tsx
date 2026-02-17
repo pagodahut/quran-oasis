@@ -818,12 +818,14 @@ export default function MushafPage() {
                     <span className="text-night-200">Show Translation</span>
                     <button
                       onClick={() => setShowTranslation(!showTranslation)}
-                      className={`w-12 h-6 rounded-full transition-colors ${
-                        showTranslation ? 'bg-gold-500' : 'bg-night-700'
+                      className={`relative w-14 h-8 rounded-full transition-all duration-300 ${
+                        showTranslation 
+                          ? 'bg-gold-500/80 shadow-[0_0_12px_rgba(201,162,39,0.3)]' 
+                          : 'bg-white/10 backdrop-blur-md border border-white/10'
                       }`}
                     >
-                      <div className={`w-5 h-5 rounded-full bg-white transition-transform ${
-                        showTranslation ? 'translate-x-6' : 'translate-x-0.5'
+                      <div className={`absolute top-1 w-6 h-6 rounded-full shadow-md transition-all duration-300 ${
+                        showTranslation ? 'left-7 bg-white' : 'left-1 bg-night-300'
                       }`} />
                     </button>
                   </div>
