@@ -18,6 +18,7 @@ import {
   Volume2,
 } from 'lucide-react';
 import TajweedText, { type WordState } from '@/components/TajweedText';
+import WordByWordInline from '@/components/WordByWordInline';
 import { fetchTajweedSurah, type TajweedSurahData } from '@/lib/quranTajweedApi';
 import {
   TarteelService,
@@ -131,12 +132,21 @@ function SessionSummary({
   onRetry,
   onBack,
   onNextAyah,
+  surahNumber,
+  startAyah,
+  endAyah,
+  wordConfidences,
 }: {
   stats: SessionStats;
   onRetry: () => void;
   onBack: () => void;
   onNextAyah?: () => void;
+  surahNumber?: number;
+  startAyah?: number;
+  endAyah?: number;
+  wordConfidences?: number[];
 }) {
+  const [showWordByWord, setShowWordByWord] = useState(false);
   const grade = useMemo(() => {
     if (stats.accuracy >= 95) return { label: 'Excellent!', emoji: '🌟', color: 'text-gold-400' };
     if (stats.accuracy >= 85) return { label: 'Great Job!', emoji: '✨', color: 'text-sage-400' };
@@ -221,6 +231,44 @@ function SessionSummary({
         </div>
       )}
 
+      {/* Word-by-Word Breakdown */}
+      {surahNumber && startAyah && (
+        <div className="mb-6">
+          <button
+            onClick={() => setShowWordByWord(!showWordByWord)}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-night-900/60 border border-night-800/50 hover:bg-night-800/60 transition-colors"
+          >
+            <span className="text-sm font-medium text-night-300">
+              📝 Word-by-Word Breakdown
+            </span>
+            <ChevronRight className={`w-4 h-4 text-night-500 transition-transform ${showWordByWord ? 'rotate-90' : ''}`} />
+          </button>
+          <AnimatePresence>
+            {showWordByWord && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="pt-3 space-y-4">
+                  {Array.from({ length: (endAyah || startAyah) - startAyah + 1 }, (_, i) => startAyah + i).map(ayahNum => (
+                    <div key={ayahNum} className="bg-night-900/40 rounded-xl p-3 border border-night-800/30">
+                      <p className="text-xs text-night-500 mb-2">Ayah {ayahNum}</p>
+                      <WordByWordInline
+                        surah={surahNumber}
+                        ayah={ayahNum}
+                        showTransliteration={true}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+
       {/* Tajweed Report */}
       {stats.tajweedRules && stats.tajweedRules.length > 0 && stats.allWords && (
         <TajweedReport
@@ -301,6 +349,7 @@ export default function LiveRecitation({
   const [errorMessage, setErrorMessage] = useState('');
   const [stats, setStats] = useState<SessionStats | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [wordByWordView, setWordByWordView] = useState(false);
 
   // Refs
   const serviceRef = useRef<TarteelService | null>(null);
@@ -852,15 +901,46 @@ export default function LiveRecitation({
                   <BismillahHeader surahNumber={surahNumber} />
                 </div>
 
-                {/* Tajweed Text */}
+                {/* Word-by-Word Toggle */}
+                <div className="max-w-2xl mx-auto flex justify-end mb-2">
+                  <button
+                    onClick={() => setWordByWordView(!wordByWordView)}
+                    className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${
+                      wordByWordView
+                        ? 'bg-gold-500/15 text-gold-400 border-gold-500/30'
+                        : 'bg-night-800/50 text-night-400 border-night-700/30 hover:bg-night-800'
+                    }`}
+                  >
+                    {wordByWordView ? '📝 Word-by-Word' : '📖 Tajweed View'}
+                  </button>
+                </div>
+
+                {/* Tajweed Text or Word-by-Word */}
                 <div className="max-w-2xl mx-auto">
-                  <TajweedText
-                    verses={versesForDisplay}
-                    wordStates={wordStates}
-                    wordConfidences={wordConfidences}
-                    currentWordIndex={currentWordIndex}
-                    showAyahMarkers={true}
-                  />
+                  {wordByWordView ? (
+                    <div className="space-y-4">
+                      {Array.from(
+                        { length: (effectiveEndAyah || startAyah) - startAyah + 1 },
+                        (_, i) => startAyah + i
+                      ).map(ayahNum => (
+                        <div key={ayahNum} className="bg-night-900/30 rounded-xl p-3 border border-night-800/30">
+                          <WordByWordInline
+                            surah={surahNumber}
+                            ayah={ayahNum}
+                            showTransliteration={true}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <TajweedText
+                      verses={versesForDisplay}
+                      wordStates={wordStates}
+                      wordConfidences={wordConfidences}
+                      currentWordIndex={currentWordIndex}
+                      showAyahMarkers={true}
+                    />
+                  )}
                 </div>
               </div>
 
@@ -962,6 +1042,10 @@ export default function LiveRecitation({
                       stats={stats}
                       onRetry={resetSession}
                       onBack={onBack}
+                      surahNumber={surahNumber}
+                      startAyah={startAyah}
+                      endAyah={effectiveEndAyah}
+                      wordConfidences={wordConfidences}
                     />
                   </div>
                 </motion.div>

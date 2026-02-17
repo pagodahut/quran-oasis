@@ -49,11 +49,15 @@ import QuranSearch from '@/components/QuranSearch';
 import TafsirDrawer from '@/components/TafsirDrawer';
 import VerseContext from '@/components/VerseContext';
 import WordByWord from '@/components/WordByWord';
+import WordByWordInline from '@/components/WordByWordInline';
 import TajweedPractice from '@/components/TajweedPractice';
 import { TajweedText, TajweedToggle, TajweedLegend } from '@/components/TajweedHighlighter';
 import { useSheikh } from '@/contexts/SheikhContext';
 import { useBookmarks } from '@/lib/bookmarks';
 import { useReadingPreferences } from '@/hooks/useAppliedPreferences';
+import { useQuranScript } from '@/hooks/useQuranScript';
+import { usePreferences, ARABIC_FONT_STYLE_OPTIONS } from '@/lib/preferencesStore';
+import { QURAN_SCRIPT_OPTIONS, type QuranScript } from '@/lib/quranScripts';
 
 function MushafSearchParamsReader({ onView }: { onView: (v: 'read' | 'explore') => void }) {
   const searchParams = useSearchParams();
@@ -72,11 +76,17 @@ export default function MushafPage() {
   
   // Get preferences
   const prefs = useReadingPreferences();
+  const { preferences, update: updatePrefs } = usePreferences();
   
   // State - initialized from preferences
   const [currentSurah, setCurrentSurah] = useState<Surah | null>(null);
   const [surahNumber, setSurahNumber] = useState(1);
   const [loading, setLoading] = useState(true);
+  
+  // Script text (uthmani vs indopak)
+  const { getScriptText, isAlternateScript, script: currentScript } = useQuranScript(surahNumber);
+  const currentFontStyle = preferences.display.arabicFontStyle;
+  const fontOption = ARABIC_FONT_STYLE_OPTIONS.find(f => f.value === currentFontStyle);
   const [selectedReciter, setSelectedReciter] = useState(prefs.reciter);
   const [showTranslation, setShowTranslation] = useState(prefs.showTranslation);
   const [translationEdition, setTranslationEdition] = useState<'sahih' | 'asad'>(prefs.translation);
@@ -107,6 +117,13 @@ export default function MushafPage() {
   const [showTajweedColors, setShowTajweedColors] = useState(false);
   const [showTajweedLegend, setShowTajweedLegend] = useState(false);
   
+  // Helper to get display text for an ayah (uses alternate script if selected)
+  const getDisplayText = (ayah: Ayah): string => {
+    const scriptText = getScriptText(ayah.numberInSurah);
+    if (scriptText) return scriptText;
+    return cleanAyahText(ayah.text.arabic, surahNumber, ayah.numberInSurah);
+  };
+
   // Refs
   const audioRef = useRef<HTMLAudioElement>(null);
   const verseRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
@@ -423,29 +440,40 @@ export default function MushafPage() {
                     onClick={() => playAyah(ayah.numberInSurah)}
                   >
                     {/* Arabic Text - Word by Word or Regular */}
-                    {wordByWordMode && isCurrentVerse ? (
+                    {wordByWordMode ? (
                       <div className="mb-4">
-                        <WordByWord
-                          surah={surahNumber}
-                          ayah={ayah.numberInSurah}
-                          arabicText={cleanAyahText(ayah.text.arabic, surahNumber, ayah.numberInSurah)}
-                          reciterId={selectedReciter}
-                          isPlaying={isPlaying}
-                          audioRef={audioRef}
-                          fontSize={fontSize}
-                          showWordTranslation={true}
-                        />
+                        {isCurrentVerse ? (
+                          <WordByWord
+                            surah={surahNumber}
+                            ayah={ayah.numberInSurah}
+                            arabicText={cleanAyahText(ayah.text.arabic, surahNumber, ayah.numberInSurah)}
+                            reciterId={selectedReciter}
+                            isPlaying={isPlaying}
+                            audioRef={audioRef}
+                            fontSize={fontSize}
+                            showWordTranslation={true}
+                          />
+                        ) : (
+                          <WordByWordInline
+                            surah={surahNumber}
+                            ayah={ayah.numberInSurah}
+                            showTransliteration={true}
+                          />
+                        )}
                       </div>
                     ) : (
                       <p 
                         className="quran-text text-night-100 mb-4"
-                        style={{ fontSize }}
+                        style={{ 
+                          fontSize,
+                          fontFamily: fontOption?.fontFamily || 'var(--font-arabic)',
+                        }}
                         lang="ar"
                         dir="rtl"
                       >
                         <TajweedText
-                          text={cleanAyahText(ayah.text.arabic, surahNumber, ayah.numberInSurah)}
-                          enabled={showTajweedColors}
+                          text={getDisplayText(ayah)}
+                          enabled={showTajweedColors && !isAlternateScript}
                           className="quran-text"
                         />
                         <span className="verse-number" aria-label={`Verse ${ayah.numberInSurah}`}>{ayah.numberInSurah}</span>
@@ -907,6 +935,108 @@ export default function MushafPage() {
                       <option value="asad">Muhammad Asad</option>
                     </select>
                   )}
+                </div>
+
+                {/* Script Style */}
+                <div>
+                  <label className="text-sm text-night-400 mb-3 block flex items-center gap-2">
+                    <Layers className="w-4 h-4" />
+                    Script Style
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {QURAN_SCRIPT_OPTIONS.map((scriptOpt) => {
+                      const isSelected = currentScript === scriptOpt.value;
+                      return (
+                        <motion.button
+                          key={scriptOpt.value}
+                          onClick={() => updatePrefs('display', { quranScript: scriptOpt.value })}
+                          className={`relative p-4 rounded-2xl text-left transition-all ${
+                            isSelected
+                              ? 'bg-gold-500/15 border-2 border-gold-500/40 shadow-[0_0_20px_rgba(201,162,39,0.15)]'
+                              : 'bg-white/[0.03] border-2 border-white/[0.06] hover:border-white/10'
+                          }`}
+                          whileTap={{ scale: 0.97 }}
+                        >
+                          {isSelected && (
+                            <motion.div
+                              className="absolute top-2 right-2 w-5 h-5 rounded-full bg-gold-500 flex items-center justify-center"
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ type: 'spring', stiffness: 500 }}
+                            >
+                              <svg className="w-3 h-3 text-night-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                              </svg>
+                            </motion.div>
+                          )}
+                          <p className={`text-sm font-medium mb-1 ${isSelected ? 'text-gold-400' : 'text-night-200'}`}>
+                            {scriptOpt.label}
+                          </p>
+                          <p className="text-[10px] text-night-500 mb-3 leading-tight">
+                            {scriptOpt.description}
+                          </p>
+                          <p
+                            className="text-lg leading-relaxed"
+                            style={{
+                              fontFamily: scriptOpt.value === 'indopak' ? 'var(--font-indopak)' : 'var(--font-arabic)',
+                              color: isSelected ? 'rgb(201,162,39)' : 'rgb(180,180,190)',
+                            }}
+                            dir="rtl"
+                            lang="ar"
+                          >
+                            {scriptOpt.arabicSample}
+                          </p>
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Font Style */}
+                <div>
+                  <label className="text-sm text-night-400 mb-3 block flex items-center gap-2">
+                    <Type className="w-4 h-4" />
+                    Font Style
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {ARABIC_FONT_STYLE_OPTIONS.map((font) => {
+                      const isSelected = currentFontStyle === font.value;
+                      return (
+                        <motion.button
+                          key={font.value}
+                          onClick={() => {
+                            updatePrefs('display', { 
+                              arabicFontStyle: font.value,
+                              // Auto-switch script when selecting indopak font
+                              ...(font.value === 'indopak' ? { quranScript: 'indopak' as QuranScript } : {}),
+                            });
+                          }}
+                          className={`relative p-3 rounded-2xl text-left transition-all ${
+                            isSelected
+                              ? 'bg-gold-500/15 border-2 border-gold-500/40'
+                              : 'bg-white/[0.03] border-2 border-white/[0.06] hover:border-white/10'
+                          }`}
+                          whileTap={{ scale: 0.97 }}
+                        >
+                          <p className={`text-xs font-medium mb-1 ${isSelected ? 'text-gold-400' : 'text-night-300'}`}>
+                            {font.label}
+                          </p>
+                          <p
+                            className="text-base"
+                            style={{
+                              fontFamily: font.fontFamily,
+                              color: isSelected ? 'rgb(201,162,39)' : 'rgb(160,160,170)',
+                            }}
+                            dir="rtl"
+                            lang="ar"
+                          >
+                            {font.arabicSample}
+                          </p>
+                          <p className="text-[10px] text-night-600 mt-1">{font.description}</p>
+                        </motion.button>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 {/* Font Size */}
