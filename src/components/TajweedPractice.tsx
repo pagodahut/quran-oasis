@@ -549,12 +549,9 @@ export default function TajweedPractice({
                     </button>
                   </div>
                   
-                  {!canUseRealtime && (
+                  {!canUseRealtime && !isRealtimeSupported && (
                     <p className="text-xs text-night-600">
-                      {!isRealtimeSupported 
-                        ? `Real-time mode requires: ${missingFeatures.join(', ')}`
-                        : 'Real-time mode not available'
-                      }
+                      {`Real-time mode requires: ${missingFeatures.join(', ')}`}
                     </p>
                   )}
                 </div>

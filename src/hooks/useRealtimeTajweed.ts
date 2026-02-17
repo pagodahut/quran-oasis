@@ -112,7 +112,8 @@ export function useRealtimeTajweed(
   const audioLevelIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
   // Track if Deepgram is configured (checked via API)
-  const [isConfigured, setIsConfigured] = useState(false);
+  // Default to true — assume server has it configured; only disable on explicit rejection
+  const [isConfigured, setIsConfigured] = useState(true);
   const [apiKey, setApiKey] = useState<string | null>(null);
   
   // Check if Deepgram is configured via server
@@ -121,18 +122,21 @@ export function useRealtimeTajweed(
       try {
         const response = await fetch('/api/deepgram/token');
         if (!response.ok) {
-          setIsConfigured(false);
+          // Server error — don't disable, let it fail gracefully at recording time
+          setIsConfigured(true);
           return;
         }
         const data = await response.json();
         if (data.configured && data.apiKey) {
           setIsConfigured(true);
           setApiKey(data.apiKey);
-        } else {
+        } else if (data.configured === false) {
+          // Server explicitly says not configured
           setIsConfigured(false);
         }
       } catch {
-        setIsConfigured(false);
+        // Network error — assume configured, will fail gracefully when actually used
+        setIsConfigured(true);
       }
     }
     checkConfig();
@@ -158,9 +162,29 @@ export function useRealtimeTajweed(
   }, []);
   
   const start = useCallback(async () => {
-    if (!isConfigured || !apiKey) {
-      onError?.('Deepgram API key not configured');
+    if (!isConfigured) {
+      onError?.('Real-time transcription service is not configured on the server');
       return;
+    }
+    
+    if (!apiKey) {
+      // Try fetching the key one more time before giving up
+      try {
+        const response = await fetch('/api/deepgram/token');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.apiKey) {
+            setApiKey(data.apiKey);
+            // Continue with the fetched key below
+          } else {
+            onError?.('Real-time transcription service is not available. Please try standard mode.');
+            return;
+          }
+        }
+      } catch {
+        onError?.('Could not connect to transcription service. Please try standard mode.');
+        return;
+      }
     }
     
     if (!browserSupport.supported) {
