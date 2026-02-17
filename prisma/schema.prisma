@@ -230,6 +230,19 @@ model NudgeHistory {
   @@index([userId, shownAt])
 }
 
+// Web Push subscriptions
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String   // Public key
+  auth      String   // Auth secret
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
 // User feedback submissions
 model Feedback {
   id        String   @id @default(cuid())

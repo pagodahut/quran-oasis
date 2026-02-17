@@ -1,8 +1,8 @@
 {
-  "name": "HIFZ — Memorize the Quran",
-  "short_name": "HIFZ",
+  "name": "Quran Oasis - Hifz Journey",
+  "short_name": "Quran Oasis",
   "description": "AI-powered Quran memorization app with personalized lessons, spaced repetition, and beautiful recitations. Start your journey to becoming a Hafiz today.",
-  "start_url": "/",
+  "start_url": "/dashboard",
   "scope": "/",
   "id": "/",
   "display": "standalone",

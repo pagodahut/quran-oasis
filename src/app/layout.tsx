@@ -7,6 +7,7 @@ import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import { SyncProvider, SyncIndicator } from '@/components/SyncProvider';
 import { ToastProvider } from '@/components/Toast';
 import InstallPrompt from '@/components/InstallPrompt';
+import PushNotificationPrompt from '@/components/PushNotificationPrompt';
 import OfflineIndicator from '@/components/OfflineIndicator';
 import SkipToContent from '@/components/SkipToContent';
 import SheikhProvider from '@/components/SheikhProvider';
@@ -198,6 +199,7 @@ export default function RootLayout({
                   {children}
                 </main>
                 <InstallPrompt />
+                <PushNotificationPrompt />
                 <SyncIndicator />
               </SheikhProvider>
             </SyncProvider>

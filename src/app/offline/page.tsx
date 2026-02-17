@@ -72,25 +72,43 @@ export default function OfflinePage() {
             {isOnline ? 'Go to App' : 'Try Again'}
           </button>
 
-          {/* Quick Links to Cached Pages */}
+          {/* What you can still do offline */}
           <div className="pt-4 border-t border-night-800">
-            <p className="text-xs text-night-500 mb-3">Cached pages you can visit:</p>
-            <div className="flex gap-2 justify-center">
-              <Link
-                href="/"
-                className="flex items-center gap-1.5 px-4 py-2 bg-night-800 hover:bg-night-700 rounded-lg text-sm text-night-300 transition-colors"
-              >
-                <Home className="w-3.5 h-3.5" />
-                Home
-              </Link>
+            <p className="text-xs text-night-500 mb-3">You&apos;re offline — here&apos;s what you can still do:</p>
+            <div className="grid grid-cols-2 gap-2">
               <Link
                 href="/practice"
-                className="flex items-center gap-1.5 px-4 py-2 bg-night-800 hover:bg-night-700 rounded-lg text-sm text-night-300 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2.5 bg-night-800 hover:bg-night-700 rounded-lg text-sm text-night-300 transition-colors"
               >
-                <BookOpen className="w-3.5 h-3.5" />
-                Practice
+                <BookOpen className="w-3.5 h-3.5 text-gold-400" />
+                Flashcards
+              </Link>
+              <Link
+                href="/mushaf"
+                className="flex items-center gap-1.5 px-4 py-2.5 bg-night-800 hover:bg-night-700 rounded-lg text-sm text-night-300 transition-colors"
+              >
+                <BookOpen className="w-3.5 h-3.5 text-gold-400" />
+                Read Quran
+              </Link>
+              <Link
+                href="/lessons"
+                className="flex items-center gap-1.5 px-4 py-2.5 bg-night-800 hover:bg-night-700 rounded-lg text-sm text-night-300 transition-colors"
+              >
+                <BookOpen className="w-3.5 h-3.5 text-gold-400" />
+                Lessons
+              </Link>
+              <Link
+                href="/"
+                className="flex items-center gap-1.5 px-4 py-2.5 bg-night-800 hover:bg-night-700 rounded-lg text-sm text-night-300 transition-colors"
+              >
+                <Home className="w-3.5 h-3.5 text-gold-400" />
+                Home
               </Link>
             </div>
+            <p className="text-xs text-night-600 mt-3">
+              Recitation with Tarteel requires an internet connection.
+              Your progress will sync when you&apos;re back online.
+            </p>
           </div>
         </div>
 
