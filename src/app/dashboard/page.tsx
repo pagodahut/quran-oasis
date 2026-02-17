@@ -27,6 +27,9 @@ import {
 import BottomNav from '@/components/BottomNav';
 import GuestBanner from '@/components/GuestBanner';
 import DashboardGreeting from '@/components/DashboardGreeting';
+import DailyGoalCard from '@/components/DailyGoalCard';
+import NudgeBanner from '@/components/NudgeBanner';
+import { getClientNudge } from '@/lib/nudges';
 import {
   getStreakInfo,
   getDailyGoalStatus,
@@ -395,6 +398,17 @@ export default function DashboardPage() {
   const [surahProgress, setSurahProgress] = useState<SurahProgressItem[]>([]);
   const [userProgress, setUserProgress] = useState(getProgress());
 
+  // Daily goal + nudge state
+  const [serverGoal, setServerGoal] = useState<{
+    targetMinutes: number; targetVerses: number;
+    completedMinutes: number; completedVerses: number;
+    isComplete: boolean;
+  } | null>(null);
+  const [serverStreak, setServerStreak] = useState(0);
+  const [nudgeMessage, setNudgeMessage] = useState<string | null>(null);
+  const [nudgeType, setNudgeType] = useState<string | undefined>();
+  const [goalLoading, setGoalLoading] = useState(true);
+
   // Server-fetched state
   const [reviewQueue, setReviewQueue] = useState<ReviewQueueData>({ total: 0, items: [] });
   const [recentSessions, setRecentSessions] = useState<RecentSession[]>([]);
@@ -453,6 +467,37 @@ export default function DashboardPage() {
       window.removeEventListener('progress-updated', loadData);
     };
   }, []);
+
+  // Fetch daily goal + nudge
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (isSignedIn) {
+      fetch('/api/goals/daily')
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (data) {
+            setServerGoal(data.goal);
+            setServerStreak(data.streak);
+            if (data.nudge) {
+              setNudgeMessage(data.nudge.message);
+              setNudgeType(data.nudge.type);
+            }
+          }
+          setGoalLoading(false);
+        })
+        .catch(() => setGoalLoading(false));
+    } else {
+      const nudge = getClientNudge({
+        streakDays: streakInfo.current,
+        totalVerses: quranProgress.versesMemorized,
+        daysSinceLastVisit: 0,
+        goalComplete: goalStatus.progress >= goalStatus.target,
+      });
+      setNudgeMessage(nudge.message);
+      setNudgeType(nudge.type);
+      setGoalLoading(false);
+    }
+  }, [isLoaded, isSignedIn]);
 
   // Fetch server data for signed-in users
   useEffect(() => {
@@ -608,30 +653,30 @@ export default function DashboardPage() {
             />
           </motion.section>
 
-          {/* ── 2. Daily Goal Progress ── */}
-          <motion.div variants={fadeInUp} className="liquid-glass-gold rounded-2xl p-5">
-            <div className="flex items-center gap-4">
-              <CircularProgress progress={goalProgress} size={72} strokeWidth={5}>
-                <div className="text-center">
-                  <span className="text-lg font-bold text-night-100">{goalProgress}%</span>
-                </div>
-              </CircularProgress>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <Target className="w-4 h-4 text-gold-400" />
-                  <span className="text-night-200 font-medium">Today&apos;s Goal</span>
-                </div>
-                <p className="text-night-400 text-sm">
-                  {goalStatus.progress}/{learningPrefs.dailyGoalVerses || goalStatus.target} verses completed
-                </p>
-                {goalProgress >= 100 && (
-                  <p className="text-sage-400 text-xs mt-1 flex items-center gap-1">
-                    <Sparkles className="w-3 h-3" /> Goal completed! Masha&apos;Allah!
-                  </p>
-                )}
-              </div>
-            </div>
-          </motion.div>
+          {/* ── 2. Daily Goal with Circular Progress Ring ── */}
+          <motion.section variants={fadeInUp}>
+            <DailyGoalCard
+              goal={serverGoal ?? {
+                targetMinutes: 20,
+                targetVerses: learningPrefs.dailyGoalVerses || goalStatus.target,
+                completedMinutes: 0,
+                completedVerses: goalStatus.progress,
+                isComplete: goalProgress >= 100,
+              }}
+              streak={isSignedIn ? serverStreak : streakInfo.current}
+              loading={goalLoading}
+            />
+          </motion.section>
+
+          {/* ── 2b. Motivational Nudge ── */}
+          {nudgeMessage && (
+            <motion.section variants={fadeInUp}>
+              <NudgeBanner message={nudgeMessage} type={nudgeType} variant="card" />
+            </motion.section>
+          )}
+
+          {/* Toast nudge on page load */}
+          <NudgeBanner message={nudgeMessage} type={nudgeType} variant="toast" />
 
           {/* ── 3. Smart Review Alert ── */}
           {isSignedIn && (
