@@ -17,26 +17,22 @@ interface OnboardingCalibrationProps {
 const QUICK_REPLIES: Record<number, string[]> = {
   0: [], // Sheikh's opening — user types freely
   1: [
-    'Yes, I can read Arabic fluently',
+    'I can read Arabic fluently',
     'I can read slowly',
-    'I know some letters but struggle',
-    "No, I can't read Arabic yet",
+    'I know some letters',
+    "I can't read Arabic yet",
   ],
   2: [
-    'Yes, I know the basic rules',
-    "I've heard of it but don't know the rules",
-    "No, I don't know what tajweed is",
+    'Memorize the entire Quran',
+    'Memorize Juz Amma',
+    'Learn selected surahs',
+    'Daily recitation habit',
   ],
   3: [
-    "I haven't memorized anything yet",
-    'A few short surahs (Fatiha, Ikhlas, etc.)',
-    'Several surahs from Juz Amma',
-    'More than one juz',
-  ],
-  4: [
-    'Yes, I understand the meanings',
-    'Some of them — mostly the short surahs',
-    "Not really, I've memorized the sounds",
+    '10 minutes',
+    '20 minutes',
+    '30 minutes',
+    '45+ minutes',
   ],
 };
 
@@ -99,7 +95,7 @@ export default function OnboardingCalibration({
 
   const currentQuickReplies = QUICK_REPLIES[questionNumber] || [];
 
-  const progressPercent = Math.min((questionNumber / 5) * 100, 100);
+  const progressPercent = Math.min((questionNumber / 3) * 100, 100);
 
   return (
     <div
