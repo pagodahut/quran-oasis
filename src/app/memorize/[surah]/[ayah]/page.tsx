@@ -24,6 +24,9 @@ import {
   Layers,
   BookOpen,
   Grid3X3,
+  Mic,
+  MicOff,
+  AlertCircle,
 } from 'lucide-react';
 import WordByWordInline from '@/components/WordByWordInline';
 import { getSurah, getAudioUrl, RECITERS, cleanAyahText, getEffectiveReciterForPerAyah, supportsPerAyah, type Ayah } from '@/lib/quranData';
@@ -35,6 +38,7 @@ import {
   saveProgress,
 } from '@/lib/progressStore';
 import { useReadingPreferences } from '@/hooks/useAppliedPreferences';
+import { TarteelService, checkBrowserSupport, type TarteelSessionResult } from '@/lib/tarteelService';
 
 // ============ PHASE TYPES ============
 
@@ -417,12 +421,31 @@ export default function MemorizePage() {
   const [showCelebration, setShowCelebration] = useState(false);
   const [wordByWordMode, setWordByWordMode] = useState(false);
   
+  // Tarteel recall state
+  const [isRecording, setIsRecording] = useState(false);
+  const [recallAccuracy, setRecallAccuracy] = useState<number[]>([]); // accuracy per attempt
+  const [lastAccuracy, setLastAccuracy] = useState<number | null>(null);
+  const [showFlashCorrection, setShowFlashCorrection] = useState(false);
+  const [tarteelAvailable, setTarteelAvailable] = useState<boolean | null>(null);
+  const tarteelRef = useRef<TarteelService | null>(null);
+  
   // Audio - use reciter from preferences
   const audioUrl = getAudioUrl(surahNum, ayahNum, prefs.reciter);
   const { isPlaying, isLoading, progress, play, pause, toggle, reset } = useAudio(audioUrl);
   
   const autoPlayRef = useRef(false);
   const repeatCountRef = useRef(0);
+
+  // Check Tarteel availability
+  useEffect(() => {
+    const check = async () => {
+      const browserOk = checkBrowserSupport().supported;
+      if (!browserOk) { setTarteelAvailable(false); return; }
+      const configured = await TarteelService.isConfigured();
+      setTarteelAvailable(configured);
+    };
+    check();
+  }, []);
 
   // Load data
   useEffect(() => {
@@ -522,6 +545,66 @@ export default function MemorizePage() {
       handleNextPhase();
     }
   };
+
+  // Tarteel recording for recall phase
+  const startRecallRecording = useCallback(async () => {
+    if (!verse || !tarteelAvailable) return;
+    
+    const displayText = cleanAyahText(verse.text.arabic, surahNum, verse.numberInSurah);
+    const service = new TarteelService({
+      expectedText: displayText,
+      chunkIntervalMs: 3000,
+      onStateChange: (state) => {
+        setIsRecording(state.isRecording);
+      },
+    });
+    tarteelRef.current = service;
+    
+    try {
+      await service.start();
+    } catch {
+      // Fallback to manual mode if mic fails
+      setTarteelAvailable(false);
+    }
+  }, [verse, surahNum, tarteelAvailable]);
+
+  const stopRecallRecording = useCallback(async (): Promise<number> => {
+    if (!tarteelRef.current) return 0;
+    
+    try {
+      const result: TarteelSessionResult = await tarteelRef.current.stop();
+      tarteelRef.current = null;
+      return result.accuracy;
+    } catch {
+      tarteelRef.current = null;
+      return 0;
+    }
+  }, []);
+
+  const handleRecallAttempt = useCallback(async () => {
+    if (tarteelAvailable && isRecording) {
+      // Stop recording and get accuracy
+      const accuracy = await stopRecallRecording();
+      setLastAccuracy(accuracy);
+      setRecallAccuracy(prev => [...prev, accuracy]);
+      
+      // Flash correction text if accuracy < 80%
+      if (accuracy < 80) {
+        setShowFlashCorrection(true);
+        setShowText(true);
+        setTimeout(() => {
+          setShowFlashCorrection(false);
+          setShowText(false);
+        }, 3000);
+      }
+      
+      handleRepComplete();
+    } else {
+      // Manual mode fallback
+      if (showText) setShowText(false);
+      handleRepComplete();
+    }
+  }, [tarteelAvailable, isRecording, stopRecallRecording, handleRepComplete, showText]);
 
   const goToNextVerse = () => {
     const surah = getSurah(surahNum);
@@ -802,18 +885,48 @@ export default function MemorizePage() {
                   Recite from Memory
                 </h2>
                 <p className="text-night-400">
-                  Now recite 3 times without looking
+                  {tarteelAvailable
+                    ? 'Tap the mic, then recite without looking'
+                    : 'Now recite 3 times without looking'}
                 </p>
               </div>
 
-              <div onClick={() => setShowText(!showText)} className="cursor-pointer">
-                <VerseDisplay verse={verse} surahNumber={surahNum} showText={showText} size="large" />
+              <div onClick={() => !showFlashCorrection && setShowText(!showText)} className="cursor-pointer relative">
+                <VerseDisplay verse={verse} surahNumber={surahNum} showText={showText || showFlashCorrection} size="large" highlight={showFlashCorrection} />
+                {showFlashCorrection && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-500/20 text-amber-400 text-xs"
+                  >
+                    <AlertCircle className="w-3 h-3" />
+                    Review the text
+                  </motion.div>
+                )}
               </div>
 
-              {!showText && (
+              {!showText && !showFlashCorrection && (
                 <p className="text-center text-night-600 text-sm">
                   Tap the box above to reveal if needed
                 </p>
+              )}
+
+              {/* Accuracy badges for previous attempts */}
+              {recallAccuracy.length > 0 && (
+                <div className="flex justify-center gap-2">
+                  {recallAccuracy.map((acc, i) => (
+                    <span
+                      key={i}
+                      className={`text-xs px-2 py-1 rounded-full font-medium ${
+                        acc >= 80
+                          ? 'bg-sage-500/20 text-sage-400'
+                          : 'bg-amber-500/20 text-amber-400'
+                      }`}
+                    >
+                      Attempt {i + 1}: {acc}%
+                    </span>
+                  ))}
+                </div>
               )}
 
               <RepetitionCounter 
@@ -831,22 +944,58 @@ export default function MemorizePage() {
                   {showText ? 'Hide' : 'Reveal'}
                 </button>
                 
-                <motion.button
-                  onClick={() => {
-                    if (showText) {
-                      // If they needed to peek, that's okay but encourage them to hide
-                      setShowText(false);
-                    }
-                    handleRepComplete();
-                  }}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex items-center gap-2 px-8 py-3 rounded-xl bg-sage-600 hover:bg-sage-500 text-white font-semibold transition-colors shadow-glow-sage"
-                >
-                  <Brain className="w-5 h-5" />
-                  I've Recited It ({repetitions + 1}/3)
-                </motion.button>
+                {tarteelAvailable ? (
+                  isRecording ? (
+                    <motion.button
+                      onClick={handleRecallAttempt}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="flex items-center gap-2 px-8 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold transition-colors animate-pulse"
+                    >
+                      <MicOff className="w-5 h-5" />
+                      Stop & Check ({repetitions + 1}/3)
+                    </motion.button>
+                  ) : (
+                    <motion.button
+                      onClick={startRecallRecording}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="flex items-center gap-2 px-8 py-3 rounded-xl bg-sage-600 hover:bg-sage-500 text-white font-semibold transition-colors shadow-glow-sage"
+                    >
+                      <Mic className="w-5 h-5" />
+                      Start Reciting ({repetitions + 1}/3)
+                    </motion.button>
+                  )
+                ) : (
+                  <motion.button
+                    onClick={() => {
+                      if (showText) setShowText(false);
+                      handleRepComplete();
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="flex items-center gap-2 px-8 py-3 rounded-xl bg-sage-600 hover:bg-sage-500 text-white font-semibold transition-colors shadow-glow-sage"
+                  >
+                    <Brain className="w-5 h-5" />
+                    I've Recited It ({repetitions + 1}/3)
+                  </motion.button>
+                )}
               </div>
+
+              {/* Last accuracy feedback */}
+              {lastAccuracy !== null && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`text-center text-sm font-medium ${
+                    lastAccuracy >= 80 ? 'text-sage-400' : 'text-amber-400'
+                  }`}
+                >
+                  {lastAccuracy >= 80
+                    ? `✓ Great recall — ${lastAccuracy}% accuracy!`
+                    : `${lastAccuracy}% — review the text and try again`}
+                </motion.div>
+              )}
             </motion.div>
           )}
 
@@ -929,6 +1078,17 @@ export default function MemorizePage() {
                     <p className="text-3xl font-bold text-sage-400">1</p>
                     <p className="text-night-500 text-sm">Verse Added</p>
                   </div>
+                  {recallAccuracy.length > 0 && (
+                    <>
+                      <div className="w-px h-12 bg-night-700" />
+                      <div className="text-center">
+                        <p className="text-3xl font-bold text-purple-400">
+                          {Math.round(recallAccuracy.reduce((a, b) => a + b, 0) / recallAccuracy.length)}%
+                        </p>
+                        <p className="text-night-500 text-sm">Accuracy</p>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 

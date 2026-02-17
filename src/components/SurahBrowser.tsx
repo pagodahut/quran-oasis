@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, 
@@ -15,6 +15,7 @@ import {
   Sun,
   Moon,
 } from 'lucide-react';
+import { getSurahProgress } from '@/lib/progressStore';
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 🕌 THE GARDEN OF SURAHS — A Living Map of the Quran
@@ -499,7 +500,48 @@ function SurahCard({
         </span>
         <span className="text-[10px] text-night-600">{surah.ayahs} ayahs</span>
       </div>
+
+      {/* Memorization Progress Bar */}
+      <SurahProgressBar surahId={surah.id} totalAyahs={surah.ayahs} />
     </motion.button>
+  );
+}
+
+// ─── Surah Progress Bar ───────────────────────────────────────────
+function SurahProgressBar({ surahId, totalAyahs }: { surahId: number; totalAyahs: number }) {
+  const [progress, setProgress] = useState({ versesMemorized: 0, percentage: 0 });
+
+  useEffect(() => {
+    try {
+      const p = getSurahProgress(surahId);
+      if (p.versesMemorized > 0) {
+        // Recompute percentage using actual totalAyahs from surah data
+        setProgress({
+          versesMemorized: p.versesMemorized,
+          percentage: Math.round((p.versesMemorized / totalAyahs) * 100),
+        });
+      }
+    } catch {
+      // progressStore may not be available in SSR
+    }
+  }, [surahId, totalAyahs]);
+
+  if (progress.versesMemorized === 0) return null;
+
+  return (
+    <div className="w-full mt-1">
+      <div className="h-1.5 bg-night-800 rounded-full overflow-hidden">
+        <motion.div
+          className="h-full bg-gradient-to-r from-sage-600 to-sage-400 rounded-full"
+          initial={{ width: 0 }}
+          animate={{ width: `${progress.percentage}%` }}
+          transition={{ duration: 0.4 }}
+        />
+      </div>
+      <p className="text-[9px] text-sage-500 mt-0.5">
+        {progress.versesMemorized}/{totalAyahs} memorized
+      </p>
+    </div>
   );
 }
 
