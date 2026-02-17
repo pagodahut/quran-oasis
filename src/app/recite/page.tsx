@@ -14,14 +14,19 @@ import {
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 import LiveRecitation from '@/components/LiveRecitation';
+import RevealRecitation, { DifficultySelector, type RevealDifficulty } from '@/components/RevealRecitation';
 import { SURAH_METADATA, type SurahMeta } from '@/lib/surahMetadata';
 
 // ============ Types ============
+
+type ReciteMode = 'standard' | 'reveal';
 
 interface SelectedSurah {
   surahNumber: number;
   startAyah: number;
   endAyah?: number;
+  mode: ReciteMode;
+  revealDifficulty?: RevealDifficulty;
 }
 
 // ============ Popular Surahs for Quick Access ============
@@ -221,14 +226,55 @@ function AyahRangeSelector({
         </motion.div>
       )}
 
+      {/* Practice Mode Toggle */}
+      <div className="mb-4">
+        <label className="block text-xs text-night-400 mb-2 font-semibold uppercase tracking-wider">
+          Practice Mode
+        </label>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setReciteMode('standard')}
+            className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition border ${
+              reciteMode === 'standard'
+                ? 'bg-gold-500/15 text-gold-400 border-gold-500/30'
+                : 'bg-night-800/50 text-night-400 border-night-700/30 hover:bg-night-800'
+            }`}
+          >
+            <div>Real-time</div>
+            <div className="text-[10px] mt-0.5 opacity-70">See text, track accuracy</div>
+          </button>
+          <button
+            onClick={() => setReciteMode('reveal')}
+            className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition border ${
+              reciteMode === 'reveal'
+                ? 'bg-gold-500/15 text-gold-400 border-gold-500/30'
+                : 'bg-night-800/50 text-night-400 border-night-700/30 hover:bg-night-800'
+            }`}
+          >
+            <div>Reveal Mode</div>
+            <div className="text-[10px] mt-0.5 opacity-70">Hidden text, reveal as you recite</div>
+          </button>
+        </div>
+      </div>
+
+      {/* Difficulty (Reveal mode only) */}
+      {reciteMode === 'reveal' && (
+        <div className="mb-6">
+          <label className="block text-xs text-night-400 mb-2 font-semibold uppercase tracking-wider">
+            Difficulty
+          </label>
+          <DifficultySelector value={revealDifficulty} onChange={setRevealDiff} />
+        </div>
+      )}
+
       {/* Start Button */}
       <motion.button
         whileTap={{ scale: 0.97 }}
         onClick={() => {
           if (mode === 'full') {
-            onStart(1, undefined);
+            onStart(1, undefined, reciteMode, revealDifficulty);
           } else {
-            onStart(startAyah, endAyah);
+            onStart(startAyah, endAyah, reciteMode, revealDifficulty);
           }
         }}
         className="w-full py-4 rounded-xl bg-gradient-to-r from-gold-600 to-gold-500 
@@ -236,7 +282,7 @@ function AyahRangeSelector({
           flex items-center justify-center gap-3 shadow-glow-gold"
       >
         <Mic className="w-5 h-5" />
-        Start Reciting
+        {reciteMode === 'reveal' ? 'Start Reveal Mode' : 'Start Reciting'}
       </motion.button>
 
       {/* Tips */}
@@ -301,12 +347,14 @@ export default function RecitePage() {
   }, []);
 
   const handleStartRecitation = useCallback(
-    (startAyah: number, endAyah?: number) => {
+    (startAyah: number, endAyah?: number, reciteMode?: ReciteMode, difficulty?: RevealDifficulty) => {
       if (!selectingSurah) return;
       setSelectedSurah({
         surahNumber: selectingSurah.number,
         startAyah,
         endAyah,
+        mode: reciteMode || 'standard',
+        revealDifficulty: difficulty,
       });
     },
     [selectingSurah]
@@ -325,6 +373,17 @@ export default function RecitePage() {
   // ============ Active Recitation ============
 
   if (selectedSurah) {
+    if (selectedSurah.mode === 'reveal') {
+      return (
+        <RevealRecitation
+          surahNumber={selectedSurah.surahNumber}
+          startAyah={selectedSurah.startAyah}
+          endAyah={selectedSurah.endAyah}
+          difficulty={selectedSurah.revealDifficulty || 'medium'}
+          onBack={() => setSelectedSurah(null)}
+        />
+      );
+    }
     return (
       <LiveRecitation
         surahNumber={selectedSurah.surahNumber}

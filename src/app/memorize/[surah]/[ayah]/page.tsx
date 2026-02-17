@@ -40,6 +40,7 @@ import {
 } from '@/lib/progressStore';
 import { useReadingPreferences } from '@/hooks/useAppliedPreferences';
 import { TarteelService, checkBrowserSupport, type TarteelSessionResult } from '@/lib/tarteelService';
+import RevealRecitation, { DifficultySelector, type RevealDifficulty } from '@/components/RevealRecitation';
 
 // ============ PHASE TYPES ============
 
@@ -430,6 +431,10 @@ export default function MemorizePage() {
   const [showFlashCorrection, setShowFlashCorrection] = useState(false);
   const [tarteelAvailable, setTarteelAvailable] = useState<boolean | null>(null);
   const tarteelRef = useRef<TarteelService | null>(null);
+  
+  // Reveal mode state
+  const [useRevealMode, setUseRevealMode] = useState(false);
+  const [revealDifficulty, setRevealDifficulty] = useState<RevealDifficulty>('medium');
   
   // Audio - use reciter from preferences
   const audioUrl = getAudioUrl(surahNum, ayahNum, prefs.reciter);
@@ -881,8 +886,33 @@ export default function MemorizePage() {
             </motion.div>
           )}
 
-          {/* RECALL PHASE (3 from memory) */}
-          {phase === 'recall' && (
+          {/* RECALL PHASE (3 from memory) — Reveal Mode */}
+          {phase === 'recall' && useRevealMode && verse && (
+            <motion.div
+              key="recall-reveal"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50"
+            >
+              <RevealRecitation
+                surahNumber={surahNum}
+                startAyah={ayahNum}
+                endAyah={ayahNum}
+                difficulty={revealDifficulty}
+                onBack={() => setUseRevealMode(false)}
+                onComplete={(res) => {
+                  setRecallAccuracy(prev => [...prev, res.accuracy]);
+                  setLastAccuracy(res.accuracy);
+                  handleRepComplete();
+                  setUseRevealMode(false);
+                }}
+              />
+            </motion.div>
+          )}
+
+          {/* RECALL PHASE (3 from memory) — Standard */}
+          {phase === 'recall' && !useRevealMode && (
             <motion.div
               key="recall"
               initial={{ opacity: 0, y: 20 }}
@@ -900,6 +930,28 @@ export default function MemorizePage() {
                     : 'Now recite 3 times without looking'}
                 </p>
               </div>
+
+              {/* Reveal Mode Toggle */}
+              {tarteelAvailable && (
+                <div className="space-y-3">
+                  <button
+                    onClick={() => setUseRevealMode(true)}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-xl 
+                      bg-gradient-to-r from-gold-900/20 to-night-900 border border-gold-500/20
+                      hover:border-gold-500/40 transition group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Sparkles className="w-5 h-5 text-gold-400" />
+                      <div className="text-left">
+                        <span className="text-sm font-medium text-gold-300">Reveal Mode</span>
+                        <p className="text-[10px] text-night-500">Words reveal as you recite them</p>
+                      </div>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-gold-400/60 group-hover:text-gold-400 transition" />
+                  </button>
+                  <DifficultySelector value={revealDifficulty} onChange={setRevealDifficulty} />
+                </div>
+              )}
 
               <div onClick={() => !showFlashCorrection && setShowText(!showText)} className="cursor-pointer relative">
                 <VerseDisplay verse={verse} surahNumber={surahNum} showText={showText || showFlashCorrection} size="large" highlight={showFlashCorrection} />
