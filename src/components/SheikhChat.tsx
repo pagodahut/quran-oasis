@@ -194,7 +194,7 @@ export default function SheikhChat({
     clearChat,
     suggestedQuestions,
     stopStreaming,
-  } = useSheikhChat({ ayahContext, userLevel });
+  } = useSheikhChat({ ayahContext, userLevel, pageContext });
 
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);

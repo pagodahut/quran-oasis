@@ -83,7 +83,7 @@ export default function PostLessonReflection({
   onReview,
   className = '',
 }: PostLessonReflectionProps) {
-  const { openSheikh } = useSheikh();
+  const { openSheikh, setPageContext } = useSheikh();
   const { generate, isLoading, error } = useSheikhGenerate<ReflectionResponse>();
   const [reflection, setReflection] = useState<ReflectionResponse | null>(null);
   const [animateIn, setAnimateIn] = useState(false);
@@ -116,7 +116,21 @@ export default function PostLessonReflection({
       : 0;
 
   const handleAskSheikh = () => {
-    openSheikh(`Tell me more about what I just memorized in ${lessonTitle}`);
+    // Set lesson completion context so Sheikh knows what was just learned
+    setPageContext({
+      page: 'lesson_complete',
+      lessonTitle,
+      lessonCompletionContext: {
+        lettersCovered: ayahs.map(a => a.surahName),
+        conceptsTaught: [],
+        quizScore: performance.perfectRecitations,
+        quizTotal: performance.totalAttempts,
+        ayahsMemorized: performance.ayahsMemorized,
+        struggles: performance.struggles,
+        timeSpentMinutes: performance.timeSpentMinutes,
+      },
+    });
+    openSheikh(`Tell me more about what I just learned in ${lessonTitle}`);
   };
 
   return (

@@ -39,6 +39,7 @@ import type { AyahContext } from '@/hooks/useSheikhChat';
 export type SheikhPage =
   | 'mushaf'
   | 'lesson'
+  | 'lesson_complete'
   | 'recite'
   | 'practice'
   | 'dashboard'
@@ -65,6 +66,16 @@ export interface SheikhPageContext {
   replayCount?: number;
   /** How many failed recitation attempts */
   failedAttempts?: number;
+  /** Lesson completion context — set when user finishes a lesson */
+  lessonCompletionContext?: {
+    lettersCovered?: string[];
+    conceptsTaught?: string[];
+    quizScore?: number;
+    quizTotal?: number;
+    ayahsMemorized?: number;
+    struggles?: string[];
+    timeSpentMinutes?: number;
+  };
 }
 
 interface SheikhContextValue {

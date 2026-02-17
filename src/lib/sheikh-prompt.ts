@@ -12,13 +12,23 @@
 // ─── Types ───────────────────────────────────────────────────────────
 
 export interface PageContext {
-  page: 'mushaf' | 'lesson' | 'recite' | 'practice' | 'dashboard' | 'techniques' | 'profile' | 'other';
+  page: 'mushaf' | 'lesson' | 'lesson_complete' | 'recite' | 'practice' | 'dashboard' | 'techniques' | 'profile' | 'other';
   lessonId?: string;
   lessonTitle?: string;
   isReciting?: boolean;
   replayCount?: number;
   failedAttempts?: number;
   tajweedResults?: TajweedResult[];
+  /** Context from a just-completed lesson */
+  lessonCompletionContext?: {
+    lettersCovered?: string[];
+    conceptsTaught?: string[];
+    quizScore?: number;
+    quizTotal?: number;
+    ayahsMemorized?: number;
+    struggles?: string[];
+    timeSpentMinutes?: number;
+  };
 }
 
 export interface TajweedResult {
@@ -218,6 +228,38 @@ export function buildPageContext(ctx: PageContext): string {
         );
       }
       break;
+
+    case 'lesson_complete': {
+      parts.push(
+        `The student just **completed a lesson**${ctx.lessonTitle ? ` — "${ctx.lessonTitle}"` : ''}.`,
+      );
+      const lc = ctx.lessonCompletionContext;
+      if (lc) {
+        if (lc.lettersCovered?.length) {
+          parts.push(`Letters/sounds covered: ${lc.lettersCovered.join(', ')}`);
+        }
+        if (lc.conceptsTaught?.length) {
+          parts.push(`Concepts taught: ${lc.conceptsTaught.join(', ')}`);
+        }
+        if (lc.quizScore != null && lc.quizTotal != null) {
+          parts.push(`Quiz result: ${lc.quizScore}/${lc.quizTotal}`);
+        }
+        if (lc.ayahsMemorized) {
+          parts.push(`Ayahs memorized this session: ${lc.ayahsMemorized}`);
+        }
+        if (lc.struggles?.length) {
+          parts.push(`Areas of difficulty: ${lc.struggles.join(', ')}`);
+        }
+        if (lc.timeSpentMinutes) {
+          parts.push(`Time spent: ${lc.timeSpentMinutes} minutes`);
+        }
+      }
+      parts.push(
+        'The student clicked "Ask Sheikh" after finishing. Answer questions about what they just learned.',
+        'Reference the specific letters, concepts, or ayahs from the lesson. Be specific and helpful.'
+      );
+      break;
+    }
 
     case 'recite':
       parts.push(
