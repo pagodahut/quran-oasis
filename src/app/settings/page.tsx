@@ -1119,6 +1119,20 @@ Additional Notes:
                 <p className="text-xs text-night-500">Suggest improvements</p>
               </div>
             </button>
+
+            {/* Admin: Bug Tracker */}
+            {process.env.NEXT_PUBLIC_ADMIN_USER_IDS && (
+              <Link
+                href="/admin/feedback"
+                className="w-full p-4 rounded-xl bg-night-800/50 hover:bg-night-800 transition-colors flex items-center gap-3 text-left"
+              >
+                <Shield className="w-5 h-5 text-gold-400" />
+                <div>
+                  <p className="text-night-100 font-medium">Bug Tracker</p>
+                  <p className="text-xs text-night-500">Review all feedback (Admin)</p>
+                </div>
+              </Link>
+            )}
           </div>
         </SettingSection>
 

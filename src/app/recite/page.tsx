@@ -107,10 +107,12 @@ function AyahRangeSelector({
   onBack,
 }: {
   surah: SurahMeta;
-  onStart: (start: number, end?: number) => void;
+  onStart: (start: number, end?: number, mode?: ReciteMode, difficulty?: RevealDifficulty) => void;
   onBack: () => void;
 }) {
   const [mode, setMode] = useState<'full' | 'range'>('full');
+  const [reciteMode, setReciteMode] = useState<ReciteMode>('standard');
+  const [revealDifficulty, setRevealDiff] = useState<RevealDifficulty>('medium');
   const [startAyah, setStartAyah] = useState(1);
   const [endAyah, setEndAyah] = useState(surah.numberOfAyahs);
 

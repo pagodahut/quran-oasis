@@ -11,6 +11,7 @@ import { useEffect, useState, useCallback } from 'react';
 
 export type FontSize = 'small' | 'medium' | 'large' | 'extra-large';
 export type ArabicFontStyle = 'uthmani' | 'madina' | 'indopak' | 'kitab';
+export type QuranScript = 'uthmani' | 'indopak';
 export type Theme = 'dark' | 'light' | 'auto';
 export type PlaybackSpeed = 0.5 | 0.75 | 1 | 1.25 | 1.5 | 2;
 export type AudioQuality = 'auto' | 'high' | 'medium' | 'low';
@@ -32,6 +33,7 @@ export interface DisplayPreferences {
   arabicFontSize: FontSize;
   arabicFontSizePx: number;
   arabicFontStyle: ArabicFontStyle;
+  quranScript: QuranScript;
   showTranslation: boolean;
   showTransliteration: boolean;
   translation: 'sahih' | 'asad';
@@ -241,6 +243,7 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
     arabicFontSize: 'medium',
     arabicFontSizePx: 28,
     arabicFontStyle: 'uthmani',
+    quranScript: 'uthmani',
     showTranslation: true,
     showTransliteration: false,
     translation: 'sahih',

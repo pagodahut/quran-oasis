@@ -251,6 +251,7 @@ model Feedback {
   message   String
   pageUrl   String?
   userAgent String?
+  status    String   @default("new") // new, in_progress, done
   createdAt DateTime @default(now())
 
   @@index([createdAt])

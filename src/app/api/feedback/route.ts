@@ -4,8 +4,7 @@ import { auth } from '@clerk/nextjs/server';
 
 /**
  * POST /api/feedback
- * Saves feedback to database (Prisma Feedback model).
- * Accepts both authenticated and guest submissions.
+ * Saves feedback to database.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -22,7 +21,6 @@ export async function POST(request: NextRequest) {
     const validCategories = ['bug', 'feature', 'general'];
     const safeCategory = validCategories.includes(category) ? category : 'general';
 
-    // Try to get authenticated user
     let userId: string | null = null;
     try {
       const { userId: clerkId } = await auth();
@@ -62,20 +60,89 @@ export async function POST(request: NextRequest) {
 
 /**
  * GET /api/feedback
- * Returns recent feedback (admin/review purposes).
+ * Returns feedback with optional filters and pagination.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const feedback = await prisma.feedback.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 100,
-    });
+    // Check admin access
+    const adminIds = process.env.ADMIN_USER_IDS?.split(',').map(s => s.trim()) || [];
+    const { userId: clerkId } = await auth();
+    
+    if (!clerkId || (adminIds.length > 0 && !adminIds.includes(clerkId))) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-    return NextResponse.json({ feedback, total: feedback.length });
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
+    const category = searchParams.get('category');
+    const status = searchParams.get('status');
+
+    const where: Record<string, string> = {};
+    if (category) where.category = category;
+    if (status) where.status = status;
+
+    const [feedback, total] = await Promise.all([
+      prisma.feedback.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.feedback.count({ where }),
+    ]);
+
+    return NextResponse.json({
+      feedback,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (error) {
     console.error('[Feedback GET Error]', error);
     return NextResponse.json(
       { error: 'Failed to read feedback' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * PATCH /api/feedback
+ * Update feedback status.
+ */
+export async function PATCH(request: NextRequest) {
+  try {
+    // Check admin access
+    const adminIds = process.env.ADMIN_USER_IDS?.split(',').map(s => s.trim()) || [];
+    const { userId: clerkId } = await auth();
+    
+    if (!clerkId || (adminIds.length > 0 && !adminIds.includes(clerkId))) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { id, status } = body;
+
+    if (!id || !status) {
+      return NextResponse.json({ error: 'id and status required' }, { status: 400 });
+    }
+
+    const validStatuses = ['new', 'in_progress', 'done'];
+    if (!validStatuses.includes(status)) {
+      return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
+    }
+
+    const updated = await prisma.feedback.update({
+      where: { id },
+      data: { status },
+    });
+
+    return NextResponse.json({ success: true, feedback: updated });
+  } catch (error) {
+    console.error('[Feedback PATCH Error]', error);
+    return NextResponse.json(
+      { error: 'Failed to update feedback' },
       { status: 500 }
     );
   }
