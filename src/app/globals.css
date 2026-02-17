@@ -3309,3 +3309,174 @@ html * {
 html.no-transitions * {
   transition: none !important;
 }
+
+/* ============================================
+   OLIVE EARTH THEME OVERRIDES
+   Earthy, grounded, vintage manuscript feel
+   ============================================ */
+
+[data-theme="olive-earth"] body {
+  background-color: #E8DCCA;
+  color: #2D2D2D;
+}
+
+[data-theme="olive-earth"] .text-gold-400,
+[data-theme="olive-earth"] .text-gold-300 {
+  color: #3F4F28;
+}
+
+[data-theme="olive-earth"] .bg-gold-500 {
+  background-color: #3F4F28;
+}
+
+[data-theme="olive-earth"] .bg-gold-500\/10 {
+  background-color: rgba(63, 79, 40, 0.10);
+}
+
+[data-theme="olive-earth"] .border-gold-500\/50 {
+  border-color: rgba(63, 79, 40, 0.50);
+}
+
+[data-theme="olive-earth"] .border-gold-500\/20 {
+  border-color: rgba(63, 79, 40, 0.20);
+}
+
+[data-theme="olive-earth"] .bismillah,
+[data-theme="olive-earth"] .surah-header {
+  color: #3F4F28;
+}
+
+[data-theme="olive-earth"] .verse-number {
+  background-color: rgba(63, 79, 40, 0.10);
+  color: #3F4F28;
+}
+
+[data-theme="olive-earth"] .text-gold-gradient {
+  background: linear-gradient(135deg, #5A7038 0%, #3F4F28 50%, #2A3518 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[data-theme="olive-earth"] .liquid-btn {
+  background: linear-gradient(135deg, #5A7038 0%, #3F4F28 100%);
+  color: #FFFFFF;
+}
+
+[data-theme="olive-earth"] .shadow-glow-gold {
+  box-shadow: 0 0 20px rgba(63, 79, 40, 0.15);
+}
+
+/* ============================================
+   PURE WHITE THEME OVERRIDES
+   Clean, minimal, distraction-free
+   ============================================ */
+
+[data-theme="pure-white"] body {
+  background-color: #FFFFFF;
+  color: #1A1A1A;
+}
+
+[data-theme="pure-white"] .text-gold-400,
+[data-theme="pure-white"] .text-gold-300 {
+  color: #2563EB;
+}
+
+[data-theme="pure-white"] .bg-gold-500 {
+  background-color: #2563EB;
+}
+
+[data-theme="pure-white"] .bg-gold-500\/10 {
+  background-color: rgba(37, 99, 235, 0.10);
+}
+
+[data-theme="pure-white"] .border-gold-500\/50 {
+  border-color: rgba(37, 99, 235, 0.50);
+}
+
+[data-theme="pure-white"] .border-gold-500\/20 {
+  border-color: rgba(37, 99, 235, 0.20);
+}
+
+[data-theme="pure-white"] .bismillah,
+[data-theme="pure-white"] .surah-header {
+  color: #2563EB;
+}
+
+[data-theme="pure-white"] .verse-number {
+  background-color: rgba(37, 99, 235, 0.10);
+  color: #2563EB;
+}
+
+[data-theme="pure-white"] .text-gold-gradient {
+  background: linear-gradient(135deg, #60A5FA 0%, #2563EB 50%, #1D4ED8 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[data-theme="pure-white"] .liquid-btn {
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  color: #FFFFFF;
+}
+
+[data-theme="pure-white"] .shadow-glow-gold {
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.15);
+}
+
+/* ============================================
+   LIGHT CREAM THEME OVERRIDES
+   Warm terracotta accents on cream
+   ============================================ */
+
+[data-theme="light-cream"] .text-gold-400,
+[data-theme="light-cream"] .text-gold-300 {
+  color: #C85A3C;
+}
+
+[data-theme="light-cream"] .bg-gold-500 {
+  background-color: #C85A3C;
+}
+
+[data-theme="light-cream"] .bg-gold-500\/10 {
+  background-color: rgba(200, 90, 60, 0.10);
+}
+
+[data-theme="light-cream"] .border-gold-500\/50 {
+  border-color: rgba(200, 90, 60, 0.50);
+}
+
+[data-theme="light-cream"] .border-gold-500\/20 {
+  border-color: rgba(200, 90, 60, 0.20);
+}
+
+[data-theme="light-cream"] body {
+  background-color: #F9F6F1;
+  color: #2D2D2D;
+}
+
+[data-theme="light-cream"] .bismillah,
+[data-theme="light-cream"] .surah-header {
+  color: #C85A3C;
+}
+
+[data-theme="light-cream"] .verse-number {
+  background-color: rgba(200, 90, 60, 0.10);
+  color: #C85A3C;
+}
+
+[data-theme="light-cream"] .text-gold-gradient {
+  background: linear-gradient(135deg, #E07A5F 0%, #C85A3C 50%, #9E4530 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[data-theme="light-cream"] .liquid-btn {
+  background: linear-gradient(135deg, #D96B4F 0%, #C85A3C 100%);
+  color: #FFFFFF;
+}
+
+[data-theme="light-cream"] .shadow-glow-gold {
+  box-shadow: 0 0 20px rgba(200, 90, 60, 0.15);
+}
