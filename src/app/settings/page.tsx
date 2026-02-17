@@ -450,7 +450,7 @@ export default function SettingsPage() {
         {/* ============ AUDIO & RECITER ============ */}
         <SettingSection 
           icon={Headphones} 
-          title="Audio & Reciter"
+          title="Audio Settings"
           description="Configure audio playback settings"
         >
           <div className="space-y-6">

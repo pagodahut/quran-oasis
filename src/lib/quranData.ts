@@ -239,15 +239,6 @@ export const RECITERS: Reciter[] = [
     style: 'Murattal',
     folder: 'Yasser_Ad-Dussary_128kbps',
   },
-  {
-    id: 'hazza',
-    name: 'Hazza Al Balushi',
-    arabicName: 'هزاع البلوشي',
-    style: 'Murattal',
-    folder: '', // No EveryAyah folder - full surah only
-    listenOnly: true,
-    surahAudioUrl: 'https://ia801208.us.archive.org/33/items/Quran-Huzza-Al_Baloushi/{surah}.mp3',
-  },
 ];
 
 // Default reciter for fallback when listen-only reciter can't be used

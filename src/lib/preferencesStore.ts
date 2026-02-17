@@ -214,14 +214,6 @@ export const RECITERS = [
     style: 'Murattal',
     description: 'Young Saudi reciter with mesmerizing voice',
   },
-  { 
-    id: 'hazza', 
-    name: 'Hazza Al Balushi', 
-    arabicName: 'هزاع البلوشي',
-    style: 'Murattal',
-    description: 'Young Omani reciter, beautiful voice',
-    listenOnly: true,
-  },
 ];
 
 export const TRANSLATIONS = [
