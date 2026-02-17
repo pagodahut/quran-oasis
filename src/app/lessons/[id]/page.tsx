@@ -561,10 +561,23 @@ export default function LessonDetailPage() {
   // Celebration hook
   const { currentEvent, closeCelebration } = useCelebration();
 
-  // Load lesson data
+  // Load lesson data and reset all state when lesson changes
   useEffect(() => {
     const foundLesson = getLessonById(lessonId);
     setLesson(foundLesson || null);
+    // Reset all lesson progress state for the new lesson
+    setCurrentStepIndex(0);
+    setCompletedSteps(new Set());
+    setLessonStarted(false);
+    setShowLessonComplete(false);
+    setAttemptCount(0);
+    setPerfectCount(0);
+    setSelectedAnswer(null);
+    setShowFeedback(false);
+    setIsCorrect(false);
+    setShowMemorizationModule(false);
+    setShowCelebration(false);
+    setShowXP(false);
   }, [lessonId]);
 
   const currentStep = lesson?.steps[currentStepIndex];
@@ -733,7 +746,8 @@ export default function LessonDetailPage() {
       }
       
       // Practice/Try blocks - handle "Practice:" and "Practice technique:" patterns
-      if (line.toLowerCase().includes('practice') && (line.includes(':') || line.includes('**'))) {
+      // Only match lines that START with a practice header pattern (not lines that just mention "practice" in passing)
+      if (/^(\*\*\s*practice\s*(technique)?:?\s*\*\*:?\s*$|^practice\s*(technique)?:)/i.test(line.trim())) {
         // Remove various practice header patterns from first line
         let practiceContent = line
           .replace(/\*\*practice\s*technique:?\*\*:?/i, '')  // **Practice technique:**
@@ -758,23 +772,26 @@ export default function LessonDetailPage() {
         // Update index to skip consumed lines
         i = j - 1;
         
-        result.push(
-          <div key={i} className="my-4 bg-sage-900/20 border border-sage-700/30 rounded-xl p-4">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-sage-700/30 flex items-center justify-center flex-shrink-0">
-                <Headphones className="w-4 h-4 text-sage-400" />
-              </div>
-              <div>
-                <h5 className="font-semibold text-sage-400 mb-1">🎯 Practice</h5>
-                <div className="text-night-300 text-sm leading-relaxed space-y-1">
-                  {practiceLines.map((pLine, pIdx) => (
-                    <p key={pIdx}>{pLine}</p>
-                  ))}
+        // Only render the practice card if there's actual content
+        if (practiceLines.length > 0) {
+          result.push(
+            <div key={i} className="my-4 bg-sage-900/20 border border-sage-700/30 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-sage-700/30 flex items-center justify-center flex-shrink-0">
+                  <Headphones className="w-4 h-4 text-sage-400" />
+                </div>
+                <div>
+                  <h5 className="font-semibold text-sage-400 mb-1">🎯 Practice</h5>
+                  <div className="text-night-300 text-sm leading-relaxed space-y-1">
+                    {practiceLines.map((pLine, pIdx) => (
+                      <p key={pIdx}>{pLine}</p>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        );
+          );
+        }
         i++;
         continue;
       }
