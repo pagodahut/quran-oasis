@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import SheikhButton from '@/components/ui/SheikhButton';
+import { HifzIcon } from '@/components/brand';
 
 export default function WelcomePage() {
   const router = useRouter();
@@ -22,9 +23,9 @@ export default function WelcomePage() {
       <div className="welcome__bg" />
 
       <div className="welcome__content">
-        {/* Mosque icon */}
+        {/* Logo */}
         <div className={`welcome__icon ${step >= 1 ? 'welcome__icon--visible' : ''}`}>
-          🕌
+          <HifzIcon size={64} animated={false} />
         </div>
 
         {/* Bismillah */}
@@ -42,7 +43,7 @@ export default function WelcomePage() {
 
         {/* Sheikh intro */}
         <div className={`welcome__sheikh-intro ${step >= 3 ? 'welcome__sheikh-intro--visible' : ''}`}>
-          <div className="welcome__sheikh-avatar">🕌</div>
+          <div className="welcome__sheikh-avatar"><HifzIcon size={24} animated={false} /></div>
           <div className="welcome__sheikh-bubble">
             <p>
               Assalamu alaikum! I&apos;m <strong>Sheikh HIFZ</strong>, your AI-powered Quran teacher.

@@ -214,32 +214,30 @@ export default function OnboardingPage() {
   const submitOnboarding = async () => {
     setIsSubmitting(true);
     try {
-      const response = await fetch('/api/onboarding', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+      // Always store in localStorage first (works for guests and authed users)
+      localStorage.setItem('quranOasis_onboarding', JSON.stringify(data));
+      localStorage.setItem('quranOasis_preferences', JSON.stringify({
+        reciter: data.preferredReciter,
+        dailyMinutes: data.dailyTimeMinutes,
+      }));
 
-      if (response.ok) {
-        const result = await response.json();
-        setRecommendation(result.recommendation);
-        
-        // Also store in localStorage for offline access
-        localStorage.setItem('quranOasis_onboarding', JSON.stringify(data));
-        localStorage.setItem('quranOasis_preferences', JSON.stringify({
-          reciter: data.preferredReciter,
-          dailyMinutes: data.dailyTimeMinutes,
-        }));
-        localStorage.setItem('quranOasis_studyPlan', JSON.stringify(result.studyPlan));
-      } else {
-        // Fallback to localStorage-only if API fails
-        localStorage.setItem('quranOasis_onboarding', JSON.stringify(data));
-        localStorage.setItem('quranOasis_preferences', JSON.stringify({
-          reciter: data.preferredReciter,
-          dailyMinutes: data.dailyTimeMinutes,
-        }));
+      // Try to sync to server if user is authenticated
+      try {
+        const response = await fetch('/api/onboarding', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          setRecommendation(result.recommendation);
+          localStorage.setItem('quranOasis_studyPlan', JSON.stringify(result.studyPlan));
+        }
+      } catch {
+        // API call failed (likely not authenticated) — that's fine, data is in localStorage
       }
       
       // Always persist learning mode to localStorage (works even if API fails)
@@ -247,20 +245,14 @@ export default function OnboardingPage() {
       
     } catch (error) {
       console.error('Onboarding submission error:', error);
-      // Fallback to localStorage
-      localStorage.setItem('quranOasis_onboarding', JSON.stringify(data));
-      localStorage.setItem('quranOasis_preferences', JSON.stringify({
-        reciter: data.preferredReciter,
-        dailyMinutes: data.dailyTimeMinutes,
-      }));
-      // Still persist learning mode
-      persistLearningMode(data.learningMode);
     }
     setIsSubmitting(false);
   };
 
   const completeOnboarding = () => {
-    router.push('/lessons');
+    // Mark onboarding as done in localStorage
+    localStorage.setItem('quranOasis_onboardingComplete', 'true');
+    router.push('/onboarding/complete');
   };
 
   // Option card component
@@ -407,7 +399,10 @@ export default function OnboardingPage() {
           
           {step !== 'complete' && (
             <button 
-              onClick={() => router.push('/lessons')}
+              onClick={() => {
+                localStorage.setItem('quranOasis_onboardingComplete', 'true');
+                router.push('/dashboard');
+              }}
               className="text-sm text-night-500 hover:text-night-300 transition-colors px-2 py-1 focus-visible-ring rounded-lg"
             >
               Skip

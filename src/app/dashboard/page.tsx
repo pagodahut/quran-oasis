@@ -21,6 +21,7 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
+import GuestBanner from '@/components/GuestBanner';
 import { StreakDisplay } from '@/components/Celebrations';
 import DashboardGreeting from '@/components/DashboardGreeting';
 import { 
@@ -367,6 +368,49 @@ function RecentActivity({
 export default function DashboardPage() {
   const { user, isLoaded, isSignedIn } = useUser();
   const { learning: learningPrefs } = useLearningPreferences();
+  const [hasSynced, setHasSynced] = useState(false);
+
+  // When user signs in, migrate localStorage onboarding data to server
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn || hasSynced) return;
+    
+    const migrateLocalData = async () => {
+      try {
+        // Sync onboarding data
+        const onboardingData = localStorage.getItem('quranOasis_onboarding');
+        if (onboardingData) {
+          await fetch('/api/onboarding', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: onboardingData,
+          });
+        }
+        
+        // Sync preferences and progress
+        const prefs = localStorage.getItem('quranOasis_preferences');
+        if (prefs) {
+          const parsed = JSON.parse(prefs);
+          await fetch('/api/user/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              settings: {
+                preferredReciter: parsed.reciter,
+              },
+            }),
+          });
+        }
+
+        // Clear guest mode flag
+        localStorage.removeItem('quranOasis_guestMode');
+        setHasSynced(true);
+      } catch (error) {
+        console.error('Failed to migrate local data:', error);
+      }
+    };
+    
+    migrateLocalData();
+  }, [isLoaded, isSignedIn, hasSynced]);
   
   // State
   const [streakInfo, setStreakInfo] = useState(getStreakInfo());
@@ -524,6 +568,11 @@ export default function DashboardPage() {
           variants={stagger}
           className="space-y-6"
         >
+          {/* Guest Mode Banner */}
+          {isLoaded && !isSignedIn && (
+            <GuestBanner />
+          )}
+
           {/* Header - Date only */}
           <motion.header variants={fadeInUp} className="pt-4 pb-2">
             <div className="flex items-start justify-between">

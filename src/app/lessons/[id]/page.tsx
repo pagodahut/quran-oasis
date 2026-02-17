@@ -258,12 +258,12 @@ function ArabicDisplay({
         {/* Main Arabic text */}
         <div 
           className={`
-            font-arabic text-center leading-relaxed
+            font-arabic text-center
             ${isSingleLetter 
-              ? 'text-8xl sm:text-9xl text-gold-400 drop-shadow-[0_0_20px_rgba(201,162,39,0.3)]' 
+              ? 'text-8xl sm:text-9xl text-gold-400 drop-shadow-[0_0_20px_rgba(201,162,39,0.3)] leading-none' 
               : isWord 
-                ? 'text-5xl sm:text-6xl text-gold-300' 
-                : 'text-3xl sm:text-4xl text-night-100'
+                ? 'text-5xl sm:text-6xl text-gold-300 leading-tight' 
+                : 'text-3xl sm:text-4xl text-night-100 leading-relaxed'
             }
           `}
           style={{ direction: 'rtl' }}
@@ -277,10 +277,10 @@ function ArabicDisplay({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="mt-4 flex flex-col items-center gap-1"
+            className="mt-3 flex flex-col items-center gap-0.5 text-center"
           >
-            <span className="text-xl font-semibold text-gold-400">{letterData.name}</span>
-            <span className="text-sm font-mono text-night-400 tracking-wide">/{letterData.phonetic}/</span>
+            <span className="text-xl font-semibold text-gold-400 leading-tight">{letterData.name}</span>
+            <span className="text-sm font-mono text-night-400 tracking-wide leading-tight">/{letterData.phonetic}/</span>
           </motion.div>
         )}
         
@@ -698,8 +698,8 @@ export default function LessonDetailPage() {
           return (
             <strong 
               key={`${key}-${j}`} 
-              className={`font-semibold ${isArabic ? 'font-arabic text-gold-300 text-2xl' : 'text-gold-400'}`}
-              style={isArabic ? { direction: 'rtl', display: 'inline-block' } : undefined}
+              className={`font-semibold ${isArabic ? 'font-arabic text-gold-300 text-2xl leading-none align-middle' : 'text-gold-400'}`}
+              style={isArabic ? { direction: 'rtl', display: 'inline-block', verticalAlign: 'middle' } : undefined}
             >
               {innerText}
             </strong>
@@ -1197,11 +1197,16 @@ export default function LessonDetailPage() {
                         // Extract only Arabic characters for audio playback
                         const arabicOnly = option.match(/[\u0600-\u06FF\u064B-\u0652]+/g)?.join('') || '';
                         
-                        // For letter_identify quizzes, hide Latin names to make it a real shape recognition test
+                        // For letter_identify quizzes, show only the phonetic name so the user
+                        // must recall the letter shape from memory (not just match visually).
+                        // Options that are pure Arabic (no parenthetical name) stay as-is since
+                        // the quiz is asking the user to distinguish shapes.
                         const isLetterIdentifyQuiz = currentStep.exercise?.type === 'letter_identify';
-                        const displayOption = isLetterIdentifyQuiz && isArabicOption
-                          ? arabicOnly  // Show only the Arabic letter, not "(Jeem)" etc.
-                          : option;     // Show full option for other quiz types
+                        const hasPhoneticName = /\(([^)]+)\)/.test(option);
+                        const phoneticOnly = option.replace(/[\u0600-\u06FF\u064B-\u0652]+/g, '').replace(/[()]/g, '').trim();
+                        const displayOption = isLetterIdentifyQuiz && isArabicOption && hasPhoneticName
+                          ? phoneticOnly  // Show only phonetic name (e.g. "Jeem") — hide Arabic letter
+                          : option;       // Pure Arabic options or non-identify quizzes: show as-is
                         
                         return (
                           <motion.button
@@ -1241,13 +1246,13 @@ export default function LessonDetailPage() {
                                 )}
                               </span>
                               <span 
-                                className={`text-lg ${isArabicOption ? 'font-arabic text-3xl' : ''}`}
-                                style={isArabicOption ? { direction: 'rtl' } : undefined}
+                                className={`text-lg ${isArabicOption && displayOption === option ? 'font-arabic text-3xl' : ''}`}
+                                style={isArabicOption && displayOption === option ? { direction: 'rtl' } : undefined}
                               >
                                 {displayOption}
                               </span>
-                              {/* Audio button - only plays Arabic characters, not Latin transliteration */}
-                              {isArabicOption && arabicOnly && !showFeedback && (
+                              {/* Audio button - only for options showing Arabic text, not phonetic-only */}
+                              {isArabicOption && arabicOnly && !showFeedback && displayOption === option && (
                                 <div className="ml-auto">
                                   <AudioButton text={arabicOnly} size="sm" />
                                 </div>

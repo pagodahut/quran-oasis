@@ -46,11 +46,15 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
-  // For protected routes, require authentication
+  // For protected routes, require authentication (except dashboard which supports guest mode)
   if (isProtectedRoute(req)) {
     const { userId, redirectToSignIn } = await auth();
     
     if (!userId) {
+      // Allow dashboard in guest mode — auth check happens client-side
+      if (req.nextUrl.pathname.startsWith('/dashboard')) {
+        return NextResponse.next();
+      }
       return redirectToSignIn();
     }
   }

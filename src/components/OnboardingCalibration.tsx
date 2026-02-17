@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import SheikhButton from '@/components/ui/SheikhButton';
+import { HifzIcon } from '@/components/brand';
 import { useCalibration, type CalibrationAssessment } from '@/hooks/useCalibration';
 
 interface OnboardingCalibrationProps {
@@ -110,7 +111,7 @@ export default function OnboardingCalibration({
       <div className="calibration__header">
         <div className="calibration__header-top">
           <div className="calibration__title-row">
-            <div className="calibration__avatar"><span>🕌</span></div>
+            <div className="calibration__avatar"><HifzIcon size={20} animated={false} /></div>
             <div>
               <h2 className="calibration__title">Meet Sheikh HIFZ</h2>
               <p className="calibration__subtitle">Your personal Quran teacher</p>
@@ -141,7 +142,7 @@ export default function OnboardingCalibration({
             style={{ animationDelay: `${i * 50}ms` }}
           >
             {msg.role === 'assistant' && (
-              <div className="calibration__bubble-avatar"><span>🕌</span></div>
+              <div className="calibration__bubble-avatar"><HifzIcon size={20} animated={false} /></div>
             )}
             <div className="calibration__bubble-content">
               <p>{msg.content}</p>
@@ -152,7 +153,7 @@ export default function OnboardingCalibration({
         {/* Typing indicator */}
         {isLoading && (
           <div className="calibration__bubble calibration__bubble--assistant">
-            <div className="calibration__bubble-avatar"><span>🕌</span></div>
+            <div className="calibration__bubble-avatar"><HifzIcon size={20} animated={false} /></div>
             <div className="calibration__bubble-content">
               <div className="calibration__typing">
                 <span /><span /><span />

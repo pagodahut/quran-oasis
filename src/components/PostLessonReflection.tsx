@@ -28,6 +28,7 @@
 
 import { useEffect, useState } from 'react';
 import SheikhButton from '@/components/ui/SheikhButton';
+import { HifzIcon } from '@/components/brand';
 import { useSheikh } from '@/contexts/SheikhContext';
 import {
   useSheikhGenerate,
@@ -188,7 +189,7 @@ export default function PostLessonReflection({
       <div className="sheikh-reflection__card">
         <div className="sheikh-reflection__card-header">
           <div className="sheikh-reflection__avatar">
-            <span>🕌</span>
+            <HifzIcon size={16} animated={false} />
           </div>
           <span className="sheikh-reflection__card-label">Sheikh HIFZ</span>
         </div>
