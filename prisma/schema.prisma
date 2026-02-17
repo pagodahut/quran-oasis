@@ -202,6 +202,34 @@ model RecitationWord {
   @@index([sessionId])
 }
 
+// Personalized daily goals
+model DailyGoal {
+  id               String   @id @default(cuid())
+  userId           String
+  date             String   // YYYY-MM-DD
+  targetMinutes    Int      @default(20)
+  targetVerses     Int      @default(5)
+  completedMinutes Int      @default(0)
+  completedVerses  Int      @default(0)
+  streakDay        Int      @default(0)
+  isComplete       Boolean  @default(false)
+  createdAt        DateTime @default(now())
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
+// Nudge tracking
+model NudgeHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  nudgeType String
+  nudgeKey  String
+  shownAt   DateTime @default(now())
+
+  @@index([userId, shownAt])
+}
+
 // User feedback submissions
 model Feedback {
   id        String   @id @default(cuid())
