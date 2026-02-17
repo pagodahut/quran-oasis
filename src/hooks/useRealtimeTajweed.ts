@@ -195,7 +195,7 @@ export function useRealtimeTajweed(
     try {
       // Create new service instance with server-provided API key
       serviceRef.current = new RealtimeTajweedService({
-        apiKey,
+        apiKey: apiKey!,
         expectedText,
       });
       

@@ -58,14 +58,17 @@ export default function WelcomePage() {
             variant="primary"
             size="lg"
             breathe
-            onClick={() => router.push('/onboarding/calibration')}
+            onClick={() => router.push('/onboarding')}
             style={{ width: '100%', maxWidth: 320 }}
           >
             ﷽ Let&apos;s Begin
           </SheikhButton>
           <button
             className="welcome__skip"
-            onClick={() => router.push('/practice')}
+            onClick={() => {
+              localStorage.setItem('quranOasis_onboardingComplete', 'true');
+              router.push('/dashboard');
+            }}
           >
             Skip for now →
           </button>

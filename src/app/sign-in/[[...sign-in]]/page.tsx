@@ -25,8 +25,6 @@ export default function SignInPage() {
           layout: {
             socialButtonsPlacement: 'top',
             logoPlacement: 'none',
-            headerTitle: 'Sign in to HIFZ',
-            headerSubtitle: 'Continue your Quran memorization journey',
           },
           elements: {
             rootBox: 'w-full max-w-md',

@@ -13,11 +13,11 @@ export default function CalibrationPage() {
   const handleComplete = async (assessment: CalibrationAssessment) => {
     setUserLevel(assessment.level);
     await markCalibrationComplete(assessment.level);
-    router.push('/practice');
+    router.push('/dashboard');
   };
 
   const handleSkip = () => {
-    router.push('/practice');
+    router.push('/dashboard');
   };
 
   return (
