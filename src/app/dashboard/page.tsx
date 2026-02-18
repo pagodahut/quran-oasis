@@ -767,21 +767,46 @@ export default function DashboardPage() {
           {/* New User CTA */}
           {quranProgress.versesMemorized === 0 && (
             <motion.section variants={fadeInUp} className="mt-2">
-              <div className="liquid-glass-gold-premium rounded-2xl p-6 text-center">
-                <Sparkles className="w-10 h-10 text-gold-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-night-100 mb-2">Begin Your Journey</h3>
-                <p className="text-night-400 mb-5 max-w-sm mx-auto">
-                  Start with Al-Fatihah or pick any surah to begin your memorization journey.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Link href="/lessons" className="liquid-btn inline-flex items-center justify-center gap-2">
-                    <BookOpen className="w-4 h-4" /> Start Learning
+              <div className="space-y-4">
+                {/* Primary CTA */}
+                <div className="liquid-glass-gold-premium rounded-2xl p-6 text-center">
+                  <Sparkles className="w-10 h-10 text-gold-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-night-100 mb-2">Begin Your Journey</h3>
+                  <p className="text-night-400 mb-5 max-w-sm mx-auto">
+                    Start with Al-Fatihah or pick any surah to begin your memorization journey.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Link href="/memorize/1/1" className="liquid-btn inline-flex items-center justify-center gap-2">
+                      <BookOpen className="w-4 h-4" /> Start with Al-Fatihah
+                    </Link>
+                    <Link
+                      href="/surahs"
+                      className="liquid-btn-outline inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl border border-night-600 text-night-200 hover:bg-night-800/50 transition-colors"
+                    >
+                      Browse Surahs
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Feature Discovery Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Link href="/recite" className="liquid-glass rounded-2xl p-4 flex items-center gap-4 group hover:border-gold-500/20 transition-all">
+                    <div className="w-11 h-11 rounded-xl bg-gold-500/15 flex items-center justify-center flex-shrink-0">
+                      <Mic className="w-5 h-5 text-gold-400" />
+                    </div>
+                    <div>
+                      <h4 className="text-night-100 font-medium text-sm">Recite & Track</h4>
+                      <p className="text-night-500 text-xs">Voice recognition scores your accuracy</p>
+                    </div>
                   </Link>
-                  <Link
-                    href="/surahs"
-                    className="liquid-btn-outline inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl border border-night-600 text-night-200 hover:bg-night-800/50 transition-colors"
-                  >
-                    Browse Surahs
+                  <Link href="/identify" className="liquid-glass rounded-2xl p-4 flex items-center gap-4 group hover:border-gold-500/20 transition-all">
+                    <div className="w-11 h-11 rounded-xl bg-amber-500/15 flex items-center justify-center flex-shrink-0">
+                      <Sparkles className="w-5 h-5 text-amber-400" />
+                    </div>
+                    <div>
+                      <h4 className="text-night-100 font-medium text-sm">Identify Verses</h4>
+                      <p className="text-night-500 text-xs">Shazam for Quran — find any ayah</p>
+                    </div>
                   </Link>
                 </div>
               </div>
