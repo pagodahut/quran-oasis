@@ -1,10 +1,20 @@
 # Tarteel Open Source Integration Plan
 
-> **Status**: ACTIVE - Phase 1 Complete ✅  
+> **Status**: ACTIVE - Phase 1 ✅ + Phase 2 ✅ (Deployed)  
 > **Owner**: Hakim (Opus Executive)  
 > **Created**: 2026-02-16  
 > **Target**: Complete integration within 2 weeks
-> **Last Updated**: 2026-02-16 02:30 EST
+> **Last Updated**: 2026-02-18 17:55 EST
+>
+> ### Phase 1+2 Completion Notes (Feb 18):
+> - Modal endpoint redeployed with **model weights baked into image** → cold start 3s, warm 170ms
+> - Added ffmpeg for webm/opus audio format conversion
+> - Fixed hybridTranscription.ts plumbing (correct API URL, JSON body format)
+> - Offline model switched to ONNX-converted `omartariq612/tarteel-ai-whisper-tiny-ar-quran-onnx`
+> - Provider indicators (🟢 Tarteel / 🟡 Browser) added to LiveRecitation + RevealRecitation
+> - Keep-warm cron pings Modal health endpoint every 4 min
+> - `MODAL_WHISPER_URL` env var set in Vercel production
+> - All pages verified 200 on prod: studio-coral-alpha.vercel.app
 
 ---
 
