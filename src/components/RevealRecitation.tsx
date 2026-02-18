@@ -459,6 +459,7 @@ export default function RevealRecitation({
   const [errorMessage, setErrorMessage] = useState('');
   const [elapsedTime, setElapsedTime] = useState(0);
   const [result, setResult] = useState<RevealResult | null>(null);
+  const [activeProvider, setActiveProvider] = useState<'tarteel' | 'browser' | null>(null);
 
   const serviceRef = useRef<TarteelService | WebSpeechService | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -591,6 +592,7 @@ export default function RevealRecitation({
         });
         serviceRef.current = service;
         await service.start();
+        setActiveProvider('tarteel');
       } else {
         if (!WebSpeechService.isSupported()) {
           setErrorMessage('Speech recognition is not supported. Please use Chrome or Edge.');
@@ -605,6 +607,7 @@ export default function RevealRecitation({
         });
         serviceRef.current = service;
         await service.start();
+        setActiveProvider('browser');
       }
 
       setPhase('recording');
@@ -919,6 +922,11 @@ export default function RevealRecitation({
                               transition={{ duration: 1.2, repeat: Infinity }}
                             />
                             <span className="text-xs text-night-400">Listening...</span>
+                            {activeProvider && (
+                              <span className="text-[10px] text-night-500">
+                                {activeProvider === 'tarteel' ? '🟢 Tarteel' : '🟡 Browser'}
+                              </span>
+                            )}
                           </div>
                           <div className="text-xs text-gold-400/80">
                             {revealedCount} of {totalWords} revealed

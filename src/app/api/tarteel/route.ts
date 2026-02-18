@@ -7,14 +7,17 @@ import { auth } from '@clerk/nextjs/server';
  * 
  * The Tarteel model (tarteel-ai/whisper-base-ar-quran) is specifically
  * fine-tuned for Quranic Arabic and returns diacritized text.
+ * 
+ * Cold start can take 15-30s on first request. The client should
+ * handle this gracefully (show loading state, fall back to WebSpeech).
  */
 
-const TARTEEL_ENDPOINT = 'https://pagodahut--hifz-whisper-transcribe-api.modal.run';
+const TARTEEL_ENDPOINT = process.env.MODAL_WHISPER_URL || 'https://pagodahut--hifz-whisper-transcribe-api.modal.run';
+const TARTEEL_TIMEOUT_MS = 45000; // 45s to handle cold starts
 
 export async function POST(request: NextRequest) {
   try {
     // Auth is optional — guest users fall back to WebSpeech if Tarteel unavailable
-    // but we still check for rate limiting purposes
     let userId: string | null = null;
     try {
       const authResult = await auth();
@@ -33,27 +36,48 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Forward to Modal Tarteel endpoint
-    const response = await fetch(TARTEEL_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ audio_base64 }),
-    });
+    // Forward to Modal Tarteel endpoint with generous timeout for cold starts
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), TARTEEL_TIMEOUT_MS);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Tarteel API error:', errorText);
-      return NextResponse.json(
-        { error: 'Transcription failed', details: errorText },
-        { status: response.status }
-      );
+    try {
+      const startTime = Date.now();
+      const response = await fetch(TARTEEL_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ audio_base64 }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeout);
+      const latencyMs = Date.now() - startTime;
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Tarteel API error:', errorText);
+        return NextResponse.json(
+          { error: 'Transcription failed', details: errorText },
+          { status: response.status }
+        );
+      }
+
+      const result = await response.json();
+
+      return NextResponse.json({
+        ...result,
+        provider: 'tarteel-whisper',
+        latencyMs,
+      });
+    } catch (error) {
+      clearTimeout(timeout);
+      if ((error as Error).name === 'AbortError') {
+        return NextResponse.json(
+          { error: 'Tarteel endpoint timeout (cold start?)', timeout: true },
+          { status: 504 }
+        );
+      }
+      throw error;
     }
-
-    const result = await response.json();
-    
-    return NextResponse.json(result);
   } catch (error) {
     console.error('Tarteel transcription error:', error);
     return NextResponse.json(
@@ -63,35 +87,61 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Health check - verify endpoint is actually reachable
+// Health check — uses a lightweight GET endpoint if available,
+// falls back to POST ping
 export async function GET() {
   try {
-    // Quick health ping with short timeout — avoids cold-start wait
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 2000);
+    const timeout = setTimeout(() => controller.abort(), 3000);
+
+    // Try the dedicated health endpoint (no GPU needed, fast)
+    const healthUrl = TARTEEL_ENDPOINT.replace('transcribe-api', 'health').replace(/\/+$/, '');
     
+    try {
+      const response = await fetch(healthUrl, {
+        method: 'GET',
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+
+      if (response.ok) {
+        return NextResponse.json({
+          configured: true,
+          endpoint: 'modal',
+          model: 'tarteel-ai/whisper-base-ar-quran',
+          warm: true,
+        });
+      }
+    } catch {
+      // Health endpoint may not exist yet, fall back to POST ping
+    }
+
+    // Fallback: POST ping with short timeout
+    const controller2 = new AbortController();
+    const timeout2 = setTimeout(() => controller2.abort(), 3000);
+
     const response = await fetch(TARTEEL_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ audio_base64: '' }), // Empty ping
-      signal: controller.signal,
+      body: JSON.stringify({ audio_base64: '' }),
+      signal: controller2.signal,
     });
-    clearTimeout(timeout);
-    
-    // Even a 400 means the endpoint is alive
+    clearTimeout(timeout2);
+
     const isAlive = response.status < 500;
-    
+
     return NextResponse.json({
       configured: isAlive,
       endpoint: 'modal',
       model: 'tarteel-ai/whisper-base-ar-quran',
+      warm: isAlive,
     });
   } catch {
-    // Endpoint unreachable — fallback to WebSpeech
     return NextResponse.json({
       configured: false,
       endpoint: 'modal',
       fallback: 'webspeech',
+      warm: false,
     });
   }
 }

@@ -2,6 +2,31 @@
 const nextConfig = {
   reactStrictMode: true,
   
+  // Turbopack config for Transformers.js (ONNX runtime in browser)
+  turbopack: {},
+  
+  // Webpack fallback config for Transformers.js (used with --webpack flag)
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        os: false,
+      };
+    } else {
+      config.externals = [...(config.externals || []), 'onnxruntime-node', 'sharp'];
+    }
+    config.experiments = {
+      ...config.experiments,
+      asyncWebAssembly: true,
+    };
+    return config;
+  },
+  
+  // Exclude server-only packages from client bundle
+  serverExternalPackages: ['onnxruntime-node', 'sharp'],
+  
   // Image optimization (NOT unoptimized for production)
   images: {
     remotePatterns: [

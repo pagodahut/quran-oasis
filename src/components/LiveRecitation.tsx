@@ -351,6 +351,7 @@ export default function LiveRecitation({
   const [stats, setStats] = useState<SessionStats | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [wordByWordView, setWordByWordView] = useState(false);
+  const [activeProvider, setActiveProvider] = useState<'tarteel' | 'browser' | null>(null);
 
   // Refs
   const serviceRef = useRef<TarteelService | WebSpeechService | null>(null);
@@ -493,6 +494,7 @@ export default function LiveRecitation({
         });
         serviceRef.current = service;
         await service.start();
+        setActiveProvider('tarteel');
       } else {
         // Fallback: Web Speech API
         if (!WebSpeechService.isSupported()) {
@@ -510,6 +512,7 @@ export default function LiveRecitation({
         });
         serviceRef.current = service;
         await service.start();
+        setActiveProvider('browser');
       }
 
       setPhase('recording');
@@ -1008,6 +1011,11 @@ export default function LiveRecitation({
                               <span className="text-xs text-night-400">
                                 Listening...
                               </span>
+                              {activeProvider && (
+                                <span className="text-[10px] text-night-500">
+                                  {activeProvider === 'tarteel' ? '🟢 Tarteel' : '🟡 Browser'}
+                                </span>
+                              )}
                             </div>
 
                             {/* Stop button */}

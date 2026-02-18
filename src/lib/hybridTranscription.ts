@@ -70,18 +70,44 @@ export async function initOfflineWhisper(
     env.allowLocalModels = false;
     env.useBrowserCache = true;
     
-    offlineWhisperPipeline = await pipeline(
-      'automatic-speech-recognition',
-      'tarteel-ai/whisper-tiny-ar-quran',
-      {
-        progress_callback: (data: any) => {
-          if (data.status === 'progress' && data.progress !== undefined) {
-            offlineModelProgress = data.progress;
-            onProgress?.(data.progress);
-          }
-        },
-      }
-    );
+    // Use the ONNX-converted version of the Tarteel Quran Whisper model
+    // The original tarteel-ai/whisper-tiny-ar-quran only has PyTorch weights
+    // Falls back to generic Xenova/whisper-tiny if the Quran-specific model fails
+    const QURAN_MODEL = 'omartariq612/tarteel-ai-whisper-tiny-ar-quran-onnx';
+    const FALLBACK_MODEL = 'Xenova/whisper-tiny';
+    
+    let modelId = QURAN_MODEL;
+    try {
+      offlineWhisperPipeline = await pipeline(
+        'automatic-speech-recognition',
+        modelId,
+        {
+          quantized: true,
+          progress_callback: (data: any) => {
+            if (data.status === 'progress' && data.progress !== undefined) {
+              offlineModelProgress = data.progress;
+              onProgress?.(data.progress);
+            }
+          },
+        }
+      );
+    } catch (quranModelError) {
+      console.warn('Quran-specific ONNX model failed, falling back to generic Whisper:', quranModelError);
+      modelId = FALLBACK_MODEL;
+      offlineWhisperPipeline = await pipeline(
+        'automatic-speech-recognition',
+        modelId,
+        {
+          quantized: true,
+          progress_callback: (data: any) => {
+            if (data.status === 'progress' && data.progress !== undefined) {
+              offlineModelProgress = data.progress;
+              onProgress?.(data.progress);
+            }
+          },
+        }
+      );
+    }
   } finally {
     offlineModelLoading = false;
   }
@@ -150,16 +176,23 @@ async function transcribeWithTarteel(
 ): Promise<TranscriptionResult> {
   const startTime = performance.now();
   
-  const formData = new FormData();
-  formData.append('audio', audioBlob, 'recording.webm');
+  // Convert audio blob to base64 for the JSON API
+  const arrayBuffer = await audioBlob.arrayBuffer();
+  const uint8Array = new Uint8Array(arrayBuffer);
+  let binary = '';
+  for (let i = 0; i < uint8Array.length; i++) {
+    binary += String.fromCharCode(uint8Array[i]);
+  }
+  const audio_base64 = btoa(binary);
   
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
   
   try {
-    const response = await fetch('/api/transcribe-tarteel', {
+    const response = await fetch('/api/tarteel', {
       method: 'POST',
-      body: formData,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ audio_base64 }),
       signal: controller.signal,
     });
     
@@ -168,6 +201,11 @@ async function transcribeWithTarteel(
     }
     
     const data = await response.json();
+    
+    if (!data.success) {
+      throw new Error(data.error || 'Tarteel transcription failed');
+    }
+    
     const latencyMs = performance.now() - startTime;
     
     return {
