@@ -822,8 +822,8 @@ export default function HomePage() {
                   >
                     <FeatureCard
                       iconComponent={PersonalizedIcon}
-                      title="Personalized Learning"
-                      description="AI creates a custom study plan based on your level, goals, and available time"
+                      title="Recite & Get Feedback"
+                      description="Real-time voice recognition tracks your recitation word-by-word with accuracy scoring"
                       gradient="from-gold-500 to-amber-600"
                     />
                   </motion.div>
@@ -835,8 +835,8 @@ export default function HomePage() {
                   >
                     <FeatureCard
                       iconComponent={SpacedRepIcon}
-                      title="Spaced Repetition"
-                      description="Science-backed review system ensures you never forget what you've memorized"
+                      title="Recite to Reveal"
+                      description="Quran text stays hidden until you recite correctly — the ultimate memorization test"
                       gradient="from-purple-500 to-pink-500"
                     />
                   </motion.div>
@@ -848,8 +848,8 @@ export default function HomePage() {
                   >
                     <FeatureCard
                       iconComponent={ProgressIcon}
-                      title="Track Progress"
-                      description="Beautiful visualizations show your journey from first verse to full HIFZ"
+                      title="Identify Any Verse"
+                      description="Like Shazam for Quran — recite any ayah and instantly find which surah it's from"
                       gradient="from-sage-500 to-emerald-500"
                     />
                   </motion.div>
