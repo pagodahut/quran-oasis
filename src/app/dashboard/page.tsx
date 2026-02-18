@@ -598,7 +598,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-night-950">
       <main className="px-4 py-6 pb-32 max-w-2xl mx-auto">
-        <motion.div initial="hidden" animate="visible" variants={stagger} className="space-y-6">
+        <motion.div initial="hidden" animate="visible" variants={stagger} className="space-y-8">
           {/* Guest Banner */}
           {isLoaded && !isSignedIn && <GuestBanner />}
 

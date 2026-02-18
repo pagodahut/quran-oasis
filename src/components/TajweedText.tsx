@@ -211,7 +211,7 @@ export default function TajweedText({
       dir="rtl"
       lang="ar"
       style={{
-        fontSize: 'clamp(1.5rem, 4.5vw, 2.25rem)',
+        fontSize: 'clamp(1.75rem, 5vw, 2.5rem)',
         wordSpacing: '0.15em',
         letterSpacing: '0.01em',
       }}
