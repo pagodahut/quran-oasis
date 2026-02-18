@@ -19,6 +19,7 @@ const isPublicRoute = createRouteMatcher([
   '/api/tajweed(.*)',
   '/api/og(.*)',
   '/api/onboarding(.*)',
+  '/identify(.*)',
 ]);
 
 // Guest-accessible routes — work without auth but enhanced with auth

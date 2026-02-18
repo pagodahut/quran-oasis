@@ -13,13 +13,14 @@ const TARTEEL_ENDPOINT = 'https://pagodahut--hifz-whisper-transcribe-api.modal.r
 
 export async function POST(request: NextRequest) {
   try {
-    // Authentication check
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+    // Auth is optional — guest users fall back to WebSpeech if Tarteel unavailable
+    // but we still check for rate limiting purposes
+    let userId: string | null = null;
+    try {
+      const authResult = await auth();
+      userId = authResult.userId;
+    } catch {
+      // Auth not available — proceed anyway
     }
 
     const body = await request.json();
@@ -62,19 +63,35 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Health check - verify endpoint is available
+// Health check - verify endpoint is actually reachable
 export async function GET() {
   try {
-    // Just return configured status (don't ping Modal to avoid cold starts)
+    // Quick health ping with short timeout — avoids cold-start wait
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 2000);
+    
+    const response = await fetch(TARTEEL_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ audio_base64: '' }), // Empty ping
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    
+    // Even a 400 means the endpoint is alive
+    const isAlive = response.status < 500;
+    
     return NextResponse.json({
-      configured: true,
+      configured: isAlive,
       endpoint: 'modal',
       model: 'tarteel-ai/whisper-base-ar-quran',
     });
   } catch {
-    return NextResponse.json(
-      { configured: false },
-      { status: 503 }
-    );
+    // Endpoint unreachable — fallback to WebSpeech
+    return NextResponse.json({
+      configured: false,
+      endpoint: 'modal',
+      fallback: 'webspeech',
+    });
   }
 }
