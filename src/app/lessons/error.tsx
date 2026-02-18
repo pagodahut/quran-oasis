@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { BookX, RefreshCw, Home, ArrowLeft, GraduationCap } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import logger from '@/lib/logger';
 import BottomNav from '@/components/BottomNav';
 
 interface ErrorProps {
@@ -13,7 +14,7 @@ interface ErrorProps {
 
 export default function LessonsError({ error, reset }: ErrorProps) {
   useEffect(() => {
-    console.error('[Lessons Error]:', error);
+    logger.error('[Lessons Error]:', error);
   }, [error]);
 
   return (

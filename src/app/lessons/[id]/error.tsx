@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { FileX, RefreshCw, Home, ArrowLeft, GraduationCap } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import logger from '@/lib/logger';
 import BottomNav from '@/components/BottomNav';
 
 interface ErrorProps {
@@ -13,7 +14,7 @@ interface ErrorProps {
 
 export default function LessonDetailError({ error, reset }: ErrorProps) {
   useEffect(() => {
-    console.error('[Lesson Detail Error]:', error);
+    logger.error('[Lesson Detail Error]:', error);
   }, [error]);
 
   return (

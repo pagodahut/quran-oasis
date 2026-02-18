@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { TrendingUp, RefreshCw, Home, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import logger from '@/lib/logger';
 import BottomNav from '@/components/BottomNav';
 
 interface ErrorProps {
@@ -13,7 +14,7 @@ interface ErrorProps {
 
 export default function ProgressError({ error, reset }: ErrorProps) {
   useEffect(() => {
-    console.error('[Progress Error]:', error);
+    logger.error('[Progress Error]:', error);
   }, [error]);
 
   return (

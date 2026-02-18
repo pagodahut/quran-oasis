@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { BookOpen, RefreshCw, Home, ArrowLeft, Volume2 } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import logger from '@/lib/logger';
 import BottomNav from '@/components/BottomNav';
 
 interface ErrorProps {
@@ -13,7 +14,7 @@ interface ErrorProps {
 
 export default function MushafError({ error, reset }: ErrorProps) {
   useEffect(() => {
-    console.error('[Mushaf Error]:', error);
+    logger.error('[Mushaf Error]:', error);
   }, [error]);
 
   return (

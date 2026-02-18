@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { Compass, RefreshCw, Home, ArrowLeft, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import logger from '@/lib/logger';
 import BottomNav from '@/components/BottomNav';
 
 interface ErrorProps {
@@ -13,7 +14,7 @@ interface ErrorProps {
 
 export default function PracticeError({ error, reset }: ErrorProps) {
   useEffect(() => {
-    console.error('[Practice Error]:', error);
+    logger.error('[Practice Error]:', error);
   }, [error]);
 
   return (

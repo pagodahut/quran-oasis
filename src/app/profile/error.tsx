@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { UserX, RefreshCw, Home, ArrowLeft, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import logger from '@/lib/logger';
 import BottomNav from '@/components/BottomNav';
 
 interface ErrorProps {
@@ -13,7 +14,7 @@ interface ErrorProps {
 
 export default function ProfileError({ error, reset }: ErrorProps) {
   useEffect(() => {
-    console.error('[Profile Error]:', error);
+    logger.error('[Profile Error]:', error);
   }, [error]);
 
   return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { WifiOff, Wifi, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -9,6 +9,12 @@ export default function OfflineIndicator() {
   const [showBanner, setShowBanner] = useState(false);
   const [wasOffline, setWasOffline] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const wasOfflineRef = useRef(false);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    wasOfflineRef.current = wasOffline;
+  }, [wasOffline]);
 
   useEffect(() => {
     // Check initial state
@@ -21,7 +27,7 @@ export default function OfflineIndicator() {
 
     const handleOnline = () => {
       setIsOnline(true);
-      if (wasOffline) {
+      if (wasOfflineRef.current) {
         // Show "back online" message briefly
         setShowBanner(true);
         setDismissed(false);
@@ -47,7 +53,7 @@ export default function OfflineIndicator() {
       window.removeEventListener('offline', handleOffline);
       if (dismissTimer) clearTimeout(dismissTimer);
     };
-  }, [wasOffline]);
+  }, []);
 
   const handleDismiss = () => {
     setDismissed(true);

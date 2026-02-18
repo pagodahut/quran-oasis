@@ -73,6 +73,8 @@ export default function TafsirDrawer({ isOpen, onClose, surahNumber, ayahNumber 
   }, [isOpen, handleKeyDown]);
   
   useEffect(() => {
+    let cancelled = false;
+
     if (isOpen) {
       setLoading(true);
       const ayah = getAyah(surahNumber, ayahNumber);
@@ -83,7 +85,6 @@ export default function TafsirDrawer({ isOpen, onClose, surahNumber, ayahNumber 
       setLoading(false);
 
       // Fetch tafsir with cancellation guard
-      let cancelled = false;
       setTafsirLoading(true);
       fetchTafsir(surahNumber, ayahNumber, selectedTafsir)
         .then((content) => {
@@ -98,9 +99,9 @@ export default function TafsirDrawer({ isOpen, onClose, surahNumber, ayahNumber 
             setTafsirLoading(false);
           }
         });
-
-      return () => { cancelled = true; };
     }
+
+    return () => { cancelled = true; };
   }, [isOpen, surahNumber, ayahNumber, selectedTafsir]);
 
   const handleTafsirChange = (tafsirId: number) => {

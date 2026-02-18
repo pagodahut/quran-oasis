@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { AlertTriangle, RefreshCw, Home, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import logger from '@/lib/logger';
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -13,7 +14,7 @@ interface ErrorProps {
 export default function Error({ error, reset }: ErrorProps) {
   useEffect(() => {
     // Log the error for debugging/analytics
-    console.error('[App Error]:', error);
+    logger.error('[App Error]:', error);
     
     // Could add error reporting service here:
     // reportError({ error, context: 'app-error-boundary' });
