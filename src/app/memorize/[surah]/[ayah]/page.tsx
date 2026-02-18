@@ -41,6 +41,7 @@ import {
 } from '@/lib/progressStore';
 import { useReadingPreferences } from '@/hooks/useAppliedPreferences';
 import { TarteelService, checkBrowserSupport, type TarteelSessionResult } from '@/lib/tarteelService';
+import { WebSpeechService, type WebSpeechSessionResult } from '@/lib/webSpeechService';
 import RevealRecitation, { DifficultySelector, type RevealDifficulty } from '@/components/RevealRecitation';
 
 // ============ PHASE TYPES ============
@@ -432,7 +433,7 @@ export default function MemorizePage() {
   const [lastAccuracy, setLastAccuracy] = useState<number | null>(null);
   const [showFlashCorrection, setShowFlashCorrection] = useState(false);
   const [tarteelAvailable, setTarteelAvailable] = useState<boolean | null>(null);
-  const tarteelRef = useRef<TarteelService | null>(null);
+  const tarteelRef = useRef<TarteelService | WebSpeechService | null>(null);
   
   // Reveal mode state
   const [useRevealMode, setUseRevealMode] = useState(false);
@@ -445,13 +446,16 @@ export default function MemorizePage() {
   const autoPlayRef = useRef(false);
   const repeatCountRef = useRef(0);
 
-  // Check Tarteel availability
+  // Check speech recognition availability (Tarteel or WebSpeech fallback)
   useEffect(() => {
     const check = async () => {
       const browserOk = checkBrowserSupport().supported;
-      if (!browserOk) { setTarteelAvailable(false); return; }
-      const configured = await TarteelService.isConfigured();
-      setTarteelAvailable(configured);
+      if (!browserOk && !WebSpeechService.isSupported()) { 
+        setTarteelAvailable(false); 
+        return; 
+      }
+      // Even if Tarteel isn't configured, WebSpeech works as fallback
+      setTarteelAvailable(true);
     };
     check();
   }, []);
@@ -555,24 +559,44 @@ export default function MemorizePage() {
     }
   };
 
-  // Tarteel recording for recall phase
+  // Recording for recall phase — tries Tarteel, falls back to WebSpeech
   const startRecallRecording = useCallback(async () => {
     if (!verse || !tarteelAvailable) return;
     
     const displayText = cleanAyahText(verse.text.arabic, surahNum, verse.numberInSurah);
-    const service = new TarteelService({
-      expectedText: displayText,
-      chunkIntervalMs: 3000,
-      onStateChange: (state) => {
-        setIsRecording(state.isRecording);
-      },
-    });
-    tarteelRef.current = service;
     
+    // Check if Tarteel endpoint is available
+    let useTarteel = false;
     try {
-      await service.start();
+      const res = await fetch('/api/tarteel', { signal: AbortSignal.timeout(3000) });
+      if (res.ok) {
+        const data = await res.json();
+        useTarteel = data.configured === true;
+      }
     } catch {
-      // Fallback to manual mode if mic fails
+      useTarteel = false;
+    }
+
+    try {
+      if (useTarteel) {
+        const service = new TarteelService({
+          expectedText: displayText,
+          chunkIntervalMs: 3000,
+          onStateChange: (state) => { setIsRecording(state.isRecording); },
+        });
+        tarteelRef.current = service;
+        await service.start();
+      } else if (WebSpeechService.isSupported()) {
+        const service = new WebSpeechService({
+          expectedText: displayText,
+          onStateChange: (state) => { setIsRecording(state.isRecording); },
+        });
+        tarteelRef.current = service;
+        await service.start();
+      } else {
+        setTarteelAvailable(false);
+      }
+    } catch {
       setTarteelAvailable(false);
     }
   }, [verse, surahNum, tarteelAvailable]);
@@ -581,7 +605,7 @@ export default function MemorizePage() {
     if (!tarteelRef.current) return 0;
     
     try {
-      const result: TarteelSessionResult = await tarteelRef.current.stop();
+      const result = await tarteelRef.current.stop();
       tarteelRef.current = null;
       return result.accuracy;
     } catch {
