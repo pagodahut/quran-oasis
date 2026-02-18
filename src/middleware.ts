@@ -4,21 +4,7 @@ import { NextResponse } from 'next/server';
 // Only use Clerk middleware if configured
 const clerkPubKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
-// Define protected routes that require authentication
-const isProtectedRoute = createRouteMatcher([
-  '/dashboard(.*)',
-  '/profile(.*)',
-  '/practice(.*)',
-  '/lessons(.*)',
-  '/memorize(.*)',
-  '/progress(.*)',
-  '/recite(.*)',
-  '/api/user(.*)',
-  '/api/progress(.*)',
-  '/api/feedback(.*)',
-]);
-
-// Public routes that don't need auth (even if user is logged in)
+// Public routes — never require auth
 const isPublicRoute = createRouteMatcher([
   '/',
   '/sign-in(.*)',
@@ -35,26 +21,43 @@ const isPublicRoute = createRouteMatcher([
   '/api/onboarding(.*)',
 ]);
 
+// Guest-accessible routes — work without auth but enhanced with auth
+const isGuestRoute = createRouteMatcher([
+  '/dashboard(.*)',
+  '/practice(.*)',
+  '/lessons(.*)',
+  '/memorize(.*)',
+  '/progress(.*)',
+  '/recite(.*)',
+]);
+
+// Strictly protected API routes — require auth
+const isProtectedApiRoute = createRouteMatcher([
+  '/api/user(.*)',
+  '/api/progress(.*)',
+  '/api/feedback(.*)',
+]);
+
 export default clerkMiddleware(async (auth, req) => {
   // If Clerk is not configured, allow all routes
   if (!clerkPubKey) {
     return NextResponse.next();
   }
 
-  // Allow public routes without auth
+  // Public routes — always allow
   if (isPublicRoute(req)) {
     return NextResponse.next();
   }
 
-  // For protected routes, require authentication (except dashboard which supports guest mode)
-  if (isProtectedRoute(req)) {
+  // Guest-accessible routes — allow without auth (client-side handles auth state)
+  if (isGuestRoute(req)) {
+    return NextResponse.next();
+  }
+
+  // Protected API routes — require authentication
+  if (isProtectedApiRoute(req)) {
     const { userId, redirectToSignIn } = await auth();
-    
     if (!userId) {
-      // Allow dashboard in guest mode — auth check happens client-side
-      if (req.nextUrl.pathname.startsWith('/dashboard')) {
-        return NextResponse.next();
-      }
       return redirectToSignIn();
     }
   }

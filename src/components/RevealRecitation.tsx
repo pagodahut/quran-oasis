@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { fetchTajweedSurah, type TajweedSurahData, type TajweedWord } from '@/lib/quranTajweedApi';
 import { TarteelService, checkBrowserSupport } from '@/lib/tarteelService';
+import { WebSpeechService } from '@/lib/webSpeechService';
 import { SURAH_METADATA } from '@/lib/surahMetadata';
 import { getTajweedColor } from '@/lib/tajweedColorMap';
 
@@ -242,7 +243,7 @@ function MissedWordFlash({
 
 // ============ Audio Level Ring ============
 
-function AudioLevelRing({ service }: { service: TarteelService | null }) {
+function AudioLevelRing({ service }: { service: TarteelService | WebSpeechService | null }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
 
@@ -459,7 +460,7 @@ export default function RevealRecitation({
   const [elapsedTime, setElapsedTime] = useState(0);
   const [result, setResult] = useState<RevealResult | null>(null);
 
-  const serviceRef = useRef<TarteelService | null>(null);
+  const serviceRef = useRef<TarteelService | WebSpeechService | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -476,12 +477,6 @@ export default function RevealRecitation({
     async function load() {
       try {
         setPhase('loading');
-        const support = checkBrowserSupport();
-        if (!support.supported) {
-          setErrorMessage(`Browser missing: ${support.missing.join(', ')}`);
-          setPhase('error');
-          return;
-        }
         const data = await fetchTajweedSurah(surahNumber, startAyah, effectiveEndAyah);
         if (cancelled) return;
         if (data.allWords.length === 0) {
@@ -525,75 +520,93 @@ export default function RevealRecitation({
 
   // ============ Start Recording ============
 
+  const handleRevealWord = useCallback((index: number, _word: string, confidence: number) => {
+    if (index < 0 || index >= totalWords) return;
+
+    setRevealStates(prev => {
+      const next = [...prev];
+      if (next[index] !== 'hidden') return prev;
+
+      if (confidence > 0.7) {
+        next[index] = 'correct';
+        setJustRevealedIdx(index);
+        setTimeout(() => setJustRevealedIdx(p => p === index ? null : p), 800);
+      } else if (confidence >= 0.4) {
+        next[index] = 'partial';
+        setJustRevealedIdx(index);
+        setTimeout(() => setJustRevealedIdx(p => p === index ? null : p), 800);
+      } else {
+        next[index] = 'missed';
+        setFlashingMissed(prev => new Set(prev).add(index));
+      }
+      return next;
+    });
+
+    setTimeout(() => {
+      const el = scrollRef.current?.querySelector(`[data-reveal-idx="${index}"]`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+  }, [totalWords]);
+
+  const handleRevealStateChange = useCallback((state: { alignments: Array<{ status: string }> }) => {
+    setRevealStates(prev => {
+      const next = [...prev];
+      let changed = false;
+      state.alignments.forEach((a, idx) => {
+        if (idx < next.length && a.status === 'missed' && next[idx] === 'hidden') {
+          next[idx] = 'missed';
+          changed = true;
+          setFlashingMissed(p => new Set(p).add(idx));
+        }
+      });
+      return changed ? next : prev;
+    });
+  }, []);
+
   const startRecording = useCallback(async () => {
     if (!tajweedData) return;
+
+    const expectedText = tajweedData.plainWords.join(' ');
+
+    // Try Tarteel first, fall back to Web Speech API
+    let useTarteel = false;
     try {
-      const checkRes = await fetch('/api/tarteel');
-      const checkData = await checkRes.json();
-      if (checkRes.status === 401) {
-        setErrorMessage('Please sign in to use this feature.');
-        setPhase('error');
-        return;
+      const checkRes = await fetch('/api/tarteel', { signal: AbortSignal.timeout(3000) });
+      if (checkRes.ok) {
+        const checkData = await checkRes.json();
+        useTarteel = checkData.configured === true;
       }
-      if (checkRes.status === 503 || !checkData.configured) {
-        setErrorMessage('Live recitation is not available right now.');
-        setPhase('error');
-        return;
+    } catch {
+      useTarteel = false;
+    }
+
+    try {
+      if (useTarteel) {
+        const service = new TarteelService({
+          expectedText,
+          chunkIntervalMs: 2500,
+          onWord: handleRevealWord,
+          onStateChange: handleRevealStateChange,
+          onError: (err) => console.error('Tarteel error:', err),
+        });
+        serviceRef.current = service;
+        await service.start();
+      } else {
+        if (!WebSpeechService.isSupported()) {
+          setErrorMessage('Speech recognition is not supported. Please use Chrome or Edge.');
+          setPhase('error');
+          return;
+        }
+        const service = new WebSpeechService({
+          expectedText,
+          onWord: handleRevealWord,
+          onStateChange: handleRevealStateChange,
+          onError: (err) => console.error('WebSpeech error:', err),
+        });
+        serviceRef.current = service;
+        await service.start();
       }
 
-      const expectedText = tajweedData.plainWords.join(' ');
-      const service = new TarteelService({
-        expectedText,
-        chunkIntervalMs: 2500,
-        onWord: (index, _word, confidence) => {
-          if (index < 0 || index >= totalWords) return;
-
-          setRevealStates(prev => {
-            const next = [...prev];
-            if (next[index] !== 'hidden') return prev; // already revealed
-
-            if (confidence > 0.7) {
-              next[index] = 'correct';
-              setJustRevealedIdx(index);
-              setTimeout(() => setJustRevealedIdx(prev => prev === index ? null : prev), 800);
-            } else if (confidence >= 0.4) {
-              next[index] = 'partial';
-              setJustRevealedIdx(index);
-              setTimeout(() => setJustRevealedIdx(prev => prev === index ? null : prev), 800);
-            } else {
-              // Missed — flash the correct word briefly
-              next[index] = 'missed';
-              setFlashingMissed(prev => new Set(prev).add(index));
-            }
-            return next;
-          });
-
-          // Auto-scroll to revealed word
-          setTimeout(() => {
-            const el = scrollRef.current?.querySelector(`[data-reveal-idx="${index}"]`);
-            el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }, 100);
-        },
-        onStateChange: (state) => {
-          // Mark skipped/missed words from alignment
-          setRevealStates(prev => {
-            const next = [...prev];
-            let changed = false;
-            state.alignments.forEach((a, idx) => {
-              if (a.status === 'missed' && next[idx] === 'hidden') {
-                next[idx] = 'missed';
-                changed = true;
-                setFlashingMissed(p => new Set(p).add(idx));
-              }
-            });
-            return changed ? next : prev;
-          });
-        },
-        onError: (err) => console.error('Tarteel error:', err),
-      });
-
-      serviceRef.current = service;
-      await service.start();
       setPhase('recording');
       setElapsedTime(0);
       timerRef.current = setInterval(() => setElapsedTime(p => p + 1), 1000);
@@ -602,7 +615,7 @@ export default function RevealRecitation({
       setErrorMessage(err instanceof Error ? err.message : 'Failed to start recording.');
       setPhase('error');
     }
-  }, [tajweedData, totalWords]);
+  }, [tajweedData, totalWords, handleRevealWord, handleRevealStateChange]);
 
   // ============ Finish Session ============
 

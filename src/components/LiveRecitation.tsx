@@ -24,6 +24,7 @@ import {
   TarteelService,
   checkBrowserSupport,
 } from '@/lib/tarteelService';
+import { WebSpeechService } from '@/lib/webSpeechService';
 import { SURAH_METADATA } from '@/lib/surahMetadata';
 import TajweedReport from '@/components/TajweedReport';
 import { detectTajweedRules } from '@/lib/realtimeTajweedService';
@@ -61,7 +62,7 @@ function formatTime(seconds: number): string {
 
 // ============ Audio Visualizer ============
 
-function AudioVisualizer({ service }: { service: TarteelService | null }) {
+function AudioVisualizer({ service }: { service: TarteelService | WebSpeechService | null }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
 
@@ -352,7 +353,7 @@ export default function LiveRecitation({
   const [wordByWordView, setWordByWordView] = useState(false);
 
   // Refs
-  const serviceRef = useRef<TarteelService | null>(null);
+  const serviceRef = useRef<TarteelService | WebSpeechService | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const wordElementsRef = useRef<Map<number, HTMLElement>>(new Map());
@@ -376,14 +377,6 @@ export default function LiveRecitation({
     async function loadData() {
       try {
         setPhase('loading');
-
-        // Check browser support
-        const support = checkBrowserSupport();
-        if (!support.supported) {
-          setErrorMessage(`Browser missing: ${support.missing.join(', ')}`);
-          setPhase('error');
-          return;
-        }
 
         // Fetch tajweed data from Quran.com
         const data = await fetchTajweedSurah(surahNumber, startAyah, effectiveEndAyah);
@@ -418,105 +411,109 @@ export default function LiveRecitation({
 
   // ============ Tarteel Integration ============
 
+  const handleStateChange = useCallback((state: { alignments: Array<{ status: string; confidence: number }>; currentWordIndex: number }) => {
+    setWordStates((prev) => {
+      const newStates = [...prev];
+      state.alignments.forEach((alignment, idx) => {
+        if (idx >= newStates.length) return;
+        if (alignment.status === 'matched') {
+          newStates[idx] = 'revealed';
+        } else if (alignment.status === 'partial') {
+          newStates[idx] = 'revealed';
+        } else if (alignment.status === 'missed') {
+          newStates[idx] = 'missed';
+        }
+      });
+      return newStates;
+    });
+
+    setWordConfidences((prev) => {
+      const next = [...prev];
+      state.alignments.forEach((alignment, idx) => {
+        if (idx < next.length && alignment.confidence > 0) {
+          next[idx] = alignment.confidence;
+        }
+      });
+      return next;
+    });
+
+    if (state.currentWordIndex >= 0) {
+      setCurrentWordIndex(state.currentWordIndex);
+    }
+  }, []);
+
+  const handleWord = useCallback((index: number, _word: string, confidence: number) => {
+    setCurrentWordIndex(index);
+
+    setWordConfidences((prev) => {
+      const next = [...prev];
+      if (index >= 0 && index < next.length) {
+        next[index] = confidence;
+      }
+      return next;
+    });
+
+    setWordStates((prev) => {
+      const newStates = [...prev];
+      if (index >= 0 && index < newStates.length) {
+        if (newStates[index] === 'hidden' || newStates[index] === 'current') {
+          newStates[index] = 'revealed';
+        }
+      }
+      return newStates;
+    });
+  }, []);
+
   const startRecording = useCallback(async () => {
     if (!tajweedData) return;
 
+    const expectedText = tajweedData.plainWords.join(' ');
+
+    // Try Tarteel first, fall back to Web Speech API
+    let useTarteel = false;
     try {
-      // Check authentication via Tarteel API
-      const checkRes = await fetch('/api/tarteel');
-      const checkData = await checkRes.json();
+      const checkRes = await fetch('/api/tarteel', { signal: AbortSignal.timeout(3000) });
+      if (checkRes.ok) {
+        const checkData = await checkRes.json();
+        useTarteel = checkData.configured === true;
+      }
+    } catch {
+      useTarteel = false;
+    }
 
-      // Handle authentication errors
-      if (checkRes.status === 401) {
-        setErrorMessage(
-          'Please sign in to use live recitation. This feature requires an account.'
-        );
-        setPhase('error');
-        return;
+    try {
+      if (useTarteel) {
+        // Try Tarteel service
+        const service = new TarteelService({
+          expectedText,
+          chunkIntervalMs: 2500,
+          onStateChange: handleStateChange,
+          onWord: handleWord,
+          onError: (error) => console.error('Tarteel error:', error),
+        });
+        serviceRef.current = service;
+        await service.start();
+      } else {
+        // Fallback: Web Speech API
+        if (!WebSpeechService.isSupported()) {
+          setErrorMessage(
+            'Speech recognition is not supported in this browser. Please use Chrome or Edge.'
+          );
+          setPhase('error');
+          return;
+        }
+        const service = new WebSpeechService({
+          expectedText,
+          onStateChange: handleStateChange,
+          onWord: handleWord,
+          onError: (error) => console.error('WebSpeech error:', error),
+        });
+        serviceRef.current = service;
+        await service.start();
       }
 
-      // Handle configuration errors
-      if (checkRes.status === 503 || !checkData.configured) {
-        setErrorMessage(
-          'Live recitation is not available. Please try again later.'
-        );
-        setPhase('error');
-        return;
-      }
-
-      // Build expected text from tajweed data
-      const expectedText = tajweedData.plainWords.join(' ');
-
-      // Create Tarteel service (uses Modal endpoint)
-      const service = new TarteelService({
-        expectedText,
-        chunkIntervalMs: 2500, // Send chunks every 2.5 seconds
-        onStateChange: (state) => {
-          // Update word states based on alignments
-          setWordStates((prev) => {
-            const newStates = [...prev];
-            state.alignments.forEach((alignment, idx) => {
-              if (alignment.status === 'matched') {
-                newStates[idx] = 'revealed';
-              } else if (alignment.status === 'partial') {
-                newStates[idx] = 'revealed'; // color handled by confidence
-              } else if (alignment.status === 'missed') {
-                newStates[idx] = 'missed';
-              }
-            });
-            return newStates;
-          });
-
-          // Update confidences from alignments
-          setWordConfidences((prev) => {
-            const next = [...prev];
-            state.alignments.forEach((alignment, idx) => {
-              if (alignment.confidence > 0) {
-                next[idx] = alignment.confidence;
-              }
-            });
-            return next;
-          });
-
-          // Update current word index
-          if (state.currentWordIndex >= 0) {
-            setCurrentWordIndex(state.currentWordIndex);
-          }
-        },
-        onWord: (index, word, confidence) => {
-          setCurrentWordIndex(index);
-
-          setWordConfidences((prev) => {
-            const next = [...prev];
-            if (index >= 0 && index < next.length) {
-              next[index] = confidence;
-            }
-            return next;
-          });
-
-          setWordStates((prev) => {
-            const newStates = [...prev];
-            if (index >= 0 && index < newStates.length) {
-              if (newStates[index] === 'hidden' || newStates[index] === 'current') {
-                newStates[index] = 'revealed';
-              }
-            }
-            return newStates;
-          });
-        },
-        onError: (error) => {
-          console.error('Tarteel error:', error);
-        },
-      });
-
-      serviceRef.current = service;
-
-      // Start
-      await service.start();
       setPhase('recording');
       setElapsedTime(0);
-
-      // Start timer
       timerRef.current = setInterval(() => {
         setElapsedTime((prev) => prev + 1);
       }, 1000);
@@ -529,7 +526,7 @@ export default function LiveRecitation({
       );
       setPhase('error');
     }
-  }, [tajweedData]);
+  }, [tajweedData, handleStateChange, handleWord]);
 
   const stopRecording = useCallback(async () => {
     // Stop timer
