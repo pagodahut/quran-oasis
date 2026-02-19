@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import SheikhButton from '@/components/ui/SheikhButton';
+import { MosqueIcon, SeedlingIcon, LeafIcon, TreeIcon, StarIcon, StrengthIcon, ThinkIcon } from '@/components/icons';
 import {
   useSheikhReview,
   type ReviewType,
@@ -26,22 +27,22 @@ interface SheikhReviewSessionProps {
   className?: string;
 }
 
-const REVIEW_META: Record<ReviewType, { label: string; emoji: string; color: string; description: string }> = {
+const REVIEW_META: Record<ReviewType, { label: string; emoji: React.ReactNode; color: string; description: string }> = {
   sabaq: {
     label: 'Sabaq',
-    emoji: '🌱',
+    emoji: <SeedlingIcon size={20} />,
     color: '#2dd496',
     description: 'New lesson — solidify what you just memorized',
   },
   sabqi: {
     label: 'Sabqi',
-    emoji: '🌿',
+    emoji: <LeafIcon size={20} />,
     color: '#40b8e0',
     description: 'Recent review — keep it fresh',
   },
   manzil: {
     label: 'Manzil',
-    emoji: '🌳',
+    emoji: <TreeIcon size={20} />,
     color: '#d4a844',
     description: 'Long-term review — maintain forever',
   },
@@ -155,7 +156,7 @@ export default function SheikhReviewSession({
       <div className={`review-session ${animateIn ? 'review-session--visible' : ''} ${className}`}>
         <div className="review-session__picker">
           <div className="review-session__picker-header">
-            <div className="review-session__avatar"><span>🕌</span></div>
+            <div className="review-session__avatar"><MosqueIcon size={20} /></div>
             <h2 className="review-session__picker-title">Review Time</h2>
             <p className="review-session__picker-subtitle">
               Sheikh HIFZ will guide you through each review type
@@ -249,7 +250,7 @@ export default function SheikhReviewSession({
             style={{ animationDelay: `${i * 50}ms` }}
           >
             {msg.role === 'assistant' && (
-              <div className="review-session__bubble-avatar"><span>🕌</span></div>
+              <div className="review-session__bubble-avatar"><MosqueIcon size={20} /></div>
             )}
             <div className="review-session__bubble-content">
               <p>{msg.content}</p>
@@ -259,7 +260,7 @@ export default function SheikhReviewSession({
 
         {isLoading && (
           <div className="review-session__bubble review-session__bubble--assistant">
-            <div className="review-session__bubble-avatar"><span>🕌</span></div>
+            <div className="review-session__bubble-avatar"><MosqueIcon size={20} /></div>
             <div className="review-session__bubble-content">
               <div className="review-session__typing"><span /><span /><span /></div>
             </div>
@@ -270,9 +271,9 @@ export default function SheikhReviewSession({
         {showResult && sessionResult && (
           <div className="review-session__result">
             <div className="review-session__result-perf">
-              {sessionResult.overallPerformance === 'excellent' && '⭐'}
+              {sessionResult.overallPerformance === 'excellent' && <StarIcon size={20} className="inline" />}
               {sessionResult.overallPerformance === 'good' && '👍'}
-              {sessionResult.overallPerformance === 'needs_work' && '💪'}
+              {sessionResult.overallPerformance === 'needs_work' && <StrengthIcon size={20} className="inline" />}
               <span style={{
                 color: sessionResult.overallPerformance === 'excellent' ? '#2dd496'
                   : sessionResult.overallPerformance === 'good' ? '#40b8e0'
@@ -324,7 +325,7 @@ export default function SheikhReviewSession({
               🎙️ Recite
             </SheikhButton>
             <SheikhButton variant="chip" breathe onClick={() => handleSend("I'm not sure, can you help?")}>
-              🤔 Help me
+              <ThinkIcon size={16} className="inline -mt-0.5" /> Help me
             </SheikhButton>
             <SheikhButton variant="chip" breathe onClick={() => handleSend("Let's move to the next one")}>
               ⏭️ Next

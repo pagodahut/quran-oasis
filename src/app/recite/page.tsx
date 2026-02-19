@@ -158,7 +158,9 @@ function AyahRangeSelector({
 
       {/* Primary Start Button — one tap to go */}
       <motion.button
-        whileTap={{ scale: 0.97 }}
+        animate={{ scale: [1, 1.02, 1] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+        whileTap={{ scale: 0.95 }}
         onClick={handleStart}
         className="w-full py-4 rounded-xl bg-gradient-to-r from-gold-600 to-gold-500 
           text-night-950 font-semibold text-base transition hover:from-gold-500 hover:to-gold-400
@@ -197,7 +199,9 @@ function AyahRangeSelector({
                   Practice Mode
                 </label>
                 <div className="flex gap-2">
-                  <button
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                     onClick={() => setReciteMode('standard')}
                     className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition border ${
                       reciteMode === 'standard'
@@ -207,8 +211,10 @@ function AyahRangeSelector({
                   >
                     <div>Standard</div>
                     <div className="text-[10px] mt-0.5 opacity-70">Word-by-word tracking</div>
-                  </button>
-                  <button
+                  </motion.button>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                     onClick={() => setReciteMode('reveal')}
                     className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition border ${
                       reciteMode === 'reveal'
@@ -218,7 +224,7 @@ function AyahRangeSelector({
                   >
                     <div>Reveal</div>
                     <div className="text-[10px] mt-0.5 opacity-70">Hidden until you recite</div>
-                  </button>
+                  </motion.button>
                 </div>
               </div>
 
@@ -522,13 +528,22 @@ export default function RecitePage() {
               All Surahs
             </h2>
           )}
-          <div className="space-y-2">
+          <motion.div
+            className="space-y-2"
+            initial="hidden"
+            animate="visible"
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.03 } } }}
+          >
             {filteredSurahs.map((surah) => (
-              <SurahCard
+              <motion.div
                 key={surah.number}
-                surah={surah}
-                onSelect={handleSelectSurah}
-              />
+                variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.25, ease: [0.25, 0.1, 0.25, 1] } } }}
+              >
+                <SurahCard
+                  surah={surah}
+                  onSelect={handleSelectSurah}
+                />
+              </motion.div>
             ))}
             {filteredSurahs.length === 0 && (
               <div className="text-center py-12">
@@ -536,7 +551,7 @@ export default function RecitePage() {
                 <p className="text-sm text-night-500">No surahs found</p>
               </div>
             )}
-          </div>
+          </motion.div>
         </section>
       </div>
 

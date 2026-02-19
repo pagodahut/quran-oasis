@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, Suspense } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -12,7 +12,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ChevronLeft, 
   ChevronRight, 
-  Menu, 
   Bookmark, 
   Settings,
   List,
@@ -21,16 +20,17 @@ import {
   SkipBack,
   SkipForward,
   Repeat,
-  Volume2,
   X,
   Search,
   BookOpen,
   Star,
   Brain,
-  BookmarkPlus,
   Mic,
   Type,
   Layers,
+  Compass,
+  BookMarked,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { 
@@ -59,6 +59,10 @@ import { useQuranScript } from '@/hooks/useQuranScript';
 import { usePreferences, ARABIC_FONT_STYLE_OPTIONS } from '@/lib/preferencesStore';
 import { QURAN_SCRIPT_OPTIONS, type QuranScript } from '@/lib/quranScripts';
 
+// Spring animation config
+const springTransition = { type: 'spring' as const, stiffness: 400, damping: 30 };
+const pillSpring = { type: 'spring' as const, stiffness: 500, damping: 35 };
+
 function MushafSearchParamsReader({ onView }: { onView: (v: 'read' | 'explore') => void }) {
   const searchParams = useSearchParams();
   useEffect(() => {
@@ -74,16 +78,13 @@ export default function MushafPage() {
   const { toggle: toggleBookmark, check: isBookmarked } = useBookmarks();
   const { setPageContext, setAyahContext } = useSheikh();
   
-  // Get preferences
   const prefs = useReadingPreferences();
   const { preferences, update: updatePrefs } = usePreferences();
   
-  // State - initialized from preferences
   const [currentSurah, setCurrentSurah] = useState<Surah | null>(null);
   const [surahNumber, setSurahNumber] = useState(1);
   const [loading, setLoading] = useState(true);
   
-  // Script text (uthmani vs indopak)
   const { getScriptText, isAlternateScript, script: currentScript } = useQuranScript(surahNumber);
   const currentFontStyle = preferences.display.arabicFontStyle;
   const fontOption = ARABIC_FONT_STYLE_OPTIONS.find(f => f.value === currentFontStyle);
@@ -99,7 +100,7 @@ export default function MushafPage() {
   const [repeatCount, setRepeatCount] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
   
-  // Multi-ayah loop state
+  // Multi-ayah loop
   const [loopRange, setLoopRange] = useState<{ start: number; end: number } | null>(null);
   const [showLoopPicker, setShowLoopPicker] = useState(false);
   
@@ -109,26 +110,35 @@ export default function MushafPage() {
   const [showSearch, setShowSearch] = useState(false);
   const [showTafsir, setShowTafsir] = useState(false);
   const [tafsirAyah, setTafsirAyah] = useState(1);
+  const [showAudioSettings, setShowAudioSettings] = useState(false);
   
-  // Word-by-word & Tajweed state
+  // Verse action menu
+  const [activeVerseMenu, setActiveVerseMenu] = useState<number | null>(null);
+  
+  // Word-by-word & Tajweed
   const [wordByWordMode, setWordByWordMode] = useState(false);
   const [showTajweedPractice, setShowTajweedPractice] = useState(false);
   const [tajweedPracticeAyah, setTajweedPracticeAyah] = useState(1);
   const [showTajweedColors, setShowTajweedColors] = useState(false);
   const [showTajweedLegend, setShowTajweedLegend] = useState(false);
   
-  // Helper to get display text for an ayah (uses alternate script if selected)
   const getDisplayText = (ayah: Ayah): string => {
     const scriptText = getScriptText(ayah.numberInSurah);
     if (scriptText) return scriptText;
     return cleanAyahText(ayah.text.arabic, surahNumber, ayah.numberInSurah);
   };
 
-  // Refs
   const audioRef = useRef<HTMLAudioElement>(null);
   const verseRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
 
-  // Sync with preferences
+  // Close verse menu on outside click
+  useEffect(() => {
+    if (activeVerseMenu === null) return;
+    const handler = () => setActiveVerseMenu(null);
+    const timer = setTimeout(() => document.addEventListener('click', handler), 10);
+    return () => { clearTimeout(timer); document.removeEventListener('click', handler); };
+  }, [activeVerseMenu]);
+
   useEffect(() => {
     setSelectedReciter(prefs.reciter);
     setShowTranslation(prefs.showTranslation);
@@ -137,7 +147,6 @@ export default function MushafPage() {
     setPlaybackRate(prefs.playbackSpeed);
   }, [prefs]);
 
-  // Load surah
   useEffect(() => {
     setLoading(true);
     const surah = getSurah(surahNumber);
@@ -146,13 +155,11 @@ export default function MushafPage() {
     setLoading(false);
   }, [surahNumber]);
 
-  // Set Sheikh context — tell the AI which page we're on and what ayah is selected
   useEffect(() => {
     setPageContext({ page: 'mushaf' });
     return () => setAyahContext(undefined);
   }, [setPageContext, setAyahContext]);
 
-  // Update Sheikh ayah context when current ayah changes
   useEffect(() => {
     if (currentSurah) {
       const ayah = currentSurah.ayahs.find(a => a.numberInSurah === currentAyah);
@@ -171,9 +178,8 @@ export default function MushafPage() {
   }, [currentSurah, currentAyah, surahNumber, translationEdition, setAyahContext]);
 
   // Audio handlers
-  const playAyah = (ayahNum: number) => {
+  const playAyah = useCallback((ayahNum: number) => {
     if (!currentSurah || !audioRef.current) return;
-    
     const url = getAudioUrl(surahNumber, ayahNum, selectedReciter);
     audioRef.current.src = url;
     audioRef.current.playbackRate = playbackRate;
@@ -181,14 +187,11 @@ export default function MushafPage() {
     setIsPlaying(true);
     setCurrentAyah(ayahNum);
     setRepeatCount(0);
-    
-    // Scroll to verse
     verseRefs.current[ayahNum]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  };
+  }, [currentSurah, surahNumber, selectedReciter, playbackRate]);
 
   const togglePlay = () => {
     if (!audioRef.current) return;
-    
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
@@ -203,9 +206,7 @@ export default function MushafPage() {
   };
 
   const handleAudioEnded = () => {
-    // Handle single ayah repeat first
     if (repeatMode === 'infinite' || repeatCount + 1 < repeatMode) {
-      // Repeat current ayah
       setRepeatCount(prev => prev + 1);
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
@@ -213,23 +214,15 @@ export default function MushafPage() {
       }
       return;
     }
-    
-    // Reset repeat count after completing single ayah repeats
     setRepeatCount(0);
-    
-    // Handle multi-ayah loop range
     if (loopRange) {
       if (currentAyah < loopRange.end) {
-        // Move to next ayah in range
         playAyah(currentAyah + 1);
       } else {
-        // Loop back to start of range
         playAyah(loopRange.start);
       }
       return;
     }
-    
-    // Normal playback - move to next ayah
     if (currentSurah && currentAyah < currentSurah.numberOfAyahs) {
       playAyah(currentAyah + 1);
     } else {
@@ -274,7 +267,6 @@ export default function MushafPage() {
         <MushafSearchParamsReader onView={setActiveView} />
       </Suspense>
 
-      {/* Audio Element */}
       <audio
         ref={audioRef}
         onEnded={handleAudioEnded}
@@ -282,9 +274,10 @@ export default function MushafPage() {
         onPlay={() => setIsPlaying(true)}
       />
 
-      {/* Header - Premium Frosted Glass */}
+      {/* ── Header ── */}
       <header className="sticky top-0 z-40 safe-area-top liquid-glass rounded-b-2xl mx-2 mt-2">
         <div className="flex items-center justify-between px-3 py-3">
+          {/* Left: back + list */}
           <div className="flex items-center gap-1.5">
             <Link href="/" className="liquid-icon-btn">
               <ChevronLeft className="w-5 h-5" />
@@ -294,87 +287,62 @@ export default function MushafPage() {
             </button>
           </div>
 
-          {/* Surah Title */}
+          {/* Center: hero surah name */}
           <button 
             onClick={() => setShowSurahList(true)}
             className="text-center flex-1 mx-3 py-1 px-2 rounded-xl hover:bg-white/5 active:bg-white/10 transition-colors"
           >
             {currentSurah && (
               <>
-                <h1 className="quran-text text-xl text-gold-400" style={{ fontFamily: 'var(--font-quran)' }} lang="ar" dir="rtl">{currentSurah.name}</h1>
-                <p className="text-xs text-night-400">{currentSurah.englishName}</p>
+                <h1 className="quran-text text-2xl text-gold-400" style={{ fontFamily: 'var(--font-quran)' }} lang="ar" dir="rtl">{currentSurah.name}</h1>
+                <p className="text-xs text-night-400">{currentSurah.englishName} &middot; {currentSurah.numberOfAyahs} verses</p>
               </>
             )}
           </button>
 
+          {/* Right: search + view toggle */}
           <div className="flex items-center gap-1.5">
             <button onClick={() => setShowSearch(true)} className="liquid-icon-btn" aria-label="Search Quran">
               <Search className="w-5 h-5" aria-hidden="true" />
             </button>
-            <Link href="/bookmarks" className="liquid-icon-btn" aria-label="View bookmarks">
-              <Bookmark className="w-5 h-5" />
-            </Link>
+            <button
+              onClick={() => setActiveView(activeView === 'read' ? 'explore' : 'read')}
+              className={`liquid-icon-btn ${activeView === 'explore' ? 'active' : ''}`}
+              aria-label="Toggle explore view"
+            >
+              <Compass className="w-5 h-5" />
+            </button>
             <button onClick={() => setShowSettings(true)} className="liquid-icon-btn">
               <Settings className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        {/* View Switcher: Read / Explore */}
-        <div className="flex items-center justify-center gap-1 px-4 py-2 border-t border-white/[0.04]">
-          {(['read', 'explore'] as const).map((view) => (
+        {/* Surah nav chevrons (Read mode only) */}
+        {activeView === 'read' && (
+          <div className="flex items-center justify-between px-4 pb-2.5">
             <button
-              key={view}
-              onClick={() => setActiveView(view)}
-              className={`relative px-5 py-2 rounded-xl text-sm font-medium transition-all ${
-                activeView === view
-                  ? 'text-gold-400'
-                  : 'text-night-400 hover:text-night-200'
-              }`}
+              onClick={() => surahNumber > 1 && setSurahNumber(surahNumber - 1)}
+              disabled={surahNumber === 1}
+              className="liquid-icon-btn !w-9 !h-9 !min-w-[36px] !min-h-[36px] disabled:opacity-20"
             >
-              {activeView === view && (
-                <motion.div
-                  layoutId="mushaf-view-tab"
-                  className="absolute inset-0 rounded-xl bg-gold-500/10 border border-gold-500/20"
-                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                />
-              )}
-              <span className="relative z-10">
-                {view === 'read' ? '📖 Read' : '🌿 Explore'}
-              </span>
+              <ChevronLeft className="w-4 h-4" />
             </button>
-          ))}
-        </div>
-
-        {/* Navigation - Smooth divider (Read mode only) */}
-        {activeView === 'read' && <div className="flex items-center justify-between px-4 py-2.5 border-t border-white/[0.04] text-sm">
-          <button
-            onClick={() => surahNumber > 1 && setSurahNumber(surahNumber - 1)}
-            disabled={surahNumber === 1}
-            className="flex items-center gap-1 text-night-400 disabled:opacity-30 min-h-[36px] px-2 rounded-lg hover:bg-white/5 active:bg-white/10 transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Prev
-          </button>
-          
-          <span className="text-night-500 text-xs">
-            {currentSurah && (
-              <>Surah {surahNumber} • {currentSurah.numberOfAyahs} verses • {currentSurah.revelationType}</>
-            )}
-          </span>
-          
-          <button
-            onClick={() => surahNumber < 114 && setSurahNumber(surahNumber + 1)}
-            disabled={surahNumber === 114}
-            className="flex items-center gap-1 text-night-400 disabled:opacity-30 min-h-[36px] px-2 rounded-lg hover:bg-white/5 active:bg-white/10 transition-colors"
-          >
-            Next
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>}
+            <span className="text-night-500 text-xs">
+              {currentSurah && <>Surah {surahNumber} &middot; {currentSurah.revelationType}</>}
+            </span>
+            <button
+              onClick={() => surahNumber < 114 && setSurahNumber(surahNumber + 1)}
+              disabled={surahNumber === 114}
+              className="liquid-icon-btn !w-9 !h-9 !min-w-[36px] !min-h-[36px] disabled:opacity-20"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </header>
 
-      {/* Explore View */}
+      {/* ── Explore View ── */}
       <AnimatePresence mode="wait">
         {activeView === 'explore' && (
           <motion.div
@@ -392,7 +360,7 @@ export default function MushafPage() {
         )}
       </AnimatePresence>
 
-      {/* Mushaf Content (Read view) */}
+      {/* ── Read View ── */}
       {activeView === 'read' && <main className="pb-56">
         {loading ? (
           <div className="flex items-center justify-center py-20">
@@ -401,34 +369,29 @@ export default function MushafPage() {
         ) : currentSurah ? (
           <div className="px-4 py-6 max-w-3xl mx-auto">
             {/* Surah Header */}
-            <div className="text-center mb-8">
-              <h2 
-                className="surah-header"
-                style={{
-                  direction: 'rtl',
-                  textAlign: 'center',
-                  width: '100%',
-                  display: 'block',
-                }}
-              >
+            <div className="text-center mb-10">
+              <h2 className="surah-header" style={{ direction: 'rtl', textAlign: 'center', width: '100%', display: 'block' }}>
                 {currentSurah.name}
               </h2>
-              <p className="text-night-400 text-center">
-                {currentSurah.englishName} — {currentSurah.englishNameTranslation}
+              <p className="text-night-400 text-center text-sm">
+                {currentSurah.englishName} &mdash; {currentSurah.englishNameTranslation}
               </p>
             </div>
 
             {/* Bismillah */}
             {shouldShowBismillah(surahNumber) && (
-              <div className="text-center mb-8 py-4 border-y border-night-800/30">
+              <div className="text-center mb-10 py-5">
+                <div className="liquid-divider-gold mb-5" />
                 <p className="bismillah">{BISMILLAH}</p>
+                <div className="liquid-divider-gold mt-5" />
               </div>
             )}
 
             {/* Verses */}
-            <div className="space-y-4">
+            <div className="space-y-6">
               {currentSurah.ayahs.map((ayah) => {
                 const isCurrentVerse = currentAyah === ayah.numberInSurah && isPlaying;
+                const isMenuOpen = activeVerseMenu === ayah.numberInSurah;
                 
                 return (
                   <motion.div
@@ -436,10 +399,11 @@ export default function MushafPage() {
                     ref={(el) => { verseRefs.current[ayah.numberInSurah] = el; }}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className={`verse-card ${isCurrentVerse ? 'active' : ''}`}
+                    className={`verse-card relative ${isCurrentVerse ? 'active' : ''}`}
+                    style={{ padding: '1.5rem' }}
                     onClick={() => playAyah(ayah.numberInSurah)}
                   >
-                    {/* Arabic Text - Word by Word or Regular */}
+                    {/* Arabic Text */}
                     {wordByWordMode ? (
                       <div className="mb-4">
                         {isCurrentVerse ? (
@@ -464,10 +428,7 @@ export default function MushafPage() {
                     ) : (
                       <p 
                         className="quran-text text-night-100 mb-4"
-                        style={{ 
-                          fontSize,
-                          fontFamily: fontOption?.fontFamily || 'var(--font-arabic)',
-                        }}
+                        style={{ fontSize, fontFamily: fontOption?.fontFamily || 'var(--font-arabic)' }}
                         lang="ar"
                         dir="rtl"
                       >
@@ -482,34 +443,25 @@ export default function MushafPage() {
 
                     {/* Translation */}
                     {showTranslation && (
-                      <p className="text-night-400 text-sm leading-relaxed border-t border-night-800/30 pt-4">
+                      <p className="text-night-400 text-sm leading-relaxed mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
                         {ayah.text.translations[translationEdition]}
                       </p>
                     )}
 
-                    {/* Verse Meta */}
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-3 pt-3 border-t border-night-800/20 gap-2">
-                      <div className="flex items-center gap-3 text-[10px] sm:text-xs text-night-500">
+                    {/* Minimal verse footer: number + bookmark + actions trigger */}
+                    <div className="flex items-center justify-between mt-4 pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                      <div className="flex items-center gap-2 text-[10px] text-night-500">
                         <span>Juz {ayah.juz}</span>
+                        <span className="text-night-700">&middot;</span>
                         <span>Pg {ayah.page}</span>
-                        <span>Ruku {ayah.ruku}</span>
-                        {ayah.sajda && <span className="text-gold-400">۩ Sajda</span>}
+                        {ayah.sajda && <span className="text-gold-400 flex items-center gap-0.5"><Star className="w-3 h-3" /> Sajda</span>}
                       </div>
-                      <div className="flex items-center gap-1.5 sm:gap-2">
-                        {/* Practice Tajweed Button */}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setTajweedPracticeAyah(ayah.numberInSurah);
-                            setShowTajweedPractice(true);
-                          }}
-                          className="text-xs text-sage-500 hover:text-sage-400 transition-colors flex items-center gap-1 bg-sage-500/10 px-2 py-1 rounded-lg"
-                          title="Practice"
-                        >
-                          <Mic className="w-3.5 h-3.5" />
-                          <span className="hidden sm:inline">Practice</span>
-                        </button>
-                        <button
+                      
+                      <div className="flex items-center gap-1.5 relative">
+                        {/* Bookmark (always visible) */}
+                        <motion.button
+                          whileTap={{ scale: 1.15 }}
+                          transition={springTransition}
                           onClick={(e) => {
                             e.stopPropagation();
                             toggleBookmark({
@@ -521,50 +473,110 @@ export default function MushafPage() {
                               translation: ayah.text.translations[translationEdition].slice(0, 100),
                             });
                           }}
-                          className={`text-xs transition-colors flex items-center gap-1 px-2 py-1 rounded-lg ${
-                            isBookmarked(surahNumber, ayah.numberInSurah)
-                              ? 'text-gold-400 bg-gold-500/20'
-                              : 'text-night-500 hover:text-gold-400 bg-night-800/50'
-                          }`}
-                          title={isBookmarked(surahNumber, ayah.numberInSurah) ? 'Saved' : 'Save'}
+                          className="liquid-icon-btn !w-9 !h-9 !min-w-[36px] !min-h-[36px]"
+                          style={isBookmarked(surahNumber, ayah.numberInSurah) ? {
+                            background: 'linear-gradient(135deg, rgba(201,162,39,0.15), rgba(201,162,39,0.08))',
+                            borderColor: 'rgba(201,162,39,0.2)',
+                          } : {}}
+                          aria-label={isBookmarked(surahNumber, ayah.numberInSurah) ? 'Remove bookmark' : 'Add bookmark'}
                         >
-                          <Bookmark className={`w-3.5 h-3.5 ${isBookmarked(surahNumber, ayah.numberInSurah) ? 'fill-gold-400' : ''}`} />
-                          <span className="hidden sm:inline">{isBookmarked(surahNumber, ayah.numberInSurah) ? 'Saved' : 'Save'}</span>
-                        </button>
-                        <button
+                          <Bookmark className={`w-4 h-4 ${isBookmarked(surahNumber, ayah.numberInSurah) ? 'text-gold-400 fill-gold-400' : ''}`} />
+                        </motion.button>
+
+                        {/* More actions trigger */}
+                        <motion.button
+                          whileTap={{ scale: 1.1 }}
+                          transition={springTransition}
                           onClick={(e) => {
                             e.stopPropagation();
-                            router.push(`/memorize/${surahNumber}/${ayah.numberInSurah}`);
+                            setActiveVerseMenu(isMenuOpen ? null : ayah.numberInSurah);
                           }}
-                          className="text-xs text-gold-500 hover:text-gold-400 transition-colors flex items-center gap-1 bg-gold-500/10 px-2 py-1 rounded-lg"
-                          title="Memorize"
+                          className={`liquid-icon-btn !w-9 !h-9 !min-w-[36px] !min-h-[36px] ${isMenuOpen ? 'active' : ''}`}
+                          aria-label="Verse actions"
                         >
-                          <Brain className="w-3.5 h-3.5" />
-                          <span className="hidden sm:inline">Memorize</span>
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setTafsirAyah(ayah.numberInSurah);
-                            setShowTafsir(true);
-                          }}
-                          className="text-xs text-night-500 hover:text-gold-400 transition-colors flex items-center gap-1 bg-night-800/30 px-2 py-1 rounded-lg"
-                          title="Tafsir"
-                        >
-                          <BookOpen className="w-3.5 h-3.5" />
-                          <span className="hidden sm:inline">Tafsir</span>
-                        </button>
+                          <SlidersHorizontal className="w-4 h-4" />
+                        </motion.button>
+
+                        {/* Floating pill action menu */}
+                        <AnimatePresence>
+                          {isMenuOpen && (
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.85, y: 8 }}
+                              animate={{ opacity: 1, scale: 1, y: 0 }}
+                              exit={{ opacity: 0, scale: 0.85, y: 8 }}
+                              transition={pillSpring}
+                              className="absolute bottom-full right-0 mb-2 z-30"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <div
+                                className="flex items-center gap-1 px-2 py-1.5 rounded-2xl"
+                                style={{
+                                  background: 'linear-gradient(135deg, rgba(28,33,40,0.95), rgba(22,27,34,0.98))',
+                                  backdropFilter: 'blur(24px) saturate(180%)',
+                                  WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                                  border: '1px solid rgba(255,255,255,0.08)',
+                                  boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2)',
+                                }}
+                              >
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={() => {
+                                    setTajweedPracticeAyah(ayah.numberInSurah);
+                                    setShowTajweedPractice(true);
+                                    setActiveVerseMenu(null);
+                                  }}
+                                  className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors"
+                                  title="Practice"
+                                >
+                                  <Mic className="w-4 h-4 text-sage-400" />
+                                  <span className="text-[10px] text-night-400">Practice</span>
+                                </motion.button>
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={() => {
+                                    router.push(`/memorize/${surahNumber}/${ayah.numberInSurah}`);
+                                    setActiveVerseMenu(null);
+                                  }}
+                                  className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors"
+                                  title="Memorize"
+                                >
+                                  <Brain className="w-4 h-4 text-gold-400" />
+                                  <span className="text-[10px] text-night-400">Memorize</span>
+                                </motion.button>
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={() => {
+                                    setTafsirAyah(ayah.numberInSurah);
+                                    setShowTafsir(true);
+                                    setActiveVerseMenu(null);
+                                  }}
+                                  className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors"
+                                  title="Tafsir"
+                                >
+                                  <BookOpen className="w-4 h-4 text-night-300" />
+                                  <span className="text-[10px] text-night-400">Tafsir</span>
+                                </motion.button>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                     </div>
                     
-                    {/* Inline Verse Context */}
-                    <div className="mt-3" onClick={(e) => e.stopPropagation()}>
-                      <VerseContext
-                        surahNumber={surahNumber}
-                        ayahNumber={ayah.numberInSurah}
-                        compact
-                      />
-                    </div>
+                    {/* Verse Context (progressive disclosure — only shown on active verse) */}
+                    {isCurrentVerse && (
+                      <motion.div 
+                        initial={{ opacity: 0, height: 0 }} 
+                        animate={{ opacity: 1, height: 'auto' }} 
+                        className="mt-3 overflow-hidden" 
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <VerseContext surahNumber={surahNumber} ayahNumber={ayah.numberInSurah} compact />
+                      </motion.div>
+                    )}
                   </motion.div>
                 );
               })}
@@ -577,226 +589,233 @@ export default function MushafPage() {
         )}
       </main>}
 
-      {/* Tajweed Legend — above audio player (z-50) */}
+      {/* Tajweed Legend */}
       {activeView === 'read' && showTajweedColors && (
         <div className="fixed bottom-44 left-4 right-4 z-50">
           <TajweedLegend show={showTajweedLegend} onClose={() => setShowTajweedLegend(false)} />
         </div>
       )}
 
-      {/* Audio Player - Premium Frosted Glass - positioned above BottomNav */}
-      {activeView === 'read' && <div className="fixed bottom-20 left-2 right-2 z-40 liquid-glass-strong rounded-2xl">
-        <div className="px-4 py-3.5 max-w-3xl mx-auto">
-          {/* Now Playing */}
-          <div className="flex items-center justify-between mb-3">
-            <div className="text-sm">
-              <span className="text-night-500 text-xs">Now Playing</span>
-              <p className="text-night-200 font-medium">
-                {currentSurah?.englishName} {surahNumber}:{currentAyah}
-                {loopRange && (
-                  <span className="text-gold-400 ml-2 text-xs font-normal">
-                    (loop {loopRange.start}-{loopRange.end})
-                  </span>
-                )}
-              </p>
+      {/* ── Audio Player — slim liquid-glass bar ── */}
+      {activeView === 'read' && (
+        <div className="fixed bottom-20 left-2 right-2 z-40">
+          <div
+            className="rounded-2xl max-w-3xl mx-auto overflow-hidden"
+            style={{
+              background: 'linear-gradient(180deg, rgba(28,33,40,0.92), rgba(22,27,34,0.96))',
+              backdropFilter: 'blur(48px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(48px) saturate(180%)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.15), 0 12px 40px rgba(0,0,0,0.2)',
+            }}
+          >
+            {/* Main slim bar */}
+            <div className="flex items-center gap-3 px-4 py-2.5">
+              {/* Info: ayah + reciter */}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-night-200 font-medium truncate">
+                  {currentSurah?.englishName} {surahNumber}:{currentAyah}
+                  {loopRange && <span className="text-gold-400 text-xs ml-1.5">({loopRange.start}-{loopRange.end})</span>}
+                </p>
+                <p className="text-[11px] text-night-500 truncate">{RECITERS.find(r => r.id === selectedReciter)?.name}</p>
+              </div>
+
+              {/* Transport: prev / play / next */}
+              <div className="flex items-center gap-2">
+                <button onClick={playPrevious} className="liquid-icon-btn !w-9 !h-9 !min-w-[36px] !min-h-[36px]" aria-label="Previous verse">
+                  <SkipBack className="w-4 h-4" />
+                </button>
+                
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  transition={springTransition}
+                  onClick={togglePlay}
+                  className="w-12 h-12 rounded-full flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(201,162,39,1), rgba(180,140,30,1))',
+                    boxShadow: isPlaying
+                      ? '0 0 24px rgba(201,162,39,0.5), 0 4px 16px rgba(0,0,0,0.3)'
+                      : '0 2px 12px rgba(201,162,39,0.35), 0 4px 16px rgba(0,0,0,0.2)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                  }}
+                  aria-label={isPlaying ? 'Pause' : 'Play'}
+                >
+                  {isPlaying ? (
+                    <Pause className="w-5 h-5 text-night-950" />
+                  ) : (
+                    <Play className="w-5 h-5 text-night-950 ml-0.5" />
+                  )}
+                </motion.button>
+                
+                <button onClick={playNext} className="liquid-icon-btn !w-9 !h-9 !min-w-[36px] !min-h-[36px]" aria-label="Next verse">
+                  <SkipForward className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Settings gear — expand advanced controls */}
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setShowAudioSettings(!showAudioSettings)}
+                className={`liquid-icon-btn !w-9 !h-9 !min-w-[36px] !min-h-[36px] ${showAudioSettings ? 'active' : ''}`}
+                aria-label="Audio settings"
+              >
+                <Settings className="w-4 h-4" />
+              </motion.button>
             </div>
-            <div className="flex items-center gap-1.5">
-              {/* Word-by-word toggle */}
-              <button
-                onClick={() => setWordByWordMode(!wordByWordMode)}
-                className={`text-xs px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 min-h-[32px] ${
-                  wordByWordMode 
-                    ? 'bg-sage-500/15 text-sage-400 border border-sage-500/30' 
-                    : 'bg-white/5 text-night-400 border border-white/5 hover:bg-white/10'
-                }`}
-                title="Word-by-word highlighting"
-              >
-                <Type className="w-3 h-3" />
-                Word
-              </button>
-              {/* Tajweed color toggle */}
-              <TajweedToggle
-                enabled={showTajweedColors}
-                onToggle={() => {
-                  setShowTajweedColors(!showTajweedColors);
-                  if (!showTajweedColors) setShowTajweedLegend(true);
-                }}
-              />
-              {/* Multi-ayah loop button */}
-              <button
-                onClick={() => setShowLoopPicker(!showLoopPicker)}
-                className={`text-xs px-2.5 py-1.5 rounded-lg transition-all min-h-[32px] ${
-                  loopRange 
-                    ? 'bg-gold-500/15 text-gold-400 border border-gold-500/30' 
-                    : 'bg-white/5 text-night-400 border border-white/5 hover:bg-white/10'
-                }`}
-              >
-                {loopRange ? `${loopRange.start}-${loopRange.end}` : 'Range'}
-              </button>
-              <button
-                onClick={cycleRepeatMode}
-                className={`text-xs px-2.5 py-1.5 rounded-lg transition-all flex items-center min-h-[32px] ${
-                  repeatMode !== 1 
-                    ? 'bg-gold-500/15 text-gold-400 border border-gold-500/30' 
-                    : 'bg-white/5 text-night-400 border border-white/5 hover:bg-white/10'
-                }`}
-              >
-                <Repeat className="w-3 h-3 mr-1" />
-                {repeatMode === 'infinite' ? '∞' : `${repeatMode}x`}
-                {repeatMode !== 1 && repeatCount > 0 && (
-                  <span className="ml-1 opacity-70">({repeatCount + 1})</span>
-                )}
-              </button>
-            </div>
-          </div>
-          
-          {/* Loop Range Picker */}
-          <AnimatePresence>
-            {showLoopPicker && currentSurah && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden mb-3"
-              >
-                <div className="bg-night-900/80 rounded-xl p-3 border border-night-800">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-night-400 font-medium">Loop Ayah Range</span>
-                    {loopRange && (
+
+            {/* Expandable advanced controls */}
+            <AnimatePresence>
+              {showAudioSettings && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="px-4 pb-3 pt-1" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {/* Word-by-word */}
                       <button
-                        onClick={() => setLoopRange(null)}
-                        className="text-xs text-red-400 hover:text-red-300"
+                        onClick={() => setWordByWordMode(!wordByWordMode)}
+                        className={`text-xs px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 min-h-[32px] ${
+                          wordByWordMode 
+                            ? 'bg-sage-500/15 text-sage-400 border border-sage-500/30' 
+                            : 'bg-white/5 text-night-400 border border-white/5 hover:bg-white/10'
+                        }`}
                       >
-                        Clear
+                        <Type className="w-3 h-3" />
+                        Word
                       </button>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1">
-                      <label className="text-xs text-night-500 block mb-1">From</label>
-                      <select
-                        value={loopRange?.start || currentAyah}
-                        onChange={(e) => {
-                          const start = parseInt(e.target.value);
-                          const end = loopRange?.end || Math.min(start + 2, currentSurah.numberOfAyahs);
-                          setLoopRange({ start, end: Math.max(start, end) });
+                      {/* Tajweed */}
+                      <TajweedToggle
+                        enabled={showTajweedColors}
+                        onToggle={() => {
+                          setShowTajweedColors(!showTajweedColors);
+                          if (!showTajweedColors) setShowTajweedLegend(true);
                         }}
-                        className="w-full bg-night-800 text-night-200 text-sm rounded-lg px-3 py-2 border border-night-700"
+                      />
+                      {/* Range */}
+                      <button
+                        onClick={() => setShowLoopPicker(!showLoopPicker)}
+                        className={`text-xs px-2.5 py-1.5 rounded-lg transition-all min-h-[32px] ${
+                          loopRange 
+                            ? 'bg-gold-500/15 text-gold-400 border border-gold-500/30' 
+                            : 'bg-white/5 text-night-400 border border-white/5 hover:bg-white/10'
+                        }`}
                       >
-                        {Array.from({ length: currentSurah.numberOfAyahs }, (_, i) => i + 1).map((num) => (
-                          <option key={num} value={num}>
-                            Ayah {num}
-                          </option>
-                        ))}
+                        {loopRange ? `${loopRange.start}-${loopRange.end}` : 'Range'}
+                      </button>
+                      {/* Repeat */}
+                      <button
+                        onClick={cycleRepeatMode}
+                        className={`text-xs px-2.5 py-1.5 rounded-lg transition-all flex items-center min-h-[32px] ${
+                          repeatMode !== 1 
+                            ? 'bg-gold-500/15 text-gold-400 border border-gold-500/30' 
+                            : 'bg-white/5 text-night-400 border border-white/5 hover:bg-white/10'
+                        }`}
+                      >
+                        <Repeat className="w-3 h-3 mr-1" />
+                        {repeatMode === 'infinite' ? '\u221E' : `${repeatMode}x`}
+                        {repeatMode !== 1 && repeatCount > 0 && <span className="ml-1 opacity-70">({repeatCount + 1})</span>}
+                      </button>
+                      {/* Speed */}
+                      <select
+                        value={playbackRate}
+                        onChange={(e) => {
+                          const rate = parseFloat(e.target.value);
+                          setPlaybackRate(rate);
+                          if (audioRef.current) audioRef.current.playbackRate = rate;
+                        }}
+                        className="bg-white/5 text-night-300 text-xs px-2 py-1.5 rounded-lg border border-white/5 min-h-[32px]"
+                      >
+                        <option value={0.5}>0.5x</option>
+                        <option value={0.75}>0.75x</option>
+                        <option value={1}>1x</option>
+                        <option value={1.25}>1.25x</option>
+                        <option value={1.5}>1.5x</option>
                       </select>
                     </div>
-                    <span className="text-night-600 mt-4">→</span>
-                    <div className="flex-1">
-                      <label className="text-xs text-night-500 block mb-1">To</label>
-                      <select
-                        value={loopRange?.end || Math.min(currentAyah + 2, currentSurah.numberOfAyahs)}
-                        onChange={(e) => {
-                          const end = parseInt(e.target.value);
-                          const start = loopRange?.start || currentAyah;
-                          setLoopRange({ start: Math.min(start, end), end });
-                        }}
-                        className="w-full bg-night-800 text-night-200 text-sm rounded-lg px-3 py-2 border border-night-700"
-                      >
-                        {Array.from({ length: currentSurah.numberOfAyahs }, (_, i) => i + 1).map((num) => (
-                          <option key={num} value={num}>
-                            Ayah {num}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <button
-                      onClick={() => {
-                        if (!loopRange) {
-                          setLoopRange({ 
-                            start: currentAyah, 
-                            end: Math.min(currentAyah + 2, currentSurah.numberOfAyahs) 
-                          });
-                        }
-                        setShowLoopPicker(false);
-                        playAyah(loopRange?.start || currentAyah);
-                      }}
-                      className="mt-4 px-4 py-2 bg-gold-500 text-night-950 rounded-lg text-sm font-medium hover:bg-gold-400 transition-colors"
-                    >
-                      Start
-                    </button>
-                  </div>
-                  <p className="text-xs text-night-500 mt-2">
-                    Loop a range of ayahs continuously. Each ayah will repeat {repeatMode === 'infinite' ? '∞' : repeatMode}x before moving to the next.
-                  </p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
-          {/* Controls - Larger touch targets */}
-          <div className="flex items-center justify-center gap-3">
-            <button 
-              onClick={playPrevious} 
-              className="liquid-icon-btn !w-12 !h-12"
-              aria-label="Previous verse"
-            >
-              <SkipBack className="w-5 h-5" />
-            </button>
-            
-            <button
-              onClick={togglePlay}
-              className="w-16 h-16 rounded-full flex items-center justify-center transition-all active:scale-95"
-              style={{
-                background: isPlaying 
-                  ? 'linear-gradient(135deg, rgba(201,162,39,1) 0%, rgba(180,140,30,1) 100%)'
-                  : 'linear-gradient(135deg, rgba(201,162,39,0.95) 0%, rgba(180,140,30,1) 100%)',
-                boxShadow: isPlaying 
-                  ? '0 0 32px rgba(201,162,39,0.5), 0 8px 24px rgba(0,0,0,0.3)'
-                  : '0 4px 20px rgba(201,162,39,0.35), 0 8px 24px rgba(0,0,0,0.2)',
-                border: '1px solid rgba(255,255,255,0.2)',
-              }}
-              aria-label={isPlaying ? 'Pause' : 'Play'}
-            >
-              {isPlaying ? (
-                <Pause className="w-7 h-7 text-night-950" />
-              ) : (
-                <Play className="w-7 h-7 text-night-950 ml-1" />
+                    {/* Loop Range Picker */}
+                    <AnimatePresence>
+                      {showLoopPicker && currentSurah && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden mt-3"
+                        >
+                          <div className="bg-night-900/80 rounded-xl p-3 border border-night-800">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs text-night-400 font-medium">Loop Ayah Range</span>
+                              {loopRange && (
+                                <button onClick={() => setLoopRange(null)} className="text-xs text-red-400 hover:text-red-300">Clear</button>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <div className="flex-1">
+                                <label className="text-xs text-night-500 block mb-1">From</label>
+                                <select
+                                  value={loopRange?.start || currentAyah}
+                                  onChange={(e) => {
+                                    const start = parseInt(e.target.value);
+                                    const end = loopRange?.end || Math.min(start + 2, currentSurah.numberOfAyahs);
+                                    setLoopRange({ start, end: Math.max(start, end) });
+                                  }}
+                                  className="w-full bg-night-800 text-night-200 text-sm rounded-lg px-3 py-2 border border-night-700"
+                                >
+                                  {Array.from({ length: currentSurah.numberOfAyahs }, (_, i) => i + 1).map((num) => (
+                                    <option key={num} value={num}>Ayah {num}</option>
+                                  ))}
+                                </select>
+                              </div>
+                              <span className="text-night-600 mt-4">&rarr;</span>
+                              <div className="flex-1">
+                                <label className="text-xs text-night-500 block mb-1">To</label>
+                                <select
+                                  value={loopRange?.end || Math.min(currentAyah + 2, currentSurah.numberOfAyahs)}
+                                  onChange={(e) => {
+                                    const end = parseInt(e.target.value);
+                                    const start = loopRange?.start || currentAyah;
+                                    setLoopRange({ start: Math.min(start, end), end });
+                                  }}
+                                  className="w-full bg-night-800 text-night-200 text-sm rounded-lg px-3 py-2 border border-night-700"
+                                >
+                                  {Array.from({ length: currentSurah.numberOfAyahs }, (_, i) => i + 1).map((num) => (
+                                    <option key={num} value={num}>Ayah {num}</option>
+                                  ))}
+                                </select>
+                              </div>
+                              <button
+                                onClick={() => {
+                                  if (!loopRange) {
+                                    setLoopRange({ start: currentAyah, end: Math.min(currentAyah + 2, currentSurah.numberOfAyahs) });
+                                  }
+                                  setShowLoopPicker(false);
+                                  playAyah(loopRange?.start || currentAyah);
+                                }}
+                                className="mt-4 px-4 py-2 bg-gold-500 text-night-950 rounded-lg text-sm font-medium hover:bg-gold-400 transition-colors"
+                              >
+                                Start
+                              </button>
+                            </div>
+                            <p className="text-xs text-night-500 mt-2">
+                              Loop a range of ayahs continuously. Each ayah repeats {repeatMode === 'infinite' ? '\u221E' : repeatMode}x before advancing.
+                            </p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </motion.div>
               )}
-            </button>
-            
-            <button 
-              onClick={playNext} 
-              className="liquid-icon-btn !w-12 !h-12"
-              aria-label="Next verse"
-            >
-              <SkipForward className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Reciter & Speed */}
-          <div className="flex items-center justify-center gap-3 mt-3 text-xs text-night-400">
-            <span className="text-night-500">{RECITERS.find(r => r.id === selectedReciter)?.name}</span>
-            <span className="text-night-700">•</span>
-            <select
-              value={playbackRate}
-              onChange={(e) => {
-                const rate = parseFloat(e.target.value);
-                setPlaybackRate(rate);
-                if (audioRef.current) audioRef.current.playbackRate = rate;
-              }}
-              className="bg-white/5 text-night-300 text-xs px-2 py-1 rounded-lg border border-white/5 min-h-[28px]"
-            >
-              <option value={0.5}>0.5x</option>
-              <option value={0.75}>0.75x</option>
-              <option value={1}>1x</option>
-              <option value={1.25}>1.25x</option>
-              <option value={1.5}>1.5x</option>
-            </select>
+            </AnimatePresence>
           </div>
         </div>
-      </div>}
+      )}
 
-      {/* Surah List Sheet */}
+      {/* ── Surah List Sheet ── */}
       <AnimatePresence>
         {showSurahList && (
           <motion.div
@@ -815,38 +834,23 @@ export default function MushafPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="sheet-handle" />
-              
               <div className="flex items-center justify-between px-4 py-3 border-b border-night-800/50">
                 <h2 className="font-semibold text-night-100">Select Surah</h2>
-                <button onClick={() => setShowSurahList(false)} className="btn-icon">
-                  <X className="w-5 h-5" />
-                </button>
+                <button onClick={() => setShowSurahList(false)} className="btn-icon"><X className="w-5 h-5" /></button>
               </div>
-              
               <div className="overflow-y-auto max-h-[70vh] pb-safe">
                 {allSurahs.map((surah) => (
                   <button
                     key={surah.number}
-                    onClick={() => {
-                      setSurahNumber(surah.number);
-                      setShowSurahList(false);
-                    }}
-                    className={`w-full flex items-center gap-4 px-4 py-3 hover:bg-night-800/50 transition-colors ${
-                      surah.number === surahNumber ? 'bg-gold-500/10' : ''
-                    }`}
+                    onClick={() => { setSurahNumber(surah.number); setShowSurahList(false); }}
+                    className={`w-full flex items-center gap-4 px-4 py-3 hover:bg-night-800/50 transition-colors ${surah.number === surahNumber ? 'bg-gold-500/10' : ''}`}
                   >
-                    <span className={`w-10 h-10 flex items-center justify-center rounded-lg text-sm font-medium ${
-                      surah.number === surahNumber 
-                        ? 'bg-gold-500 text-night-950' 
-                        : 'bg-night-800 text-night-400'
-                    }`}>
+                    <span className={`w-10 h-10 flex items-center justify-center rounded-lg text-sm font-medium ${surah.number === surahNumber ? 'bg-gold-500 text-night-950' : 'bg-night-800 text-night-400'}`}>
                       {surah.number}
                     </span>
                     <div className="flex-1 text-left">
                       <p className="text-night-100">{surah.englishName}</p>
-                      <p className="text-xs text-night-500">
-                        {surah.englishNameTranslation} • {surah.numberOfAyahs} verses
-                      </p>
+                      <p className="text-xs text-night-500">{surah.englishNameTranslation} &middot; {surah.numberOfAyahs} verses</p>
                     </div>
                     <p className="quran-text text-gold-400/80 text-lg">{surah.name}</p>
                   </button>
@@ -857,7 +861,7 @@ export default function MushafPage() {
         )}
       </AnimatePresence>
 
-      {/* Settings Sheet */}
+      {/* ── Settings Sheet ── */}
       <AnimatePresence>
         {showSettings && (
           <motion.div
@@ -876,16 +880,12 @@ export default function MushafPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="sheet-handle flex-shrink-0" />
-              
               <div className="flex items-center justify-between px-4 py-3 border-b border-night-800/50 flex-shrink-0">
                 <h2 className="font-semibold text-night-100">Mushaf Settings</h2>
-                <button onClick={() => setShowSettings(false)} className="btn-icon">
-                  <X className="w-5 h-5" />
-                </button>
+                <button onClick={() => setShowSettings(false)} className="btn-icon"><X className="w-5 h-5" /></button>
               </div>
-              
               <div className="p-4 space-y-6 overflow-y-auto flex-1 pb-safe">
-                {/* Reciter Selection */}
+                {/* Reciter */}
                 <div>
                   <label className="text-sm text-night-400 mb-3 block">Reciter</label>
                   <div className="space-y-2">
@@ -897,11 +897,9 @@ export default function MushafPage() {
                       >
                         <div className="flex-1 text-left">
                           <p className="text-night-100">{reciter.name}</p>
-                          <p className="text-xs text-night-500">{reciter.arabicName} • {reciter.style}</p>
+                          <p className="text-xs text-night-500">{reciter.arabicName} &middot; {reciter.style}</p>
                         </div>
-                        {selectedReciter === reciter.id && (
-                          <Star className="w-4 h-4 text-gold-400" />
-                        )}
+                        {selectedReciter === reciter.id && <Star className="w-4 h-4 text-gold-400" />}
                       </button>
                     ))}
                   </div>
@@ -915,14 +913,10 @@ export default function MushafPage() {
                     <button
                       onClick={() => setShowTranslation(!showTranslation)}
                       className={`relative w-14 h-8 rounded-full transition-all duration-300 ${
-                        showTranslation 
-                          ? 'bg-gold-500/80 shadow-[0_0_12px_rgba(201,162,39,0.3)]' 
-                          : 'bg-white/10 backdrop-blur-md border border-white/10'
+                        showTranslation ? 'bg-gold-500/80 shadow-[0_0_12px_rgba(201,162,39,0.3)]' : 'bg-white/10 backdrop-blur-md border border-white/10'
                       }`}
                     >
-                      <div className={`absolute top-1 w-6 h-6 rounded-full shadow-md transition-all duration-300 ${
-                        showTranslation ? 'left-7 bg-white' : 'left-1 bg-night-300'
-                      }`} />
+                      <div className={`absolute top-1 w-6 h-6 rounded-full shadow-md transition-all duration-300 ${showTranslation ? 'left-7 bg-white' : 'left-1 bg-night-300'}`} />
                     </button>
                   </div>
                   {showTranslation && (
@@ -940,8 +934,7 @@ export default function MushafPage() {
                 {/* Script Style */}
                 <div>
                   <label className="text-sm text-night-400 mb-3 block flex items-center gap-2">
-                    <Layers className="w-4 h-4" />
-                    Script Style
+                    <Layers className="w-4 h-4" /> Script Style
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     {QURAN_SCRIPT_OPTIONS.map((scriptOpt) => {
@@ -950,42 +943,17 @@ export default function MushafPage() {
                         <motion.button
                           key={scriptOpt.value}
                           onClick={() => updatePrefs('display', { quranScript: scriptOpt.value })}
-                          className={`relative p-4 rounded-2xl text-left transition-all ${
-                            isSelected
-                              ? 'bg-gold-500/15 border-2 border-gold-500/40 shadow-[0_0_20px_rgba(201,162,39,0.15)]'
-                              : 'bg-white/[0.03] border-2 border-white/[0.06] hover:border-white/10'
-                          }`}
+                          className={`relative p-4 rounded-2xl text-left transition-all ${isSelected ? 'bg-gold-500/15 border-2 border-gold-500/40 shadow-[0_0_20px_rgba(201,162,39,0.15)]' : 'bg-white/[0.03] border-2 border-white/[0.06] hover:border-white/10'}`}
                           whileTap={{ scale: 0.97 }}
                         >
                           {isSelected && (
-                            <motion.div
-                              className="absolute top-2 right-2 w-5 h-5 rounded-full bg-gold-500 flex items-center justify-center"
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ type: 'spring', stiffness: 500 }}
-                            >
-                              <svg className="w-3 h-3 text-night-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                              </svg>
+                            <motion.div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-gold-500 flex items-center justify-center" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 500 }}>
+                              <svg className="w-3 h-3 text-night-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                             </motion.div>
                           )}
-                          <p className={`text-sm font-medium mb-1 ${isSelected ? 'text-gold-400' : 'text-night-200'}`}>
-                            {scriptOpt.label}
-                          </p>
-                          <p className="text-[10px] text-night-500 mb-3 leading-tight">
-                            {scriptOpt.description}
-                          </p>
-                          <p
-                            className="text-lg leading-relaxed"
-                            style={{
-                              fontFamily: scriptOpt.value === 'indopak' ? 'var(--font-indopak)' : 'var(--font-arabic)',
-                              color: isSelected ? 'rgb(201,162,39)' : 'rgb(180,180,190)',
-                            }}
-                            dir="rtl"
-                            lang="ar"
-                          >
-                            {scriptOpt.arabicSample}
-                          </p>
+                          <p className={`text-sm font-medium mb-1 ${isSelected ? 'text-gold-400' : 'text-night-200'}`}>{scriptOpt.label}</p>
+                          <p className="text-[10px] text-night-500 mb-3 leading-tight">{scriptOpt.description}</p>
+                          <p className="text-lg leading-relaxed" style={{ fontFamily: scriptOpt.value === 'indopak' ? 'var(--font-indopak)' : 'var(--font-arabic)', color: isSelected ? 'rgb(201,162,39)' : 'rgb(180,180,190)' }} dir="rtl" lang="ar">{scriptOpt.arabicSample}</p>
                         </motion.button>
                       );
                     })}
@@ -995,8 +963,7 @@ export default function MushafPage() {
                 {/* Font Style */}
                 <div>
                   <label className="text-sm text-night-400 mb-3 block flex items-center gap-2">
-                    <Type className="w-4 h-4" />
-                    Font Style
+                    <Type className="w-4 h-4" /> Font Style
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     {ARABIC_FONT_STYLE_OPTIONS.map((font) => {
@@ -1004,34 +971,12 @@ export default function MushafPage() {
                       return (
                         <motion.button
                           key={font.value}
-                          onClick={() => {
-                            updatePrefs('display', { 
-                              arabicFontStyle: font.value,
-                              // Auto-switch script when selecting indopak font
-                              ...(font.value === 'indopak' ? { quranScript: 'indopak' as QuranScript } : {}),
-                            });
-                          }}
-                          className={`relative p-3 rounded-2xl text-left transition-all ${
-                            isSelected
-                              ? 'bg-gold-500/15 border-2 border-gold-500/40'
-                              : 'bg-white/[0.03] border-2 border-white/[0.06] hover:border-white/10'
-                          }`}
+                          onClick={() => updatePrefs('display', { arabicFontStyle: font.value, ...(font.value === 'indopak' ? { quranScript: 'indopak' as QuranScript } : {}) })}
+                          className={`relative p-3 rounded-2xl text-left transition-all ${isSelected ? 'bg-gold-500/15 border-2 border-gold-500/40' : 'bg-white/[0.03] border-2 border-white/[0.06] hover:border-white/10'}`}
                           whileTap={{ scale: 0.97 }}
                         >
-                          <p className={`text-xs font-medium mb-1 ${isSelected ? 'text-gold-400' : 'text-night-300'}`}>
-                            {font.label}
-                          </p>
-                          <p
-                            className="text-base"
-                            style={{
-                              fontFamily: font.fontFamily,
-                              color: isSelected ? 'rgb(201,162,39)' : 'rgb(160,160,170)',
-                            }}
-                            dir="rtl"
-                            lang="ar"
-                          >
-                            {font.arabicSample}
-                          </p>
+                          <p className={`text-xs font-medium mb-1 ${isSelected ? 'text-gold-400' : 'text-night-300'}`}>{font.label}</p>
+                          <p className="text-base" style={{ fontFamily: font.fontFamily, color: isSelected ? 'rgb(201,162,39)' : 'rgb(160,160,170)' }} dir="rtl" lang="ar">{font.arabicSample}</p>
                           <p className="text-[10px] text-night-600 mt-1">{font.description}</p>
                         </motion.button>
                       );
@@ -1041,20 +986,9 @@ export default function MushafPage() {
 
                 {/* Font Size */}
                 <div>
-                  <label className="text-sm text-night-400 mb-3 block">
-                    Arabic Font Size: {fontSize}px
-                  </label>
-                  <input
-                    type="range"
-                    min={20}
-                    max={48}
-                    value={fontSize}
-                    onChange={(e) => setFontSize(parseInt(e.target.value))}
-                    className="w-full"
-                  />
-                  <p className="quran-text text-center mt-2 text-night-300" style={{ fontSize }}>
-                    بِسْمِ اللَّهِ
-                  </p>
+                  <label className="text-sm text-night-400 mb-3 block">Arabic Font Size: {fontSize}px</label>
+                  <input type="range" min={20} max={48} value={fontSize} onChange={(e) => setFontSize(parseInt(e.target.value))} className="w-full" />
+                  <p className="quran-text text-center mt-2 text-night-300" style={{ fontSize }} dir="rtl" lang="ar">بِسْمِ اللَّهِ</p>
                 </div>
               </div>
             </motion.div>
@@ -1064,29 +998,17 @@ export default function MushafPage() {
       
       <BottomNav />
       
-      {/* Quran Search */}
       <QuranSearch
         isOpen={showSearch}
         onClose={() => setShowSearch(false)}
         onSelectResult={(surah, ayah) => {
           setSurahNumber(surah);
-          // Scroll to ayah after surah loads
-          setTimeout(() => {
-            setCurrentAyah(ayah);
-            playAyah(ayah);
-          }, 100);
+          setTimeout(() => { setCurrentAyah(ayah); playAyah(ayah); }, 100);
         }}
       />
       
-      {/* Tafsir Drawer */}
-      <TafsirDrawer
-        isOpen={showTafsir}
-        onClose={() => setShowTafsir(false)}
-        surahNumber={surahNumber}
-        ayahNumber={tafsirAyah}
-      />
+      <TafsirDrawer isOpen={showTafsir} onClose={() => setShowTafsir(false)} surahNumber={surahNumber} ayahNumber={tafsirAyah} />
       
-      {/* Tajweed Practice Modal */}
       <AnimatePresence>
         {showTajweedPractice && currentSurah && (
           <TajweedPractice
@@ -1099,8 +1021,6 @@ export default function MushafPage() {
           />
         )}
       </AnimatePresence>
-      
-      {/* AI Sheikh FAB is now rendered globally via SheikhOverlay in layout */}
     </div>
   );
 }

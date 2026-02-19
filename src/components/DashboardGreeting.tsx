@@ -22,6 +22,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import SheikhButton from '@/components/ui/SheikhButton';
 import { useSheikh } from '@/contexts/SheikhContext';
+import { MosqueIcon, FireIcon } from '@/components/icons';
 import {
   useSheikhGenerate,
   type GreetingContext,
@@ -140,12 +141,12 @@ export default function DashboardGreeting({
       >
         <div className="dashboard-greeting__avatar-row">
           <div className="dashboard-greeting__avatar">
-            <span>🕌</span>
+            <MosqueIcon size={20} />
           </div>
           <div className="dashboard-greeting__meta">
             <span className="dashboard-greeting__label">Sheikh HIFZ</span>
             {streakDays && streakDays > 1 && (
-              <span className="dashboard-greeting__streak">🔥 {streakDays}</span>
+              <span className="dashboard-greeting__streak"><FireIcon size={16} className="inline -mt-0.5" /> {streakDays}</span>
             )}
           </div>
         </div>

@@ -25,6 +25,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
+import AnimatedNumber from '@/components/AnimatedNumber';
 import GuestBanner from '@/components/GuestBanner';
 import DashboardGreeting from '@/components/DashboardGreeting';
 import DailyGoalCard from '@/components/DailyGoalCard';
@@ -234,7 +235,7 @@ function ReviewAlert({ total, onStart }: { total: number; onStart: () => void })
             <CheckCircle2 className="w-5 h-5 text-sage-400" />
           </div>
           <div>
-            <p className="text-night-100 font-medium">All caught up! 🌟</p>
+            <p className="text-night-100 font-medium">All caught up!</p>
             <p className="text-night-500 text-sm">No overdue reviews. Great job!</p>
           </div>
         </div>
@@ -303,7 +304,9 @@ function WeeklyStatsGrid({ stats }: { stats: WeeklyStats }) {
               <item.icon className={`w-4 h-4 ${item.color}`} />
             </div>
           </div>
-          <p className="text-2xl font-bold text-night-100">{item.value}</p>
+          <p className="text-2xl font-bold text-night-100">
+            <AnimatedNumber value={parseInt(String(item.value).replace('%', '')) || 0} suffix={String(item.value).includes('%') ? '%' : ''} />
+          </p>
           <p className="text-xs text-night-500 mt-0.5">{item.label}</p>
         </motion.div>
       ))}
@@ -368,7 +371,8 @@ function QuickActions() {
           <motion.div
             variants={scaleIn}
             whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.95 }}
+            whileTap={{ scale: 0.92 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             className="liquid-glass rounded-2xl p-4 flex flex-col items-center gap-2 cursor-pointer"
           >
             <div className={`w-11 h-11 rounded-xl ${action.bg} flex items-center justify-center`}>

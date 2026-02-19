@@ -17,7 +17,10 @@ import {
   TreePine,
   Sprout,
   Leaf,
+  Star,
+  BookMarked,
 } from 'lucide-react';
+import { MosqueIcon, BookReadIcon, TreeIcon, TargetIcon, CalendarIcon, StarIcon as IslamicStarIcon, CrescentIcon, CrownIcon } from '@/components/icons';
 import SheikhReviewSession from '@/components/SheikhReviewSession';
 import { useSheikh } from '@/contexts/SheikhContext';
 import { loadUserProfile, isCalibrationComplete } from '@/lib/user-profile-sync';
@@ -182,7 +185,7 @@ export default function PracticePage() {
           {/* Sheikh message */}
           <div className="liquid-card p-4 flex gap-3">
             <div className="w-10 h-10 rounded-xl bg-gold-500/10 flex items-center justify-center flex-shrink-0">
-              <span className="text-lg">🕌</span>
+              <BookMarked className="w-5 h-5 text-gold-400" />
             </div>
             <p className="text-night-300 text-sm leading-relaxed">
               Which ayahs are you working on? I&apos;ll schedule them into your daily review cycle.
@@ -323,13 +326,13 @@ export default function PracticePage() {
                 <h2 className="text-xs font-semibold text-night-500 uppercase tracking-wider mb-3">Today&apos;s Review</h2>
                 <div className="space-y-2">
                   {dueCount.sabaq > 0 && (
-                    <ReviewCard emoji="🌱" icon={Sprout} label="Sabaq" description="New lesson review" count={dueCount.sabaq} accent="text-sage-400" accentBg="bg-sage-500/10" />
+                    <ReviewCard emoji="" icon={Sprout} label="Sabaq" description="New lesson review" count={dueCount.sabaq} accent="text-sage-400" accentBg="bg-sage-500/10" />
                   )}
                   {dueCount.sabqi > 0 && (
-                    <ReviewCard emoji="🌿" icon={Leaf} label="Sabqi" description="Recent review" count={dueCount.sabqi} accent="text-blue-400" accentBg="bg-blue-500/10" />
+                    <ReviewCard emoji="" icon={Leaf} label="Sabqi" description="Recent review" count={dueCount.sabqi} accent="text-blue-400" accentBg="bg-blue-500/10" />
                   )}
                   {dueCount.manzil > 0 && (
-                    <ReviewCard emoji="🌳" icon={TreePine} label="Manzil" description="Long-term review" count={dueCount.manzil} accent="text-gold-400" accentBg="bg-gold-500/10" />
+                    <ReviewCard emoji="" icon={TreePine} label="Manzil" description="Long-term review" count={dueCount.manzil} accent="text-gold-400" accentBg="bg-gold-500/10" />
                   )}
                 </div>
 
@@ -373,10 +376,10 @@ export default function PracticePage() {
             <section>
               <h2 className="text-xs font-semibold text-night-500 uppercase tracking-wider mb-3">Your Progress</h2>
               <div className="grid grid-cols-2 gap-3">
-                <StatCard label="Total Ayahs" value={stats.totalAyahs} icon="📖" />
-                <StatCard label="In Manzil" value={stats.manzilCount} icon="🌳" />
-                <StatCard label="Accuracy" value={`${Math.round(stats.averageAccuracy * 100)}%`} icon="🎯" />
-                <StatCard label="Days Active" value={stats.daysSinceStart} icon="📅" />
+                <StatCard label="Total Ayahs" value={stats.totalAyahs} icon={BookOpen} iconColor="text-gold-400" />
+                <StatCard label="In Manzil" value={stats.manzilCount} icon={TreePine} iconColor="text-sage-400" />
+                <StatCard label="Accuracy" value={`${Math.round(stats.averageAccuracy * 100)}%`} icon={Target} iconColor="text-teal-400" />
+                <StatCard label="Days Active" value={stats.daysSinceStart} icon={Calendar} iconColor="text-purple-400" />
               </div>
             </section>
 
@@ -395,7 +398,7 @@ export default function PracticePage() {
             {dueCount.total === 0 && stats.totalAyahs > 0 && (
               <div className="liquid-card p-4 flex gap-3">
                 <div className="w-10 h-10 rounded-xl bg-gold-500/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-lg">🕌</span>
+                  <Star className="w-5 h-5 text-gold-400" />
                 </div>
                 <p className="text-night-400 text-sm leading-relaxed">
                   Masha&apos;Allah, you&apos;re all caught up! Consider adding new ayahs
@@ -409,7 +412,9 @@ export default function PracticePage() {
               <div className="space-y-6">
                 {/* Welcome */}
                 <div className="text-center pt-4 pb-2">
-                  <div className="text-5xl mb-4">🕌</div>
+                  <div className="w-14 h-14 rounded-2xl bg-gold-500/10 flex items-center justify-center mx-auto mb-4">
+                    <BookOpen className="w-7 h-7 text-gold-400" />
+                  </div>
                   <h3 className="text-xl font-semibold text-night-100 mb-2">Start Your Memorization Journey</h3>
                   <p className="text-night-400 text-sm leading-relaxed max-w-xs mx-auto">
                     Pick a starting point below, and Sheikh HIFZ will guide your daily review with spaced repetition.
@@ -437,13 +442,17 @@ export default function PracticePage() {
                   <div className="space-y-2">
                     {[
                       {
-                        emoji: '🌟',
+                        icon: Star,
+                        iconColor: 'text-gold-400',
+                        iconBg: 'bg-gold-500/15',
                         title: 'Al-Fatihah',
                         desc: 'The Opening — 7 ayahs, recited in every prayer',
                         action: () => { srs.addAyahs(1, 1, 7); refreshCounts(); },
                       },
                       {
-                        emoji: '🌙',
+                        icon: BookOpen,
+                        iconColor: 'text-teal-400',
+                        iconBg: 'bg-teal-500/15',
                         title: 'Last 10 Surahs',
                         desc: 'Short surahs perfect for beginners (An-Nasr to An-Nas)',
                         action: () => {
@@ -456,7 +465,9 @@ export default function PracticePage() {
                         },
                       },
                       {
-                        emoji: '👑',
+                        icon: Sparkles,
+                        iconColor: 'text-purple-400',
+                        iconBg: 'bg-purple-500/15',
                         title: 'Ayat al-Kursi',
                         desc: 'The Throne Verse — Surah Al-Baqarah, Ayah 255',
                         action: () => { srs.addAyahs(2, 255, 255); refreshCounts(); },
@@ -464,12 +475,14 @@ export default function PracticePage() {
                     ].map((preset) => (
                       <motion.button
                         key={preset.title}
-                        whileTap={{ scale: 0.98 }}
+                        whileHover={{ scale: 1.01, boxShadow: '0 0 20px rgba(201, 162, 39, 0.08)' }}
+                        whileTap={{ scale: 0.97 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                         onClick={preset.action}
-                        className="w-full liquid-card p-4 flex items-center gap-3 text-left hover:bg-white/[0.04] transition-colors"
+                        className="w-full liquid-card p-4 flex items-center gap-3 text-left hover:bg-white/[0.04] hover:border-gold-500/15 transition-colors"
                       >
-                        <div className="w-10 h-10 rounded-xl bg-night-800/80 flex items-center justify-center flex-shrink-0">
-                          <span className="text-lg">{preset.emoji}</span>
+                        <div className={`w-10 h-10 rounded-xl ${preset.iconBg} flex items-center justify-center flex-shrink-0`}>
+                          <preset.icon className={`w-5 h-5 ${preset.iconColor}`} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-night-100 font-medium">{preset.title}</p>
@@ -506,7 +519,11 @@ function ReviewCard({ emoji, icon: Icon, label, description, count, accent, acce
   emoji: string; icon: React.ElementType; label: string; description: string; count: number; accent: string; accentBg: string;
 }) {
   return (
-    <div className="liquid-card p-4 flex items-center justify-between">
+    <motion.div
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+      className="liquid-card p-4 flex items-center justify-between cursor-default">
       <div className="flex items-center gap-3">
         <div className={`w-10 h-10 rounded-xl ${accentBg} flex items-center justify-center`}>
           <Icon className={`w-5 h-5 ${accent}`} />
@@ -520,14 +537,14 @@ function ReviewCard({ emoji, icon: Icon, label, description, count, accent, acce
         <span className={`text-xl font-bold ${accent}`}>{count}</span>
         <p className="text-[10px] text-night-600 uppercase tracking-wider">due</p>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
-function StatCard({ label, value, icon }: { label: string; value: string | number; icon: string }) {
+function StatCard({ label, value, icon: Icon, iconColor }: { label: string; value: string | number; icon: React.ElementType; iconColor: string }) {
   return (
     <div className="liquid-card p-4 flex flex-col items-center gap-1.5 text-center">
-      <span className="text-xl">{icon}</span>
+      <Icon className={`w-5 h-5 ${iconColor}`} />
       <span className="text-lg font-bold text-gold-400">{value}</span>
       <span className="text-[10px] text-night-500 uppercase tracking-wider">{label}</span>
     </div>

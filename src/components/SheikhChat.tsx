@@ -1,4 +1,5 @@
 'use client';
+import { MosqueIcon, BookReadIcon } from '@/components/icons';
 
 /**
  * SheikhChat V2 — Context-Aware AI Quran Teacher Panel
@@ -343,7 +344,7 @@ export default function SheikhChat({
 
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-amber-500/15 flex items-center justify-center">
-                <span className="text-lg">📖</span>
+                <BookReadIcon size={20} />
               </div>
               <div>
                 <h3 className="text-sm font-semibold text-white">Sheikh HIFZ</h3>
@@ -385,7 +386,7 @@ export default function SheikhChat({
                 className="flex flex-col items-center text-center py-6"
               >
                 <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-4 border border-amber-500/20">
-                  <span className="text-3xl">🕌</span>
+                  <MosqueIcon size={32} />
                 </div>
                 <h4 className="text-base font-semibold text-white mb-1.5">
                   بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ

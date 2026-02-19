@@ -8,6 +8,7 @@
 import { type ReactNode, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePremium } from '@/contexts/PremiumContext';
+import { SparkleIcon, MosqueIcon, StarIcon, NotesIcon, ReciteIcon } from '@/components/icons';
 import Link from 'next/link';
 
 interface PremiumGateProps {
@@ -49,7 +50,7 @@ export default function PremiumGate({ feature, children, soft, onGated }: Premiu
                        text-black shadow-lg shadow-amber-500/25
                        flex items-center gap-2"
           >
-            <span>✨</span>
+            <SparkleIcon size={18} />
             <span>Unlock Premium</span>
           </motion.button>
         </div>
@@ -110,7 +111,7 @@ export function PremiumUpgradeModal({
                 transition={{ type: 'spring', damping: 8 }}
                 className="text-5xl mb-3"
               >
-                ✨
+                <SparkleIcon size={48} />
               </motion.div>
               <h2 className="text-2xl font-bold text-white mb-2">
                 Upgrade to Premium
@@ -135,13 +136,13 @@ export function PremiumUpgradeModal({
             {/* Benefits */}
             <div className="space-y-3 mb-6">
               {[
-                { emoji: '🕌', text: 'Unlimited Sheikh AI conversations' },
-                { emoji: '📋', text: 'AI-powered personalized study plans' },
-                { emoji: '🎙️', text: 'Advanced speech recognition & tajweed analysis' },
-                { emoji: '⭐', text: 'Priority support & early access to new features' },
-              ].map(({ emoji, text }) => (
+                { icon: <MosqueIcon size={20} />, text: 'Unlimited Sheikh AI conversations' },
+                { icon: <NotesIcon size={20} />, text: 'AI-powered personalized study plans' },
+                { icon: <ReciteIcon size={20} />, text: 'Advanced speech recognition & tajweed analysis' },
+                { icon: <StarIcon size={20} />, text: 'Priority support & early access to new features' },
+              ].map(({ icon, text }) => (
                 <div key={text} className="flex items-center gap-3 text-sm">
-                  <span className="text-lg">{emoji}</span>
+                  <span className="text-lg">{icon}</span>
                   <span className="text-gray-200">{text}</span>
                 </div>
               ))}

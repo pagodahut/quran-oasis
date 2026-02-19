@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import SheikhButton from '@/components/ui/SheikhButton';
 import { HifzIcon } from '@/components/brand';
+import { SeedlingIcon, LeafIcon, TreeIcon } from '@/components/icons';
 import { useCalibration, type CalibrationAssessment } from '@/hooks/useCalibration';
 
 interface OnboardingCalibrationProps {
@@ -162,9 +163,9 @@ export default function OnboardingCalibration({
         {showResult && assessment && (
           <div className="calibration__result">
             <div className="calibration__result-badge">
-              {assessment.level === 'beginner' && '🌱'}
-              {assessment.level === 'intermediate' && '🌿'}
-              {assessment.level === 'advanced' && '🌳'}
+              {assessment.level === 'beginner' && <SeedlingIcon size={32} />}
+              {assessment.level === 'intermediate' && <LeafIcon size={32} />}
+              {assessment.level === 'advanced' && <TreeIcon size={32} />}
             </div>
             <h3 className="calibration__result-level">
               {assessment.level.charAt(0).toUpperCase() + assessment.level.slice(1)} Level

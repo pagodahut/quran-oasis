@@ -24,6 +24,7 @@
 import { useEffect, useState } from 'react';
 import SheikhButton from '@/components/ui/SheikhButton';
 import { useSheikh } from '@/contexts/SheikhContext';
+import { MosqueIcon, BookReadIcon, TipIcon } from '@/components/icons';
 import {
   useSheikhGenerate,
   type BriefingContext,
@@ -137,7 +138,7 @@ export default function PreLessonBriefing({
       {/* Theme badge */}
       {briefing?.theme && (
         <div className="sheikh-briefing__theme">
-          <span className="sheikh-briefing__theme-icon">📖</span>
+          <span className="sheikh-briefing__theme-icon"><BookReadIcon size={20} /></span>
           <span className="sheikh-briefing__theme-text">{briefing.theme}</span>
         </div>
       )}
@@ -145,7 +146,7 @@ export default function PreLessonBriefing({
       {/* Sheikh avatar + header */}
       <div className="sheikh-briefing__header">
         <div className="sheikh-briefing__avatar">
-          <span className="sheikh-briefing__avatar-emoji">🕌</span>
+          <MosqueIcon size={20} className="sheikh-briefing__avatar-emoji" />
         </div>
         <div className="sheikh-briefing__title">
           <span className="sheikh-briefing__label">Sheikh HIFZ</span>
@@ -181,7 +182,7 @@ export default function PreLessonBriefing({
             <p className="sheikh-briefing__message">{briefing.message}</p>
             {briefing.tip && (
               <div className="sheikh-briefing__tip">
-                <span className="sheikh-briefing__tip-icon">💡</span>
+                <span className="sheikh-briefing__tip-icon"><TipIcon size={16} /></span>
                 <span className="sheikh-briefing__tip-text">{briefing.tip}</span>
               </div>
             )}

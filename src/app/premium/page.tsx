@@ -10,6 +10,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { SparkleIcon, DuaHandsIcon } from '@/components/icons';
 
 const FREE_FEATURES = [
   { text: 'All 114 Surah lessons & quizzes', included: true },
@@ -69,7 +70,7 @@ export default function PremiumPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-10"
         >
-          <span className="text-5xl mb-4 block">✨</span>
+          <span className="text-5xl mb-4 block"><SparkleIcon size={48} /></span>
           <h1 className="text-3xl font-bold text-white mb-3">
             HIFZ Premium
           </h1>
@@ -175,7 +176,7 @@ export default function PremiumPage() {
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
             >
-              <span className="text-4xl mb-3 block">🤲</span>
+              <span className="text-4xl mb-3 block"><DuaHandsIcon size={40} /></span>
               <h3 className="text-lg font-semibold text-white mb-1">
                 JazakAllah Khair!
               </h3>

@@ -60,6 +60,7 @@ import PreLessonBriefing from '@/components/PreLessonBriefing';
 import PostLessonReflection from '@/components/PostLessonReflection';
 import { playAyah, stopPlayback } from '@/lib/quranAudioService';
 import { CelebrationOverlay, useCelebration } from '@/components/Celebrations';
+import { MemorizeIcon, TipIcon, TargetIcon } from '@/components/icons';
 import { 
   updateStreak, 
   updateDailyProgress, 
@@ -738,7 +739,7 @@ export default function LessonDetailPage() {
                 <Brain className="w-4 h-4 text-gold-400" />
               </div>
               <div>
-                <h5 className="font-semibold text-gold-400 mb-1">🧠 Memory Trick</h5>
+                <h5 className="font-semibold text-gold-400 mb-1 flex items-center gap-1.5"><MemorizeIcon size={16} /> Memory Trick</h5>
                 <p className="text-night-300 text-sm leading-relaxed">{trickContent || lines[++i]}</p>
               </div>
             </div>
@@ -784,7 +785,7 @@ export default function LessonDetailPage() {
                   <Headphones className="w-4 h-4 text-sage-400" />
                 </div>
                 <div>
-                  <h5 className="font-semibold text-sage-400 mb-1">🎯 Practice</h5>
+                  <h5 className="font-semibold text-sage-400 mb-1 flex items-center gap-1.5"><TargetIcon size={16} /> Practice</h5>
                   <div className="text-night-300 text-sm leading-relaxed space-y-1">
                     {practiceLines.map((pLine, pIdx) => (
                       <p key={pIdx}>{pLine}</p>
@@ -809,7 +810,7 @@ export default function LessonDetailPage() {
                 <Lightbulb className="w-4 h-4 text-sage-400" />
               </div>
               <div>
-                <h5 className="font-semibold text-sage-400 mb-1">💡 Tip</h5>
+                <h5 className="font-semibold text-sage-400 mb-1 flex items-center gap-1.5"><TipIcon size={16} /> Tip</h5>
                 <p className="text-night-300 text-sm leading-relaxed">{tipContent || lines[++i]}</p>
               </div>
             </div>
@@ -1115,7 +1116,7 @@ export default function LessonDetailPage() {
                   <div className="space-y-6">
                     <div className="bg-gold-900/20 rounded-2xl p-6 border border-gold-500/20 text-center">
                       <h3 className="text-xl font-semibold text-gold-400 mb-2">
-                        🎯 Memorization Practice
+                        <TargetIcon size={16} className="inline -mt-0.5" /> Memorization Practice
                       </h3>
                       <p className="text-night-300 mb-4">
                         Use the 10-3 method to memorize this verse

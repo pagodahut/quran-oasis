@@ -5,21 +5,22 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { markCalibrationComplete, type UserLevel } from '@/lib/user-profile-sync';
 import { ChevronRight, Sparkles, Loader2, BookOpen, Target, Clock, Check } from 'lucide-react';
+import { SeedlingIcon, LettersIcon, BookReadIcon, BooksIcon, SparkleIcon, MosqueIcon, CrescentIcon, StarIcon, DuaHandsIcon } from '@/components/icons';
 type Step = 'name' | 'journey' | 'arabic' | 'goal' | 'time' | 'welcome';
 
 const ARABIC_OPTIONS = [
-  { value: 'none', label: 'Complete beginner', icon: '🌱' },
-  { value: 'letters', label: 'Know the letters', icon: '🔤' },
-  { value: 'basic', label: 'Can read basics', icon: '📖' },
-  { value: 'intermediate', label: 'Intermediate', icon: '📚' },
-  { value: 'fluent', label: 'Fluent', icon: '✨' },
+  { value: 'none', label: 'Complete beginner', icon: <SeedlingIcon size={20} /> },
+  { value: 'letters', label: 'Know the letters', icon: <LettersIcon size={20} /> },
+  { value: 'basic', label: 'Can read basics', icon: <BookReadIcon size={20} /> },
+  { value: 'intermediate', label: 'Intermediate', icon: <BooksIcon size={20} /> },
+  { value: 'fluent', label: 'Fluent', icon: <SparkleIcon size={20} /> },
 ];
 
 const GOAL_OPTIONS = [
-  { value: 'full_hifz', label: 'Full Quran memorization', icon: '🕌' },
-  { value: 'juz_amma', label: 'Juz Amma', icon: '🌙' },
-  { value: 'selected_surahs', label: 'Selected surahs', icon: '⭐' },
-  { value: 'daily_connection', label: 'Daily recitation', icon: '🤲' },
+  { value: 'full_hifz', label: 'Full Quran memorization', icon: <MosqueIcon size={20} /> },
+  { value: 'juz_amma', label: 'Juz Amma', icon: <CrescentIcon size={20} /> },
+  { value: 'selected_surahs', label: 'Selected surahs', icon: <StarIcon size={20} /> },
+  { value: 'daily_connection', label: 'Daily recitation', icon: <DuaHandsIcon size={20} /> },
 ];
 
 const TIME_OPTIONS = [
@@ -593,7 +594,7 @@ function OptionPill({
   children: React.ReactNode;
   selected: boolean;
   onClick: () => void;
-  icon?: string;
+  icon?: React.ReactNode;
   delay?: number;
 }) {
   return (
@@ -614,7 +615,7 @@ function OptionPill({
         backdropFilter: 'blur(8px)',
       }}
     >
-      {icon && <span className="text-lg">{icon}</span>}
+      {icon && <span className="text-lg flex items-center">{icon}</span>}
       <span className={`flex-1 ${selected ? 'text-gold-400 font-medium' : 'text-night-200'}`}>
         {children}
       </span>

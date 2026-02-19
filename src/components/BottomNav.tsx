@@ -163,7 +163,9 @@ export default function BottomNav() {
                       : '1px solid transparent',
                     transition: 'all 0.2s ease',
                   }}
-                  whileTap={{ scale: 0.92 }}
+                  whileTap={{ scale: 0.85 }}
+                  animate={isActive ? { scale: 1.1 } : { scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 20 }}
                 >
                   <item.Icon 
                     className={`w-5 h-5 sm:w-[22px] sm:h-[22px] transition-colors duration-200 ${

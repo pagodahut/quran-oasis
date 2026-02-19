@@ -1,4 +1,5 @@
 'use client';
+import { MosqueIcon } from '@/components/icons';
 
 import { useEffect, useState } from 'react';
 import SheikhButton from '@/components/ui/SheikhButton';
@@ -137,7 +138,7 @@ export default function TajweedSheikhFeedback({
       {/* Sheikh feedback card */}
       <div className="tajweed-feedback__card">
         <div className="tajweed-feedback__card-header">
-          <div className="tajweed-feedback__avatar"><span>🕌</span></div>
+          <div className="tajweed-feedback__avatar"><MosqueIcon size={20} /></div>
           <span style={{ fontSize: 13, fontWeight: 600, color: '#2dd496' }}>Sheikh HIFZ</span>
         </div>
 

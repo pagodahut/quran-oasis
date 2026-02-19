@@ -13,6 +13,7 @@ import {
   Layers,
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
+import { TipIcon } from '@/components/icons';
 
 // ============ Tajweed Rule Data ============
 
@@ -630,7 +631,7 @@ export default function TajweedReferencePage() {
                             <div className="space-y-2">
                               {rule.tips.map((tip, i) => (
                                 <div key={i} className="flex items-start gap-2">
-                                  <span className="text-gold-500 text-xs mt-0.5">💡</span>
+                                  <TipIcon size={12} className="text-gold-500 mt-0.5" />
                                   <p className="text-xs text-night-400 leading-relaxed">{tip}</p>
                                 </div>
                               ))}

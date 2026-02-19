@@ -16,6 +16,7 @@ import {
   User,
 } from 'lucide-react';
 import { HifzLogo, HifzIcon, HifzIconSimple } from '@/components/brand/HifzLogo';
+import AnimatedBackground from '@/components/AnimatedBackground';
 import { SignInButton, SignUpButton, UserButton, SignedIn, SignedOut } from '@clerk/nextjs';
 
 // Animation variants
@@ -463,6 +464,9 @@ export default function HomePage() {
         className="fixed inset-0 bg-gradient-divine-warm"
         style={{ scale: bgScale }}
       />
+      
+      {/* Islamic geometric canvas animation */}
+      <AnimatedBackground opacity={0.2} speed={0.5} />
       
       {/* Pattern overlay */}
       <div className="fixed inset-0 pattern-arabesque opacity-30" />
