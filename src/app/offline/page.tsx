@@ -106,7 +106,7 @@ export default function OfflinePage() {
               </Link>
             </div>
             <p className="text-xs text-night-600 mt-3">
-              Recitation with Tarteel requires an internet connection.
+              Sheikh Hifz recitation requires an internet connection.
               Your progress will sync when you&apos;re back online.
             </p>
           </div>

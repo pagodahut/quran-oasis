@@ -47,7 +47,7 @@ function ProfileIcon({ className = "", strokeWidth = 2 }: { className?: string; 
 // Fixed 4-tab navigation: Home, Quran, Practice, Profile
 const navItems = [
   { href: '/dashboard', Icon: HomeIcon, label: 'Home', ariaLabel: 'Go to Dashboard' },
-  { href: '/recite', Icon: QuranIcon, label: 'Quran', ariaLabel: 'Browse Quran' },
+  { href: '/mushaf', Icon: QuranIcon, label: 'Quran', ariaLabel: 'Browse Quran' },
   { href: '/practice', Icon: PracticeIcon, label: 'Practice', ariaLabel: 'Go to Practice' },
   { href: '/profile', Icon: ProfileIcon, label: 'Profile', ariaLabel: 'View Profile' },
 ];
@@ -115,7 +115,7 @@ export default function BottomNav() {
             // /profile covers /profile, /settings
             const isActive = pathname === item.href || 
               (item.href === '/dashboard' && pathname === '/') ||
-              (item.href === '/recite' && ['/mushaf', '/surahs', '/browse', '/identify'].some(p => pathname.startsWith(p))) ||
+              (item.href === '/mushaf' && ['/surahs', '/browse', '/identify', '/recite'].some(p => pathname.startsWith(p))) ||
               (item.href === '/profile' && pathname.startsWith('/settings')) ||
               (item.href !== '/' && item.href !== '/dashboard' && pathname.startsWith(item.href));
             

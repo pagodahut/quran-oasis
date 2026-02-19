@@ -302,6 +302,9 @@ export default function MushafPage() {
 
           {/* Right: search + view toggle */}
           <div className="flex items-center gap-1.5">
+            <Link href="/recite" className="liquid-icon-btn" aria-label="Recite & Practice">
+              <Mic className="w-5 h-5" aria-hidden="true" />
+            </Link>
             <button onClick={() => setShowSearch(true)} className="liquid-icon-btn" aria-label="Search Quran">
               <Search className="w-5 h-5" aria-hidden="true" />
             </button>

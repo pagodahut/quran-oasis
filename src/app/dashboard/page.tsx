@@ -358,10 +358,10 @@ function RecentActivityList({ sessions }: { sessions: RecentSession[] }) {
 
 function QuickActions() {
   const actions = [
-    { icon: Mic, label: 'Recite', href: '/recite', color: 'text-gold-400', bg: 'bg-gold-500/20' },
-    { icon: Sparkles, label: 'Identify', href: '/identify', color: 'text-amber-400', bg: 'bg-amber-500/20' },
-    { icon: GraduationCap, label: 'Lessons', href: '/lessons', color: 'text-purple-400', bg: 'bg-purple-500/20' },
     { icon: BookMarked, label: 'Mushaf', href: '/mushaf', color: 'text-teal-400', bg: 'bg-teal-500/20' },
+    { icon: Mic, label: 'Recite', href: '/recite', color: 'text-gold-400', bg: 'bg-gold-500/20' },
+    { icon: GraduationCap, label: 'Lessons', href: '/lessons', color: 'text-purple-400', bg: 'bg-purple-500/20' },
+    { icon: Zap, label: 'Flashcards', href: '/practice/flashcards', color: 'text-amber-400', bg: 'bg-amber-500/20' },
   ];
 
   return (

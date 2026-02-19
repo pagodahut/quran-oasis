@@ -357,20 +357,53 @@ export default function PracticePage() {
               </section>
             )}
 
-            {/* Smart Review Link */}
-            <Link
-              href="/practice/review"
-              className="liquid-card p-4 flex items-center gap-3 hover:bg-white/[0.04] transition-colors"
-            >
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                <Brain className="w-5 h-5 text-purple-400" />
+            {/* Practice Tools */}
+            <section>
+              <h2 className="text-xs font-semibold text-night-500 uppercase tracking-wider mb-3">Practice Tools</h2>
+              <div className="space-y-2">
+                <Link
+                  href="/practice/flashcards"
+                  className="liquid-card p-4 flex items-center gap-3 hover:bg-white/[0.04] transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-amber-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-night-100 font-medium">Flashcards</p>
+                    <p className="text-xs text-night-500">Test your recall with spaced repetition cards</p>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-night-600" />
+                </Link>
+
+                <Link
+                  href="/practice/review"
+                  className="liquid-card p-4 flex items-center gap-3 hover:bg-white/[0.04] transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                    <Brain className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-night-100 font-medium">Smart Review</p>
+                    <p className="text-xs text-night-500">AI-prioritized verses based on difficulty</p>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-night-600" />
+                </Link>
+
+                <Link
+                  href="/lessons"
+                  className="liquid-card p-4 flex items-center gap-3 hover:bg-white/[0.04] transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-teal-500/10 flex items-center justify-center">
+                    <BookOpen className="w-5 h-5 text-teal-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-night-100 font-medium">Lessons</p>
+                    <p className="text-xs text-night-500">Structured learning with guided instruction</p>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-night-600" />
+                </Link>
               </div>
-              <div className="flex-1">
-                <p className="text-night-100 font-medium">Smart Review</p>
-                <p className="text-xs text-night-500">AI-prioritized verses based on difficulty</p>
-              </div>
-              <ArrowRight className="w-4 h-4 text-night-600" />
-            </Link>
+            </section>
 
             {/* Stats */}
             <section>

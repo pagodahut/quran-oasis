@@ -473,18 +473,23 @@ export default function LiveRecitation({
     // Try Tarteel first, fall back to Web Speech API
     let useTarteel = false;
     try {
+      console.log('[Sheikh Hifz] Checking Tarteel health at /api/tarteel...');
       const checkRes = await fetch('/api/tarteel', { signal: AbortSignal.timeout(3000) });
       if (checkRes.ok) {
         const checkData = await checkRes.json();
         useTarteel = checkData.configured === true;
+        console.log('[Sheikh Hifz] Health check result:', checkData, '→ useTarteel:', useTarteel);
+      } else {
+        console.warn('[Sheikh Hifz] Health check failed with status:', checkRes.status);
       }
-    } catch {
+    } catch (e) {
+      console.warn('[Sheikh Hifz] Health check error, falling back to lite:', e);
       useTarteel = false;
     }
 
     try {
       if (useTarteel) {
-        // Try Tarteel service
+        console.log('[Sheikh Hifz] Using Tarteel (full) provider');
         const service = new TarteelService({
           expectedText,
           chunkIntervalMs: 2500,
@@ -496,6 +501,7 @@ export default function LiveRecitation({
         await service.start();
         setActiveProvider('tarteel');
       } else {
+        console.log('[Sheikh Hifz] Using WebSpeech (lite) provider');
         // Fallback: Web Speech API
         if (!WebSpeechService.isSupported()) {
           setErrorMessage(
@@ -1012,8 +1018,9 @@ export default function LiveRecitation({
                                 Listening...
                               </span>
                               {activeProvider && (
-                                <span className="text-[10px] text-night-500">
-                                  {activeProvider === 'tarteel' ? '🟢 Tarteel' : '🟡 Browser'}
+                                <span className="text-[10px] text-night-500 flex items-center gap-1">
+                                  <span className={`inline-block w-1.5 h-1.5 rounded-full ${activeProvider === 'tarteel' ? 'bg-gold-400' : 'bg-night-500'}`} />
+                                  {activeProvider === 'tarteel' ? 'Sheikh Hifz' : 'Sheikh Hifz (lite)'}
                                 </span>
                               )}
                             </div>
