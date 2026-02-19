@@ -49,8 +49,27 @@ const scaleIn = {
   }
 };
 
-// Geometric diamond accent - subtle Islamic-inspired motif
-function GeometricAccent({ className = "", size = 8 }: { className?: string; size?: number }) {
+// Geometric diamond accent - subtle Islamic-inspired motif with animation
+function GeometricAccent({ className = "", size = 8, animated = false }: { className?: string; size?: number; animated?: boolean }) {
+  if (animated) {
+    return (
+      <motion.svg 
+        viewBox="0 0 12 12" 
+        width={size} 
+        height={size} 
+        className={className}
+        fill="currentColor"
+        animate={{ 
+          rotate: [0, 90, 180, 270, 360],
+          scale: [1, 1.15, 1, 0.9, 1],
+          opacity: [0.4, 0.7, 0.4, 0.6, 0.4]
+        }}
+        transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+      >
+        <path d="M6 0L12 6L6 12L0 6Z" />
+      </motion.svg>
+    );
+  }
   return (
     <svg 
       viewBox="0 0 12 12" 
@@ -61,6 +80,82 @@ function GeometricAccent({ className = "", size = 8 }: { className?: string; siz
     >
       <path d="M6 0L12 6L6 12L0 6Z" />
     </svg>
+  );
+}
+
+// Large animated Islamic geometric pattern (arabesque/zellige) behind hero
+function IslamicGeometricBackground() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* Large slowly rotating 8-pointed star pattern */}
+      <motion.div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
+        style={{ willChange: 'transform' }}
+      >
+        <svg viewBox="0 0 600 600" width={800} height={800} className="opacity-[0.04]">
+          <defs>
+            <pattern id="islamicTile" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+              {/* 8-pointed star */}
+              <path d="M50 10l8 24h25l-20 15 8 24-21-15-21 15 8-24-20-15h25z" fill="#c9a227"/>
+              {/* Connecting hexagonal lines */}
+              <path d="M0 0L25 25M75 25L100 0M0 100L25 75M75 75L100 100" stroke="#c9a227" strokeWidth="0.5" fill="none"/>
+              <rect x="45" y="45" width="10" height="10" transform="rotate(45 50 50)" fill="#c9a227" opacity="0.5"/>
+            </pattern>
+          </defs>
+          <rect width="600" height="600" fill="url(#islamicTile)"/>
+        </svg>
+      </motion.div>
+
+      {/* Second layer - counter-rotating tessellation */}
+      <motion.div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+        animate={{ rotate: -360 }}
+        transition={{ duration: 180, repeat: Infinity, ease: "linear" }}
+        style={{ willChange: 'transform' }}
+      >
+        <svg viewBox="0 0 400 400" width={600} height={600} className="opacity-[0.03]">
+          <defs>
+            <pattern id="hexTile" x="0" y="0" width="60" height="52" patternUnits="userSpaceOnUse">
+              <polygon points="30,0 60,15 60,37 30,52 0,37 0,15" fill="none" stroke="#c9a227" strokeWidth="0.8"/>
+              <circle cx="30" cy="26" r="3" fill="#c9a227" opacity="0.6"/>
+            </pattern>
+          </defs>
+          <rect width="400" height="400" fill="url(#hexTile)"/>
+        </svg>
+      </motion.div>
+
+      {/* Pulsing 8-pointed stars scattered */}
+      {[
+        { x: '15%', y: '20%', size: 30, delay: 0, duration: 8 },
+        { x: '80%', y: '15%', size: 24, delay: 2, duration: 10 },
+        { x: '70%', y: '70%', size: 28, delay: 4, duration: 9 },
+        { x: '20%', y: '75%', size: 22, delay: 1, duration: 11 },
+        { x: '50%', y: '30%', size: 20, delay: 3, duration: 7 },
+      ].map((star, i) => (
+        <motion.div
+          key={`star-${i}`}
+          className="absolute"
+          style={{ left: star.x, top: star.y }}
+          animate={{
+            rotate: [0, 180, 360],
+            opacity: [0.03, 0.08, 0.03],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: star.duration,
+            repeat: Infinity,
+            delay: star.delay,
+            ease: "easeInOut",
+          }}
+        >
+          <svg viewBox="0 0 24 24" width={star.size} height={star.size} fill="#c9a227">
+            <path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8Z"/>
+          </svg>
+        </motion.div>
+      ))}
+    </div>
   );
 }
 
@@ -224,6 +319,7 @@ function FloatingParticles() {
           }}
           animate={{
             y: [-15, 15, -15],
+            rotate: particle.id % 3 === 0 ? [0, 180, 360] : [0, 0, 0],
             opacity: [0.1, 0.3, 0.1],
           }}
           transition={{
@@ -233,10 +329,23 @@ function FloatingParticles() {
             ease: "easeInOut"
           }}
         >
-          <div 
-            className="rounded-full bg-gold-400/20"
-            style={{ width: particle.size, height: particle.size }}
-          />
+          {particle.id % 5 === 0 ? (
+            // 8-pointed star
+            <svg viewBox="0 0 24 24" width={particle.size * 2.5} height={particle.size * 2.5} fill="currentColor" className="text-gold-400/20">
+              <path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8Z"/>
+            </svg>
+          ) : particle.id % 3 === 0 ? (
+            // Diamond
+            <svg viewBox="0 0 12 12" width={particle.size * 2} height={particle.size * 2} fill="currentColor" className="text-gold-400/20">
+              <path d="M6 0L12 6L6 12L0 6Z"/>
+            </svg>
+          ) : (
+            // Circle
+            <div 
+              className="rounded-full bg-gold-400/20"
+              style={{ width: particle.size, height: particle.size }}
+            />
+          )}
         </motion.div>
       ))}
     </div>
@@ -475,6 +584,9 @@ export default function HomePage() {
       {/* Subtle floating particles */}
       <FloatingParticles />
       
+      {/* Stunning Islamic geometric background */}
+      <IslamicGeometricBackground />
+      
       {/* Decorative orbs with parallax */}
       <motion.div 
         className="fixed top-10 left-5 w-[600px] h-[600px] rounded-full blur-[120px]"
@@ -701,11 +813,39 @@ export default function HomePage() {
                 boxShadow: 'inset 0 0 60px rgba(139, 105, 20, 0.05), 0 8px 32px rgba(0, 0, 0, 0.2)',
               }}
             >
-              {/* Decorative corner ornaments */}
-              <div className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-gold-500/40 rounded-tl-lg" />
-              <div className="absolute top-3 right-3 w-8 h-8 border-t-2 border-r-2 border-gold-500/40 rounded-tr-lg" />
-              <div className="absolute bottom-3 left-3 w-8 h-8 border-b-2 border-l-2 border-gold-500/40 rounded-bl-lg" />
-              <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-gold-500/40 rounded-br-lg" />
+              {/* Animated corner ornaments - draw themselves in */}
+              {[
+                { pos: 'top-3 left-3', d: 'M0 32L0 4Q0 0 4 0L32 0' },
+                { pos: 'top-3 right-3', d: 'M32 32L32 4Q32 0 28 0L0 0' },
+                { pos: 'bottom-3 left-3', d: 'M0 0L0 28Q0 32 4 32L32 32' },
+                { pos: 'bottom-3 right-3', d: 'M32 0L32 28Q32 32 28 32L0 32' },
+              ].map((corner, i) => (
+                <motion.svg
+                  key={i}
+                  className={`absolute ${corner.pos} w-8 h-8`}
+                  viewBox="0 0 32 32"
+                  fill="none"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                >
+                  <motion.path
+                    d={corner.d}
+                    stroke="#c9a227"
+                    strokeWidth="2"
+                    strokeOpacity="0.4"
+                    strokeLinecap="round"
+                    variants={{
+                      hidden: { pathLength: 0, opacity: 0 },
+                      visible: { 
+                        pathLength: 1, 
+                        opacity: 1, 
+                        transition: { duration: 0.8, delay: 0.3 + i * 0.15, ease: "easeOut" }
+                      }
+                    }}
+                  />
+                </motion.svg>
+              ))}
               
               {/* Scroll-Triggered Opening Animation */}
               <motion.div 
@@ -926,18 +1066,18 @@ export default function HomePage() {
             className="max-w-4xl mx-auto"
           >
             <div className="liquid-glass-gold-premium rounded-3xl p-10 md:p-16 flex flex-col items-center justify-center min-h-[280px] relative overflow-hidden">
-              {/* Subtle corner accents */}
+              {/* Animated corner accents */}
               <div className="absolute top-4 left-4">
-                <GeometricAccent size={8} className="text-gold-500/25" />
+                <GeometricAccent size={8} className="text-gold-500/25" animated />
               </div>
               <div className="absolute top-4 right-4">
-                <GeometricAccent size={8} className="text-gold-500/25" />
+                <GeometricAccent size={8} className="text-gold-500/25" animated />
               </div>
               <div className="absolute bottom-4 left-4">
-                <GeometricAccent size={8} className="text-gold-500/25" />
+                <GeometricAccent size={8} className="text-gold-500/25" animated />
               </div>
               <div className="absolute bottom-4 right-4">
-                <GeometricAccent size={8} className="text-gold-500/25" />
+                <GeometricAccent size={8} className="text-gold-500/25" animated />
               </div>
               
               {/* No quote symbol - just the text, scaled up and centered */}

@@ -7,53 +7,42 @@ interface LogoProps {
   className?: string;
   animated?: boolean;
   showWordmark?: boolean;
+  color?: string;
 }
 
 /**
- * HIFZ Logo - Moon + Book Chevrons
+ * HIFZ Logo - Moon + Book Chevrons (Inline SVG)
  * 
  * Design: Crescent moon with stacked book chevrons
  * representing Islamic identity and knowledge/learning
  */
 
-// Shared SVG content for the book + crescent logo
-function LogoSvgContent() {
+// Inline SVG paths for the HIFZ logo
+function HifzLogoSvg({ size = 40, color = '#c9a227', className = '' }: { size?: number; color?: string; className?: string }) {
   return (
-    <>
-      <defs>
-        <linearGradient id="hifz-gold" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#f4d47c" />
-          <stop offset="50%" stopColor="#c9a227" />
-          <stop offset="100%" stopColor="#8b6914" />
-        </linearGradient>
-      </defs>
-
-      {/* Crescent moon — thin elegant arc */}
-      <path
-        d="M 38 4 A 12 12 0 1 0 38 28 A 9 9 0 1 1 38 4 Z"
-        fill="url(#hifz-gold)"
-      />
-
-      {/* Left page */}
-      <path
-        d="M 30 34 C 30 38, 26 42, 12 44 L 12 50 C 26 48, 30 44, 30 40 Z"
-        fill="url(#hifz-gold)"
-      />
-
-      {/* Right page */}
-      <path
-        d="M 34 34 C 34 38, 38 42, 52 44 L 52 50 C 38 48, 34 44, 34 40 Z"
-        fill="url(#hifz-gold)"
-      />
-
-      {/* Spine */}
-      <line x1="32" y1="33" x2="32" y2="52" stroke="url(#hifz-gold)" strokeWidth="2.5" strokeLinecap="round" />
-    </>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 200 210"
+      width={size}
+      height={size * 1.05}
+      fill={color}
+      className={className}
+      aria-label="HIFZ"
+    >
+      {/* Crescent Moon */}
+      <path d="M76 6a14 14 0 1 1-3.5 27.5A17.5 17.5 0 1 0 76 6Z"/>
+      {/* Top chevron - curved wings */}
+      <path d="M0 36L68 36C78 36 86 42 92 54C96 62 99 76 100 108C101 76 104 62 108 54C114 42 122 36 132 36L200 36L200 56C170 56 145 60 125 74C112 83 106 96 100 114C94 96 88 83 75 74C55 60 30 56 0 56Z"/>
+      {/* Middle chevron */}
+      <path d="M0 122L68 122L100 160L132 122L200 122L200 142L132 142L100 180L68 142L0 142Z"/>
+      {/* Bottom chevron */}
+      <path d="M0 150L68 150L100 188L132 150L200 150L200 170L132 170L100 208L68 170L0 170Z"/>
+    </svg>
   );
 }
 
-// Inline SVG icon - crescent moon + open book, gold gradient
-export function HifzIcon({ size = 40, className = '', animated = true }: LogoProps) {
+// Main icon using inline SVG
+export function HifzIcon({ size = 40, className = '', animated = true, color = '#c9a227' }: LogoProps) {
   const Container = animated ? motion.div : 'div';
   
   return (
@@ -66,26 +55,22 @@ export function HifzIcon({ size = 40, className = '', animated = true }: LogoPro
         transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] }
       })}
     >
-      <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <LogoSvgContent />
-      </svg>
+      <HifzLogoSvg size={size} color={color} />
     </Container>
   );
 }
 
-// Simple icon for small contexts (nav, tabs) - same design, no animation wrapper
+// Simple icon for small contexts (nav, tabs)
 export function HifzIconSimple({ 
   size = 24, 
-  className = '' 
+  className = '',
+  color = '#c9a227'
 }: { 
   size?: number; 
   className?: string;
+  color?: string;
 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-      <LogoSvgContent />
-    </svg>
-  );
+  return <HifzLogoSvg size={size} color={color} className={className} />;
 }
 
 // The HIFZ wordmark (text logo)
