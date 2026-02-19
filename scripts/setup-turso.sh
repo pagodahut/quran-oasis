@@ -36,7 +36,11 @@ echo "========================================="
 
 echo ""
 echo "Pushing schema to Turso..."
-TURSO_DATABASE_URL="$TURSO_URL" TURSO_AUTH_TOKEN="$TURSO_TOKEN" DATABASE_URL="$TURSO_URL?authToken=$TURSO_TOKEN" npx prisma db push --accept-data-loss
+# Prisma's sqlite provider can't use libsql:// URLs directly.
+# Dump schema from local SQLite and push via turso CLI.
+sqlite3 prisma/dev.db ".schema" > /tmp/hifz-schema.sql
+sed -i '' 's/CREATE UNIQUE INDEX/CREATE UNIQUE INDEX IF NOT EXISTS/g' /tmp/hifz-schema.sql
+turso db shell hifz-quran < /tmp/hifz-schema.sql
 
 echo ""
 echo "✅ Done! Database is ready."
