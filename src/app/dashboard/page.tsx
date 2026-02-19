@@ -22,7 +22,6 @@ import {
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 import { StreakDisplay } from '@/components/Celebrations';
-import DashboardGreeting from '@/components/DashboardGreeting';
 import { 
   getStreakInfo, 
   getDailyGoalStatus, 
