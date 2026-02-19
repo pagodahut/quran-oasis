@@ -55,20 +55,21 @@ export default function PracticePage() {
   } | null>(null);
   const [loadingReview, setLoadingReview] = useState(false);
 
+  const [isCalibrated, setIsCalibrated] = useState(true);
+
   // Load profile and SRS state
   useEffect(() => {
     setPageContext({ page: 'practice' });
 
     async function init() {
       const calibrated = await isCalibrationComplete();
-      if (!calibrated) {
-        router.push('/onboarding/welcome');
-        return;
-      }
+      setIsCalibrated(calibrated);
 
       const profile = await loadUserProfile();
       if (profile?.level) {
         setUserLevel(profile.level);
+      } else {
+        setUserLevel('beginner');
       }
 
       srs.reload();
@@ -275,6 +276,15 @@ export default function PracticePage() {
 
   return (
     <div className="min-h-screen bg-night-950">
+      {/* Calibration Banner */}
+      {!isCalibrated && (
+        <Link href="/onboarding" className="liquid-card mx-4 mt-3 p-3 flex items-center gap-3 bg-gold-500/5 border-gold-500/20">
+          <Sparkles className="w-4 h-4 text-gold-400 flex-shrink-0" />
+          <span className="text-sm text-night-300">Personalize your experience</span>
+          <ArrowRight className="w-4 h-4 text-night-500 ml-auto flex-shrink-0" />
+        </Link>
+      )}
+
       {/* Header */}
       <header className="liquid-glass sticky top-0 z-40 safe-area-top">
         <div className="px-4 py-3 flex items-center justify-between">

@@ -2,9 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { useLearningMode } from '@/hooks/useLearningMode';
 
 // Custom geometric icons - cohesive Islamic-inspired design
 function HomeIcon({ className = "", strokeWidth = 2 }: { className?: string; strokeWidth?: number }) {
@@ -19,33 +18,9 @@ function HomeIcon({ className = "", strokeWidth = 2 }: { className?: string; str
 function QuranIcon({ className = "", strokeWidth = 2 }: { className?: string; strokeWidth?: number }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} strokeWidth={strokeWidth} stroke="currentColor" aria-hidden="true">
-      {/* Open book shape */}
       <path d="M4 19.5A2.5 2.5 0 016.5 17H20" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" strokeLinecap="round" strokeLinejoin="round" />
-      {/* Decorative lines suggesting Arabic text */}
       <path d="M8 7h8M8 10h6M8 13h7" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
-    </svg>
-  );
-}
-
-function BrowseIcon({ className = "", strokeWidth = 2 }: { className?: string; strokeWidth?: number }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} strokeWidth={strokeWidth} stroke="currentColor" aria-hidden="true">
-      {/* Grid/garden layout representing surah collection */}
-      <rect x="3" y="3" width="7" height="7" rx="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="14" y="3" width="7" height="7" rx="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="3" y="14" width="7" height="7" rx="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="14" y="14" width="7" height="7" rx="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function LearnIcon({ className = "", strokeWidth = 2 }: { className?: string; strokeWidth?: number }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} strokeWidth={strokeWidth} stroke="currentColor" aria-hidden="true">
-      <path d="M12 3L2 9l10 6 10-6-10-6z" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M2 17l10 6 10-6" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M2 12l10 6 10-6" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
     </svg>
   );
 }
@@ -60,18 +35,6 @@ function PracticeIcon({ className = "", strokeWidth = 2 }: { className?: string;
   );
 }
 
-function ReciteIcon({ className = "", strokeWidth = 2 }: { className?: string; strokeWidth?: number }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} strokeWidth={strokeWidth} stroke="currentColor" aria-hidden="true">
-      {/* Microphone */}
-      <rect x="9" y="2" width="6" height="11" rx="3" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M5 10a7 7 0 0014 0" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M12 17v4" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M8 21h8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 function ProfileIcon({ className = "", strokeWidth = 2 }: { className?: string; strokeWidth?: number }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} strokeWidth={strokeWidth} stroke="currentColor" aria-hidden="true">
@@ -81,24 +44,26 @@ function ProfileIcon({ className = "", strokeWidth = 2 }: { className?: string; 
   );
 }
 
+// Fixed 4-tab navigation: Home, Quran, Practice, Profile
+const navItems = [
+  { href: '/dashboard', Icon: HomeIcon, label: 'Home', ariaLabel: 'Go to Dashboard' },
+  { href: '/recite', Icon: QuranIcon, label: 'Quran', ariaLabel: 'Browse Quran' },
+  { href: '/practice', Icon: PracticeIcon, label: 'Practice', ariaLabel: 'Go to Practice' },
+  { href: '/profile', Icon: ProfileIcon, label: 'Profile', ariaLabel: 'View Profile' },
+];
+
 export default function BottomNav() {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
-  const { showLearn, showPractice, isLoaded } = useLearningMode();
 
-  // Collapse nav on scroll down, expand on scroll up (iOS-style)
-  // Using useCallback for better performance
   const handleScroll = useCallback(() => {
     const currentScrollY = window.scrollY;
-    
-    // Add hysteresis to prevent flickering
     if (currentScrollY > lastScrollY + 10 && currentScrollY > 100) {
       setIsCollapsed(true);
     } else if (currentScrollY < lastScrollY - 10) {
       setIsCollapsed(false);
     }
-    
     setLastScrollY(currentScrollY);
   }, [lastScrollY]);
 
@@ -106,23 +71,6 @@ export default function BottomNav() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
-
-  // Build nav items based on learning mode
-  // Navigation: Browse/Surahs merged into Quran tab (Explore view)
-  // - Beginner (5 items): Home, Learn, Quran, Practice, Profile
-  // - Intermediate (4 items): Home, Quran, Practice, Profile  
-  // - Hafiz (3 items): Home, Quran, Profile
-  const navItems = useMemo(() => {
-    const items = [
-      { href: '/dashboard', Icon: HomeIcon, label: 'Home', ariaLabel: 'Go to Dashboard', show: true },
-      { href: '/lessons', Icon: LearnIcon, label: 'Learn', ariaLabel: 'Go to Lessons', show: showLearn },
-      { href: '/mushaf', Icon: QuranIcon, label: 'Quran', ariaLabel: 'Read Quran', show: true },
-      { href: '/practice', Icon: PracticeIcon, label: 'Practice', ariaLabel: 'Go to Practice', show: showPractice },
-      { href: '/profile', Icon: ProfileIcon, label: 'Profile', ariaLabel: 'View Profile', show: true },
-    ];
-    
-    return items.filter(item => item.show);
-  }, [showLearn, showPractice]);
 
   return (
     <nav 
@@ -143,7 +91,7 @@ export default function BottomNav() {
         }`}
         style={{
           maxWidth: isCollapsed 
-            ? `${Math.min(navItems.length * 52 + 32, 340)}px` // Dynamic width: items * min-width + padding
+            ? `${Math.min(4 * 52 + 32, 340)}px`
             : undefined,
           background: 'var(--theme-glass-base)',
           backdropFilter: 'blur(64px) saturate(200%)',
@@ -161,7 +109,14 @@ export default function BottomNav() {
         }}
         >
           {navItems.map((item) => {
+            // Active matching: exact match or sub-route match
+            // /recite covers /recite, /recite/1, /mushaf, /surahs, /identify etc.
+            // /practice covers /practice, /practice/*
+            // /profile covers /profile, /settings
             const isActive = pathname === item.href || 
+              (item.href === '/dashboard' && pathname === '/') ||
+              (item.href === '/recite' && ['/mushaf', '/surahs', '/browse', '/identify'].some(p => pathname.startsWith(p))) ||
+              (item.href === '/profile' && pathname.startsWith('/settings')) ||
               (item.href !== '/' && item.href !== '/dashboard' && pathname.startsWith(item.href));
             
             return (
