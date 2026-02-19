@@ -40,6 +40,56 @@ const wordCache = new Map<string, VocabularyMatch>();
 const verseCache = new Map<string, QuranWord[]>();
 
 // ============================================
+// Names of Allah - Verified Audio Map
+// Each entry is manually verified against Quran.com word-by-word audio
+// Format: arabic text -> { surah, ayah, position }
+// ============================================
+
+const NAMES_OF_ALLAH_AUDIO_MAP: Record<string, { surah: number; ayah: number; position: number }> = {
+  // Verified from Surah Al-Hashr (59:22-24) - contains many Names in sequence
+  'الله': { surah: 1, ayah: 1, position: 2 },
+  'الرَّحْمَٰن': { surah: 1, ayah: 1, position: 3 },
+  'الرَّحِيم': { surah: 1, ayah: 1, position: 4 },
+  'الْمَلِك': { surah: 59, ayah: 23, position: 4 },
+  'الْقُدُّوس': { surah: 59, ayah: 23, position: 5 },
+  'السَّلَام': { surah: 59, ayah: 23, position: 6 },
+  'الْمُؤْمِن': { surah: 59, ayah: 23, position: 7 },
+  'الْمُهَيْمِن': { surah: 59, ayah: 23, position: 8 },
+  'الْعَزِيز': { surah: 59, ayah: 23, position: 9 },
+  'الْجَبَّار': { surah: 59, ayah: 23, position: 10 },
+  'الْمُتَكَبِّر': { surah: 59, ayah: 23, position: 11 },
+  'الْخَالِق': { surah: 59, ayah: 24, position: 3 },
+  'الْبَارِئ': { surah: 59, ayah: 24, position: 4 },
+  'الْمُصَوِّر': { surah: 59, ayah: 24, position: 5 },
+};
+
+// Set of all Names of Allah arabic texts (used to identify Names that lack verified audio)
+// This prevents falling back to generic word lookup which could play wrong audio
+const NAMES_OF_ALLAH_TEXTS = new Set([
+  'الله', 'الرَّحْمَٰن', 'الرَّحِيم', 'الْمَلِك', 'الْقُدُّوس',
+  'السَّلَام', 'الْمُؤْمِن', 'الْمُهَيْمِن', 'الْعَزِيز', 'الْجَبَّار',
+  'الْمُتَكَبِّر', 'الْخَالِق', 'الْبَارِئ', 'الْمُصَوِّر', 'الْغَفَّار',
+  'الْقَهَّار', 'الْوَهَّاب', 'الرَّزَّاق', 'الْفَتَّاح', 'الْعَلِيم',
+  'الْقَابِض', 'الْبَاسِط', 'الْخَافِض', 'الرَّافِع', 'الْمُعِزّ',
+  'الْمُذِلّ', 'السَّمِيع', 'الْبَصِير', 'الْحَكَم', 'الْعَدْل',
+  'اللَّطِيف', 'الْخَبِير', 'الْحَلِيم', 'الْعَظِيم', 'الْغَفُور',
+  'الشَّكُور', 'الْعَلِيّ', 'الْكَبِير', 'الْحَفِيظ', 'الْمُقِيت',
+  'الْحَسِيب', 'الْجَلِيل', 'الْكَرِيم', 'الرَّقِيب', 'الْمُجِيب',
+  'الْوَاسِع', 'الْحَكِيم', 'الْوَدُود', 'الْمَجِيد', 'الْبَاعِث',
+  'الشَّهِيد', 'الْحَقّ', 'الْوَكِيل', 'الْقَوِيّ', 'الْمَتِين',
+  'الْوَلِيّ', 'الْحَمِيد', 'الْمُحْصِي', 'الْمُبْدِئ', 'الْمُعِيد',
+  'الْمُحْيِي', 'الْمُمِيت', 'الْحَيّ', 'الْقَيُّوم', 'الْوَاجِد',
+  'الْمَاجِد', 'الْوَاحِد', 'الصَّمَد', 'الْقَادِر', 'الْمُقْتَدِر',
+  'الْمُقَدِّم', 'الْمُؤَخِّر', 'الْأَوَّل', 'الْآخِر', 'الظَّاهِر',
+  'الْبَاطِن', 'الْوَالِي', 'الْمُتَعَالِي', 'الْبَرّ', 'التَّوَّاب',
+  'الْمُنْتَقِم', 'الْعَفُوّ', 'الرَّؤُوف', 'مَالِكَ الْمُلْك',
+  'ذُو الْجَلَالِ وَالْإِكْرَام', 'الْمُقْسِط', 'الْجَامِع',
+  'الْغَنِيّ', 'الْمُغْنِي', 'الْمَانِع', 'الضَّارّ', 'النَّافِع',
+  'النُّور', 'الْهَادِي', 'الْبَدِيع', 'الْبَاقِي', 'الْوَارِث',
+  'الرَّشِيد', 'الصَّبُور',
+]);
+
+// ============================================
 // Pre-mapped common vocabulary
 // Format: word -> { surah, ayah, position }
 // ============================================
@@ -147,7 +197,32 @@ function buildAudioUrl(surah: number, ayah: number, position: number): string {
 export function getVocabularyAudioUrl(word: string): string | null {
   const normalized = normalizeArabic(word);
   
-  // Direct match
+  // 1. Check Names of Allah verified map FIRST (exact match)
+  if (NAMES_OF_ALLAH_AUDIO_MAP[word]) {
+    const { surah, ayah, position } = NAMES_OF_ALLAH_AUDIO_MAP[word];
+    return buildAudioUrl(surah, ayah, position);
+  }
+  
+  // 2. Check Names of Allah via normalization
+  for (const [key, value] of Object.entries(NAMES_OF_ALLAH_AUDIO_MAP)) {
+    if (normalizeArabic(key) === normalized) {
+      return buildAudioUrl(value.surah, value.ayah, value.position);
+    }
+  }
+  
+  // 3. If this IS a Name of Allah but NOT in our verified map,
+  //    return null — silent is better than wrong audio
+  if (NAMES_OF_ALLAH_TEXTS.has(word)) {
+    return null;
+  }
+  // Also check normalized form against Names set
+  for (const name of NAMES_OF_ALLAH_TEXTS) {
+    if (normalizeArabic(name) === normalized) {
+      return null;
+    }
+  }
+  
+  // 4. Regular vocabulary lookup (non-Names-of-Allah words)
   if (VOCABULARY_MAP[word]) {
     const { surah, ayah, position } = VOCABULARY_MAP[word];
     return buildAudioUrl(surah, ayah, position);

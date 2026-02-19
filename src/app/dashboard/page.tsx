@@ -413,6 +413,17 @@ export default function DashboardPage() {
   const [nudgeType, setNudgeType] = useState<string | undefined>();
   const [goalLoading, setGoalLoading] = useState(true);
 
+  // Delay showing guest banner to avoid flash after sign-in (Clerk timing)
+  const [showGuestBanner, setShowGuestBanner] = useState(false);
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      const timer = setTimeout(() => setShowGuestBanner(true), 500);
+      return () => clearTimeout(timer);
+    } else {
+      setShowGuestBanner(false);
+    }
+  }, [isLoaded, isSignedIn]);
+
   // Server-fetched state
   const [reviewQueue, setReviewQueue] = useState<ReviewQueueData>({ total: 0, items: [] });
   const [recentSessions, setRecentSessions] = useState<RecentSession[]>([]);
@@ -604,7 +615,7 @@ export default function DashboardPage() {
       <main className="px-4 py-6 pb-32 max-w-2xl mx-auto">
         <motion.div initial="hidden" animate="visible" variants={stagger} className="space-y-8">
           {/* Guest Banner */}
-          {isLoaded && !isSignedIn && <GuestBanner />}
+          {showGuestBanner && <GuestBanner />}
 
           {/* ── 1. Greeting Header ── */}
           <motion.header variants={fadeInUp} className="pt-4 pb-1">

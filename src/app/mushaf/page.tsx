@@ -30,7 +30,9 @@ import {
   Layers,
   Compass,
   BookMarked,
-  SlidersHorizontal,
+  Check,
+  Volume2,
+  Square,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { 
@@ -42,7 +44,8 @@ import {
   shouldShowBismillah,
   cleanAyahText,
   type Surah,
-  type Ayah
+  type Ayah,
+  type Reciter,
 } from '@/lib/quranData';
 import BottomNav from '@/components/BottomNav';
 import QuranSearch from '@/components/QuranSearch';
@@ -50,6 +53,7 @@ import TafsirDrawer from '@/components/TafsirDrawer';
 import VerseContext from '@/components/VerseContext';
 import WordByWord from '@/components/WordByWord';
 import WordByWordInline from '@/components/WordByWordInline';
+import WordByWordGrid from '@/components/WordByWordGrid';
 import TajweedPractice from '@/components/TajweedPractice';
 import { TajweedText, TajweedToggle, TajweedLegend } from '@/components/TajweedHighlighter';
 import { useSheikh } from '@/contexts/SheikhContext';
@@ -61,7 +65,7 @@ import { QURAN_SCRIPT_OPTIONS, type QuranScript } from '@/lib/quranScripts';
 
 // Spring animation config
 const springTransition = { type: 'spring' as const, stiffness: 400, damping: 30 };
-const pillSpring = { type: 'spring' as const, stiffness: 500, damping: 35 };
+// (pillSpring removed — verse actions are now inline)
 
 function MushafSearchParamsReader({ onView }: { onView: (v: 'read' | 'explore') => void }) {
   const searchParams = useSearchParams();
@@ -112,16 +116,37 @@ export default function MushafPage() {
   const [tafsirAyah, setTafsirAyah] = useState(1);
   const [showAudioSettings, setShowAudioSettings] = useState(false);
   
-  // Verse action menu
-  const [activeVerseMenu, setActiveVerseMenu] = useState<number | null>(null);
-  
   // Word-by-word & Tajweed
-  const [wordByWordMode, setWordByWordMode] = useState(false);
+  const [wordByWordMode, setWordByWordMode] = useState<'off' | 'inline' | 'grid'>('off');
   const [showTajweedPractice, setShowTajweedPractice] = useState(false);
   const [tajweedPracticeAyah, setTajweedPracticeAyah] = useState(1);
   const [showTajweedColors, setShowTajweedColors] = useState(false);
   const [showTajweedLegend, setShowTajweedLegend] = useState(false);
   
+  // Sample audio for reciter preview
+  const sampleAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [playingSampleId, setPlayingSampleId] = useState<string | null>(null);
+  
+  const playSample = useCallback((reciter: Reciter) => {
+    if (playingSampleId === reciter.id) {
+      // Stop current
+      sampleAudioRef.current?.pause();
+      setPlayingSampleId(null);
+      return;
+    }
+    if (sampleAudioRef.current) {
+      sampleAudioRef.current.pause();
+    }
+    const audio = new Audio(reciter.sampleUrl);
+    sampleAudioRef.current = audio;
+    setPlayingSampleId(reciter.id);
+    audio.play();
+    // Auto-stop after 8 seconds or when ended
+    const timeout = setTimeout(() => { audio.pause(); setPlayingSampleId(null); }, 8000);
+    audio.onended = () => { clearTimeout(timeout); setPlayingSampleId(null); };
+    audio.onpause = () => { clearTimeout(timeout); setPlayingSampleId(null); };
+  }, [playingSampleId]);
+
   const getDisplayText = (ayah: Ayah): string => {
     const scriptText = getScriptText(ayah.numberInSurah);
     if (scriptText) return scriptText;
@@ -130,14 +155,6 @@ export default function MushafPage() {
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const verseRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
-
-  // Close verse menu on outside click
-  useEffect(() => {
-    if (activeVerseMenu === null) return;
-    const handler = () => setActiveVerseMenu(null);
-    const timer = setTimeout(() => document.addEventListener('click', handler), 10);
-    return () => { clearTimeout(timer); document.removeEventListener('click', handler); };
-  }, [activeVerseMenu]);
 
   useEffect(() => {
     setSelectedReciter(prefs.reciter);
@@ -394,7 +411,6 @@ export default function MushafPage() {
             <div className="space-y-6">
               {currentSurah.ayahs.map((ayah) => {
                 const isCurrentVerse = currentAyah === ayah.numberInSurah && isPlaying;
-                const isMenuOpen = activeVerseMenu === ayah.numberInSurah;
                 
                 return (
                   <motion.div
@@ -407,7 +423,14 @@ export default function MushafPage() {
                     onClick={() => playAyah(ayah.numberInSurah)}
                   >
                     {/* Arabic Text */}
-                    {wordByWordMode ? (
+                    {wordByWordMode === 'grid' ? (
+                      <div className="mb-4" onClick={(e) => e.stopPropagation()}>
+                        <WordByWordGrid
+                          surah={surahNumber}
+                          ayah={ayah.numberInSurah}
+                        />
+                      </div>
+                    ) : wordByWordMode === 'inline' ? (
                       <div className="mb-4">
                         {isCurrentVerse ? (
                           <WordByWord
@@ -460,8 +483,8 @@ export default function MushafPage() {
                         {ayah.sajda && <span className="text-gold-400 flex items-center gap-0.5"><Star className="w-3 h-3" /> Sajda</span>}
                       </div>
                       
-                      <div className="flex items-center gap-1.5 relative">
-                        {/* Bookmark (always visible) */}
+                      <div className="flex items-center gap-1.5">
+                        {/* Bookmark */}
                         <motion.button
                           whileTap={{ scale: 1.15 }}
                           transition={springTransition}
@@ -476,96 +499,81 @@ export default function MushafPage() {
                               translation: ayah.text.translations[translationEdition].slice(0, 100),
                             });
                           }}
-                          className="liquid-icon-btn !w-9 !h-9 !min-w-[36px] !min-h-[36px]"
+                          className="liquid-icon-btn !w-8 !h-8 !min-w-[32px] !min-h-[32px]"
                           style={isBookmarked(surahNumber, ayah.numberInSurah) ? {
                             background: 'linear-gradient(135deg, rgba(201,162,39,0.15), rgba(201,162,39,0.08))',
                             borderColor: 'rgba(201,162,39,0.2)',
-                          } : {}}
+                          } : {
+                            backdropFilter: 'blur(8px)',
+                            WebkitBackdropFilter: 'blur(8px)',
+                            border: '1px solid rgba(255,255,255,0.06)',
+                          }}
                           aria-label={isBookmarked(surahNumber, ayah.numberInSurah) ? 'Remove bookmark' : 'Add bookmark'}
                         >
-                          <Bookmark className={`w-4 h-4 ${isBookmarked(surahNumber, ayah.numberInSurah) ? 'text-gold-400 fill-gold-400' : ''}`} />
+                          <Bookmark className={`w-3.5 h-3.5 ${isBookmarked(surahNumber, ayah.numberInSurah) ? 'text-gold-400 fill-gold-400' : ''}`} />
                         </motion.button>
 
-                        {/* More actions trigger */}
+                        {/* Practice */}
                         <motion.button
-                          whileTap={{ scale: 1.1 }}
-                          transition={springTransition}
+                          whileTap={{ scale: 0.9 }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            setActiveVerseMenu(isMenuOpen ? null : ayah.numberInSurah);
+                            setTajweedPracticeAyah(ayah.numberInSurah);
+                            setShowTajweedPractice(true);
                           }}
-                          className={`liquid-icon-btn !w-9 !h-9 !min-w-[36px] !min-h-[36px] ${isMenuOpen ? 'active' : ''}`}
-                          aria-label="Verse actions"
+                          className="w-8 h-8 min-w-[32px] min-h-[32px] rounded-lg flex items-center justify-center transition-colors hover:bg-white/10"
+                          style={{
+                            backdropFilter: 'blur(8px)',
+                            WebkitBackdropFilter: 'blur(8px)',
+                            border: '1px solid rgba(255,255,255,0.06)',
+                            background: 'rgba(255,255,255,0.03)',
+                          }}
+                          aria-label="Practice this verse"
+                          title="Practice"
                         >
-                          <SlidersHorizontal className="w-4 h-4" />
+                          <Mic className="w-3.5 h-3.5 text-sage-400" />
                         </motion.button>
 
-                        {/* Floating pill action menu */}
-                        <AnimatePresence>
-                          {isMenuOpen && (
-                            <motion.div
-                              initial={{ opacity: 0, scale: 0.85, y: 8 }}
-                              animate={{ opacity: 1, scale: 1, y: 0 }}
-                              exit={{ opacity: 0, scale: 0.85, y: 8 }}
-                              transition={pillSpring}
-                              className="absolute bottom-full right-0 mb-2 z-30"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <div
-                                className="flex items-center gap-1 px-2 py-1.5 rounded-2xl"
-                                style={{
-                                  background: 'linear-gradient(135deg, rgba(28,33,40,0.95), rgba(22,27,34,0.98))',
-                                  backdropFilter: 'blur(24px) saturate(180%)',
-                                  WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-                                  border: '1px solid rgba(255,255,255,0.08)',
-                                  boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2)',
-                                }}
-                              >
-                                <motion.button
-                                  whileHover={{ scale: 1.05 }}
-                                  whileTap={{ scale: 0.95 }}
-                                  onClick={() => {
-                                    setTajweedPracticeAyah(ayah.numberInSurah);
-                                    setShowTajweedPractice(true);
-                                    setActiveVerseMenu(null);
-                                  }}
-                                  className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors"
-                                  title="Practice"
-                                >
-                                  <Mic className="w-4 h-4 text-sage-400" />
-                                  <span className="text-[10px] text-night-400">Practice</span>
-                                </motion.button>
-                                <motion.button
-                                  whileHover={{ scale: 1.05 }}
-                                  whileTap={{ scale: 0.95 }}
-                                  onClick={() => {
-                                    router.push(`/memorize/${surahNumber}/${ayah.numberInSurah}`);
-                                    setActiveVerseMenu(null);
-                                  }}
-                                  className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors"
-                                  title="Memorize"
-                                >
-                                  <Brain className="w-4 h-4 text-gold-400" />
-                                  <span className="text-[10px] text-night-400">Memorize</span>
-                                </motion.button>
-                                <motion.button
-                                  whileHover={{ scale: 1.05 }}
-                                  whileTap={{ scale: 0.95 }}
-                                  onClick={() => {
-                                    setTafsirAyah(ayah.numberInSurah);
-                                    setShowTafsir(true);
-                                    setActiveVerseMenu(null);
-                                  }}
-                                  className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors"
-                                  title="Tafsir"
-                                >
-                                  <BookOpen className="w-4 h-4 text-night-300" />
-                                  <span className="text-[10px] text-night-400">Tafsir</span>
-                                </motion.button>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
+                        {/* Memorize */}
+                        <motion.button
+                          whileTap={{ scale: 0.9 }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/memorize/${surahNumber}/${ayah.numberInSurah}`);
+                          }}
+                          className="w-8 h-8 min-w-[32px] min-h-[32px] rounded-lg flex items-center justify-center transition-colors hover:bg-white/10"
+                          style={{
+                            backdropFilter: 'blur(8px)',
+                            WebkitBackdropFilter: 'blur(8px)',
+                            border: '1px solid rgba(255,255,255,0.06)',
+                            background: 'rgba(255,255,255,0.03)',
+                          }}
+                          aria-label="Memorize this verse"
+                          title="Memorize"
+                        >
+                          <Brain className="w-3.5 h-3.5 text-gold-400" />
+                        </motion.button>
+
+                        {/* Tafsir */}
+                        <motion.button
+                          whileTap={{ scale: 0.9 }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setTafsirAyah(ayah.numberInSurah);
+                            setShowTafsir(true);
+                          }}
+                          className="w-8 h-8 min-w-[32px] min-h-[32px] rounded-lg flex items-center justify-center transition-colors hover:bg-white/10"
+                          style={{
+                            backdropFilter: 'blur(8px)',
+                            WebkitBackdropFilter: 'blur(8px)',
+                            border: '1px solid rgba(255,255,255,0.06)',
+                            background: 'rgba(255,255,255,0.03)',
+                          }}
+                          aria-label="View tafsir"
+                          title="Tafsir"
+                        >
+                          <BookOpen className="w-3.5 h-3.5 text-night-300" />
+                        </motion.button>
                       </div>
                     </div>
                     
@@ -678,17 +686,19 @@ export default function MushafPage() {
                 >
                   <div className="px-4 pb-3 pt-1" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      {/* Word-by-word */}
+                      {/* Word-by-word (cycles: off → inline → grid → off) */}
                       <button
-                        onClick={() => setWordByWordMode(!wordByWordMode)}
+                        onClick={() => setWordByWordMode(prev => prev === 'off' ? 'inline' : prev === 'inline' ? 'grid' : 'off')}
                         className={`text-xs px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 min-h-[32px] ${
-                          wordByWordMode 
-                            ? 'bg-sage-500/15 text-sage-400 border border-sage-500/30' 
+                          wordByWordMode !== 'off'
+                            ? wordByWordMode === 'grid'
+                              ? 'bg-gold-500/15 text-gold-400 border border-gold-500/30'
+                              : 'bg-sage-500/15 text-sage-400 border border-sage-500/30'
                             : 'bg-white/5 text-night-400 border border-white/5 hover:bg-white/10'
                         }`}
                       >
                         <Type className="w-3 h-3" />
-                        Word
+                        {wordByWordMode === 'grid' ? 'Word ⊞' : 'Word'}
                       </button>
                       {/* Tajweed */}
                       <TajweedToggle
@@ -890,21 +900,95 @@ export default function MushafPage() {
               <div className="p-4 space-y-6 overflow-y-auto flex-1 pb-safe">
                 {/* Reciter */}
                 <div>
-                  <label className="text-sm text-night-400 mb-3 block">Reciter</label>
-                  <div className="space-y-2">
-                    {RECITERS.map((reciter) => (
-                      <button
-                        key={reciter.id}
-                        onClick={() => setSelectedReciter(reciter.id)}
-                        className={`reciter-preview w-full ${selectedReciter === reciter.id ? 'selected' : ''}`}
-                      >
-                        <div className="flex-1 text-left">
-                          <p className="text-night-100">{reciter.name}</p>
-                          <p className="text-xs text-night-500">{reciter.arabicName} &middot; {reciter.style}</p>
-                        </div>
-                        {selectedReciter === reciter.id && <Star className="w-4 h-4 text-gold-400" />}
-                      </button>
-                    ))}
+                  <label className="text-sm text-night-400 mb-3 block flex items-center gap-2">
+                    <Volume2 className="w-4 h-4" /> Reciter
+                  </label>
+                  <div className="space-y-3">
+                    {RECITERS.map((reciter) => {
+                      const isSelected = selectedReciter === reciter.id;
+                      const isPlayingSample = playingSampleId === reciter.id;
+                      return (
+                        <motion.button
+                          key={reciter.id}
+                          onClick={() => setSelectedReciter(reciter.id)}
+                          className={`relative w-full p-4 rounded-2xl text-left transition-all ${
+                            isSelected
+                              ? 'border-2 border-gold-500/50 shadow-[0_0_20px_rgba(201,162,39,0.12)]'
+                              : 'border-2 border-white/[0.06] hover:border-white/10'
+                          }`}
+                          style={{
+                            background: isSelected
+                              ? 'linear-gradient(135deg, rgba(201,162,39,0.10) 0%, rgba(22,27,34,0.55) 50%, rgba(201,162,39,0.06) 100%)'
+                              : 'linear-gradient(135deg, rgba(255,255,255,0.028) 0%, rgba(255,255,255,0.012) 100%)',
+                            backdropFilter: 'blur(20px) saturate(150%)',
+                            WebkitBackdropFilter: 'blur(20px) saturate(150%)',
+                          }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          {/* Selected checkmark */}
+                          {isSelected && (
+                            <motion.div
+                              className="absolute top-3 right-3 w-6 h-6 rounded-full bg-gold-500 flex items-center justify-center"
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ type: 'spring', stiffness: 500 }}
+                            >
+                              <Check className="w-3.5 h-3.5 text-night-950" />
+                            </motion.div>
+                          )}
+
+                          <div className="flex items-start gap-3 pr-8">
+                            {/* Play sample button */}
+                            <motion.div
+                              whileTap={{ scale: 0.9 }}
+                              onClick={(e) => { e.stopPropagation(); playSample(reciter); }}
+                              className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                                isPlayingSample
+                                  ? 'bg-gold-500 text-night-950'
+                                  : 'bg-white/[0.06] text-night-400 hover:bg-white/10'
+                              }`}
+                              style={isPlayingSample ? { boxShadow: '0 0 16px rgba(201,162,39,0.4)' } : {}}
+                            >
+                              {isPlayingSample ? (
+                                <Square className="w-3.5 h-3.5 fill-current" />
+                              ) : (
+                                <Play className="w-3.5 h-3.5 ml-0.5" />
+                              )}
+                            </motion.div>
+
+                            <div className="flex-1 min-w-0">
+                              {/* Name */}
+                              <p className={`font-medium text-sm ${isSelected ? 'text-gold-400' : 'text-night-100'}`}>
+                                {reciter.name}
+                              </p>
+                              <p className="text-xs text-night-500 mt-0.5" dir="rtl" lang="ar">
+                                {reciter.arabicName}
+                              </p>
+                              {/* Description */}
+                              <p className="text-xs text-night-400 mt-1.5 leading-relaxed">
+                                {reciter.description}
+                              </p>
+                              {/* Tags */}
+                              <div className="flex flex-wrap gap-1.5 mt-2">
+                                {reciter.tags.map((tag) => (
+                                  <span
+                                    key={tag}
+                                    className="text-[10px] px-2 py-0.5 rounded-full"
+                                    style={{
+                                      background: isSelected ? 'rgba(201,162,39,0.15)' : 'rgba(255,255,255,0.05)',
+                                      color: isSelected ? 'rgb(201,162,39)' : 'rgb(140,140,155)',
+                                      border: `1px solid ${isSelected ? 'rgba(201,162,39,0.2)' : 'rgba(255,255,255,0.06)'}`,
+                                    }}
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </motion.button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -968,19 +1052,24 @@ export default function MushafPage() {
                   <label className="text-sm text-night-400 mb-3 block flex items-center gap-2">
                     <Type className="w-4 h-4" /> Font Style
                   </label>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-3">
                     {ARABIC_FONT_STYLE_OPTIONS.map((font) => {
                       const isSelected = currentFontStyle === font.value;
                       return (
                         <motion.button
                           key={font.value}
                           onClick={() => updatePrefs('display', { arabicFontStyle: font.value, ...(font.value === 'indopak' ? { quranScript: 'indopak' as QuranScript } : {}) })}
-                          className={`relative p-3 rounded-2xl text-left transition-all ${isSelected ? 'bg-gold-500/15 border-2 border-gold-500/40' : 'bg-white/[0.03] border-2 border-white/[0.06] hover:border-white/10'}`}
+                          className={`relative w-full p-4 rounded-2xl text-left transition-all ${isSelected ? 'bg-gold-500/15 border-2 border-gold-500/40 shadow-[0_0_20px_rgba(201,162,39,0.15)]' : 'bg-white/[0.03] border-2 border-white/[0.06] hover:border-white/10'}`}
                           whileTap={{ scale: 0.97 }}
                         >
-                          <p className={`text-xs font-medium mb-1 ${isSelected ? 'text-gold-400' : 'text-night-300'}`}>{font.label}</p>
-                          <p className="text-base" style={{ fontFamily: font.fontFamily, color: isSelected ? 'rgb(201,162,39)' : 'rgb(160,160,170)' }} dir="rtl" lang="ar">{font.arabicSample}</p>
-                          <p className="text-[10px] text-night-600 mt-1">{font.description}</p>
+                          {isSelected && (
+                            <motion.div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-gold-500 flex items-center justify-center" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 500 }}>
+                              <Check className="w-3 h-3 text-night-950" />
+                            </motion.div>
+                          )}
+                          <p className={`text-sm font-medium mb-1 ${isSelected ? 'text-gold-400' : 'text-night-200'}`}>{font.label}</p>
+                          <p className="text-[11px] text-night-500 mb-3 leading-tight">{font.description}</p>
+                          <p className="text-2xl leading-[2]" style={{ fontFamily: font.fontFamily, color: isSelected ? 'rgb(201,162,39)' : 'rgb(180,180,190)' }} dir="rtl" lang="ar">{font.arabicSample}</p>
                         </motion.button>
                       );
                     })}

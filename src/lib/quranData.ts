@@ -178,8 +178,11 @@ export interface Reciter {
   arabicName: string;
   style: string;
   folder: string;
-  listenOnly?: boolean; // Full surah only, no per-ayah audio
-  surahAudioUrl?: string; // URL pattern for full surah (use {surah} placeholder)
+  description: string;
+  tags: string[];
+  sampleUrl: string;
+  listenOnly?: boolean;
+  surahAudioUrl?: string;
 }
 
 export const RECITERS: Reciter[] = [
@@ -189,6 +192,9 @@ export const RECITERS: Reciter[] = [
     arabicName: 'مشاري راشد العفاسي',
     style: 'Murattal',
     folder: 'Alafasy_128kbps',
+    description: 'Kuwaiti imam known for his beautiful, melodic voice. One of the most popular reciters worldwide.',
+    tags: ['melodic', 'emotional', 'popular'],
+    sampleUrl: 'https://everyayah.com/data/Alafasy_128kbps/001001.mp3',
   },
   {
     id: 'husary',
@@ -196,6 +202,9 @@ export const RECITERS: Reciter[] = [
     arabicName: 'محمود خليل الحصري',
     style: 'Murattal',
     folder: 'Husary_128kbps',
+    description: 'Egyptian master, considered the gold standard for tajweed precision. His recordings are used for memorization globally.',
+    tags: ['precise', 'tajweed', 'classic'],
+    sampleUrl: 'https://everyayah.com/data/Husary_128kbps/001001.mp3',
   },
   {
     id: 'sudais',
@@ -203,6 +212,9 @@ export const RECITERS: Reciter[] = [
     arabicName: 'عبدالرحمن السديس',
     style: 'Murattal',
     folder: 'Abdurrahmaan_As-Sudais_192kbps',
+    description: 'Imam of Masjid al-Haram in Makkah. Powerful, reverent recitation that millions hear during Hajj.',
+    tags: ['powerful', 'reverent', 'Makkah'],
+    sampleUrl: 'https://everyayah.com/data/Abdurrahmaan_As-Sudais_192kbps/001001.mp3',
   },
   {
     id: 'abdul_basit',
@@ -210,6 +222,9 @@ export const RECITERS: Reciter[] = [
     arabicName: 'عبدالباسط عبدالصمد',
     style: 'Mujawwad',
     folder: 'Abdul_Basit_Mujawwad_128kbps',
+    description: 'Legendary Egyptian reciter famed for his mujawwad (elaborate) style. UNESCO recognized his voice.',
+    tags: ['mujawwad', 'legendary', 'elaborate'],
+    sampleUrl: 'https://everyayah.com/data/Abdul_Basit_Mujawwad_128kbps/001001.mp3',
   },
   {
     id: 'ghamadi',
@@ -217,6 +232,9 @@ export const RECITERS: Reciter[] = [
     arabicName: 'سعد الغامدي',
     style: 'Murattal',
     folder: 'Ghamadi_40kbps',
+    description: 'Saudi reciter with a calm, soothing voice. Great for daily listening and relaxation.',
+    tags: ['calm', 'soothing', 'gentle'],
+    sampleUrl: 'https://everyayah.com/data/Ghamadi_40kbps/001001.mp3',
   },
   {
     id: 'shuraym',
@@ -224,6 +242,9 @@ export const RECITERS: Reciter[] = [
     arabicName: 'سعود الشريم',
     style: 'Murattal',
     folder: 'Saood_ash-Shuraym_128kbps',
+    description: 'Imam of Masjid al-Haram. Clear, measured pace ideal for following along.',
+    tags: ['clear', 'measured', 'Makkah'],
+    sampleUrl: 'https://everyayah.com/data/Saood_ash-Shuraym_128kbps/001001.mp3',
   },
   {
     id: 'hani_rifai',
@@ -231,6 +252,9 @@ export const RECITERS: Reciter[] = [
     arabicName: 'هاني الرفاعي',
     style: 'Murattal',
     folder: 'Hani_Rifai_192kbps',
+    description: 'Saudi reciter known for his sweet, gentle tone. Popular for bedtime and calm recitation.',
+    tags: ['sweet', 'gentle', 'soft'],
+    sampleUrl: 'https://everyayah.com/data/Hani_Rifai_192kbps/001001.mp3',
   },
   {
     id: 'yasser_dossari',
@@ -238,6 +262,9 @@ export const RECITERS: Reciter[] = [
     arabicName: 'ياسر الدوسري',
     style: 'Murattal',
     folder: 'Yasser_Ad-Dussary_128kbps',
+    description: 'Young Saudi reciter with a powerful, emotional style. Rising star.',
+    tags: ['emotional', 'powerful', 'modern'],
+    sampleUrl: 'https://everyayah.com/data/Yasser_Ad-Dussary_128kbps/001001.mp3',
   },
 ];
 

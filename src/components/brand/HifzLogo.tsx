@@ -16,7 +16,43 @@ interface LogoProps {
  * representing Islamic identity and knowledge/learning
  */
 
-// Inline SVG icon - crescent moon + open book, gold colored
+// Shared SVG content for the book + crescent logo
+function LogoSvgContent() {
+  return (
+    <>
+      <defs>
+        <linearGradient id="hifz-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#f4d47c" />
+          <stop offset="50%" stopColor="#c9a227" />
+          <stop offset="100%" stopColor="#8b6914" />
+        </linearGradient>
+      </defs>
+
+      {/* Crescent moon — thin elegant arc */}
+      <path
+        d="M 38 4 A 12 12 0 1 0 38 28 A 9 9 0 1 1 38 4 Z"
+        fill="url(#hifz-gold)"
+      />
+
+      {/* Left page */}
+      <path
+        d="M 30 34 C 30 38, 26 42, 12 44 L 12 50 C 26 48, 30 44, 30 40 Z"
+        fill="url(#hifz-gold)"
+      />
+
+      {/* Right page */}
+      <path
+        d="M 34 34 C 34 38, 38 42, 52 44 L 52 50 C 38 48, 34 44, 34 40 Z"
+        fill="url(#hifz-gold)"
+      />
+
+      {/* Spine */}
+      <line x1="32" y1="33" x2="32" y2="52" stroke="url(#hifz-gold)" strokeWidth="2.5" strokeLinecap="round" />
+    </>
+  );
+}
+
+// Inline SVG icon - crescent moon + open book, gold gradient
 export function HifzIcon({ size = 40, className = '', animated = true }: LogoProps) {
   const Container = animated ? motion.div : 'div';
   
@@ -31,26 +67,13 @@ export function HifzIcon({ size = 40, className = '', animated = true }: LogoPro
       })}
     >
       <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Crescent moon */}
-        <path
-          d="M 36 6 A 22 22 0 1 0 36 50 A 16 16 0 1 1 36 6 Z"
-          fill="#c9a227"
-        />
-        {/* Open book */}
-        <path
-          d="M 20 44 Q 20 38, 32 36 Q 44 38, 44 44"
-          fill="none"
-          stroke="#c9a227"
-          strokeWidth="3"
-          strokeLinecap="round"
-        />
-        <line x1="32" y1="36" x2="32" y2="46" stroke="#c9a227" strokeWidth="2.5" strokeLinecap="round" />
+        <LogoSvgContent />
       </svg>
     </Container>
   );
 }
 
-// Simple icon for small contexts (nav, tabs) - uses same SVG
+// Simple icon for small contexts (nav, tabs) - same design, no animation wrapper
 export function HifzIconSimple({ 
   size = 24, 
   className = '' 
@@ -60,9 +83,7 @@ export function HifzIconSimple({
 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-      <path d="M 36 6 A 22 22 0 1 0 36 50 A 16 16 0 1 1 36 6 Z" fill="#c9a227" />
-      <path d="M 20 44 Q 20 38, 32 36 Q 44 38, 44 44" fill="none" stroke="#c9a227" strokeWidth="3" strokeLinecap="round" />
-      <line x1="32" y1="36" x2="32" y2="46" stroke="#c9a227" strokeWidth="2.5" strokeLinecap="round" />
+      <LogoSvgContent />
     </svg>
   );
 }

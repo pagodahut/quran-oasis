@@ -16,7 +16,7 @@ interface ArabicTextProps {
   style?: React.CSSProperties;
   as?: 'span' | 'p' | 'div' | 'h1' | 'h2' | 'h3';
   /** Override the font style preference */
-  fontStyle?: 'uthmani' | 'madina' | 'indopak' | 'kitab';
+  fontStyle?: 'uthmani' | 'madina' | 'indopak';
   /** Override font size */
   fontSize?: number;
 }

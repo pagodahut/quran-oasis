@@ -111,6 +111,17 @@ export default function ProfilePage() {
   const { user, isLoaded, isSignedIn } = useUser();
   const { openUserProfile } = useClerk();
   const { learning: learningPrefs } = useLearningPreferences();
+
+  // Delay showing guest state to avoid flash after sign-in (Clerk timing)
+  const [showAsGuest, setShowAsGuest] = useState(false);
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      const timer = setTimeout(() => setShowAsGuest(true), 500);
+      return () => clearTimeout(timer);
+    } else {
+      setShowAsGuest(false);
+    }
+  }, [isLoaded, isSignedIn]);
   const [stats, setStats] = useState({
     versesMemorized: 0,
     surahsCompleted: 0,
@@ -181,11 +192,13 @@ export default function ProfilePage() {
     };
   }, []);
 
-  // Get user info
-  const displayName = user?.firstName || user?.username || 'Student of Quran';
-  const email = user?.primaryEmailAddress?.emailAddress;
-  const avatarUrl = user?.imageUrl;
-  const joinedDate = user?.createdAt 
+  // Get user info — only use Clerk data when fully signed in
+  const displayName = isSignedIn && user
+    ? (user.firstName || user.username || 'Student of Quran')
+    : 'Student of Quran';
+  const email = isSignedIn ? user?.primaryEmailAddress?.emailAddress : undefined;
+  const avatarUrl = isSignedIn ? user?.imageUrl : undefined;
+  const joinedDate = isSignedIn && user?.createdAt 
     ? new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(user.createdAt)
     : 'Just started';
 
@@ -308,7 +321,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Sign in prompt for guests */}
-            {!isSignedIn && (
+            {showAsGuest && (
               <div className="mt-4 pt-4 border-t border-night-800/50">
                 <p className="text-night-400 text-sm mb-3">
                   Sign in to save your progress across devices

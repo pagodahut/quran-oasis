@@ -50,6 +50,7 @@ export default function FlashcardSession({
   const [cardState, setCardState] = useState<CardState>('question');
   const [results, setResults] = useState<{ cardId: string; quality: number }[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [audioAvailable, setAudioAvailable] = useState(true);
   const [showHint, setShowHint] = useState(false);
   
   const currentCard = cards[currentIndex];
@@ -77,10 +78,14 @@ export default function FlashcardSession({
   }, [cardState]);
   
   const playAudio = async () => {
-    if (!currentCard || isPlaying) return;
+    if (!currentCard || isPlaying || !audioAvailable) return;
     setIsPlaying(true);
     try {
-      await playArabic(currentCard.arabic);
+      const success = await playArabic(currentCard.arabic);
+      if (!success) {
+        // No audio available — disable button silently (no error shown)
+        setAudioAvailable(false);
+      }
     } finally {
       setIsPlaying(false);
     }
@@ -88,8 +93,10 @@ export default function FlashcardSession({
   
   const handleReveal = () => {
     setCardState('answer');
-    // Auto-play audio when revealing
-    playAudio();
+    // Auto-play audio when revealing (silently skips if unavailable)
+    if (audioAvailable) {
+      playAudio();
+    }
   };
   
   const handleGrade = (quality: 0 | 1 | 2 | 3 | 4 | 5) => {
@@ -109,6 +116,7 @@ export default function FlashcardSession({
       setCurrentIndex(prev => prev + 1);
       setCardState('question');
       setShowHint(false);
+      setAudioAvailable(true);
     }
   };
   
@@ -183,11 +191,12 @@ export default function FlashcardSession({
                 </span>
                 <button
                   onClick={playAudio}
-                  disabled={isPlaying}
-                  className="liquid-icon-btn !w-10 !h-10"
-                  aria-label="Play audio"
+                  disabled={isPlaying || !audioAvailable}
+                  className={`liquid-icon-btn !w-10 !h-10 ${!audioAvailable ? 'opacity-30 cursor-not-allowed' : ''}`}
+                  aria-label={audioAvailable ? 'Play audio' : 'Audio not available'}
+                  title={audioAvailable ? 'Play audio' : 'Audio not available'}
                 >
-                  <Volume2 className={`w-5 h-5 ${isPlaying ? 'text-gold-400 animate-pulse' : ''}`} />
+                  <Volume2 className={`w-5 h-5 ${isPlaying ? 'text-gold-400 animate-pulse' : !audioAvailable ? 'text-night-600' : ''}`} />
                 </button>
               </div>
               

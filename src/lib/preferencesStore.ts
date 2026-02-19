@@ -10,7 +10,7 @@ import { useEffect, useState, useCallback } from 'react';
 // ============================================
 
 export type FontSize = 'small' | 'medium' | 'large' | 'extra-large';
-export type ArabicFontStyle = 'uthmani' | 'madina' | 'indopak' | 'kitab';
+export type ArabicFontStyle = 'uthmani' | 'madina' | 'indopak';
 export type QuranScript = 'uthmani' | 'indopak';
 export type Theme = 'dark' | 'light' | 'auto';
 export type PlaybackSpeed = 0.5 | 0.75 | 1 | 1.25 | 1.5 | 2;
@@ -96,31 +96,24 @@ export const ARABIC_FONT_STYLE_OPTIONS: {
 }[] = [
   { 
     value: 'uthmani', 
-    label: 'Uthmani', 
-    arabicSample: 'بِسْمِ ٱللَّهِ',
-    description: 'Classic Amiri script, beautiful serifs',
+    label: 'Hafs Uthmani', 
+    arabicSample: 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
+    description: 'Traditional Uthmani script with elegant serifs — the standard for most printed Mushafs',
     fontFamily: 'var(--font-arabic)',
   },
   { 
     value: 'madina', 
-    label: 'Madina', 
-    arabicSample: 'بِسْمِ ٱللَّهِ',
-    description: 'Naskh style, clear and elegant',
+    label: 'Naskh', 
+    arabicSample: 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
+    description: 'Clean Naskh typeface — highly readable, similar to the Madinah Mushaf',
     fontFamily: 'var(--font-quran)',
   },
   { 
     value: 'indopak', 
     label: 'Indo-Pak', 
-    arabicSample: 'بِسْمِ ٱللَّهِ',
-    description: 'Nastaliq style popular in South Asia',
-    fontFamily: 'var(--font-indopak)',
-  },
-  { 
-    value: 'kitab', 
-    label: 'Kitab', 
-    arabicSample: 'بِسْمِ ٱللَّهِ',
-    description: 'Scheherazade, modern and readable',
-    fontFamily: 'var(--font-kitab)',
+    arabicSample: 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
+    description: 'Nastaliq calligraphy style — familiar to readers from Pakistan, India & Bangladesh',
+    fontFamily: "'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif",
   },
 ];
 
@@ -159,64 +152,9 @@ export const DAILY_GOAL_OPTIONS = {
   ],
 };
 
-export const RECITERS = [
-  { 
-    id: 'alafasy', 
-    name: 'Mishary Rashid Alafasy', 
-    arabicName: 'مشاري راشد العفاسي',
-    style: 'Murattal',
-    description: 'Clear, beautiful recitation perfect for memorization',
-  },
-  { 
-    id: 'husary', 
-    name: 'Mahmoud Khalil Al-Husary', 
-    arabicName: 'محمود خليل الحصري',
-    style: 'Murattal',
-    description: 'Classic Egyptian style, excellent for learning tajweed',
-  },
-  { 
-    id: 'sudais', 
-    name: 'Abdul Rahman Al-Sudais', 
-    arabicName: 'عبدالرحمن السديس',
-    style: 'Murattal',
-    description: 'Imam of Masjid Al-Haram, powerful recitation',
-  },
-  { 
-    id: 'abdul_basit', 
-    name: 'Abdul Basit Abdul Samad', 
-    arabicName: 'عبدالباسط عبدالصمد',
-    style: 'Mujawwad',
-    description: 'Legendary Egyptian reciter, beautiful mujawwad style',
-  },
-  { 
-    id: 'ghamadi', 
-    name: 'Saad Al-Ghamdi', 
-    arabicName: 'سعد الغامدي',
-    style: 'Murattal',
-    description: 'Clear and melodious Saudi reciter',
-  },
-  { 
-    id: 'shuraym', 
-    name: "Sa'ud ash-Shuraym", 
-    arabicName: 'سعود الشريم',
-    style: 'Murattal',
-    description: 'Imam of Masjid Al-Haram, powerful and clear',
-  },
-  { 
-    id: 'hani_rifai', 
-    name: 'Hani ar-Rifai', 
-    arabicName: 'هاني الرفاعي',
-    style: 'Murattal',
-    description: 'Beautiful Saudi reciter with emotional delivery',
-  },
-  { 
-    id: 'yasser_dossari', 
-    name: 'Yasser Ad-Dossari', 
-    arabicName: 'ياسر الدوسري',
-    style: 'Murattal',
-    description: 'Young Saudi reciter with mesmerizing voice',
-  },
-];
+// Re-export RECITERS from quranData for backward compat
+// The canonical reciter list lives in quranData.ts
+export { RECITERS } from '@/lib/quranData';
 
 export const TRANSLATIONS = [
   { id: 'sahih', name: 'Sahih International', language: 'English' },
