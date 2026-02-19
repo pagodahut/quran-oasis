@@ -1,76 +1,71 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-// Only use Clerk middleware if configured
 const clerkPubKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
-// Public routes — never require auth
-const isPublicRoute = createRouteMatcher([
-  '/',
-  '/sign-in(.*)',
-  '/sign-up(.*)',
-  '/mushaf(.*)',
-  '/surahs(.*)',
-  '/techniques(.*)',
-  '/onboarding(.*)',
-  '/api/sheikh(.*)',
-  '/api/deepgram(.*)',
-  '/api/transcribe(.*)',
-  '/api/tajweed(.*)',
-  '/api/og(.*)',
-  '/api/onboarding(.*)',
-  '/identify(.*)',
-]);
+// Dynamically import Clerk only when keys are present
+let clerkMiddlewareHandler: ((req: NextRequest) => Promise<NextResponse>) | null = null;
 
-// Guest-accessible routes — work without auth but enhanced with auth
-const isGuestRoute = createRouteMatcher([
-  '/dashboard(.*)',
-  '/practice(.*)',
-  '/lessons(.*)',
-  '/memorize(.*)',
-  '/progress(.*)',
-  '/recite(.*)',
-]);
+if (clerkPubKey) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { clerkMiddleware, createRouteMatcher } = require('@clerk/nextjs/server');
 
-// Strictly protected API routes — require auth
-const isProtectedApiRoute = createRouteMatcher([
-  '/api/user(.*)',
-  '/api/progress(.*)',
-  '/api/feedback(.*)',
-]);
+  const isPublicRoute = createRouteMatcher([
+    '/',
+    '/sign-in(.*)',
+    '/sign-up(.*)',
+    '/mushaf(.*)',
+    '/surahs(.*)',
+    '/techniques(.*)',
+    '/onboarding(.*)',
+    '/api/sheikh(.*)',
+    '/api/deepgram(.*)',
+    '/api/transcribe(.*)',
+    '/api/tajweed(.*)',
+    '/api/og(.*)',
+    '/api/onboarding(.*)',
+    '/identify(.*)',
+  ]);
 
-export default clerkMiddleware(async (auth, req) => {
-  // If Clerk is not configured, allow all routes
-  if (!clerkPubKey) {
-    return NextResponse.next();
-  }
+  const isGuestRoute = createRouteMatcher([
+    '/dashboard(.*)',
+    '/practice(.*)',
+    '/lessons(.*)',
+    '/memorize(.*)',
+    '/progress(.*)',
+    '/recite(.*)',
+  ]);
 
-  // Public routes — always allow
-  if (isPublicRoute(req)) {
-    return NextResponse.next();
-  }
+  const isProtectedApiRoute = createRouteMatcher([
+    '/api/user(.*)',
+    '/api/progress(.*)',
+    '/api/feedback(.*)',
+  ]);
 
-  // Guest-accessible routes — allow without auth (client-side handles auth state)
-  if (isGuestRoute(req)) {
-    return NextResponse.next();
-  }
+  clerkMiddlewareHandler = clerkMiddleware(async (auth: any, req: NextRequest) => {
+    if (isPublicRoute(req)) return NextResponse.next();
+    if (isGuestRoute(req)) return NextResponse.next();
 
-  // Protected API routes — require authentication
-  if (isProtectedApiRoute(req)) {
-    const { userId, redirectToSignIn } = await auth();
-    if (!userId) {
-      return redirectToSignIn();
+    if (isProtectedApiRoute(req)) {
+      const { userId, redirectToSignIn } = await auth();
+      if (!userId) return redirectToSignIn();
     }
-  }
 
-  return NextResponse.next();
-});
+    return NextResponse.next();
+  });
+}
+
+export default function middleware(req: NextRequest) {
+  // No Clerk keys → pass everything through
+  if (!clerkMiddlewareHandler) {
+    return NextResponse.next();
+  }
+  return clerkMiddlewareHandler(req);
+}
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
     '/(api|trpc)(.*)',
   ],
 };
