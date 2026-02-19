@@ -35,21 +35,15 @@ export default function WelcomePage() {
 
         {/* Title */}
         <h1 className={`welcome__title ${step >= 2 ? 'welcome__title--visible' : ''}`}>
-          Quran Oasis
+          HIFZ
         </h1>
         <p className={`welcome__subtitle ${step >= 2 ? 'welcome__subtitle--visible' : ''}`}>
-          Your personal Quran memorization companion
+          Memorize the Quran
         </p>
 
-        {/* Sheikh intro */}
-        <div className={`welcome__sheikh-intro ${step >= 3 ? 'welcome__sheikh-intro--visible' : ''}`}>
-          <div className="welcome__sheikh-avatar"><HifzIcon size={24} animated={false} /></div>
-          <div className="welcome__sheikh-bubble">
-            <p>
-              Assalamu alaikum! I&apos;m <strong>Sheikh HIFZ</strong>, your AI-powered Quran teacher.
-              Let me learn about your background so I can personalize your journey.
-            </p>
-          </div>
+        {/* Welcome message */}
+        <div className={`welcome__message ${step >= 3 ? 'welcome__message--visible' : ''}`}>
+          <p>Assalamu Alaikum! Let&apos;s personalize your memorization journey.</p>
         </div>
 
         {/* CTA */}
@@ -61,7 +55,7 @@ export default function WelcomePage() {
             onClick={() => router.push('/onboarding')}
             style={{ width: '100%', maxWidth: 320 }}
           >
-            ﷽ Let&apos;s Begin
+            Let&apos;s Begin
           </SheikhButton>
           {/* Skip removed — calibration is required before practicing */}
         </div>
@@ -113,7 +107,7 @@ export default function WelcomePage() {
         .welcome__bismillah {
           font-size: 24px;
           color: #2dd496;
-          font-family: 'Amiri', 'Scheherazade New', serif;
+          font-family: var(--font-quran);
           opacity: 0;
           transform: translateY(10px);
           transition: all 0.6s ease;
@@ -153,49 +147,23 @@ export default function WelcomePage() {
           transform: translateY(0);
         }
 
-        .welcome__sheikh-intro {
-          display: flex;
-          gap: 12px;
-          align-items: flex-start;
+        .welcome__message {
           width: 100%;
+          text-align: center;
           opacity: 0;
           transform: translateY(16px);
           transition: all 0.6s ease;
           margin-bottom: 24px;
         }
-        .welcome__sheikh-intro--visible {
+        .welcome__message--visible {
           opacity: 1;
           transform: translateY(0);
         }
-
-        .welcome__sheikh-avatar {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, #2dd496, #1a7a54);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 20px;
-          flex-shrink: 0;
-          box-shadow: 0 0 20px rgba(45, 212, 150, 0.3);
-        }
-
-        .welcome__sheikh-bubble {
-          padding: 12px 16px;
-          background: linear-gradient(135deg, #0c1f1a, #132e25);
-          border: 1px solid rgba(45, 212, 150, 0.12);
-          border-radius: 16px;
-          border-top-left-radius: 4px;
-        }
-        .welcome__sheikh-bubble p {
+        .welcome__message p {
           margin: 0;
-          font-size: 14px;
-          line-height: 1.55;
+          font-size: 15px;
+          line-height: 1.6;
           color: #c8e6dc;
-        }
-        .welcome__sheikh-bubble strong {
-          color: #2dd496;
         }
 
         .welcome__cta {

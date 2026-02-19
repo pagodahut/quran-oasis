@@ -301,7 +301,7 @@ export default function MushafPage() {
           >
             {currentSurah && (
               <>
-                <h1 className="quran-text text-xl text-gold-400" lang="ar" dir="rtl">{currentSurah.name}</h1>
+                <h1 className="quran-text text-xl text-gold-400" style={{ fontFamily: 'var(--font-quran)' }} lang="ar" dir="rtl">{currentSurah.name}</h1>
                 <p className="text-xs text-night-400">{currentSurah.englishName}</p>
               </>
             )}

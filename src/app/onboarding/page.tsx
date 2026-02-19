@@ -5,8 +5,6 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { markCalibrationComplete, type UserLevel } from '@/lib/user-profile-sync';
 import { ChevronRight, Sparkles, Loader2, BookOpen, Target, Clock, Check } from 'lucide-react';
-import { HifzIcon } from '@/components/brand';
-
 type Step = 'name' | 'journey' | 'arabic' | 'goal' | 'time' | 'welcome';
 
 const ARABIC_OPTIONS = [
@@ -34,7 +32,7 @@ const TIME_OPTIONS = [
 const STEPS: Step[] = ['name', 'journey', 'arabic', 'goal', 'time', 'welcome'];
 
 const SHEIKH_RESPONSES: Record<string, string> = {
-  none: "Everyone starts somewhere. I'll guide you from the very beginning. 🌟",
+  none: "Everyone starts somewhere. We'll begin from the very beginning. 🌟",
   letters: "Great foundation! We'll build on that together.",
   basic: "MashaAllah, you're already on your way!",
   intermediate: "Wonderful progress! Let's take it further.",
@@ -200,7 +198,7 @@ export default function OnboardingPage() {
           {step === 'name' && (
             <StepContainer key="name">
               <SheikhBubble typing>
-                Assalamu Alaikum! I&apos;m Sheikh HIFZ, your personal guide on this beautiful journey. What&apos;s your name?
+                Assalamu Alaikum! What&apos;s your name?
               </SheikhBubble>
 
               <motion.div
@@ -267,7 +265,7 @@ export default function OnboardingPage() {
                   transition={{ delay: 0.7 }}
                   className="text-gold-400 text-xl leading-relaxed text-center mb-6"
                   style={{
-                    fontFamily: "'Amiri', 'Scheherazade New', serif",
+                    fontFamily: 'var(--font-quran)',
                     direction: 'rtl',
                   }}
                 >
@@ -456,7 +454,7 @@ export default function OnboardingPage() {
                   transition={{ delay: 0.7 }}
                   className="text-night-400 mb-10 leading-relaxed max-w-sm"
                 >
-                  I&apos;ve prepared a personalized path just for you. May Allah make it easy and blessed. 🤲
+                  Your personalized path is ready. May Allah make it easy and blessed. 🤲
                 </motion.p>
 
                 {/* Feature preview cards */}
@@ -545,16 +543,7 @@ function SheikhBubble({ children, typing }: { children: React.ReactNode; typing?
       className="flex gap-3 items-start"
     >
       <div
-        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-        style={{
-          background: 'linear-gradient(135deg, rgba(201,162,39,0.9), rgba(180,140,30,1))',
-          boxShadow: '0 0 24px rgba(201,162,39,0.25)',
-        }}
-      >
-        <HifzIcon size={20} animated={false} />
-      </div>
-      <div
-        className="p-4 rounded-2xl max-w-[85%]"
+        className="p-4 rounded-2xl"
         style={{
           background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.015) 100%)',
           border: '1px solid rgba(255,255,255,0.07)',
@@ -587,7 +576,7 @@ function SheikhResponse({ text }: { text: string }) {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mt-4 ml-13 pl-[52px]"
+      className="mt-4"
     >
       <p className="text-gold-400/80 text-sm italic">{text}</p>
     </motion.div>

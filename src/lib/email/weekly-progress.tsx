@@ -283,7 +283,7 @@ const styles = {
     textDecoration: 'underline',
   } as React.CSSProperties,
   bismillah: {
-    fontFamily: 'Amiri, serif',
+    fontFamily: 'KFGQPC Hafs Uthmani, Amiri Quran, Amiri, serif',
     fontSize: '18px',
     color: '#d4a647',
     opacity: 0.5,

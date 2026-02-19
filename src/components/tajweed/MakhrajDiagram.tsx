@@ -262,7 +262,7 @@ export default function MakhrajDiagram({
                     textAnchor="middle"
                     fill="#fcd34d"
                     fontSize={fontSize + 4}
-                    fontFamily="Amiri, serif"
+                    fontFamily="KFGQPC Hafs Uthmani, Amiri Quran, Amiri, serif"
                     direction="rtl"
                   >
                     {point.letters.join(' ')}

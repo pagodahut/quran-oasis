@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 
 interface LogoProps {
   size?: number;
@@ -17,7 +16,7 @@ interface LogoProps {
  * representing Islamic identity and knowledge/learning
  */
 
-// Main icon using the PNG image
+// Inline SVG icon - crescent moon + open book, gold colored
 export function HifzIcon({ size = 40, className = '', animated = true }: LogoProps) {
   const Container = animated ? motion.div : 'div';
   
@@ -31,19 +30,27 @@ export function HifzIcon({ size = 40, className = '', animated = true }: LogoPro
         transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] }
       })}
     >
-      <Image
-        src="/hifz-logo.png"
-        alt="HIFZ"
-        width={size}
-        height={size}
-        className="object-contain"
-        priority={size > 100}
-      />
+      <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Crescent moon */}
+        <path
+          d="M 36 6 A 22 22 0 1 0 36 50 A 16 16 0 1 1 36 6 Z"
+          fill="#c9a227"
+        />
+        {/* Open book */}
+        <path
+          d="M 20 44 Q 20 38, 32 36 Q 44 38, 44 44"
+          fill="none"
+          stroke="#c9a227"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
+        <line x1="32" y1="36" x2="32" y2="46" stroke="#c9a227" strokeWidth="2.5" strokeLinecap="round" />
+      </svg>
     </Container>
   );
 }
 
-// Simple icon for small contexts (nav, tabs) - uses same logo
+// Simple icon for small contexts (nav, tabs) - uses same SVG
 export function HifzIconSimple({ 
   size = 24, 
   className = '' 
@@ -52,13 +59,11 @@ export function HifzIconSimple({
   className?: string;
 }) {
   return (
-    <Image
-      src="/hifz-logo.png"
-      alt="HIFZ"
-      width={size}
-      height={size}
-      className={`object-contain ${className}`}
-    />
+    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      <path d="M 36 6 A 22 22 0 1 0 36 50 A 16 16 0 1 1 36 6 Z" fill="#c9a227" />
+      <path d="M 20 44 Q 20 38, 32 36 Q 44 38, 44 44" fill="none" stroke="#c9a227" strokeWidth="3" strokeLinecap="round" />
+      <line x1="32" y1="36" x2="32" y2="46" stroke="#c9a227" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
   );
 }
 
