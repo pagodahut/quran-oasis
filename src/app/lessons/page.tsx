@@ -714,6 +714,20 @@ function LessonsContent() {
               nextLessonId={nextLesson?.id}
             />
           </div>
+
+          {/* Tajweed Guide */}
+          <Link href="/techniques" className="block mt-6 p-4 rounded-2xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 hover:border-emerald-500/40 transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-night-100">Tajweed Techniques Guide</h3>
+                <p className="text-xs text-night-400 mt-0.5">Master pronunciation rules and recitation techniques</p>
+              </div>
+              <Sparkles className="w-4 h-4 text-emerald-400" />
+            </div>
+          </Link>
         </div>
       </main>
       

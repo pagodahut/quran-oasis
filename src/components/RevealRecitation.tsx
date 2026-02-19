@@ -416,9 +416,9 @@ export function DifficultySelector({
   onChange: (d: RevealDifficulty) => void;
 }) {
   const options: { key: RevealDifficulty; label: string; desc: string }[] = [
-    { key: 'easy', label: 'Easy', desc: 'First letter hints' },
-    { key: 'medium', label: 'Medium', desc: 'Layout only' },
-    { key: 'hard', label: 'Hard', desc: 'Everything hidden' },
+    { key: 'easy', label: 'Guided', desc: 'First letters shown' },
+    { key: 'medium', label: 'Balanced', desc: 'Word shapes only' },
+    { key: 'hard', label: 'Memory', desc: 'Fully hidden' },
   ];
 
   return (

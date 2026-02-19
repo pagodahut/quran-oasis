@@ -404,21 +404,90 @@ export default function PracticePage() {
               </div>
             )}
 
-            {/* Empty State */}
+            {/* Empty State — Quick Start */}
             {stats.totalAyahs === 0 && (
-              <div className="text-center py-12">
-                <div className="text-5xl mb-4">📖</div>
-                <h3 className="text-xl font-semibold text-night-100 mb-2">Start Your Memorization Journey</h3>
-                <p className="text-night-400 text-sm leading-relaxed mb-6 max-w-xs mx-auto">
-                  Add the ayahs you&apos;re working on, and Sheikh HIFZ will schedule
-                  daily reviews using proven spaced repetition techniques.
-                </p>
+              <div className="space-y-6">
+                {/* Welcome */}
+                <div className="text-center pt-4 pb-2">
+                  <div className="text-5xl mb-4">🕌</div>
+                  <h3 className="text-xl font-semibold text-night-100 mb-2">Start Your Memorization Journey</h3>
+                  <p className="text-night-400 text-sm leading-relaxed max-w-xs mx-auto">
+                    Pick a starting point below, and Sheikh HIFZ will guide your daily review with spaced repetition.
+                  </p>
+                </div>
+
+                {/* Quick Start Review */}
+                <Link
+                  href="/practice/review"
+                  className="liquid-card p-4 flex items-center gap-3 bg-gold-500/5 border-gold-500/20 hover:bg-gold-500/10 transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gold-500/10 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-gold-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-night-100 font-medium">Try a Quick Review</p>
+                    <p className="text-xs text-night-500">Experience a sample review session</p>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-gold-500" />
+                </Link>
+
+                {/* Popular Starting Points */}
+                <section>
+                  <h2 className="text-xs font-semibold text-night-500 uppercase tracking-wider mb-3">Popular Starting Points</h2>
+                  <div className="space-y-2">
+                    {[
+                      {
+                        emoji: '🌟',
+                        title: 'Al-Fatihah',
+                        desc: 'The Opening — 7 ayahs, recited in every prayer',
+                        action: () => { srs.addAyahs(1, 1, 7); refreshCounts(); },
+                      },
+                      {
+                        emoji: '🌙',
+                        title: 'Last 10 Surahs',
+                        desc: 'Short surahs perfect for beginners (An-Nasr to An-Nas)',
+                        action: () => {
+                          const last10: [number, number, number][] = [
+                            [105, 1, 5], [106, 1, 4], [107, 1, 7], [108, 1, 3], [109, 1, 6],
+                            [110, 1, 3], [111, 1, 5], [112, 1, 4], [113, 1, 5], [114, 1, 6],
+                          ];
+                          for (const [s, a, e] of last10) srs.addAyahs(s, a, e);
+                          refreshCounts();
+                        },
+                      },
+                      {
+                        emoji: '👑',
+                        title: 'Ayat al-Kursi',
+                        desc: 'The Throne Verse — Surah Al-Baqarah, Ayah 255',
+                        action: () => { srs.addAyahs(2, 255, 255); refreshCounts(); },
+                      },
+                    ].map((preset) => (
+                      <motion.button
+                        key={preset.title}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={preset.action}
+                        className="w-full liquid-card p-4 flex items-center gap-3 text-left hover:bg-white/[0.04] transition-colors"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-night-800/80 flex items-center justify-center flex-shrink-0">
+                          <span className="text-lg">{preset.emoji}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-night-100 font-medium">{preset.title}</p>
+                          <p className="text-xs text-night-500 truncate">{preset.desc}</p>
+                        </div>
+                        <Plus className="w-4 h-4 text-night-600 flex-shrink-0" />
+                      </motion.button>
+                    ))}
+                  </div>
+                </section>
+
+                {/* Secondary: manual add */}
                 <button
                   onClick={() => setView('add-ayahs')}
-                  className="liquid-btn py-3 px-8 text-base"
+                  className="w-full liquid-card p-4 flex items-center justify-center gap-2 text-night-400 hover:text-gold-400 hover:bg-gold-500/5 transition-colors"
                 >
-                  <Sparkles className="w-5 h-5 mr-2" />
-                  Add Your First Ayahs
+                  <Plus className="w-4 h-4" />
+                  <span className="text-sm font-medium">Add specific ayahs manually</span>
                 </button>
               </div>
             )}

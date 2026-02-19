@@ -110,11 +110,20 @@ function AyahRangeSelector({
   onStart: (start: number, end?: number, mode?: ReciteMode, difficulty?: RevealDifficulty) => void;
   onBack: () => void;
 }) {
+  const [showOptions, setShowOptions] = useState(false);
   const [mode, setMode] = useState<'full' | 'range'>('full');
   const [reciteMode, setReciteMode] = useState<ReciteMode>('standard');
   const [revealDifficulty, setRevealDiff] = useState<RevealDifficulty>('medium');
   const [startAyah, setStartAyah] = useState(1);
   const [endAyah, setEndAyah] = useState(surah.numberOfAyahs);
+
+  const handleStart = () => {
+    if (mode === 'full') {
+      onStart(1, undefined, reciteMode, revealDifficulty);
+    } else {
+      onStart(startAyah, endAyah, reciteMode, revealDifficulty);
+    }
+  };
 
   return (
     <motion.div
@@ -133,7 +142,7 @@ function AyahRangeSelector({
       </button>
 
       {/* Surah info */}
-      <div className="text-center mb-8">
+      <div className="text-center mb-6">
         <h2
           className="font-quran text-quran-lg text-gold-400 mb-2"
           dir="rtl"
@@ -147,148 +156,178 @@ function AyahRangeSelector({
         </p>
       </div>
 
-      {/* Mode Toggle */}
-      <div className="flex gap-2 mb-6">
-        <button
-          onClick={() => setMode('full')}
-          className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition ${
-            mode === 'full'
-              ? 'bg-gold-500/15 text-gold-400 border border-gold-500/30'
-              : 'bg-night-800/50 text-night-400 border border-night-700/30 hover:bg-night-800'
-          }`}
-        >
-          Full Surah
-        </button>
-        <button
-          onClick={() => setMode('range')}
-          className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition ${
-            mode === 'range'
-              ? 'bg-gold-500/15 text-gold-400 border border-gold-500/30'
-              : 'bg-night-800/50 text-night-400 border border-night-700/30 hover:bg-night-800'
-          }`}
-        >
-          Custom Range
-        </button>
-      </div>
-
-      {/* Range Inputs */}
-      {mode === 'range' && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          className="mb-6 space-y-4"
-        >
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs text-night-400 mb-1.5">
-                Start Ayah
-              </label>
-              <input
-                type="number"
-                min={1}
-                max={surah.numberOfAyahs}
-                value={startAyah}
-                onChange={(e) =>
-                  setStartAyah(
-                    Math.max(1, Math.min(surah.numberOfAyahs, parseInt(e.target.value) || 1))
-                  )
-                }
-                className="w-full px-3 py-2.5 rounded-xl bg-night-800 border border-night-700 
-                  text-night-100 text-center text-sm focus:outline-none focus:border-gold-500/50
-                  focus:ring-1 focus:ring-gold-500/20"
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-night-400 mb-1.5">
-                End Ayah
-              </label>
-              <input
-                type="number"
-                min={startAyah}
-                max={surah.numberOfAyahs}
-                value={endAyah}
-                onChange={(e) =>
-                  setEndAyah(
-                    Math.max(
-                      startAyah,
-                      Math.min(surah.numberOfAyahs, parseInt(e.target.value) || surah.numberOfAyahs)
-                    )
-                  )
-                }
-                className="w-full px-3 py-2.5 rounded-xl bg-night-800 border border-night-700 
-                  text-night-100 text-center text-sm focus:outline-none focus:border-gold-500/50
-                  focus:ring-1 focus:ring-gold-500/20"
-              />
-            </div>
-          </div>
-          <p className="text-xs text-night-500 text-center">
-            {endAyah - startAyah + 1} ayah{endAyah - startAyah > 0 ? 's' : ''} selected
-          </p>
-        </motion.div>
-      )}
-
-      {/* Practice Mode Toggle */}
-      <div className="mb-4">
-        <label className="block text-xs text-night-400 mb-2 font-semibold uppercase tracking-wider">
-          Practice Mode
-        </label>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setReciteMode('standard')}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition border ${
-              reciteMode === 'standard'
-                ? 'bg-gold-500/15 text-gold-400 border-gold-500/30'
-                : 'bg-night-800/50 text-night-400 border-night-700/30 hover:bg-night-800'
-            }`}
-          >
-            <div>Real-time</div>
-            <div className="text-[10px] mt-0.5 opacity-70">See text, track accuracy</div>
-          </button>
-          <button
-            onClick={() => setReciteMode('reveal')}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition border ${
-              reciteMode === 'reveal'
-                ? 'bg-gold-500/15 text-gold-400 border-gold-500/30'
-                : 'bg-night-800/50 text-night-400 border-night-700/30 hover:bg-night-800'
-            }`}
-          >
-            <div>Reveal Mode</div>
-            <div className="text-[10px] mt-0.5 opacity-70">Hidden text, reveal as you recite</div>
-          </button>
-        </div>
-      </div>
-
-      {/* Difficulty (Reveal mode only) */}
-      {reciteMode === 'reveal' && (
-        <div className="mb-6">
-          <label className="block text-xs text-night-400 mb-2 font-semibold uppercase tracking-wider">
-            Difficulty
-          </label>
-          <DifficultySelector value={revealDifficulty} onChange={setRevealDiff} />
-        </div>
-      )}
-
-      {/* Start Button */}
+      {/* Primary Start Button — one tap to go */}
       <motion.button
         whileTap={{ scale: 0.97 }}
-        onClick={() => {
-          if (mode === 'full') {
-            onStart(1, undefined, reciteMode, revealDifficulty);
-          } else {
-            onStart(startAyah, endAyah, reciteMode, revealDifficulty);
-          }
-        }}
+        onClick={handleStart}
         className="w-full py-4 rounded-xl bg-gradient-to-r from-gold-600 to-gold-500 
           text-night-950 font-semibold text-base transition hover:from-gold-500 hover:to-gold-400
-          flex items-center justify-center gap-3 shadow-glow-gold"
+          flex items-center justify-center gap-3 shadow-glow-gold mb-3"
       >
         <Mic className="w-5 h-5" />
-        {reciteMode === 'reveal' ? 'Start Reveal Mode' : 'Start Reciting'}
+        Start Reciting
       </motion.button>
 
+      <p className="text-xs text-night-500 text-center mb-6">
+        Full surah · Standard mode
+        {showOptions ? '' : ' · '}
+        {!showOptions && (
+          <button
+            onClick={() => setShowOptions(true)}
+            className="text-gold-400/70 hover:text-gold-400 transition underline underline-offset-2"
+          >
+            Customize
+          </button>
+        )}
+      </p>
+
+      {/* Collapsible Options */}
+      <AnimatePresence>
+        {showOptions && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="border border-night-800/50 rounded-xl p-4 mb-6 space-y-5 bg-night-900/30">
+              {/* Practice Mode */}
+              <div>
+                <label className="block text-xs text-night-400 mb-2 font-semibold uppercase tracking-wider">
+                  Practice Mode
+                </label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setReciteMode('standard')}
+                    className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition border ${
+                      reciteMode === 'standard'
+                        ? 'bg-gold-500/15 text-gold-400 border-gold-500/30'
+                        : 'bg-night-800/50 text-night-400 border-night-700/30 hover:bg-night-800'
+                    }`}
+                  >
+                    <div>Standard</div>
+                    <div className="text-[10px] mt-0.5 opacity-70">Word-by-word tracking</div>
+                  </button>
+                  <button
+                    onClick={() => setReciteMode('reveal')}
+                    className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition border ${
+                      reciteMode === 'reveal'
+                        ? 'bg-gold-500/15 text-gold-400 border-gold-500/30'
+                        : 'bg-night-800/50 text-night-400 border-night-700/30 hover:bg-night-800'
+                    }`}
+                  >
+                    <div>Reveal</div>
+                    <div className="text-[10px] mt-0.5 opacity-70">Hidden until you recite</div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Difficulty (Reveal mode only) */}
+              {reciteMode === 'reveal' && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                >
+                  <label className="block text-xs text-night-400 mb-2 font-semibold uppercase tracking-wider">
+                    Hint Level
+                  </label>
+                  <DifficultySelector value={revealDifficulty} onChange={setRevealDiff} />
+                </motion.div>
+              )}
+
+              {/* Ayah Range */}
+              <div>
+                <label className="block text-xs text-night-400 mb-2 font-semibold uppercase tracking-wider">
+                  Ayah Range
+                </label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setMode('full')}
+                    className={`flex-1 py-2 rounded-xl text-sm font-medium transition ${
+                      mode === 'full'
+                        ? 'bg-gold-500/15 text-gold-400 border border-gold-500/30'
+                        : 'bg-night-800/50 text-night-400 border border-night-700/30 hover:bg-night-800'
+                    }`}
+                  >
+                    Full Surah
+                  </button>
+                  <button
+                    onClick={() => setMode('range')}
+                    className={`flex-1 py-2 rounded-xl text-sm font-medium transition ${
+                      mode === 'range'
+                        ? 'bg-gold-500/15 text-gold-400 border border-gold-500/30'
+                        : 'bg-night-800/50 text-night-400 border border-night-700/30 hover:bg-night-800'
+                    }`}
+                  >
+                    Custom Range
+                  </button>
+                </div>
+
+                {/* Range Inputs */}
+                {mode === 'range' && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mt-3 space-y-3"
+                  >
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs text-night-400 mb-1.5">
+                          Start Ayah
+                        </label>
+                        <input
+                          type="number"
+                          min={1}
+                          max={surah.numberOfAyahs}
+                          value={startAyah}
+                          onChange={(e) =>
+                            setStartAyah(
+                              Math.max(1, Math.min(surah.numberOfAyahs, parseInt(e.target.value) || 1))
+                            )
+                          }
+                          className="w-full px-3 py-2.5 rounded-xl bg-night-800 border border-night-700 
+                            text-night-100 text-center text-sm focus:outline-none focus:border-gold-500/50
+                            focus:ring-1 focus:ring-gold-500/20"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-night-400 mb-1.5">
+                          End Ayah
+                        </label>
+                        <input
+                          type="number"
+                          min={startAyah}
+                          max={surah.numberOfAyahs}
+                          value={endAyah}
+                          onChange={(e) =>
+                            setEndAyah(
+                              Math.max(
+                                startAyah,
+                                Math.min(surah.numberOfAyahs, parseInt(e.target.value) || surah.numberOfAyahs)
+                              )
+                            )
+                          }
+                          className="w-full px-3 py-2.5 rounded-xl bg-night-800 border border-night-700 
+                            text-night-100 text-center text-sm focus:outline-none focus:border-gold-500/50
+                            focus:ring-1 focus:ring-gold-500/20"
+                        />
+                      </div>
+                    </div>
+                    <p className="text-xs text-night-500 text-center">
+                      {endAyah - startAyah + 1} ayah{endAyah - startAyah > 0 ? 's' : ''} selected
+                    </p>
+                  </motion.div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Tips */}
-      <div className="mt-8 space-y-3">
+      <div className="mt-4 space-y-3">
         <h3 className="text-xs font-semibold text-night-400 uppercase tracking-wider">
           Tips
         </h3>
@@ -297,7 +336,6 @@ function AyahRangeSelector({
             'Find a quiet place for best results',
             'Recite at your natural pace',
             'Words light up as you recite correctly',
-            'Red highlights indicate mistakes',
           ].map((tip, i) => (
             <div key={i} className="flex items-start gap-2">
               <Star className="w-3 h-3 text-gold-500/60 mt-0.5 flex-shrink-0" />
