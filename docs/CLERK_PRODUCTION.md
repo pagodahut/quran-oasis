@@ -23,16 +23,43 @@ vercel env add CLERK_SECRET_KEY                     # paste sk_live_...
 ```
 Set for **Production** (and optionally Preview/Development).
 
-### 3. Database — SQLite Won't Work on Vercel Serverless
-SQLite (`file:./dev.db`) only works locally. For production, migrate to one of:
+### 3. Database — Turso (libSQL) for Production
 
-- **Turso** (SQLite-compatible, recommended): `libsql://your-db.turso.io`
-- **Neon** (PostgreSQL): change `provider = "postgresql"` in schema.prisma
-- **PlanetScale** (MySQL): change `provider = "mysql"` in schema.prisma
+The app uses **Turso** (libSQL) for production. The Prisma client auto-detects:
+- If `TURSO_DATABASE_URL` + `TURSO_AUTH_TOKEN` are set → uses libSQL adapter (production)
+- Otherwise → uses local SQLite `file:./dev.db` (development)
 
-Set `DATABASE_URL` on Vercel for your chosen provider:
+#### Quick Setup
+Run the helper script:
 ```bash
-vercel env add DATABASE_URL   # paste the production connection string
+./scripts/setup-turso.sh
+```
+
+#### Manual Setup
+```bash
+# Install Turso CLI
+brew install tursodatabase/tap/turso
+
+# Login & create database
+turso auth login
+turso db create hifz-quran
+
+# Get credentials
+turso db show hifz-quran --url     # → libsql://hifz-quran-<username>.turso.io
+turso db tokens create hifz-quran  # → eyJ...
+```
+
+#### Set on Vercel
+```bash
+vercel env add TURSO_DATABASE_URL    # libsql://hifz-quran-<username>.turso.io
+vercel env add TURSO_AUTH_TOKEN      # the token from above
+vercel env add DATABASE_URL          # same as TURSO_DATABASE_URL (for Prisma migrations)
+```
+
+#### Push Schema to Turso
+```bash
+npx prisma generate
+DATABASE_URL="libsql://hifz-quran-<username>.turso.io?authToken=<token>" npx prisma db push
 ```
 
 ### 4. Redeploy

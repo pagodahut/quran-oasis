@@ -2,7 +2,8 @@
 // Based on Manus build - 9 core tables
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
