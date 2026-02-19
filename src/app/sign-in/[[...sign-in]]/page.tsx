@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 export default function SignInPage() {
   return (
-    <div className="min-h-screen bg-night-950 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4">
       {/* Logo */}
       <Link href="/" className="mb-8 flex items-center gap-2">
         <Image

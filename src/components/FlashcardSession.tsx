@@ -121,7 +121,7 @@ export default function FlashcardSession({
   }
   
   return (
-    <div className="min-h-screen bg-night-950 flex flex-col">
+    <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-40 safe-area-top px-4 pt-4">
         <div className="liquid-glass rounded-2xl p-3">
@@ -373,7 +373,7 @@ export function SessionComplete({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="min-h-screen bg-night-950 flex flex-col items-center justify-center p-6"
+      className="min-h-screen flex flex-col items-center justify-center p-6"
     >
       <motion.div
         initial={{ scale: 0 }}

@@ -38,7 +38,7 @@ const stagger = {
 
 export default function MemorizationTechniquesPage() {
   return (
-    <div className="min-h-screen bg-night-950">
+    <div className="min-h-screen">
       {/* Header - Liquid Glass */}
       <header 
         className="sticky top-0 z-40 safe-area-top"

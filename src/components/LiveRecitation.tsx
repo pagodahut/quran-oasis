@@ -754,7 +754,7 @@ export default function LiveRecitation({
   // ============ Render ============
 
   return (
-    <div className="min-h-screen bg-night-950 flex flex-col">
+    <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-20 bg-night-950/90 backdrop-blur-xl border-b border-night-800/50">
         <div className="flex items-center justify-between px-4 py-3">

@@ -117,7 +117,7 @@ export default function FeedbackTrackerPage() {
   };
 
   return (
-    <div className="min-h-screen bg-night-950">
+    <div className="min-h-screen">
       {/* Header */}
       <header className="sticky top-0 z-40 liquid-glass rounded-b-2xl mx-2 mt-2">
         <div className="flex items-center justify-between px-4 py-4">

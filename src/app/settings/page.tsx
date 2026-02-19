@@ -408,14 +408,14 @@ export default function SettingsPage() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-night-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="animate-pulse text-gold-400">Loading settings...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-night-950">
+    <div className="min-h-screen">
       {/* Success Toast */}
       <AnimatePresence>
         {successMessage && (
@@ -1079,7 +1079,7 @@ Device Info:
 Additional Context:
 [Any other relevant information]
                 `.trim());
-                window.open(`mailto:support@hifz.app?subject=${subject}&body=${body}`, '_blank');
+                window.open(`mailto:support@gethifz.com?subject=${subject}&body=${body}`, '_blank');
                 showSuccess('Opening email client...');
               }}
               className="w-full p-4 rounded-xl bg-night-800/50 hover:bg-night-800 transition-colors flex items-center gap-3 text-left"
@@ -1108,7 +1108,7 @@ Use Case:
 Additional Notes:
 [Any other relevant information]
                 `.trim());
-                window.open(`mailto:support@hifz.app?subject=${subject}&body=${body}`, '_blank');
+                window.open(`mailto:support@gethifz.com?subject=${subject}&body=${body}`, '_blank');
                 showSuccess('Opening email client...');
               }}
               className="w-full p-4 rounded-xl bg-night-800/50 hover:bg-night-800 transition-colors flex items-center gap-3 text-left"

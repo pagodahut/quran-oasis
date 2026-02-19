@@ -1234,7 +1234,7 @@
     transform: translate(-50%, -50%);
     color: rgba(201, 162, 39, 0.6);
     font-size: 0.5rem;
-    background: var(--night-950, #0f1419);
+    background: var(--theme-surface);
     padding: 0 0.5rem;
   }
   

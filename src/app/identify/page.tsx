@@ -133,7 +133,7 @@ export default function IdentifyPage() {
   };
 
   return (
-    <div className="min-h-screen min-h-dvh bg-night-950 flex flex-col">
+    <div className="min-h-screen min-h-dvh flex flex-col">
       {/* Header */}
       <header className="px-4 pt-6 pb-4 safe-area-top">
         <div className="flex items-center gap-3">

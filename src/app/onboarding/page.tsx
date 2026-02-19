@@ -139,7 +139,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen min-h-dvh bg-night-950 flex flex-col relative overflow-hidden">
+    <div className="min-h-screen min-h-dvh flex flex-col relative overflow-hidden">
       {/* Ambient background glow */}
       <div
         className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] pointer-events-none"

@@ -430,9 +430,9 @@ export default function TajweedReferencePage() {
   }, [searchQuery, activeCategory]);
 
   return (
-    <div className="min-h-screen bg-night-950 pb-32">
+    <div className="min-h-screen pb-32">
       {/* Header */}
-      <header className="sticky top-0 z-20 bg-night-950/90 backdrop-blur-xl border-b border-night-800/30">
+      <header className="sticky top-0 z-20 bg-[var(--theme-surface)]/90 backdrop-blur-xl border-b border-night-800/30">
         <div className="px-4 pt-safe-top">
           <div className="flex items-center gap-3 py-4">
             <Link

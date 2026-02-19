@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 
 export default function BrowseLoading() {
   return (
-    <div className="min-h-screen bg-night-950 flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

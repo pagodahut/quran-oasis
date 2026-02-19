@@ -191,14 +191,14 @@ export default function ProfilePage() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-night-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-gold-400 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-night-950">
+    <div className="min-h-screen">
       {/* Header - Premium Frosted Glass */}
       <header 
         className="sticky top-0 z-40 safe-area-top liquid-glass mx-2 mt-2 rounded-2xl"

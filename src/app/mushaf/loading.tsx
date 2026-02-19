@@ -5,7 +5,7 @@ import BottomNav from '@/components/BottomNav';
 
 export default function MushafLoading() {
   return (
-    <div className="min-h-screen bg-night-950">
+    <div className="min-h-screen">
       {/* Header skeleton - Premium frosted glass style */}
       <header 
         className="sticky top-0 z-40 safe-area-top mx-2 mt-2 rounded-2xl overflow-hidden"

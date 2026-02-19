@@ -168,7 +168,7 @@ export default function PracticePage() {
 
   if (view === 'add-ayahs') {
     return (
-      <div className="min-h-screen bg-night-950">
+      <div className="min-h-screen">
         <header className="liquid-glass sticky top-0 z-40 safe-area-top">
           <div className="px-4 py-3 flex items-center gap-3">
             <button onClick={() => setView('dashboard')} className="liquid-icon-btn">
@@ -275,7 +275,7 @@ export default function PracticePage() {
   // ─── Dashboard View ──────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-night-950">
+    <div className="min-h-screen">
       {/* Calibration Banner */}
       {!isCalibrated && (
         <Link href="/onboarding" className="liquid-card mx-4 mt-3 p-3 flex items-center gap-3 bg-gold-500/5 border-gold-500/20">

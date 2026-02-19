@@ -5,7 +5,7 @@ import Skeleton from '@/components/Skeleton';
 
 export default function PracticeLoading() {
   return (
-    <div className="min-h-screen bg-night-950 pb-24">
+    <div className="min-h-screen pb-24">
       {/* Background pattern placeholder */}
       <div className="fixed inset-0 opacity-10">
         <div 

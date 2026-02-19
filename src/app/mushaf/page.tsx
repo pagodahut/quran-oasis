@@ -269,7 +269,7 @@ export default function MushafPage() {
   };
 
   return (
-    <div className="min-h-screen bg-night-950">
+    <div className="min-h-screen">
       <Suspense fallback={null}>
         <MushafSearchParamsReader onView={setActiveView} />
       </Suspense>

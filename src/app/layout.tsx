@@ -72,7 +72,7 @@ export const metadata: Metadata = {
     title: defaultMeta.title,
     description: defaultMeta.description,
     images: ['/twitter-image'],
-    creator: '@hifzapp',
+    creator: '@gethifz',
   },
   alternates: {
     canonical: SITE_URL,

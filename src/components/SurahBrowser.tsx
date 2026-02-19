@@ -224,7 +224,7 @@ export default function SurahBrowser({ onAddToQueue }: SurahBrowserProps) {
   };
 
   return (
-    <div className="min-h-screen bg-night-950 relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden">
       {/* Atmospheric background */}
       <div className="fixed inset-0 bg-gradient-radial from-sage-500/5 via-transparent to-transparent pointer-events-none" />
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-gradient-radial from-sage-500/8 to-transparent blur-3xl pointer-events-none" />

@@ -124,14 +124,14 @@ export default function FlashcardsPage() {
   // Deck selection view
   if (isCheckingCalibration) {
     return (
-      <div className="min-h-screen bg-night-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="w-12 h-12 border-2 border-gold-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-night-950">
+    <div className="min-h-screen">
       {/* Header */}
       <header className="sticky top-0 z-40 safe-area-top liquid-glass mx-2 mt-2 rounded-2xl">
         <div className="flex items-center justify-between px-3 py-3">

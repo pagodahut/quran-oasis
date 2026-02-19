@@ -5,7 +5,7 @@ import BottomNav from '@/components/BottomNav';
 
 export default function HomeLoading() {
   return (
-    <div className="min-h-screen bg-night-950 overflow-hidden">
+    <div className="min-h-screen overflow-hidden">
       {/* Hero section skeleton */}
       <div className="relative min-h-[75vh] flex flex-col items-center justify-center px-6">
         {/* Background glow effect */}

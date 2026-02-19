@@ -4,7 +4,7 @@ import BottomNav from '@/components/BottomNav';
 
 export default function SettingsLoading() {
   return (
-    <div className="min-h-screen bg-night-950">
+    <div className="min-h-screen">
       {/* Header skeleton */}
       <header className="liquid-glass sticky top-0 z-40 safe-area-top">
         <div className="px-4 py-3">

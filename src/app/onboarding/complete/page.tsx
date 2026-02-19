@@ -14,7 +14,7 @@ export default function OnboardingCompletePage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-night-950 flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center">
       <p className="text-night-400">Redirecting to your dashboard...</p>
     </div>
   );

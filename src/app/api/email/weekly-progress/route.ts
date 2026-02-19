@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
         };
 
         await getResend().emails.send({
-          from: 'HIFZ <noreply@hifz.app>',
+          from: 'HIFZ <noreply@gethifz.com>',
           to: user.email,
           subject: `Your Weekly Hifz Progress — ${versesReviewed} verses reviewed${streak > 0 ? ` 🔥${streak}` : ''}`,
           react: WeeklyProgressEmail(progressData),

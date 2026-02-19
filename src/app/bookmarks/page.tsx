@@ -219,7 +219,7 @@ export default function BookmarksPage() {
   }, {} as Record<number, { surahName: string; surahArabicName: string; bookmarks: BookmarkType[] }>);
 
   return (
-    <div className="min-h-screen bg-night-950">
+    <div className="min-h-screen">
       {/* Header */}
       <header className="liquid-glass sticky top-0 z-40 safe-area-top">
         <div className="px-4 py-3">

@@ -84,16 +84,16 @@ export default function ReviewQueuePage() {
 
   if (isCheckingCalibration) {
     return (
-      <div className="min-h-screen bg-night-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="w-12 h-12 border-2 border-gold-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-night-950 text-night-100 pb-24">
+    <div className="min-h-screen text-night-100 pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-night-950/80 backdrop-blur-xl border-b border-night-800/50">
+      <div className="sticky top-0 z-20 bg-[var(--theme-surface)]/80 backdrop-blur-xl border-b border-night-800/50">
         <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-3">
           <Link href="/practice" className="p-2 -ml-2 rounded-xl hover:bg-night-800/50 transition-colors">
             <ArrowLeft className="w-5 h-5 text-night-400" />

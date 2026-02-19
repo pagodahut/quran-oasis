@@ -916,7 +916,7 @@ export default function LessonDetailPage() {
 
   if (!lesson) {
     return (
-      <div className="min-h-screen bg-night-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -949,7 +949,7 @@ export default function LessonDetailPage() {
   if (showLessonComplete) {
     const timeSpent = Math.round((Date.now() - lessonStartTime) / 60000);
     return (
-      <div className="min-h-screen bg-night-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <PostLessonReflection
           lessonTitle={lesson.title}
           ayahs={lessonAyahs}
@@ -973,7 +973,7 @@ export default function LessonDetailPage() {
   // Show PreLessonBriefing before lesson starts
   if (!lessonStarted && lessonAyahs.length > 0) {
     return (
-      <div className="min-h-screen bg-night-950 px-4 py-8">
+      <div className="min-h-screen px-4 py-8">
         <PreLessonBriefing
           lessonTitle={lesson.title}
           ayahs={lessonAyahs}
@@ -987,7 +987,7 @@ export default function LessonDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-night-950 flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <audio ref={audioRef} />
       
       {/* Celebration effects */}

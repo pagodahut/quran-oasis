@@ -7,7 +7,7 @@ import BottomNav from '@/components/BottomNav';
 
 export default function LessonNotFound() {
   return (
-    <div className="min-h-screen bg-night-950 flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <main className="flex-1 flex items-center justify-center p-6 pb-28">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}

@@ -538,7 +538,7 @@ function LessonsContent() {
         lessonTitle={completedLesson?.title}
         onClose={handleCloseCompletion}
       />
-    <div className="min-h-screen bg-night-950">
+    <div className="min-h-screen">
       {/* Header - Premium Frosted Glass */}
       <header 
         className="sticky top-0 z-40 safe-area-top liquid-glass mx-2 mt-2 rounded-2xl"
@@ -740,7 +740,7 @@ function LessonsContent() {
 // Export with Suspense wrapper for useSearchParams
 export default function LessonsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-night-950" />}>
+    <Suspense fallback={<div className="min-h-screen" />}>
       <LessonsContent />
     </Suspense>
   );

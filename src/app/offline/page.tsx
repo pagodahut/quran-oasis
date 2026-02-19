@@ -31,7 +31,7 @@ export default function OfflinePage() {
   };
 
   return (
-    <div className="min-h-screen bg-night-950 flex items-center justify-center p-6">
+    <div className="min-h-screen flex items-center justify-center p-6">
       <div className="max-w-md w-full text-center">
         {/* Offline Icon */}
         <div className="relative mx-auto w-24 h-24 mb-8">
