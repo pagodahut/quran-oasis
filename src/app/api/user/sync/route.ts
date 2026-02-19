@@ -16,6 +16,7 @@ interface SyncVerse {
   lastReview?: string | number | null;
   status?: string;
   confidence?: number;
+  category?: string;
 }
 
 // GET - Load user data from server
@@ -71,7 +72,8 @@ export async function GET() {
         nextReview: p.nextReview,
         lastReview: p.lastReview,
         status: p.status,
-        confidence: Math.round(p.easeFactor * 20), // Convert ease to confidence
+        confidence: p.confidence, // Independent 0-100 score from DB
+        category: p.category,     // sabaq, sabqi, manzil
         totalReviews: p.repetitions,
       };
     }
@@ -173,6 +175,8 @@ export async function POST(request: NextRequest) {
             nextReview: verse.nextReview ? new Date(verse.nextReview) : new Date(),
             lastReview: verse.lastReview ? new Date(verse.lastReview) : null,
             status: verse.status || 'learning',
+            confidence: verse.confidence ?? 0,
+            category: verse.category || 'sabaq',
           },
           update: {
             easeFactor: verse.easeFactor || 2.5,
@@ -181,6 +185,8 @@ export async function POST(request: NextRequest) {
             nextReview: verse.nextReview ? new Date(verse.nextReview) : new Date(),
             lastReview: verse.lastReview ? new Date(verse.lastReview) : null,
             status: verse.status || 'learning',
+            confidence: verse.confidence ?? 0,
+            category: verse.category || 'sabaq',
           },
         });
       }

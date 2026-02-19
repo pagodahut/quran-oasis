@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useUser } from '@clerk/nextjs';
+import { useAuth } from '@/hooks/useAuth';
 import {
   Flame,
   BookOpen,
@@ -391,7 +391,7 @@ function QuickActions() {
 // ============================================
 
 export default function DashboardPage() {
-  const { user, isLoaded, isSignedIn } = useUser();
+  const { user, isLoaded, isSignedIn } = useAuth();
   const { learning: learningPrefs } = useLearningPreferences();
   const [hasSynced, setHasSynced] = useState(false);
 

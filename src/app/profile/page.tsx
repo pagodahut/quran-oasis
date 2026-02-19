@@ -1,6 +1,6 @@
 'use client';
 
-import { useUser, SignOutButton, useClerk } from '@clerk/nextjs';
+import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -108,20 +108,17 @@ function SettingsRow({ icon: Icon, label, href, onClick }: {
 }
 
 export default function ProfilePage() {
-  const { user, isLoaded, isSignedIn } = useUser();
-  const { openUserProfile } = useClerk();
+  const { user, isLoaded, isSignedIn, isGuest, isClerkConfigured } = useAuth();
+  // Safely get Clerk utilities — noop when Clerk isn't configured
+  let openUserProfile = () => {};
+  if (isClerkConfigured) {
+    try {
+      const { useClerk } = require('@clerk/nextjs');
+      const clerk = useClerk();
+      openUserProfile = clerk.openUserProfile;
+    } catch {}
+  }
   const { learning: learningPrefs } = useLearningPreferences();
-
-  // Delay showing guest state to avoid flash after sign-in (Clerk timing)
-  const [showAsGuest, setShowAsGuest] = useState(false);
-  useEffect(() => {
-    if (isLoaded && !isSignedIn) {
-      const timer = setTimeout(() => setShowAsGuest(true), 500);
-      return () => clearTimeout(timer);
-    } else {
-      setShowAsGuest(false);
-    }
-  }, [isLoaded, isSignedIn]);
   const [stats, setStats] = useState({
     versesMemorized: 0,
     surahsCompleted: 0,
@@ -192,26 +189,24 @@ export default function ProfilePage() {
     };
   }, []);
 
-  // Get user info — only use Clerk data when fully signed in
-  const displayName = isSignedIn && user
-    ? (user.firstName || user.username || 'Student of Quran')
-    : 'Student of Quran';
-  const email = isSignedIn ? user?.primaryEmailAddress?.emailAddress : undefined;
-  const avatarUrl = isSignedIn ? user?.imageUrl : undefined;
-  const joinedDate = isSignedIn && user?.createdAt 
+  // Get user info
+  const displayName = user?.firstName || user?.username || 'Student of Quran';
+  const email = user?.primaryEmailAddress?.emailAddress;
+  const avatarUrl = user?.imageUrl;
+  const joinedDate = user?.createdAt 
     ? new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(user.createdAt)
     : 'Just started';
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-night-950 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-gold-400 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-night-950">
       {/* Header - Premium Frosted Glass */}
       <header 
         className="sticky top-0 z-40 safe-area-top liquid-glass mx-2 mt-2 rounded-2xl"
@@ -320,8 +315,8 @@ export default function ProfilePage() {
               <span className="text-gold-400">{quranProgress.percentage}% of Quran</span>
             </div>
 
-            {/* Sign in prompt for guests */}
-            {showAsGuest && (
+            {/* Sign in prompt - only when Clerk is configured but user isn't signed in */}
+            {isClerkConfigured && !isSignedIn && (
               <div className="mt-4 pt-4 border-t border-night-800/50">
                 <p className="text-night-400 text-sm mb-3">
                   Sign in to save your progress across devices
@@ -333,6 +328,14 @@ export default function ProfilePage() {
                   <User className="w-4 h-4" />
                   Sign In
                 </Link>
+              </div>
+            )}
+            {/* Local mode indicator when Clerk is not configured */}
+            {!isClerkConfigured && (
+              <div className="mt-4 pt-4 border-t border-night-800/50">
+                <p className="text-night-500 text-xs">
+                  📱 Local mode — progress saved on this device
+                </p>
               </div>
             )}
           </motion.div>
@@ -504,16 +507,21 @@ export default function ProfilePage() {
           </motion.div>
 
           {/* Sign Out - visible at bottom */}
-          {isSignedIn && (
-            <motion.div variants={fadeInUp} className="pt-4">
-              <SignOutButton redirectUrl="/">
-                <button className="w-full py-3 px-4 rounded-xl text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2">
-                  <LogOut className="w-5 h-5" />
-                  <span>Sign Out</span>
-                </button>
-              </SignOutButton>
-            </motion.div>
-          )}
+          {isSignedIn && isClerkConfigured && (() => {
+            try {
+              const { SignOutButton } = require('@clerk/nextjs');
+              return (
+                <motion.div variants={fadeInUp} className="pt-4">
+                  <SignOutButton redirectUrl="/">
+                    <button className="w-full py-3 px-4 rounded-xl text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2">
+                      <LogOut className="w-5 h-5" />
+                      <span>Sign Out</span>
+                    </button>
+                  </SignOutButton>
+                </motion.div>
+              );
+            } catch { return null; }
+          })()}
 
           {/* Footer space to ensure content isn't cut off */}
           <div className="h-8" />

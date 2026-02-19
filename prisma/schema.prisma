@@ -27,6 +27,10 @@ model User {
   bookmarks      Bookmark[]
   dailyActivity  DailyActivity[]
   achievements   UserAchievement[]
+  lessonProgress LessonProgress[]
+  recitationAttempts RecitationAttempt[]
+  studySessions  StudySession[]
+  calibration    UserCalibration?
 }
 
 // User preferences
@@ -42,7 +46,6 @@ model UserPreferences {
   showTranslation Boolean @default(true)
   autoPlayNext Boolean @default(false)
   repeatCount  Int     @default(3)          // Default repeat for memorization
-  emailNotifications Boolean @default(true) // Weekly progress email opt-in
 }
 
 // Onboarding responses
@@ -103,6 +106,10 @@ model MemorizationProgress {
   // Status
   status        String   @default("not_started") // not_started, learning, reviewing, memorized
   
+  // Independent confidence score and category
+  confidence    Int      @default(0)    // 0-100 independent confidence score
+  category      String   @default("sabaq") // sabaq, sabqi, manzil
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -151,109 +158,62 @@ model UserAchievement {
   @@unique([userId, achievementId])
 }
 
-// Verse difficulty tracking for adaptive review
-model VerseDifficulty {
-  id                  String   @id @default(cuid())
-  userId              String
-  surahNumber         Int
-  ayahNumber          Int
-  difficultyScore     Float    @default(0.5)  // 0 = easy, 1 = hard
-  lastAttemptAccuracy Float    @default(0)     // 0-1
-  attemptCount        Int      @default(0)
-  lastAttemptAt       DateTime @default(now())
-  nextReviewAt        DateTime @default(now())
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-
-  @@unique([userId, surahNumber, ayahNumber])
-  @@index([userId, nextReviewAt])
+// Track each lesson attempt
+model LessonProgress {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId      String   // lesson slug/id from lesson-content
+  status        String   @default("not_started") // not_started, in_progress, completed
+  score         Int?     // 0-100 performance score
+  timeSpentSec  Int      @default(0)
+  completedAt   DateTime?
+  attempts      Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  @@unique([userId, lessonId])
 }
 
-// Recitation session history
-model RecitationSession {
-  id              String   @id @default(cuid())
-  userId          String
-  surahNumber     Int
-  startAyah       Int
-  endAyah         Int
-  overallAccuracy Int      // 0-100
-  duration        Int      // seconds
-  totalWords      Int      @default(0)
-  matchedWords    Int      @default(0)
-  createdAt       DateTime @default(now())
-
-  words RecitationWord[]
-
-  @@index([userId, createdAt])
-  @@index([userId, surahNumber])
+// Track recitation attempts for AI analysis
+model RecitationAttempt {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  surahNumber   Int
+  ayahNumber    Int
+  duration      Int      // seconds
+  accuracy      Float?   // 0-1 from AI grading
+  tajweedScore  Float?   // 0-1 tajweed quality
+  feedback      String?  // AI feedback text
+  audioUrl      String?  // stored recording path
+  createdAt     DateTime @default(now())
 }
 
-// Word-level recitation data
-model RecitationWord {
-  id              String  @id @default(cuid())
-  sessionId       String
-  session         RecitationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  wordIndex       Int
-  expectedWord    String
-  transcribedWord String?
-  confidence      Float   @default(0)
-  isCorrect       Boolean @default(false)
-
-  @@index([sessionId])
+// Study sessions for analytics
+model StudySession {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startedAt     DateTime @default(now())
+  endedAt       DateTime?
+  durationMin   Int      @default(0)
+  versesLearned Int      @default(0)
+  versesReviewed Int     @default(0)
+  lessonId      String?  // which lesson was studied
+  sessionType   String   @default("memorization") // memorization, review, recitation, flashcards
 }
 
-// Personalized daily goals
-model DailyGoal {
-  id               String   @id @default(cuid())
-  userId           String
-  date             String   // YYYY-MM-DD
-  targetMinutes    Int      @default(20)
-  targetVerses     Int      @default(5)
-  completedMinutes Int      @default(0)
-  completedVerses  Int      @default(0)
-  streakDay        Int      @default(0)
-  isComplete       Boolean  @default(false)
-  createdAt        DateTime @default(now())
-
-  @@unique([userId, date])
-  @@index([userId, date])
-}
-
-// Nudge tracking
-model NudgeHistory {
-  id        String   @id @default(cuid())
-  userId    String
-  nudgeType String
-  nudgeKey  String
-  shownAt   DateTime @default(now())
-
-  @@index([userId, shownAt])
-}
-
-// Web Push subscriptions
-model PushSubscription {
-  id        String   @id @default(cuid())
-  userId    String
-  endpoint  String   @unique
-  p256dh    String   // Public key
-  auth      String   // Auth secret
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId])
-}
-
-// User feedback submissions
-model Feedback {
-  id        String   @id @default(cuid())
-  userId    String?  // Optional — guests can submit too
-  category  String   // bug, feature, general
-  message   String
-  pageUrl   String?
-  userAgent String?
-  status    String   @default("new") // new, in_progress, done
-  createdAt DateTime @default(now())
-
-  @@index([createdAt])
-  @@index([category])
+// Persist calibration from Sheikh onboarding
+model UserCalibration {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  level             String   // beginner, intermediate, advanced
+  arabicReading     String
+  tajweedKnowledge  String
+  memorizationCount Int      @default(0)
+  understanding     String
+  summary           String
+  recommendation    String
+  calibratedAt      DateTime @default(now())
 }

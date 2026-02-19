@@ -7,7 +7,6 @@ import {
   Square,
   RotateCcw,
   ChevronLeft,
-  ChevronRight,
   Loader2,
   AlertCircle,
   CheckCircle2,
@@ -18,16 +17,15 @@ import {
   Volume2,
 } from 'lucide-react';
 import TajweedText, { type WordState } from '@/components/TajweedText';
-import WordByWordInline from '@/components/WordByWordInline';
 import { fetchTajweedSurah, type TajweedSurahData } from '@/lib/quranTajweedApi';
 import {
-  TarteelService,
+  RealtimeTajweedService,
+  normalizeArabic,
+  arabicSimilarity,
   checkBrowserSupport,
-} from '@/lib/tarteelService';
-import { WebSpeechService } from '@/lib/webSpeechService';
+  type TranscribedWord,
+} from '@/lib/realtimeTajweedService';
 import { SURAH_METADATA } from '@/lib/surahMetadata';
-import TajweedReport from '@/components/TajweedReport';
-import { detectTajweedRules } from '@/lib/realtimeTajweedService';
 
 // ============ Types ============
 
@@ -45,9 +43,6 @@ interface SessionStats {
   missedWords: number;
   errorWords: number;
   duration: number; // seconds
-  practiceWords: Array<{ index: number; expected: string; confidence: number }>;
-  tajweedRules?: ReturnType<typeof detectTajweedRules>;
-  allWords?: string[];
 }
 
 type Phase = 'loading' | 'ready' | 'recording' | 'complete' | 'error';
@@ -62,7 +57,7 @@ function formatTime(seconds: number): string {
 
 // ============ Audio Visualizer ============
 
-function AudioVisualizer({ service }: { service: TarteelService | WebSpeechService | null }) {
+function AudioVisualizer({ service }: { service: RealtimeTajweedService | null }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
 
@@ -132,22 +127,11 @@ function SessionSummary({
   stats,
   onRetry,
   onBack,
-  onNextAyah,
-  surahNumber,
-  startAyah,
-  endAyah,
-  wordConfidences,
 }: {
   stats: SessionStats;
   onRetry: () => void;
   onBack: () => void;
-  onNextAyah?: () => void;
-  surahNumber?: number;
-  startAyah?: number;
-  endAyah?: number;
-  wordConfidences?: number[];
 }) {
-  const [showWordByWord, setShowWordByWord] = useState(false);
   const grade = useMemo(() => {
     if (stats.accuracy >= 95) return { label: 'Excellent!', emoji: '🌟', color: 'text-gold-400' };
     if (stats.accuracy >= 85) return { label: 'Great Job!', emoji: '✨', color: 'text-sage-400' };
@@ -200,87 +184,6 @@ function SessionSummary({
         </div>
       </div>
 
-      {/* Practice Words */}
-      {stats.practiceWords.length > 0 && (
-        <div className="mb-6">
-          <h3 className="text-xs font-semibold text-night-400 uppercase tracking-wider mb-3">
-            Words to Practice
-          </h3>
-          <div className="bg-night-900/60 rounded-xl p-4 border border-night-800/50">
-            <div className="flex flex-wrap gap-2" dir="rtl">
-              {stats.practiceWords.map((pw) => (
-                <span
-                  key={pw.index}
-                  className="inline-block px-3 py-1.5 rounded-lg text-sm font-arabic border"
-                  style={{
-                    color: pw.confidence < 0.5 ? '#ef4444' : '#facc15',
-                    borderColor:
-                      pw.confidence < 0.5
-                        ? 'rgba(239, 68, 68, 0.3)'
-                        : 'rgba(250, 204, 21, 0.3)',
-                    backgroundColor:
-                      pw.confidence < 0.5
-                        ? 'rgba(239, 68, 68, 0.1)'
-                        : 'rgba(250, 204, 21, 0.08)',
-                  }}
-                >
-                  {pw.expected}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Word-by-Word Breakdown */}
-      {surahNumber && startAyah && (
-        <div className="mb-6">
-          <button
-            onClick={() => setShowWordByWord(!showWordByWord)}
-            className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-night-900/60 border border-night-800/50 hover:bg-night-800/60 transition-colors"
-          >
-            <span className="text-sm font-medium text-night-300">
-              📝 Word-by-Word Breakdown
-            </span>
-            <ChevronRight className={`w-4 h-4 text-night-500 transition-transform ${showWordByWord ? 'rotate-90' : ''}`} />
-          </button>
-          <AnimatePresence>
-            {showWordByWord && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden"
-              >
-                <div className="pt-3 space-y-4">
-                  {Array.from({ length: (endAyah || startAyah) - startAyah + 1 }, (_, i) => startAyah + i).map(ayahNum => (
-                    <div key={ayahNum} className="bg-night-900/40 rounded-xl p-3 border border-night-800/30">
-                      <p className="text-xs text-night-500 mb-2">Ayah {ayahNum}</p>
-                      <WordByWordInline
-                        surah={surahNumber}
-                        ayah={ayahNum}
-                        showTransliteration={true}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      )}
-
-      {/* Tajweed Report */}
-      {stats.tajweedRules && stats.tajweedRules.length > 0 && stats.allWords && (
-        <TajweedReport
-          rulesDetected={stats.tajweedRules}
-          alignments={[]}
-          words={stats.allWords}
-          accuracy={stats.accuracy}
-          duration={stats.duration}
-        />
-      )}
-
       {/* Actions */}
       <div className="flex gap-3">
         <button
@@ -292,23 +195,12 @@ function SessionSummary({
         </button>
         <button
           onClick={onRetry}
-          className="flex-1 py-3 rounded-xl bg-night-800 text-night-300 
-            border border-night-700 font-medium transition hover:bg-night-700
-            flex items-center justify-center gap-2"
+          className="flex-1 py-3 rounded-xl bg-gold-500/90 text-night-950 
+            font-semibold transition hover:bg-gold-400 flex items-center justify-center gap-2"
         >
           <RotateCcw className="w-4 h-4" />
-          Retry
+          Try Again
         </button>
-        {onNextAyah && (
-          <button
-            onClick={onNextAyah}
-            className="flex-1 py-3 rounded-xl bg-gold-500/90 text-night-950 
-              font-semibold transition hover:bg-gold-400 flex items-center justify-center gap-2"
-          >
-            Next
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        )}
       </div>
     </motion.div>
   );
@@ -346,21 +238,15 @@ export default function LiveRecitation({
   const [tajweedData, setTajweedData] = useState<TajweedSurahData | null>(null);
   const [wordStates, setWordStates] = useState<WordState[]>([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(-1);
-  const [wordConfidences, setWordConfidences] = useState<number[]>([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [stats, setStats] = useState<SessionStats | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
-  const [wordByWordView, setWordByWordView] = useState(false);
-  const [activeProvider, setActiveProvider] = useState<'tarteel' | 'browser' | null>(null);
 
   // Refs
-  const serviceRef = useRef<TarteelService | WebSpeechService | null>(null);
+  const serviceRef = useRef<RealtimeTajweedService | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const wordElementsRef = useRef<Map<number, HTMLElement>>(new Map());
-
-  const [previousBest, setPreviousBest] = useState<number | null>(null);
-  const [saved, setSaved] = useState(false);
 
   // Surah metadata
   const surahMeta = useMemo(
@@ -379,6 +265,14 @@ export default function LiveRecitation({
       try {
         setPhase('loading');
 
+        // Check browser support
+        const support = checkBrowserSupport();
+        if (!support.supported) {
+          setErrorMessage(`Browser missing: ${support.missing.join(', ')}`);
+          setPhase('error');
+          return;
+        }
+
         // Fetch tajweed data from Quran.com
         const data = await fetchTajweedSurah(surahNumber, startAyah, effectiveEndAyah);
 
@@ -392,7 +286,6 @@ export default function LiveRecitation({
 
         setTajweedData(data);
         setWordStates(new Array(data.allWords.length).fill('hidden'));
-        setWordConfidences(new Array(data.allWords.length).fill(0));
         setCurrentWordIndex(-1);
         setPhase('ready');
       } catch (err) {
@@ -410,119 +303,161 @@ export default function LiveRecitation({
     };
   }, [surahNumber, startAyah, effectiveEndAyah]);
 
-  // ============ Tarteel Integration ============
+  // ============ Word Alignment Logic ============
 
-  const handleStateChange = useCallback((state: { alignments: Array<{ status: string; confidence: number }>; currentWordIndex: number }) => {
-    setWordStates((prev) => {
-      const newStates = [...prev];
-      state.alignments.forEach((alignment, idx) => {
-        if (idx >= newStates.length) return;
-        if (alignment.status === 'matched') {
-          newStates[idx] = 'revealed';
-        } else if (alignment.status === 'partial') {
-          newStates[idx] = 'revealed';
-        } else if (alignment.status === 'missed') {
-          newStates[idx] = 'missed';
+  const processTranscribedWords = useCallback(
+    (transcribedWords: TranscribedWord[], isFinal: boolean) => {
+      if (!tajweedData) return;
+
+      const expected = tajweedData.plainWords;
+
+      setWordStates((prev) => {
+        const newStates = [...prev];
+        let expectedIdx = 0;
+
+        // Find where we left off (first 'hidden' word)
+        for (let i = 0; i < newStates.length; i++) {
+          if (newStates[i] === 'hidden' || newStates[i] === 'current') {
+            expectedIdx = i;
+            break;
+          }
+          if (i === newStates.length - 1) {
+            expectedIdx = newStates.length;
+          }
         }
+
+        for (const trans of transcribedWords) {
+          if (expectedIdx >= expected.length) break;
+
+          // Look ahead up to 4 words for best match
+          let bestMatch = -1;
+          let bestSim = 0;
+
+          for (
+            let j = expectedIdx;
+            j < Math.min(expectedIdx + 4, expected.length);
+            j++
+          ) {
+            const sim = arabicSimilarity(trans.word, expected[j]);
+            if (sim > bestSim && sim > 0.4) {
+              bestMatch = j;
+              bestSim = sim;
+            }
+          }
+
+          if (bestMatch >= 0) {
+            // Mark skipped words as missed
+            for (let j = expectedIdx; j < bestMatch; j++) {
+              if (newStates[j] === 'hidden' || newStates[j] === 'current') {
+                newStates[j] = 'missed';
+              }
+            }
+
+            // Mark the matched word
+            if (isFinal) {
+              newStates[bestMatch] = bestSim > 0.75 ? 'revealed' : 'error';
+            } else {
+              newStates[bestMatch] = 'current';
+            }
+
+            expectedIdx = bestMatch + 1;
+          }
+        }
+
+        return newStates;
       });
-      return newStates;
-    });
+    },
+    [tajweedData]
+  );
 
-    setWordConfidences((prev) => {
-      const next = [...prev];
-      state.alignments.forEach((alignment, idx) => {
-        if (idx < next.length && alignment.confidence > 0) {
-          next[idx] = alignment.confidence;
-        }
-      });
-      return next;
-    });
-
-    if (state.currentWordIndex >= 0) {
-      setCurrentWordIndex(state.currentWordIndex);
-    }
-  }, []);
-
-  const handleWord = useCallback((index: number, _word: string, confidence: number) => {
-    setCurrentWordIndex(index);
-
-    setWordConfidences((prev) => {
-      const next = [...prev];
-      if (index >= 0 && index < next.length) {
-        next[index] = confidence;
-      }
-      return next;
-    });
-
-    setWordStates((prev) => {
-      const newStates = [...prev];
-      if (index >= 0 && index < newStates.length) {
-        if (newStates[index] === 'hidden' || newStates[index] === 'current') {
-          newStates[index] = 'revealed';
-        }
-      }
-      return newStates;
-    });
-  }, []);
+  // ============ Deepgram Integration ============
 
   const startRecording = useCallback(async () => {
     if (!tajweedData) return;
 
-    const expectedText = tajweedData.plainWords.join(' ');
-
-    // Try Tarteel first, fall back to Web Speech API
-    let useTarteel = false;
     try {
-      console.log('[Sheikh Hifz] Checking Tarteel health at /api/tarteel...');
-      const checkRes = await fetch('/api/tarteel', { signal: AbortSignal.timeout(3000) });
-      if (checkRes.ok) {
-        const checkData = await checkRes.json();
-        useTarteel = checkData.configured === true;
-        console.log('[Sheikh Hifz] Health check result:', checkData, '→ useTarteel:', useTarteel);
-      } else {
-        console.warn('[Sheikh Hifz] Health check failed with status:', checkRes.status);
+      // Get Deepgram API key
+      const tokenRes = await fetch('/api/deepgram/token');
+      const tokenData = await tokenRes.json();
+
+      // Handle authentication errors
+      if (tokenRes.status === 401) {
+        setErrorMessage(
+          'Authentication required for live recitation. Please sign in or check your configuration.'
+        );
+        setPhase('error');
+        return;
       }
-    } catch (e) {
-      console.warn('[Sheikh Hifz] Health check error, falling back to lite:', e);
-      useTarteel = false;
-    }
 
-    try {
-      if (useTarteel) {
-        console.log('[Sheikh Hifz] Using Tarteel (full) provider');
-        const service = new TarteelService({
-          expectedText,
-          chunkIntervalMs: 2500,
-          onStateChange: handleStateChange,
-          onWord: handleWord,
-          onError: (error) => console.error('Tarteel error:', error),
-        });
-        serviceRef.current = service;
-        await service.start();
-        setActiveProvider('tarteel');
-      } else {
-        console.log('[Sheikh Hifz] Using WebSpeech (lite) provider');
-        // Fallback: Web Speech API
-        if (!WebSpeechService.isSupported()) {
-          setErrorMessage(
-            'Speech recognition is not supported in this browser. Please use Chrome or Edge.'
-          );
-          setPhase('error');
-          return;
+      // Handle configuration errors
+      if (tokenRes.status === 503 || !tokenData.configured || !tokenData.apiKey) {
+        setErrorMessage(
+          'Live recitation is not available. Please try again later.'
+        );
+        setPhase('error');
+        return;
+      }
+
+      // Build expected text from tajweed data
+      const expectedText = tajweedData.plainWords.join(' ');
+
+      // Create service
+      const service = new RealtimeTajweedService({
+        apiKey: tokenData.apiKey,
+        expectedText,
+      });
+
+      serviceRef.current = service;
+
+      // Handle state changes from the service
+      service.onStateChange((state) => {
+        if (state.words.length > 0) {
+          processTranscribedWords(state.words, true);
         }
-        const service = new WebSpeechService({
-          expectedText,
-          onStateChange: handleStateChange,
-          onWord: handleWord,
-          onError: (error) => console.error('WebSpeech error:', error),
-        });
-        serviceRef.current = service;
-        await service.start();
-        setActiveProvider('browser');
-      }
 
+        // Update current word index
+        const lastMatched = state.alignments
+          .filter(
+            (a) => a.status === 'matched' || a.status === 'partial' || a.status === 'current'
+          )
+          .map((a) => a.expectedIndex)
+          .filter((i) => i >= 0);
+
+        if (lastMatched.length > 0) {
+          const maxIdx = Math.max(...lastMatched);
+          setCurrentWordIndex(maxIdx);
+        }
+      });
+
+      // Handle individual word events
+      service.onWord((index, word) => {
+        setCurrentWordIndex(index);
+
+        setWordStates((prev) => {
+          const newStates = [...prev];
+          if (index >= 0 && index < newStates.length) {
+            if (newStates[index] === 'hidden' || newStates[index] === 'current') {
+              const sim = arabicSimilarity(
+                word.word,
+                tajweedData.plainWords[index] || ''
+              );
+              newStates[index] = sim > 0.75 ? 'revealed' : 'error';
+            }
+          }
+          return newStates;
+        });
+      });
+
+      service.onError((error) => {
+        console.error('Deepgram error:', error);
+      });
+
+      // Start
+      await service.start();
       setPhase('recording');
       setElapsedTime(0);
+
+      // Start timer
       timerRef.current = setInterval(() => {
         setElapsedTime((prev) => prev + 1);
       }, 1000);
@@ -535,7 +470,7 @@ export default function LiveRecitation({
       );
       setPhase('error');
     }
-  }, [tajweedData, handleStateChange, handleWord]);
+  }, [tajweedData, processTranscribedWords]);
 
   const stopRecording = useCallback(async () => {
     // Stop timer
@@ -563,31 +498,10 @@ export default function LiveRecitation({
         const missedWords = finalStates.filter(
           (s) => s === 'missed' || s === 'hidden' || s === 'current'
         ).length;
-
-        // Count high-confidence words for accuracy
-        const goodWords = wordConfidences.filter(
-          (c, i) => finalStates[i] === 'revealed' && c > 0.8
-        ).length;
         const accuracy =
           totalWords > 0
-            ? Math.round((goodWords / totalWords) * 100)
+            ? Math.round((matchedWords / totalWords) * 100)
             : 0;
-
-        // Collect words that need practice (low confidence or missed)
-        const practiceWords: SessionStats['practiceWords'] = [];
-        finalStates.forEach((s, i) => {
-          if (s === 'missed' || (s === 'revealed' && wordConfidences[i] <= 0.8)) {
-            practiceWords.push({
-              index: i,
-              expected: tajweedData!.plainWords[i] || '',
-              confidence: wordConfidences[i],
-            });
-          }
-        });
-
-        // Detect tajweed rules from the expected text
-        const fullText = tajweedData?.plainWords.join(' ') || '';
-        const tajweedRules = detectTajweedRules(fullText);
 
         setStats({
           accuracy,
@@ -596,9 +510,6 @@ export default function LiveRecitation({
           missedWords,
           errorWords,
           duration: elapsedTime,
-          practiceWords,
-          tajweedRules,
-          allWords: tajweedData?.plainWords || [],
         });
 
         return finalStates;
@@ -616,79 +527,12 @@ export default function LiveRecitation({
   const resetSession = useCallback(() => {
     if (tajweedData) {
       setWordStates(new Array(tajweedData.allWords.length).fill('hidden'));
-      setWordConfidences(new Array(tajweedData.allWords.length).fill(0));
       setCurrentWordIndex(-1);
       setElapsedTime(0);
       setStats(null);
-      setSaved(false);
       setPhase('ready');
     }
   }, [tajweedData]);
-
-  // ============ Fetch Previous Best ============
-
-  useEffect(() => {
-    async function fetchBest() {
-      try {
-        const res = await fetch(`/api/recitation?surah=${surahNumber}&limit=100`);
-        if (res.ok) {
-          const data = await res.json();
-          const best = data.bestScores?.find((b: { surahNumber: number }) => b.surahNumber === surahNumber);
-          if (best) setPreviousBest(best.bestAccuracy);
-        }
-      } catch {
-        // Check localStorage for guests
-        try {
-          const stored = JSON.parse(localStorage.getItem('recitation-history') || '[]');
-          const surahSessions = stored.filter((s: { surahNumber: number }) => s.surahNumber === surahNumber);
-          if (surahSessions.length > 0) {
-            const best = Math.max(...surahSessions.map((s: { overallAccuracy: number }) => s.overallAccuracy));
-            setPreviousBest(best);
-          }
-        } catch { /* ignore */ }
-      }
-    }
-    fetchBest();
-  }, [surahNumber]);
-
-  // ============ Auto-Save Session ============
-
-  useEffect(() => {
-    if (phase !== 'complete' || !stats || saved) return;
-    setSaved(true);
-
-    const sessionData = {
-      surahNumber,
-      startAyah,
-      endAyah: effectiveEndAyah,
-      overallAccuracy: stats.accuracy,
-      duration: stats.duration,
-      totalWords: stats.totalWords,
-      matchedWords: stats.matchedWords,
-      words: tajweedData?.allWords.map((w, i) => ({
-        wordIndex: i,
-        expectedWord: w.text,
-        transcribedWord: null,
-        confidence: wordConfidences[i] || 0,
-        isCorrect: wordStates[i] === 'revealed',
-      })) || [],
-    };
-
-    // Save to API
-    fetch('/api/recitation', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(sessionData),
-    }).catch(() => {
-      // If API fails (guest user), save to localStorage
-      try {
-        const stored = JSON.parse(localStorage.getItem('recitation-history') || '[]');
-        stored.unshift({ ...sessionData, createdAt: new Date().toISOString() });
-        // Keep last 50 local sessions
-        localStorage.setItem('recitation-history', JSON.stringify(stored.slice(0, 50)));
-      } catch { /* ignore */ }
-    });
-  }, [phase, stats, saved, surahNumber, startAyah, effectiveEndAyah, tajweedData, wordStates, wordConfidences]);
 
   // ============ Cleanup ============
 
@@ -735,18 +579,6 @@ export default function LiveRecitation({
     }));
   }, [tajweedData]);
 
-  // ============ Running Accuracy ============
-
-  const runningAccuracy = useMemo(() => {
-    if (!tajweedData || tajweedData.allWords.length === 0) return 0;
-    const processed = wordStates.filter((s) => s === 'revealed' || s === 'missed').length;
-    if (processed === 0) return 100;
-    const goodWords = wordConfidences.filter(
-      (c, i) => wordStates[i] === 'revealed' && c > 0.8
-    ).length;
-    return Math.round((goodWords / processed) * 100);
-  }, [wordStates, wordConfidences, tajweedData]);
-
   // ============ Progress bar ============
 
   const progress = useMemo(() => {
@@ -760,7 +592,7 @@ export default function LiveRecitation({
   // ============ Render ============
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen bg-night-950 flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-20 bg-night-950/90 backdrop-blur-xl border-b border-night-800/50">
         <div className="flex items-center justify-between px-4 py-3">
@@ -788,31 +620,16 @@ export default function LiveRecitation({
             </p>
           </div>
 
-          {/* Timer & Accuracy */}
+          {/* Timer */}
           <div className="min-w-[60px] text-right">
             {phase === 'recording' && (
-              <motion.div
+              <motion.span
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="flex flex-col items-end gap-0.5"
+                className="text-sm font-mono text-gold-400"
               >
-                <span className="text-sm font-mono text-gold-400">
-                  {formatTime(elapsedTime)}
-                </span>
-                {currentWordIndex >= 0 && (
-                  <span
-                    className={`text-xs font-medium ${
-                      runningAccuracy >= 80
-                        ? 'text-green-400'
-                        : runningAccuracy >= 50
-                        ? 'text-yellow-400'
-                        : 'text-red-400'
-                    }`}
-                  >
-                    {runningAccuracy}%
-                  </span>
-                )}
-              </motion.div>
+                {formatTime(elapsedTime)}
+              </motion.span>
             )}
           </div>
         </div>
@@ -907,46 +724,14 @@ export default function LiveRecitation({
                   <BismillahHeader surahNumber={surahNumber} />
                 </div>
 
-                {/* Word-by-Word Toggle */}
-                <div className="max-w-2xl mx-auto flex justify-end mb-2">
-                  <button
-                    onClick={() => setWordByWordView(!wordByWordView)}
-                    className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${
-                      wordByWordView
-                        ? 'bg-gold-500/15 text-gold-400 border-gold-500/30'
-                        : 'bg-night-800/50 text-night-400 border-night-700/30 hover:bg-night-800'
-                    }`}
-                  >
-                    {wordByWordView ? '📝 Word-by-Word' : '📖 Tajweed View'}
-                  </button>
-                </div>
-
-                {/* Tajweed Text or Word-by-Word */}
+                {/* Tajweed Text */}
                 <div className="max-w-2xl mx-auto">
-                  {wordByWordView ? (
-                    <div className="space-y-4">
-                      {Array.from(
-                        { length: (effectiveEndAyah || startAyah) - startAyah + 1 },
-                        (_, i) => startAyah + i
-                      ).map(ayahNum => (
-                        <div key={ayahNum} className="bg-night-900/30 rounded-xl p-3 border border-night-800/30">
-                          <WordByWordInline
-                            surah={surahNumber}
-                            ayah={ayahNum}
-                            showTransliteration={true}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <TajweedText
-                      verses={versesForDisplay}
-                      wordStates={wordStates}
-                      wordConfidences={wordConfidences}
-                      currentWordIndex={currentWordIndex}
-                      showAyahMarkers={true}
-                    />
-                  )}
+                  <TajweedText
+                    verses={versesForDisplay}
+                    wordStates={wordStates}
+                    currentWordIndex={currentWordIndex}
+                    showAyahMarkers={true}
+                  />
                 </div>
               </div>
 
@@ -975,17 +760,10 @@ export default function LiveRecitation({
                       <div className="p-4 flex items-center justify-center gap-6">
                         {phase === 'ready' && (
                           <>
-                            {/* Previous best & hint */}
-                            <div className="mr-auto">
-                              {previousBest !== null && (
-                                <p className="text-xs text-gold-400/80 mb-0.5">
-                                  Previous best: {previousBest}%
-                                </p>
-                              )}
-                              <p className="text-xs text-night-500">
-                                Tap to start reciting
-                              </p>
-                            </div>
+                            {/* Hint text */}
+                            <p className="text-xs text-night-500 mr-auto">
+                              Tap to start reciting
+                            </p>
 
                             {/* Start button */}
                             <motion.button
@@ -1017,12 +795,6 @@ export default function LiveRecitation({
                               <span className="text-xs text-night-400">
                                 Listening...
                               </span>
-                              {activeProvider && (
-                                <span className="text-[10px] text-night-500 flex items-center gap-1">
-                                  <span className={`inline-block w-1.5 h-1.5 rounded-full ${activeProvider === 'tarteel' ? 'bg-gold-400' : 'bg-night-500'}`} />
-                                  {activeProvider === 'tarteel' ? 'Sheikh Hifz' : 'Sheikh Hifz (lite)'}
-                                </span>
-                              )}
                             </div>
 
                             {/* Stop button */}
@@ -1054,10 +826,6 @@ export default function LiveRecitation({
                       stats={stats}
                       onRetry={resetSession}
                       onBack={onBack}
-                      surahNumber={surahNumber}
-                      startAyah={startAyah}
-                      endAyah={effectiveEndAyah}
-                      wordConfidences={wordConfidences}
                     />
                   </div>
                 </motion.div>
