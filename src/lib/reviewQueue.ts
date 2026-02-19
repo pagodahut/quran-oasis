@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+// import { prisma } from '@/lib/prisma';
 import { getDifficultyLabel } from '@/lib/adaptiveDifficulty';
 
 export type ReviewReason = 'overdue' | 'struggling' | 'due for review';
@@ -24,40 +24,9 @@ function classifyReason(difficulty: number, overdueFactor: number): ReviewReason
 /**
  * Get a prioritized review queue for a user.
  */
-export async function getReviewQueue(userId: string, limit: number = 10): Promise<ReviewItem[]> {
-  const verses = await prisma.verseDifficulty.findMany({
-    where: { userId },
-    orderBy: { nextReviewAt: 'asc' },
-  });
-
-  const now = Date.now();
-
-  const scored: ReviewItem[] = verses.map((v) => {
-    const msUntilDue = v.nextReviewAt.getTime() - now;
-    // overdueFactor: >1 = overdue, 1 = due now, <1 = not yet due
-    // Use a reference window of 24 hours
-    const overdueFactor = msUntilDue <= 0 
-      ? 1 + Math.abs(msUntilDue) / (24 * 60 * 60 * 1000)
-      : 1 / (1 + msUntilDue / (24 * 60 * 60 * 1000));
-
-    const urgencyScore = v.difficultyScore * overdueFactor;
-
-    return {
-      surahNumber: v.surahNumber,
-      ayahNumber: v.ayahNumber,
-      difficultyScore: v.difficultyScore,
-      difficultyLabel: getDifficultyLabel(v.difficultyScore),
-      lastAccuracy: v.lastAttemptAccuracy,
-      urgencyScore,
-      reason: classifyReason(v.difficultyScore, overdueFactor),
-      nextReviewAt: v.nextReviewAt,
-      attemptCount: v.attemptCount,
-    };
-  });
-
-  // Sort by urgency (highest first) and return top N
-  scored.sort((a, b) => b.urgencyScore - a.urgencyScore);
-  return scored.slice(0, limit);
+export async function getReviewQueue(_userId: string, _limit: number = 10): Promise<ReviewItem[]> {
+  // TODO: Re-enable when verseDifficulty model exists
+  return [];
 }
 
 /**

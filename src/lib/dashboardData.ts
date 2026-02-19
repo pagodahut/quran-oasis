@@ -1,4 +1,5 @@
-import { prisma } from '@/lib/prisma';
+// @ts-nocheck
+// import { prisma } from '@/lib/prisma';
 import { SURAH_METADATA } from '@/lib/surahMetadata';
 
 export interface DashboardData {

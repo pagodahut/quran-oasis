@@ -1,4 +1,4 @@
-import { prisma } from './prisma';
+// import { prisma } from './prisma';
 
 export type NudgeType =
   | 'streak'
@@ -76,43 +76,12 @@ function selectNudgeType(ctx: NudgeContext): NudgeType {
 
 /** Get a nudge for the user, respecting cooldown */
 export async function getNudge(
-  userId: string,
+  _userId: string,
   context: NudgeContext
 ): Promise<Nudge | null> {
-  // Check cooldown
-  const recent = await prisma.nudgeHistory.findFirst({
-    where: { userId },
-    orderBy: { shownAt: 'desc' },
-  });
-
-  if (recent && Date.now() - recent.shownAt.getTime() < NUDGE_COOLDOWN_MS) {
-    return null;
-  }
-
-  const type = selectNudgeType(context);
-  const variants = NUDGE_VARIANTS[type];
-
-  // Find recently shown keys to avoid repetition
-  const recentNudges = await prisma.nudgeHistory.findMany({
-    where: { userId, nudgeType: type },
-    orderBy: { shownAt: 'desc' },
-    take: Math.max(1, variants.length - 2),
-    select: { nudgeKey: true },
-  });
-  const recentKeys = new Set(recentNudges.map((n) => n.nudgeKey));
-
-  // Pick one not recently shown, fallback to random
-  let candidates = variants.filter((v) => !recentKeys.has(v.key));
-  if (candidates.length === 0) candidates = variants;
-
-  const nudge = candidates[Math.floor(Math.random() * candidates.length)];
-
-  // Record it
-  await prisma.nudgeHistory.create({
-    data: { userId, nudgeType: type, nudgeKey: nudge.key },
-  });
-
-  return nudge;
+  // TODO: Re-enable DB tracking when nudgeHistory model is added
+  // For now, just use the client-side fallback
+  return getClientNudge(context);
 }
 
 /** Get nudge without DB (client-side fallback) */

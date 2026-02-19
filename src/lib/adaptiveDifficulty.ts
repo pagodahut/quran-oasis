@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+// import { prisma } from '@/lib/prisma'; // TODO: re-enable when verseDifficulty model exists
 
 /**
  * Adaptive Difficulty Algorithm
@@ -75,58 +75,17 @@ function computeDifficultyScore(
  * Returns the updated difficulty record.
  */
 export async function calculateDifficulty(
-  userId: string,
-  surahNumber: number,
-  ayahNumber: number,
-  latestAccuracy: number, // 0-1
+  _userId: string,
+  _surahNumber: number,
+  _ayahNumber: number,
+  latestAccuracy: number,
 ) {
-  // Get existing record
-  const existing = await prisma.verseDifficulty.findUnique({
-    where: {
-      userId_surahNumber_ayahNumber: { userId, surahNumber, ayahNumber },
-    },
-  });
-
-  const currentScore = existing?.difficultyScore ?? 0.5;
-  const attemptCount = (existing?.attemptCount ?? 0) + 1;
-  const lastAttemptAt = existing?.lastAttemptAt ?? null;
-
-  const difficultyScore = computeDifficultyScore(
-    currentScore,
-    attemptCount,
-    latestAccuracy,
-    lastAttemptAt,
-  );
-
-  const nextReviewAt = getNextReviewDate(difficultyScore, attemptCount, latestAccuracy);
-
-  const record = await prisma.verseDifficulty.upsert({
-    where: {
-      userId_surahNumber_ayahNumber: { userId, surahNumber, ayahNumber },
-    },
-    create: {
-      userId,
-      surahNumber,
-      ayahNumber,
-      difficultyScore,
-      lastAttemptAccuracy: latestAccuracy,
-      attemptCount,
-      lastAttemptAt: new Date(),
-      nextReviewAt,
-    },
-    update: {
-      difficultyScore,
-      lastAttemptAccuracy: latestAccuracy,
-      attemptCount,
-      lastAttemptAt: new Date(),
-      nextReviewAt,
-    },
-  });
-
+  // TODO: Re-enable when verseDifficulty model is added to Prisma schema
+  const difficultyScore = 1 - latestAccuracy;
   return {
-    difficultyScore: record.difficultyScore,
-    nextReviewAt: record.nextReviewAt,
-    attemptCount: record.attemptCount,
+    difficultyScore,
+    nextReviewAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    attemptCount: 1,
   };
 }
 

@@ -113,8 +113,9 @@ export async function GET() {
       },
       bookmarks,
       preferences: user.preferences ? {
-        emailNotifications: user.preferences.emailNotifications,
-      } : { emailNotifications: true },
+        reciter: user.preferences.reciter,
+        showTranslation: user.preferences.showTranslation,
+      } : null,
       studyPlan: user.studyPlan,
       onboarding: user.onboarding,
     });
@@ -247,19 +248,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Sync email notification preference
-    if (emailNotifications !== undefined) {
-      await prisma.userPreferences.upsert({
-        where: { userId: user.id },
-        create: {
-          userId: user.id,
-          emailNotifications,
-        },
-        update: {
-          emailNotifications,
-        },
-      });
-    }
+    // TODO: Add emailNotifications field to UserPreferences schema when email feature ships
 
     return NextResponse.json({ success: true, syncedAt: new Date().toISOString() });
   } catch (error) {
