@@ -2,6 +2,7 @@ import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getRecommendedStartLesson, getLessonsByPath } from '@/lib/lesson-content';
+import logger from '@/lib/logger';
 
 // Types for onboarding data
 interface OnboardingData {
@@ -218,7 +219,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Onboarding POST error:', error);
+    logger.error('Onboarding POST error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -257,7 +258,7 @@ export async function GET() {
       } : null,
     });
   } catch (error) {
-    console.error('Onboarding GET error:', error);
+    logger.error('Onboarding GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

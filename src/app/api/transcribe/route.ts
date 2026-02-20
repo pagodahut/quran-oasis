@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import logger from '@/lib/logger';
 
 /**
  * Audio Transcription API Route
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const error = await response.text();
-      console.error('Whisper API error:', error);
+      logger.error('Whisper API error:', error);
       return NextResponse.json(
         { error: 'Transcription failed' },
         { status: response.status }
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json({ transcription });
   } catch (error) {
-    console.error('Transcription error:', error);
+    logger.error('Transcription error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

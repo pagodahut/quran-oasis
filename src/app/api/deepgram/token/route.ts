@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
+import logger from '@/lib/logger';
 
 /**
  * Deepgram Token API Route
@@ -40,7 +41,7 @@ export async function GET(request: NextRequest) {
       scoped: false,
     });
   } catch (error) {
-    console.error('Deepgram token error:', error);
+    logger.error('Deepgram token error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

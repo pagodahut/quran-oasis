@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import logger from '@/lib/logger';
 
 /**
  * Tajweed Analysis API Route
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(analysis);
   } catch (error) {
-    console.error('Tajweed analysis error:', error);
+    logger.error('Tajweed analysis error:', error);
     return NextResponse.json(
       { error: 'Failed to analyze recitation' },
       { status: 500 }
@@ -136,7 +137,7 @@ Focus on the most important improvements, not every tiny detail.`;
 
     if (!response.ok) {
       const error = await response.text();
-      console.error('Claude API error:', error);
+      logger.error('Claude API error:', error);
       throw new Error(`Claude API error: ${response.status}`);
     }
 
@@ -169,7 +170,7 @@ Focus on the most important improvements, not every tiny detail.`;
       ],
     };
   } catch (error) {
-    console.error('Claude analysis failed:', error);
+    logger.error('Claude analysis failed:', error);
     
     // Return fallback analysis
     return {

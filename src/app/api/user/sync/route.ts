@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import logger from '@/lib/logger';
 
 interface SyncBookmark {
   surah: number;
@@ -59,7 +60,18 @@ export async function GET() {
     }
 
     // Transform to match localStorage format
-    const verses: Record<string, any> = {};
+    const verses: Record<string, {
+      surah: number;
+      ayah: number;
+      easeFactor: number;
+      interval: number;
+      repetitions: number;
+      nextReview: Date;
+      lastReview: Date | null;
+      status: string;
+      confidence: number;
+      totalReviews: number;
+    }> = {};
     for (const p of user.progress) {
       const key = `${p.surahNumber}:${p.ayahNumber}`;
       verses[key] = {
@@ -114,7 +126,7 @@ export async function GET() {
       onboarding: user.onboarding,
     });
   } catch (error) {
-    console.error('Sync GET error:', error);
+    logger.error('Sync GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -239,7 +251,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, syncedAt: new Date().toISOString() });
   } catch (error) {
-    console.error('Sync POST error:', error);
+    logger.error('Sync POST error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
