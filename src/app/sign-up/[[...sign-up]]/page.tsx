@@ -2,21 +2,14 @@
 
 import { SignUp } from '@clerk/nextjs';
 import Link from 'next/link';
-import Image from 'next/image';
+import { HifzLogo } from '@/components/brand/HifzLogo';
 
 export default function SignUpPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       {/* Logo */}
-      <Link href="/" className="mb-8 flex items-center gap-2">
-        <Image
-          src="/hifz-logo.png"
-          alt="HIFZ"
-          width={40}
-          height={40}
-          className="w-10 h-10"
-        />
-        <span className="text-2xl font-bold text-night-100">HIFZ</span>
+      <Link href="/" className="mb-8">
+        <HifzLogo iconSize={40} wordmarkSize={24} animated={false} />
       </Link>
 
       {/* Sign Up Component */}

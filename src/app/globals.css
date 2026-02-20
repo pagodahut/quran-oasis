@@ -3629,3 +3629,50 @@ html.no-transitions * {
   background: var(--theme-card);
   border-color: var(--theme-border);
 }
+
+/* ============================================
+   Dark Mode - Class-based (darkMode: 'class')
+   ============================================ */
+
+.dark {
+  color-scheme: dark;
+  --background: #0a0e14;
+  --foreground: #e6edf3;
+  --surface: rgba(22, 27, 34, 0.8);
+  --surface-elevated: rgba(30, 36, 44, 0.9);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.1);
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted: #484f58;
+  --gold-glow: rgba(201, 162, 39, 0.15);
+  --teal-glow: rgba(26, 107, 107, 0.12);
+}
+
+.dark body {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* Dark glass surfaces */
+.dark .liquid-card {
+  background: linear-gradient(135deg, rgba(22, 27, 34, 0.72), rgba(255, 255, 255, 0.02));
+  border-color: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.dark .liquid-glass-gold {
+  background: linear-gradient(135deg, rgba(201, 162, 39, 0.08), rgba(22, 27, 34, 0.7));
+  border-color: rgba(201, 162, 39, 0.15);
+  box-shadow: 0 0 24px rgba(201, 162, 39, 0.08), 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.dark .liquid-glass-gold-premium {
+  background: linear-gradient(135deg, rgba(201, 162, 39, 0.12), rgba(22, 27, 34, 0.8));
+  border-color: rgba(201, 162, 39, 0.2);
+  box-shadow: 0 0 32px rgba(201, 162, 39, 0.1), 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.dark .liquid-btn {
+  box-shadow: 0 2px 12px rgba(201, 162, 39, 0.3), 0 8px 28px rgba(201, 162, 39, 0.2);
+}

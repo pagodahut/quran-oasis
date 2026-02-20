@@ -34,25 +34,26 @@ const variantClasses: Record<LiquidButtonVariant, string> = {
     'text-night-950 font-semibold',
     'border border-white/20',
     'shadow-[0_2px_8px_rgba(201,162,39,0.25),0_8px_24px_rgba(201,162,39,0.2),inset_0_1px_0_rgba(255,255,255,0.25)]',
+    'dark:shadow-[0_2px_12px_rgba(201,162,39,0.3),0_8px_28px_rgba(201,162,39,0.25),inset_0_1px_0_rgba(255,255,255,0.20)]',
   ].join(' '),
   secondary: [
     'backdrop-blur-[16px]',
-    'bg-white/[0.06]',
-    'text-night-100 font-medium',
-    'border border-white/10',
-    'shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.06)]',
+    'bg-white/[0.12] dark:bg-white/[0.06]',
+    'text-night-800 dark:text-night-100 font-medium',
+    'border border-black/[0.08] dark:border-white/10',
+    'shadow-[0_2px_8px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.3)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.06)]',
   ].join(' '),
   ghost: [
     'bg-transparent',
-    'text-night-300 font-medium',
+    'text-night-600 dark:text-night-300 font-medium',
     'border border-transparent',
-    'hover:bg-white/[0.04]',
+    'hover:bg-black/[0.04] dark:hover:bg-white/[0.04]',
   ].join(' '),
   icon: [
     'backdrop-blur-[16px]',
-    'bg-white/[0.05]',
-    'text-night-400',
-    'border border-white/[0.06]',
+    'bg-white/[0.1] dark:bg-white/[0.05]',
+    'text-night-500 dark:text-night-400',
+    'border border-black/[0.06] dark:border-white/[0.06]',
     'flex items-center justify-center',
   ].join(' '),
 };
@@ -89,11 +90,7 @@ const LiquidButton = forwardRef<HTMLButtonElement, LiquidButtonProps>(
         {...props}
       >
         {icon && <span className="flex-shrink-0">{icon}</span>}
-
-        {/* Normal children (non-expand mode) */}
         {!expandLabel && children}
-
-        {/* Expand label mode */}
         <AnimatePresence>
           {expandLabel && expanded && (
             <motion.span

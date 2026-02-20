@@ -26,8 +26,11 @@ export default function LiquidPill({ children, selected = false, onClick, classN
         'backdrop-blur-[12px] transition-colors duration-200',
         'border',
         selected
-          ? 'bg-gold-500/20 border-gold-500/30 text-gold-400'
-          : 'bg-white/[0.06] border-white/[0.08] text-night-400 hover:text-night-200 hover:bg-white/[0.1]',
+          ? 'bg-gold-500/20 border-gold-500/30 text-gold-600 dark:text-gold-400'
+          : [
+              'bg-black/[0.04] border-black/[0.06] text-night-500 hover:text-night-700 hover:bg-black/[0.08]',
+              'dark:bg-white/[0.06] dark:border-white/[0.08] dark:text-night-400 dark:hover:text-night-200 dark:hover:bg-white/[0.1]',
+            ].join(' '),
         className,
       )}
     >

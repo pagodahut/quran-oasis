@@ -21,6 +21,8 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
+import KanbanBoard from '@/components/KanbanBoard';
+import AgentPanel from '@/components/AgentPanel';
 import { StreakDisplay } from '@/components/Celebrations';
 import { 
   getStreakInfo, 
@@ -672,6 +674,16 @@ export default function DashboardPage() {
             <RecentActivity activities={recentActivity} />
           </motion.section>
           
+          {/* Agent Panel */}
+          <motion.section variants={fadeInUp}>
+            <AgentPanel />
+          </motion.section>
+
+          {/* Kanban Board */}
+          <motion.section variants={fadeInUp}>
+            <KanbanBoard />
+          </motion.section>
+
           {/* Quick Actions for New Users */}
           {quranProgress.versesMemorized === 0 && (
             <motion.section variants={fadeInUp} className="mt-6">

@@ -27,8 +27,8 @@ export default function LiquidToggle({ checked, onChange, disabled = false, clas
         'backdrop-blur-[12px] border',
         'disabled:opacity-50 disabled:cursor-not-allowed',
         checked
-          ? 'bg-gold-500/20 border-gold-500/40'
-          : 'bg-white/[0.05] border-white/10',
+          ? 'bg-gold-500/20 border-gold-500/40 dark:bg-gold-500/25 dark:border-gold-500/50'
+          : 'bg-black/[0.05] border-black/[0.08] dark:bg-white/[0.05] dark:border-white/10',
         className,
       )}
     >
@@ -39,7 +39,7 @@ export default function LiquidToggle({ checked, onChange, disabled = false, clas
           'w-[22px] h-[22px] rounded-full',
           checked
             ? 'bg-gradient-to-br from-gold-400 to-gold-600 shadow-[0_0_10px_rgba(201,162,39,0.5),0_2px_4px_rgba(0,0,0,0.2)]'
-            : 'bg-gradient-to-br from-white/90 to-white/70 shadow-[0_2px_4px_rgba(0,0,0,0.2)]',
+            : 'bg-gradient-to-br from-night-300 to-night-400 dark:from-white/90 dark:to-white/70 shadow-[0_2px_4px_rgba(0,0,0,0.2)]',
         )}
         style={{ x: checked ? 20 : 0 }}
       />
