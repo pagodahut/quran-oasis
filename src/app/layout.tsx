@@ -11,6 +11,7 @@ import PushNotificationPrompt from '@/components/PushNotificationPrompt';
 import OfflineIndicator from '@/components/OfflineIndicator';
 import SkipToContent from '@/components/SkipToContent';
 import SheikhProvider from '@/components/SheikhProvider';
+import UTMCapture from '@/components/UTMCapture';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { PremiumProvider } from '@/contexts/PremiumContext';
 import { fontVariables } from '@/lib/fonts';
@@ -193,6 +194,7 @@ export default function RootLayout({
           <ToastProvider>
             <SyncProvider>
               <SheikhProvider>
+                <UTMCapture />
                 <ServiceWorkerRegistration />
                 <OfflineIndicator />
                 <main id="main-content" tabIndex={-1} className="outline-none">
