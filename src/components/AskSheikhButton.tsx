@@ -19,47 +19,50 @@ interface AskSheikhButtonProps {
   show?: boolean;
 }
 
-/** Stylized crescent moon + open book SVG icon */
+/** Premium crescent moon & star icon — elegant Islamic motif */
 function SheikhIcon() {
   return (
     <svg
-      width="28"
-      height="28"
-      viewBox="0 0 28 28"
+      width="30"
+      height="30"
+      viewBox="0 0 30 30"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className="sheikh-icon"
     >
-      {/* Open book base */}
+      {/* Crescent moon — thick, elegant arc */}
       <path
-        d="M4 20.5C4 20.5 6.5 18.5 14 18.5C21.5 18.5 24 20.5 24 20.5V9C24 9 21.5 7 14 7C6.5 7 4 9 4 9V20.5Z"
+        d="M19.5 5.5C16.8 7.2 15.2 10.2 15.2 13.5C15.2 16.8 16.8 19.8 19.5 21.5C17.2 22.8 14.4 23 11.9 21.8C9.4 20.6 7.6 18.2 7 15.4C6.4 12.6 7.1 9.7 8.9 7.5C10.7 5.3 13.4 4 16.3 4C17.5 4 18.6 4.3 19.5 5.5Z"
+        fill="url(#crescentGrad)"
+        stroke="rgba(212,175,55,0.3)"
+        strokeWidth="0.5"
+      />
+      {/* Star */}
+      <path
+        d="M22.5 8L23.3 10.2L25.5 10.2L23.7 11.5L24.3 13.7L22.5 12.4L20.7 13.7L21.3 11.5L19.5 10.2L21.7 10.2Z"
+        fill="url(#starGrad)"
+      />
+      {/* Small decorative star */}
+      <circle cx="25" cy="7" r="0.9" fill="currentColor" opacity="0.5" />
+      <circle cx="21" cy="5.5" r="0.5" fill="currentColor" opacity="0.35" />
+      {/* Subtle geometric line beneath — like a minaret silhouette hint */}
+      <path
+        d="M10 24.5C12.5 23 17.5 23 20 24.5"
         stroke="currentColor"
-        strokeWidth="1.5"
+        strokeWidth="0.7"
         strokeLinecap="round"
-        strokeLinejoin="round"
-        opacity="0.9"
+        opacity="0.25"
       />
-      {/* Book spine */}
-      <path
-        d="M14 7V18.5"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinecap="round"
-        opacity="0.7"
-      />
-      {/* Crescent moon above book */}
-      <path
-        d="M16.5 3C15.2 3.8 14.5 5.2 14.5 6.5C14.5 7.8 15.2 9 16.5 9.5C15.3 9.8 14 9.3 13.2 8.3C12.4 7.3 12.2 5.9 12.8 4.7C13.4 3.5 14.8 2.8 16.5 3Z"
-        fill="currentColor"
-        opacity="0.85"
-      />
-      {/* Small star */}
-      <circle cx="19" cy="4.5" r="0.8" fill="currentColor" opacity="0.6" />
-      {/* Subtle page lines */}
-      <path d="M7 11.5H11" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round" opacity="0.3" />
-      <path d="M7 13.5H10" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round" opacity="0.3" />
-      <path d="M17 11.5H21" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round" opacity="0.3" />
-      <path d="M17 13.5H20" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round" opacity="0.3" />
+      <defs>
+        <linearGradient id="crescentGrad" x1="7" y1="4" x2="20" y2="22" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#f5d680" />
+          <stop offset="1" stopColor="#d4af37" />
+        </linearGradient>
+        <linearGradient id="starGrad" x1="20" y1="8" x2="25" y2="14" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#ffe8a0" />
+          <stop offset="1" stopColor="#d4af37" />
+        </linearGradient>
+      </defs>
     </svg>
   );
 }
@@ -146,8 +149,8 @@ export default function AskSheikhButton({
       <style jsx>{`
         .sheikh-fab {
           position: relative;
-          width: 60px;
-          height: 60px;
+          width: 64px;
+          height: 64px;
           border-radius: 50%;
           border: none;
           cursor: pointer;
@@ -158,15 +161,16 @@ export default function AskSheikhButton({
 
         .sheikh-fab__glow {
           position: absolute;
-          inset: -3px;
+          inset: -6px;
           border-radius: 50%;
           background: radial-gradient(
             circle,
-            rgba(212, 175, 55, 0.25) 0%,
-            rgba(212, 175, 55, 0.08) 50%,
-            transparent 70%
+            rgba(212, 175, 55, 0.35) 0%,
+            rgba(212, 175, 55, 0.12) 40%,
+            rgba(212, 175, 55, 0.04) 60%,
+            transparent 75%
           );
-          animation: sheikhBreathe 4s ease-in-out infinite;
+          animation: sheikhBreathe 3.5s ease-in-out infinite;
           pointer-events: none;
         }
 
@@ -175,58 +179,58 @@ export default function AskSheikhButton({
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 60px;
-          height: 60px;
+          width: 64px;
+          height: 64px;
           border-radius: 50%;
           background: linear-gradient(
             145deg,
-            rgba(255, 255, 255, 0.12) 0%,
-            rgba(255, 255, 255, 0.04) 50%,
-            rgba(212, 175, 55, 0.08) 100%
+            rgba(30, 25, 15, 0.85) 0%,
+            rgba(20, 18, 12, 0.92) 50%,
+            rgba(35, 28, 12, 0.88) 100%
           );
-          backdrop-filter: blur(24px) saturate(1.4);
-          -webkit-backdrop-filter: blur(24px) saturate(1.4);
-          border: 1px solid rgba(255, 255, 255, 0.15);
+          backdrop-filter: blur(32px) saturate(1.6);
+          -webkit-backdrop-filter: blur(32px) saturate(1.6);
+          border: 1.5px solid rgba(212, 175, 55, 0.3);
           box-shadow:
-            0 0 20px rgba(212, 175, 55, 0.15),
-            0 4px 16px rgba(0, 0, 0, 0.25),
-            inset 0 1px 0 rgba(255, 255, 255, 0.12),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-          color: rgba(212, 175, 55, 0.9);
+            0 0 24px rgba(212, 175, 55, 0.2),
+            0 6px 20px rgba(0, 0, 0, 0.35),
+            inset 0 1px 0 rgba(212, 175, 55, 0.15),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+          color: rgba(212, 175, 55, 0.95);
           transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
         .sheikh-fab:hover .sheikh-fab__surface {
-          border-color: rgba(212, 175, 55, 0.35);
+          border-color: rgba(212, 175, 55, 0.55);
           box-shadow:
-            0 0 30px rgba(212, 175, 55, 0.3),
-            0 0 60px rgba(212, 175, 55, 0.1),
-            0 6px 20px rgba(0, 0, 0, 0.3),
-            inset 0 1px 0 rgba(255, 255, 255, 0.15);
-          color: rgba(212, 175, 55, 1);
+            0 0 40px rgba(212, 175, 55, 0.35),
+            0 0 80px rgba(212, 175, 55, 0.12),
+            0 8px 24px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(212, 175, 55, 0.25);
+          color: rgba(245, 214, 128, 1);
           background: linear-gradient(
             145deg,
-            rgba(255, 255, 255, 0.16) 0%,
-            rgba(255, 255, 255, 0.06) 50%,
-            rgba(212, 175, 55, 0.12) 100%
+            rgba(40, 32, 15, 0.9) 0%,
+            rgba(25, 22, 12, 0.95) 50%,
+            rgba(45, 35, 15, 0.9) 100%
           );
         }
 
         .sheikh-fab:active .sheikh-fab__surface {
           box-shadow:
-            0 0 16px rgba(212, 175, 55, 0.2),
-            0 2px 8px rgba(0, 0, 0, 0.3),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            0 0 20px rgba(212, 175, 55, 0.25),
+            0 2px 10px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(212, 175, 55, 0.1);
         }
 
         @keyframes sheikhBreathe {
           0%, 100% {
-            opacity: 0.5;
+            opacity: 0.4;
             transform: scale(1);
           }
           50% {
             opacity: 1;
-            transform: scale(1.08);
+            transform: scale(1.12);
           }
         }
       `}</style>

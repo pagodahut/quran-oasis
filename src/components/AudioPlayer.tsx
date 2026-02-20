@@ -79,6 +79,9 @@ export function AudioPlayer({
   const [isCached, setIsCached] = useState(false);
   const [networkQuality, setNetworkQuality] = useState<AudioQuality>('high');
   const [previewingReciter, setPreviewingReciter] = useState<string | null>(null);
+  const [audioError, setAudioError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const MAX_RETRIES = 3;
 
   // Get effective quality
   const effectiveQuality: AudioQuality = settings.audioQuality === 'auto' 
@@ -100,11 +103,19 @@ export function AudioPlayer({
     }
   }, [isPlaying, surah, ayah, reciter, effectiveQuality, totalAyahs, settings.autoPreload]);
 
-  // Auto-play effect
+  // Reset error state on track change
+  useEffect(() => {
+    setAudioError(null);
+    setRetryCount(0);
+  }, [surah, ayah, reciter]);
+
+  // Auto-play effect — guarded for browser autoplay policy
   useEffect(() => {
     if (audioRef.current && autoPlay) {
-      audioRef.current.play();
-      setIsPlaying(true);
+      audioRef.current.play().catch(() => {
+        // Autoplay blocked by browser — require user interaction
+        setIsPlaying(false);
+      });
     }
   }, [autoPlay, surah, ayah]);
 
@@ -128,11 +139,34 @@ export function AudioPlayer({
     
     if (isPlaying) {
       audioRef.current.pause();
+      setIsPlaying(false);
     } else {
-      audioRef.current.play();
+      setAudioError(null);
+      audioRef.current.play().catch((err) => {
+        console.error('Audio play failed:', err);
+        setAudioError('Playback failed. Tap to retry.');
+        setIsPlaying(false);
+      });
+      setIsPlaying(true);
     }
-    setIsPlaying(!isPlaying);
   }, [isPlaying]);
+
+  const handleAudioError = useCallback(() => {
+    setIsPlaying(false);
+    setIsLoading(false);
+    if (retryCount < MAX_RETRIES) {
+      // Auto-retry with a small delay
+      const delay = (retryCount + 1) * 1000;
+      setTimeout(() => {
+        if (audioRef.current) {
+          setRetryCount(prev => prev + 1);
+          audioRef.current.load();
+        }
+      }, delay);
+    } else {
+      setAudioError('Audio unavailable. Check your connection and try again.');
+    }
+  }, [retryCount]);
 
   const handleTimeUpdate = useCallback(() => {
     if (audioRef.current) {
@@ -292,13 +326,34 @@ export function AudioPlayer({
       <audio
         ref={audioRef}
         src={audioUrl}
+        crossOrigin="anonymous"
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
         onLoadStart={handleLoadStart}
         onCanPlay={handleCanPlay}
         onEnded={handleEnded}
+        onError={handleAudioError}
         preload="auto"
       />
+
+      {/* Audio error banner */}
+      {audioError && (
+        <div className="relative z-10 mb-3 flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20">
+          <span className="text-xs text-red-300">{audioError}</span>
+          <button
+            onClick={() => {
+              setAudioError(null);
+              setRetryCount(0);
+              if (audioRef.current) {
+                audioRef.current.load();
+              }
+            }}
+            className="ml-auto text-xs font-medium text-red-400 hover:text-red-300 px-2 py-1 rounded bg-red-500/10"
+          >
+            Retry
+          </button>
+        </div>
+      )}
 
       {showControls && (
         <div className="relative z-10">
@@ -692,10 +747,14 @@ export function PlayButton({
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
+        setIsPlaying(false);
       } else {
-        audioRef.current.play();
+        audioRef.current.play().catch((err) => {
+          console.error('PlayButton: playback failed', err);
+          setIsPlaying(false);
+        });
+        setIsPlaying(true);
       }
-      setIsPlaying(!isPlaying);
     }
   };
 
@@ -704,7 +763,9 @@ export function PlayButton({
       <audio
         ref={audioRef}
         src={audioUrl}
+        crossOrigin="anonymous"
         onEnded={() => setIsPlaying(false)}
+        onError={() => setIsPlaying(false)}
       />
       <motion.button
         whileHover={{ scale: 1.1 }}
