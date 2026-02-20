@@ -22,21 +22,21 @@ function HifzLogoSvg({ size = 40, color = '#c9a227', className = '' }: { size?: 
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 200 210"
+      viewBox="0 0 200 246"
       width={size}
-      height={size * 1.05}
+      height={size * 1.23}
       fill={color}
       className={className}
       aria-label="HIFZ"
     >
       {/* Crescent Moon */}
-      <path d="M76 6a14 14 0 1 1-3.5 27.5A17.5 17.5 0 1 0 76 6Z"/>
-      {/* Top chevron - curved wings */}
-      <path d="M0 36L68 36C78 36 86 42 92 54C96 62 99 76 100 108C101 76 104 62 108 54C114 42 122 36 132 36L200 36L200 56C170 56 145 60 125 74C112 83 106 96 100 114C94 96 88 83 75 74C55 60 30 56 0 56Z"/>
+      <path d="M125 4a18 18 0 1 1-4.5 35.5A22.5 22.5 0 1 0 125 4Z"/>
+      {/* Top chevron - curved open book wings */}
+      <path d="M0 60C25 60 50 60 70 60C82 60 90 62 95 68C98 72 100 80 100 80C100 80 102 72 105 68C110 62 118 60 130 60C150 60 175 60 200 60L200 96C165 96 135 100 115 112C106 118 103 130 100 148C97 130 94 118 85 112C65 100 35 96 0 96Z"/>
       {/* Middle chevron */}
-      <path d="M0 122L68 122L100 160L132 122L200 122L200 142L132 142L100 180L68 142L0 142Z"/>
+      <path d="M0 154L65 154L100 194L135 154L200 154L200 176L135 176L100 216L65 176L0 176Z"/>
       {/* Bottom chevron */}
-      <path d="M0 150L68 150L100 188L132 150L200 150L200 170L132 170L100 208L68 170L0 170Z"/>
+      <path d="M0 184L65 184L100 224L135 184L200 184L200 206L135 206L100 246L65 206L0 206Z"/>
     </svg>
   );
 }
