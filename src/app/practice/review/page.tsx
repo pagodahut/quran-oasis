@@ -126,13 +126,22 @@ export default function ReviewQueuePage() {
             <p className="text-night-400 mb-8 max-w-xs mx-auto">
               You&apos;ve reviewed all your verses. Keep up the great work!
             </p>
-            <Link
-              href="/surahs"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gold-500/20 text-gold-400 border border-gold-500/30 hover:bg-gold-500/30 transition-colors"
-            >
-              <BookOpen className="w-4 h-4" />
-              Memorize New Verses
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link
+                href="/recite?surah=1&ayah=1"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gold-500/20 text-gold-400 border border-gold-500/30 hover:bg-gold-500/30 transition-colors"
+              >
+                <Play className="w-4 h-4" />
+                Try a Sample Review (Al-Fatihah)
+              </Link>
+              <Link
+                href="/surahs"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-night-800/50 text-night-300 border border-night-700/30 hover:bg-night-800 transition-colors"
+              >
+                <BookOpen className="w-4 h-4" />
+                Memorize New Verses
+              </Link>
+            </div>
           </motion.div>
         ) : (
           <motion.div initial="hidden" animate="visible" variants={stagger} className="space-y-3">

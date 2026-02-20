@@ -667,7 +667,7 @@ export default function MemorizePage() {
       <header className="glass sticky top-0 z-40 safe-area-top">
         <div className="flex items-center justify-between px-4 py-3">
           <button 
-            onClick={() => router.back()} 
+            onClick={() => router.push('/dashboard')} 
             className="p-2 hover:bg-night-800 rounded-xl transition-colors"
           >
             <X className="w-5 h-5 text-night-400" />

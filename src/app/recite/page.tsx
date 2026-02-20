@@ -412,7 +412,7 @@ export default function RecitePage() {
     } else if (selectingSurah) {
       setSelectingSurah(null);
     } else {
-      router.back();
+      router.push('/practice');
     }
   }, [selectedSurah, selectingSurah, router]);
 

@@ -18,11 +18,8 @@ import {
   Star,
   Zap,
   Award,
-  MessageCircle,
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
-import KanbanBoard from '@/components/KanbanBoard';
-import AgentPanel from '@/components/AgentPanel';
 import { StreakDisplay } from '@/components/Celebrations';
 import { 
   getStreakInfo, 
@@ -77,6 +74,31 @@ function getGreeting(): string {
   if (hour >= 12 && hour < 17) return 'Good Afternoon';
   if (hour >= 17 && hour < 21) return 'Good Evening';
   return 'Good Night';
+}
+
+const INSPIRATION_MESSAGES = [
+  '"Whoever recites a letter from the Book of Allah will receive a good deed, and each good deed is multiplied by ten." — Prophet Muhammad ﷺ (Tirmidhi)',
+  '"The Quran will be a proof for you or against you." — Prophet Muhammad ﷺ (Muslim)',
+  '"The best among you are those who learn the Quran and teach it." — Prophet Muhammad ﷺ (Bukhari)',
+  '"Read the Quran, for it will come as an intercessor for its reciters on the Day of Resurrection." — Prophet Muhammad ﷺ (Muslim)',
+  '"The one who is proficient in the recitation of the Quran will be with the honourable and obedient scribes (angels)." — Prophet Muhammad ﷺ (Bukhari & Muslim)',
+  '"Verily the one who recites the Quran beautifully and precisely, will be in the company of the noble and obedient angels." — Prophet Muhammad ﷺ (Bukhari)',
+  '"Indeed, Allah elevates some people with this Quran and degrades others with it." — Prophet Muhammad ﷺ (Muslim)',
+  '"It will be said to the companion of the Quran: Read and ascend, and beautify your voice as you used to in the world." — Prophet Muhammad ﷺ (Abu Dawud & Tirmidhi)',
+  '"Do not make your houses graveyards. Indeed, Shaytan flees from the house in which Surah Al-Baqarah is recited." — Prophet Muhammad ﷺ (Muslim)',
+  '"The Quran is a rich treasure — whoever finds it has found great wealth." — Abdullah ibn Mas\'ud (رضي الله عنه)',
+  'Every verse you memorize is a seed planted for your akhirah. Keep going! 🌱',
+  'Consistency is the key to Hifz. Even one ayah a day adds up to 365 ayahs a year.',
+  'The journey of a thousand miles begins with a single step. You are already on the path. ✨',
+  'Remember: the Quran was revealed gradually over 23 years. Be patient with yourself.',
+];
+
+function getInspirationMessage(): string {
+  // Use day of year + hour so it changes a few times a day
+  const now = new Date();
+  const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+  const index = (dayOfYear * 3 + Math.floor(now.getHours() / 8)) % INSPIRATION_MESSAGES.length;
+  return INSPIRATION_MESSAGES[index];
 }
 
 function getIslamicDate(): string {
@@ -525,12 +547,17 @@ export default function DashboardPage() {
           variants={stagger}
           className="space-y-6"
         >
-          {/* Header - Date only */}
+          {/* Header with Greeting */}
           <motion.header variants={fadeInUp} className="pt-4 pb-2">
             <div className="flex items-start justify-between">
-              <p className="text-night-500 text-sm uppercase tracking-wider">
-                {getIslamicDate()}
-              </p>
+              <div>
+                <h1 className="text-2xl font-bold text-night-100 mb-1">
+                  {getGreeting()}, {displayName}
+                </h1>
+                <p className="text-night-500 text-sm">
+                  {getIslamicDate()}
+                </p>
+              </div>
               
               {/* Streak Badge */}
               <motion.div
@@ -546,7 +573,19 @@ export default function DashboardPage() {
             </div>
           </motion.header>
           
-          {/* Sheikh greeting removed — encouragement lives in the Today's Goal section */}
+          {/* Inspirational Message */}
+          <motion.div variants={fadeInUp} className="liquid-card rounded-2xl p-4">
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg bg-gold-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Sparkles className="w-4 h-4 text-gold-400" />
+              </div>
+              <div>
+                <p className="text-night-200 text-sm leading-relaxed italic">
+                  {getInspirationMessage()}
+                </p>
+              </div>
+            </div>
+          </motion.div>
           
           {/* Daily Goal Progress Mini */}
           <motion.div variants={fadeInUp} className="liquid-glass-gold rounded-2xl p-4">
@@ -575,6 +614,37 @@ export default function DashboardPage() {
             )}
           </motion.div>
           
+          {/* Quick Stats Grid - Memorization Progress */}
+          <motion.section variants={fadeInUp}>
+            <h2 className="text-night-500 text-xs uppercase tracking-wider mb-3 px-1">Your Progress</h2>
+            <div className="grid grid-cols-3 gap-3">
+              <QuickStat
+                icon={BookOpen}
+                value={quranProgress.versesMemorized}
+                label="Verses"
+                color="text-gold-400"
+              />
+              <QuickStat
+                icon={Zap}
+                value={streakInfo.longest}
+                label="Best Streak"
+                color="text-orange-400"
+              />
+              <QuickStat
+                icon={Award}
+                value={achievements.unlocked.length}
+                label="Achievements"
+                color="text-purple-400"
+              />
+            </div>
+            <Link 
+              href="/progress" 
+              className="flex items-center justify-center gap-2 mt-3 text-night-400 hover:text-night-200 transition-colors text-sm"
+            >
+              View detailed progress <ArrowRight className="w-4 h-4" />
+            </Link>
+          </motion.section>
+
           {/* Daily Focus Cards */}
           <motion.section variants={fadeInUp}>
             <h2 className="text-night-500 text-xs uppercase tracking-wider mb-3 px-1">Daily Focus</h2>
@@ -637,53 +707,12 @@ export default function DashboardPage() {
             </motion.section>
           )}
           
-          {/* Quick Stats Grid */}
-          <motion.section variants={fadeInUp}>
-            <h2 className="text-night-500 text-xs uppercase tracking-wider mb-3 px-1">Your Progress</h2>
-            <div className="grid grid-cols-3 gap-3">
-              <QuickStat
-                icon={BookOpen}
-                value={quranProgress.versesMemorized}
-                label="Verses"
-                color="text-gold-400"
-              />
-              <QuickStat
-                icon={Zap}
-                value={streakInfo.longest}
-                label="Best Streak"
-                color="text-orange-400"
-              />
-              <QuickStat
-                icon={Award}
-                value={achievements.unlocked.length}
-                label="Achievements"
-                color="text-purple-400"
-              />
-            </div>
-            <Link 
-              href="/progress" 
-              className="flex items-center justify-center gap-2 mt-3 text-night-400 hover:text-night-200 transition-colors text-sm"
-            >
-              View detailed progress <ArrowRight className="w-4 h-4" />
-            </Link>
-          </motion.section>
-          
           {/* Recent Activity */}
           <motion.section variants={fadeInUp}>
             <h2 className="text-night-500 text-xs uppercase tracking-wider mb-3 px-1">Recent Activity</h2>
             <RecentActivity activities={recentActivity} />
           </motion.section>
           
-          {/* Agent Panel */}
-          <motion.section variants={fadeInUp}>
-            <AgentPanel />
-          </motion.section>
-
-          {/* Kanban Board */}
-          <motion.section variants={fadeInUp}>
-            <KanbanBoard />
-          </motion.section>
-
           {/* Quick Actions for New Users */}
           {quranProgress.versesMemorized === 0 && (
             <motion.section variants={fadeInUp} className="mt-6">

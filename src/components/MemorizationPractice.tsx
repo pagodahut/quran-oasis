@@ -543,6 +543,13 @@ export default function MemorizationPractice({
                 <CheckCircle2 className="w-5 h-5 mr-2" />
                 I Recited Successfully!
               </button>
+
+              <a
+                href={`/recite?surah=${surah}&ayah=${ayah}`}
+                className="block text-center text-sm text-gold-400 hover:text-gold-300 transition-colors mt-2"
+              >
+                Or try Recite & Reveal with AI error detection →
+              </a>
               
               <button
                 onClick={() => {

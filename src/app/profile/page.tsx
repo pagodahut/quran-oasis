@@ -31,6 +31,7 @@ import {
   Zap,
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
+import AgentPanel from '@/components/AgentPanel';
 import { getProgressStats, getSurahProgressList } from '@/lib/progressStore';
 import { StreakDisplay, GoalProgressRing } from '@/components/Celebrations';
 import { 
@@ -496,6 +497,12 @@ export default function ProfilePage() {
               <SettingsRow icon={Target} label="Daily Goal" href="/settings" />
               <SettingsRow icon={Palette} label="Preferences" href="/settings" />
             </div>
+          </motion.div>
+
+          {/* Agent Actions */}
+          <motion.div variants={fadeInUp}>
+            <h3 className="text-sm font-medium text-night-400 mb-3 px-1">AI Agent Activity</h3>
+            <AgentPanel />
           </motion.div>
 
           <motion.div variants={fadeInUp}>
