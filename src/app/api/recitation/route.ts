@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// TODO: Wire up recitation session tracking once model is finalized
 export async function POST(request: NextRequest) {
-  return NextResponse.json({ message: 'Recitation endpoint not yet configured' });
+  return NextResponse.json(
+    { error: 'Not implemented', message: 'This feature is coming soon' },
+    { status: 501 }
+  );
 }
 
 export async function GET(request: NextRequest) {
-  return NextResponse.json({ sessions: [] });
+  return NextResponse.json(
+    { error: 'Not implemented', message: 'This feature is coming soon' },
+    { status: 501 }
+  );
 }

@@ -137,7 +137,7 @@ function OfflineModelSection() {
         </div>
       </div>
       <OfflineModelLoader 
-        onReady={() => console.log('Offline model ready!')}
+        onReady={() => {}}
       />
     </div>
   );

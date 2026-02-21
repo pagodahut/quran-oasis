@@ -18,7 +18,6 @@ if (clerkPubKey) {
     '/surahs(.*)',
     '/techniques(.*)',
     '/onboarding(.*)',
-    '/api/sheikh(.*)',
     '/api/deepgram(.*)',
     '/api/transcribe(.*)',
     '/api/tajweed(.*)',

@@ -2,7 +2,7 @@
  * SEO Constants and Utilities for HIFZ
  */
 
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://studio-coral-alpha.vercel.app';
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://gethifz.com';
 export const SITE_NAME = 'HIFZ';
 
 export const defaultMeta = {

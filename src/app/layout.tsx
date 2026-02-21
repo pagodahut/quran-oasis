@@ -1,6 +1,3 @@
-// Force dynamic rendering for all pages - Clerk needs runtime context
-export const dynamic = 'force-dynamic';
-
 import type { Metadata, Viewport } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
@@ -175,7 +172,7 @@ export default function RootLayout({
     <html lang="en" dir="ltr" className={`dark ${fontVariables}`} data-scroll-behavior="smooth">
       <head>
         {/* Favicon */}
-        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon.png" type="image/png" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         

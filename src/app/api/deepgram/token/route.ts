@@ -3,14 +3,7 @@ import { auth } from '@clerk/nextjs/server';
 
 /**
  * Deepgram Token API Route
- * Returns API key for client-side WebSocket connection
- *
- * NOTE: In production, this should:
- * 1. Generate temporary/scoped tokens via Deepgram's API
- * 2. Implement rate limiting per user
- * 3. Log usage for monitoring
- *
- * For now, returns the key directly (still better than NEXT_PUBLIC_)
+ * Returns a short-lived scoped token for client-side WebSocket connection
  */
 
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY;
@@ -33,11 +26,31 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Request a short-lived temporary token from Deepgram
+    const response = await fetch('https://api.deepgram.com/v1/auth/token', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Token ${DEEPGRAM_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ time_to_live: 600 }),
+    });
+
+    if (!response.ok) {
+      console.error('Deepgram token request failed:', response.status, await response.text());
+      return NextResponse.json(
+        { error: 'Failed to generate temporary token' },
+        { status: 502 }
+      );
+    }
+
+    const data = await response.json();
+
     return NextResponse.json({
-      apiKey: DEEPGRAM_API_KEY,
+      apiKey: data.key,
       configured: true,
-      // Indicate this is a full key (not scoped) - for monitoring
-      scoped: false,
+      scoped: true,
+      expiresIn: 600,
     });
   } catch (error) {
     console.error('Deepgram token error:', error);

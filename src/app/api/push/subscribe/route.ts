@@ -1,3 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-// TODO: Add PushSubscription model to Prisma schema
-export async function POST(req: NextRequest) { return NextResponse.json({ ok: true }); }
+
+export async function POST(req: NextRequest) {
+  return NextResponse.json(
+    { error: 'Not implemented', message: 'This feature is coming soon' },
+    { status: 501 }
+  );
+}
