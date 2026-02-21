@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Mic,
   Search,
@@ -358,9 +358,37 @@ function AyahRangeSelector({
 
 export default function RecitePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSurah, setSelectedSurah] = useState<SelectedSurah | null>(null);
   const [selectingSurah, setSelectingSurah] = useState<SurahMeta | null>(null);
+
+  // Handle URL parameters on mount
+  useEffect(() => {
+    const surahParam = searchParams.get('surah');
+    const modeParam = searchParams.get('mode') as ReciteMode | null;
+    const startParam = searchParams.get('start');
+
+    if (surahParam) {
+      const surahNumber = parseInt(surahParam);
+      const surahMeta = SURAH_METADATA.find(s => s.number === surahNumber);
+      
+      if (surahMeta) {
+        if (modeParam && startParam) {
+          // Direct to recitation with specific mode and ayah
+          setSelectedSurah({
+            surahNumber,
+            startAyah: parseInt(startParam),
+            mode: modeParam,
+            revealDifficulty: 'medium',
+          });
+        } else {
+          // Go to ayah range selector for this surah
+          setSelectingSurah(surahMeta);
+        }
+      }
+    }
+  }, [searchParams]);
 
   // Filter surahs by search
   const filteredSurahs = useMemo(() => {

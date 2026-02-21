@@ -19,6 +19,7 @@ import {
   Leaf,
   Star,
   BookMarked,
+  Mic,
 } from 'lucide-react';
 import { MosqueIcon, BookReadIcon, TreeIcon, TargetIcon, CalendarIcon, StarIcon as IslamicStarIcon, CrescentIcon, CrownIcon } from '@/components/icons';
 import SheikhReviewSession from '@/components/SheikhReviewSession';
@@ -361,6 +362,20 @@ export default function PracticePage() {
             <section>
               <h2 className="text-xs font-semibold text-night-500 uppercase tracking-wider mb-3">Practice Tools</h2>
               <div className="space-y-2">
+                <Link
+                  href="/recite"
+                  className="liquid-card p-4 flex items-center gap-3 hover:bg-white/[0.04] transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                    <Mic className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-night-100 font-medium">Live Recitation</p>
+                    <p className="text-xs text-night-500">Real-time word tracking and tajweed feedback</p>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-night-600" />
+                </Link>
+
                 <Link
                   href="/practice/flashcards"
                   className="liquid-card p-4 flex items-center gap-3 hover:bg-white/[0.04] transition-colors"

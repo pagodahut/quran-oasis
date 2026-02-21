@@ -18,6 +18,7 @@ import {
   Star,
   Zap,
   Award,
+  Mic,
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 import { StreakDisplay } from '@/components/Celebrations';
@@ -665,6 +666,28 @@ export default function DashboardPage() {
                 meta={`${quranProgress.versesMemorized} verses`}
                 href="/practice"
               />
+            </div>
+            <div className="mt-3">
+              <Link href="/recite">
+                <motion.div
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                  className="liquid-card rounded-2xl p-4 cursor-pointer group bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-emerald-600/5 border-emerald-500/20"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                        <Mic className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="text-night-100 font-medium">Live Recitation Practice</h4>
+                        <p className="text-night-400 text-sm">Real-time tajweed feedback & word tracking</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-night-600 group-hover:text-night-400 transition-colors" />
+                  </div>
+                </motion.div>
+              </Link>
             </div>
           </motion.section>
           

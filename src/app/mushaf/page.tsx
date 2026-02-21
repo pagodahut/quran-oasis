@@ -668,10 +668,10 @@ export default function MushafPage() {
                             setShowTajweedPractice(true);
                           }}
                           className="text-xs text-emerald-500 hover:text-emerald-400 transition-colors flex items-center gap-1 bg-emerald-500/10 px-2 py-1 rounded-lg"
-                          title="Practice"
+                          title="Practice Tajweed - Record & analyze pronunciation"
                         >
                           <Mic className="w-3.5 h-3.5" />
-                          <span className="hidden sm:inline">Practice</span>
+                          <span className="hidden sm:inline">Tajweed</span>
                         </button>
                         <button
                           onClick={(e) => {
@@ -705,6 +705,17 @@ export default function MushafPage() {
                         >
                           <Brain className="w-3.5 h-3.5" />
                           <span className="hidden sm:inline">Memorize</span>
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/recite?surah=${surahNumber}&mode=reveal&start=${ayah.numberInSurah}`);
+                          }}
+                          className="text-xs text-sage-500 hover:text-sage-400 transition-colors flex items-center gap-1 bg-sage-500/10 px-2 py-1 rounded-lg"
+                          title="Recite to Reveal"
+                        >
+                          <Play className="w-3.5 h-3.5" />
+                          <span className="hidden sm:inline">Reveal</span>
                         </button>
                         <button
                           onClick={(e) => {
@@ -1137,6 +1148,29 @@ export default function MushafPage() {
         )}
       </AnimatePresence>
       
+      {/* Recite Floating Action Button */}
+      {!browseMode && currentSurah && (
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0, opacity: 0 }}
+          className="fixed bottom-32 right-4 z-30"
+        >
+          <Link
+            href={`/recite?surah=${surahNumber}`}
+            className="w-16 h-16 rounded-full flex items-center justify-center transition-all active:scale-95 shadow-lg"
+            style={{
+              background: 'linear-gradient(135deg, rgba(34,197,94,0.95) 0%, rgba(22,163,74,1) 100%)',
+              boxShadow: '0 8px 24px rgba(34,197,94,0.4), 0 4px 12px rgba(0,0,0,0.3)',
+              border: '1px solid rgba(255,255,255,0.2)',
+            }}
+            title="Start Recitation Practice"
+          >
+            <Mic className="w-7 h-7 text-white" />
+          </Link>
+        </motion.div>
+      )}
+
       {/* AI Sheikh FAB is now rendered globally via SheikhOverlay in layout */}
     </div>
   );

@@ -384,7 +384,7 @@ function mapRuleToKey(ruleName?: string): TajweedRule {
  */
 /**
  * Transcribe audio via server-side API route
- * Uses Tarteel Whisper (Quran-optimized) with fallback to Deepgram
+ * Uses Tarteel Whisper (Quran-optimized) with fallback to Deepgram and OpenAI
  */
 async function transcribeViaServer(audioBlob: Blob): Promise<string | null> {
   try {
@@ -399,26 +399,33 @@ async function transcribeViaServer(audioBlob: Blob): Promise<string | null> {
     
     if (response.ok) {
       const data = await response.json();
-      if (data.text) {
-        // Using Tarteel Whisper
-        return data.text;
+      if (data.text && data.text.trim()) {
+        return data.text.trim();
       }
+    } else {
+      console.warn('[Transcription] Tarteel API error:', response.status);
     }
     
-    // Fallback to legacy Deepgram endpoint
-    console.warn('[Transcription] Tarteel failed, falling back to Deepgram');
+    // Fallback to OpenAI Whisper
+    console.warn('[Transcription] Tarteel failed, trying OpenAI Whisper');
     response = await fetch('/api/transcribe', {
       method: 'POST',
       body: formData,
     });
     
-    if (!response.ok) {
-      console.error('Transcription API error:', response.status);
-      return null;
+    if (response.ok) {
+      const data = await response.json();
+      const text = data.transcription || data.text;
+      if (text && text.trim()) {
+        return text.trim();
+      }
+    } else {
+      console.warn('[Transcription] OpenAI Whisper API error:', response.status);
     }
     
-    const data = await response.json();
-    return data.transcription || data.text || null;
+    // All transcription methods failed
+    console.error('[Transcription] All methods failed - no transcription available');
+    return null;
   } catch (error) {
     console.error('Transcription error:', error);
     return null;

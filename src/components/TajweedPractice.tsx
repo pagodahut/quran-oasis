@@ -124,13 +124,18 @@ export default function TajweedPractice({
   // Actual mic access is deferred to user gesture (Start Recording click)
   useEffect(() => {
     async function checkPermission() {
-      const permState = await checkMicPermission();
-      if (permState === 'granted') {
-        setMicPermission('granted');
-      } else if (permState === 'denied') {
-        setMicPermission('denied');
+      try {
+        const permState = await checkMicPermission();
+        if (permState === 'granted') {
+          setMicPermission('granted');
+        } else if (permState === 'denied') {
+          setMicPermission('denied');
+        }
+        // 'prompt' → leave as 'pending', will request on user gesture
+      } catch (error) {
+        console.warn('Could not check mic permission:', error);
+        // Leave as pending, will prompt on user gesture
       }
-      // 'prompt' → leave as 'pending', will request on user gesture
     }
     checkPermission();
     
@@ -339,13 +344,21 @@ export default function TajweedPractice({
       }
     } catch (error) {
       console.error('Analysis failed:', error);
-      // Show error feedback
+      
+      // Show practice mode feedback when API analysis fails
       setFeedback({
-        overall: 'good',
-        accuracy: 75,
+        overall: 'practice_mode',
+        accuracy: undefined,
         rulesAnalysis: [],
-        encouragement: "We couldn't fully analyze your recitation, but keep practicing! 🌟",
-        specificTips: ["Try recording in a quieter environment", "Make sure to speak clearly into the microphone"],
+        encouragement: "Great effort! Keep practicing with the original audio to improve your tajweed. 🎯",
+        specificTips: [
+          "Listen carefully to the reciter's pronunciation",
+          "Practice ayah by ayah to build confidence",
+          "Focus on proper makharij (articulation points)",
+          "For AI-powered feedback, configure transcription services in settings"
+        ],
+        isPracticeMode: true,
+        practiceNote: "AI analysis temporarily unavailable - using practice mode.",
       });
       setStep('feedback');
     }
