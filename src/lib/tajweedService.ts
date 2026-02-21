@@ -400,7 +400,7 @@ async function transcribeViaServer(audioBlob: Blob): Promise<string | null> {
     if (response.ok) {
       const data = await response.json();
       if (data.text) {
-        console.log('[Transcription] Using Tarteel Whisper');
+        // Using Tarteel Whisper
         return data.text;
       }
     }

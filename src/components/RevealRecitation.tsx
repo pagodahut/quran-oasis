@@ -572,12 +572,12 @@ export default function RevealRecitation({
     // Try Tarteel first, fall back to Web Speech API
     let useTarteel = false;
     try {
-      console.log('[Sheikh Hifz] Checking Tarteel health at /api/tarteel...');
+      // Check Tarteel health
       const checkRes = await fetch('/api/tarteel', { signal: AbortSignal.timeout(3000) });
       if (checkRes.ok) {
         const checkData = await checkRes.json();
         useTarteel = checkData.configured === true;
-        console.log('[Sheikh Hifz] Health check result:', checkData, '→ useTarteel:', useTarteel);
+        // Health check passed
       } else {
         console.warn('[Sheikh Hifz] Health check failed with status:', checkRes.status);
       }
@@ -588,7 +588,7 @@ export default function RevealRecitation({
 
     try {
       if (useTarteel) {
-        console.log('[Sheikh Hifz] Using Tarteel (full) provider');
+        // Using Tarteel (full) provider
         const service = new TarteelService({
           expectedText,
           chunkIntervalMs: 2500,
@@ -600,7 +600,7 @@ export default function RevealRecitation({
         await service.start();
         setActiveProvider('tarteel');
       } else {
-        console.log('[Sheikh Hifz] Using WebSpeech (lite) provider');
+        // Using WebSpeech (lite) provider
         if (!WebSpeechService.isSupported()) {
           setErrorMessage('Speech recognition is not supported. Please use Chrome or Edge.');
           setPhase('error');
