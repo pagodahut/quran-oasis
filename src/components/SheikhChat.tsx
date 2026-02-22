@@ -261,6 +261,28 @@ export default function SheikhChat({
     }
   }, [messages]);
 
+  // Escape key to close + body scroll lock
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEscape = (e: globalThis.KeyboardEvent) => {
+      if (e.key === 'Escape' && onClose) {
+        e.preventDefault();
+        onClose();
+      }
+    };
+
+    // Lock body scroll
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isOpen, onClose]);
+
   // Focus input when opened
   useEffect(() => {
     if (isOpen && inputRef.current) {
@@ -335,38 +357,38 @@ export default function SheikhChat({
     }
   };
 
-  const wrapperClasses = {
-    panel: 'fixed bottom-0 left-0 right-0 z-50 max-h-[85vh]',
-    fullpage: 'fixed inset-0 z-50',
-    inline: 'relative w-full',
-  };
-
   if (!isOpen) return null;
 
   return (
     <>
+    {/* Full-screen backdrop — always clickable to close */}
+    {mode === 'panel' && onClose && (
+      <motion.div
+        key="sheikh-backdrop"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[49] bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+    )}
+
     <AnimatePresence>
       <motion.div
         initial={mode === 'inline' ? {} : { y: '100%' }}
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-        className={`${wrapperClasses[mode]} flex flex-col`}
+        className={`${
+          mode === 'panel' ? 'fixed bottom-0 left-0 right-0 z-50 max-h-[85vh]' :
+          mode === 'fullpage' ? 'fixed inset-0 z-50' :
+          'relative w-full'
+        } flex flex-col`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="sheikh-chat-title"
         aria-describedby="sheikh-chat-subtitle"
       >
-        {/* Backdrop */}
-        {mode === 'panel' && onClose && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 -top-[100vh] bg-black/40 backdrop-blur-sm"
-            onClick={onClose}
-          />
-        )}
 
         {/* Chat Container */}
         <div
@@ -376,11 +398,19 @@ export default function SheikhChat({
                       ${mode === 'fullpage' ? 'h-full' : ''}
                       ${mode === 'inline' ? 'rounded-2xl border border-white/10 max-h-[500px]' : ''}`}
         >
+          {/* Drag handle — tappable close target */}
+          {mode === 'panel' && onClose && (
+            <button
+              onClick={onClose}
+              className="w-full py-2 flex justify-center cursor-pointer focus:outline-none"
+              aria-label="Close Sheikh chat panel"
+            >
+              <div className="w-10 h-1 bg-white/25 rounded-full" />
+            </button>
+          )}
+
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/5">
-            {mode === 'panel' && (
-              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-white/20 rounded-full" />
-            )}
 
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-amber-500/15 flex items-center justify-center">
