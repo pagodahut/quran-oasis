@@ -65,6 +65,25 @@ type StateCallback = (state: RealtimeState) => void;
 type WordCallback = (index: number, word: TranscribedWord) => void;
 type ErrorCallback = (error: string) => void;
 
+interface DeepgramWord {
+  word: string;
+  start: number;
+  end: number;
+  confidence: number;
+}
+
+interface DeepgramAlternative {
+  transcript: string;
+  words?: DeepgramWord[];
+}
+
+interface DeepgramTranscriptData {
+  channel: {
+    alternatives: DeepgramAlternative[];
+  };
+  is_final: boolean;
+}
+
 // ============================================
 // Tajweed Rule Detection (Static Analysis)
 // ============================================
@@ -529,7 +548,7 @@ export class RealtimeTajweedService {
     });
   }
   
-  private handleTranscript(data: any): void {
+  private handleTranscript(data: DeepgramTranscriptData): void {
     if (!data.channel?.alternatives?.[0]) return;
     
     const alternative = data.channel.alternatives[0];
@@ -539,7 +558,7 @@ export class RealtimeTajweedService {
     if (!transcript) return;
     
     // Extract words with timestamps
-    const words: TranscribedWord[] = (alternative.words || []).map((w: any) => ({
+    const words: TranscribedWord[] = (alternative.words || []).map((w: DeepgramWord) => ({
       word: w.word,
       start: w.start,
       end: w.end,

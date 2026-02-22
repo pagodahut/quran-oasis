@@ -21,13 +21,11 @@ function classifyReason(difficulty: number, overdueFactor: number): ReviewReason
   return 'due for review';
 }
 
-/**
- * Get a prioritized review queue for a user.
- */
-export async function getReviewQueue(_userId: string, _limit: number = 10): Promise<ReviewItem[]> {
-  // TODO: Re-enable when verseDifficulty model exists
-  return [];
-}
+// TODO: verify if still needed - async review queue not currently used
+// export async function getReviewQueue(_userId: string, _limit: number = 10): Promise<ReviewItem[]> {
+//   // TODO: Re-enable when verseDifficulty model exists
+//   return [];
+// }
 
 /**
  * Client-side localStorage fallback for guest users.

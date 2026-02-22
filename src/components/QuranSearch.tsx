@@ -167,6 +167,10 @@ export default function QuranSearch({ isOpen, onClose, onSelectResult }: QuranSe
             WebkitBackdropFilter: 'blur(16px)',
           }}
           onClick={onClose}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="search-title"
+          aria-describedby="search-description"
         >
           <motion.div
             initial={{ y: -20, opacity: 0 }}
@@ -175,6 +179,12 @@ export default function QuranSearch({ isOpen, onClose, onSelectResult }: QuranSe
             className="max-w-2xl mx-auto px-4 py-6 safe-area-top"
             onClick={e => e.stopPropagation()}
           >
+            {/* Hidden title and description for screen readers */}
+            <h1 id="search-title" className="sr-only">Quran Search</h1>
+            <p id="search-description" className="sr-only">
+              Search the Quran by verse content, surah names, or specific verse references like "2:255"
+            </p>
+            
             {/* Top glow effect */}
             <div 
               className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-40 pointer-events-none"
@@ -190,14 +200,18 @@ export default function QuranSearch({ isOpen, onClose, onSelectResult }: QuranSe
                 initial={{ scale: 0.98 }}
                 animate={{ scale: 1 }}
               >
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-night-400 z-10" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-night-400 z-10" aria-hidden="true" />
+                <label htmlFor="search-input" className="sr-only">
+                  Search Quran verses, surahs, or use specific references like "2:255"
+                </label>
                 <input
+                  id="search-input"
                   ref={inputRef}
                   type="text"
                   value={query}
                   onChange={e => setQuery(e.target.value)}
                   placeholder="Search verses or try '2:255', 'surah 18 ayah 10', or 'Al-Baqarah 255'..."
-                  className="w-full pl-12 pr-4 py-4 rounded-2xl text-night-100 placeholder:text-night-500 transition-all duration-300"
+                  className="w-full pl-12 pr-4 py-4 rounded-2xl text-night-100 placeholder:text-night-500 transition-all duration-300 focus:ring-2 focus:ring-gold-500/50"
                   style={{
                     background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
                     border: '1px solid rgba(255,255,255,0.1)',
@@ -206,14 +220,19 @@ export default function QuranSearch({ isOpen, onClose, onSelectResult }: QuranSe
                     boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1), 0 4px 16px rgba(0,0,0,0.15)',
                     outline: 'none',
                   }}
+                  aria-describedby="search-help"
                 />
+                <p id="search-help" className="sr-only">
+                  You can search for verses by content, surah names, or use specific verse references like "2:255" or "surah 18 ayah 10"
+                </p>
                 {isSearching && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="absolute right-4 top-1/2 -translate-y-1/2"
+                    aria-label="Searching"
                   >
-                    <Loader2 className="w-5 h-5 text-gold-400 animate-spin" />
+                    <Loader2 className="w-5 h-5 text-gold-400 animate-spin" aria-hidden="true" />
                   </motion.div>
                 )}
               </motion.div>
@@ -222,50 +241,63 @@ export default function QuranSearch({ isOpen, onClose, onSelectResult }: QuranSe
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onClose}
-                className="liquid-icon-btn"
+                className="liquid-icon-btn focus:ring-2 focus:ring-gold-500/50"
+                aria-label="Close search"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5" aria-hidden="true" />
               </motion.button>
             </div>
             
             {/* Filter Pills - Liquid Glass Tabs */}
-            <div 
-              className="inline-flex p-1 rounded-xl mb-6"
-              style={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
-                border: '1px solid rgba(255,255,255,0.06)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-              }}
-            >
-              {[
-                { value: 'both' as const, label: 'All' },
-                { value: 'arabic' as const, label: 'Arabic' },
-                { value: 'translation' as const, label: 'Translation' },
-              ].map(filter => (
-                <motion.button
-                  key={filter.value}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setSearchIn(filter.value)}
-                  className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
-                  style={{
-                    background: searchIn === filter.value 
-                      ? 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)'
-                      : 'transparent',
-                    color: searchIn === filter.value ? '#e5e5e5' : '#6b7280',
-                    boxShadow: searchIn === filter.value 
-                      ? '0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1)'
-                      : 'none',
-                  }}
-                >
-                  {filter.label}
-                </motion.button>
-              ))}
-            </div>
+            <fieldset className="mb-6">
+              <legend className="sr-only">Search scope</legend>
+              <div 
+                className="inline-flex p-1 rounded-xl"
+                role="radiogroup"
+                aria-label="Search scope selection"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                }}
+              >
+                {[
+                  { value: 'both' as const, label: 'All' },
+                  { value: 'arabic' as const, label: 'Arabic' },
+                  { value: 'translation' as const, label: 'Translation' },
+                ].map(filter => (
+                  <motion.button
+                    key={filter.value}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setSearchIn(filter.value)}
+                    className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 focus:ring-2 focus:ring-gold-500/50"
+                    style={{
+                      background: searchIn === filter.value 
+                        ? 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)'
+                        : 'transparent',
+                      color: searchIn === filter.value ? '#e5e5e5' : '#6b7280',
+                      boxShadow: searchIn === filter.value 
+                        ? '0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1)'
+                        : 'none',
+                    }}
+                    role="radio"
+                    aria-checked={searchIn === filter.value}
+                    aria-label={`Search in ${filter.label.toLowerCase()}`}
+                  >
+                    {filter.label}
+                  </motion.button>
+                ))}
+              </div>
+            </fieldset>
             
             {/* Results */}
-            <div className="max-h-[70vh] overflow-y-auto space-y-6 pb-safe">
+            <div 
+              className="max-h-[70vh] overflow-y-auto space-y-6 pb-safe"
+              aria-live="polite"
+              aria-label="Search results"
+            >
               {/* Verse Results - Primary Focus */}
               {results.length > 0 && (
                 <motion.div
@@ -294,13 +326,14 @@ export default function QuranSearch({ isOpen, onClose, onSelectResult }: QuranSe
                           onSelectResult(result.surah, result.ayah.numberInSurah);
                           onClose();
                         }}
-                        className="w-full p-5 rounded-2xl transition-all text-left group shadow-lg hover:shadow-xl"
+                        className="w-full p-5 rounded-2xl transition-all text-left group shadow-lg hover:shadow-xl focus:ring-2 focus:ring-gold-500/50 focus:outline-none"
                         style={{
                           background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
                           border: '1px solid rgba(255,255,255,0.08)',
                           backdropFilter: 'blur(16px)',
                           WebkitBackdropFilter: 'blur(16px)',
                         }}
+                        aria-label={`Go to ${result.surahName}, verse ${result.ayah.numberInSurah}: ${result.ayah.text.translations.sahih.substring(0, 100)}${result.ayah.text.translations.sahih.length > 100 ? '...' : ''}`}
                       >
                         {/* Header with better styling */}
                         <div className="flex items-center justify-between mb-4">
@@ -392,7 +425,7 @@ export default function QuranSearch({ isOpen, onClose, onSelectResult }: QuranSe
                             onSelectResult(surah.number, 1);
                             onClose();
                           }}
-                          className={`${sizeClasses[cardSize]} p-4 rounded-2xl text-left flex flex-col justify-between group relative overflow-hidden transition-all duration-300`}
+                          className={`${sizeClasses[cardSize]} p-4 rounded-2xl text-left flex flex-col justify-between group relative overflow-hidden transition-all duration-300 focus:ring-2 focus:ring-gold-500/50 focus:outline-none`}
                           style={{
                             background: isMakki
                               ? 'linear-gradient(135deg, rgba(196,148,58,0.08) 0%, rgba(15,15,20,0.9) 100%)'
@@ -402,6 +435,7 @@ export default function QuranSearch({ isOpen, onClose, onSelectResult }: QuranSe
                               : '1px solid rgba(45,212,150,0.25)',
                             backdropFilter: 'blur(12px)',
                           }}
+                          aria-label={`Go to ${surah.englishName} (${surah.englishNameTranslation}), Surah ${surah.number}, ${surah.numberOfAyahs} verses, ${surah.revelationType}`}
                         >
                           <div className="flex items-start justify-between">
                             <span className={`text-xl font-light opacity-40 ${isMakki ? 'text-gold-400' : 'text-sage-400'}`}>

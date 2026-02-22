@@ -614,6 +614,14 @@ export default function LiveRecitation({
 
   return (
     <div className="min-h-screen bg-night-950 flex flex-col">
+      {/* Skip to main content */}
+      <a 
+        href="#main-recitation" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-night-800 focus:text-night-100 focus:rounded-lg focus:border focus:border-gold-500"
+      >
+        Skip to recitation content
+      </a>
+      
       {/* Header */}
       <header className="sticky top-0 z-20 bg-night-950/90 backdrop-blur-xl border-b border-night-800/50">
         <div className="flex items-center justify-between px-4 py-3">
@@ -624,9 +632,10 @@ export default function LiveRecitation({
               }
               onBack();
             }}
-            className="flex items-center gap-1 text-night-400 hover:text-night-200 transition"
+            className="flex items-center gap-1 text-night-400 hover:text-night-200 transition focus:ring-2 focus:ring-gold-500/50 focus:outline-none rounded-lg p-1"
+            aria-label="Go back to previous page"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-5 h-5" aria-hidden="true" />
             <span className="text-sm font-medium">Back</span>
           </button>
 
@@ -648,16 +657,23 @@ export default function LiveRecitation({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="space-y-1"
+                aria-live="polite"
+                aria-label="Live recitation statistics"
               >
-                <div className="text-sm font-mono text-gold-400">
+                <div 
+                  className="text-sm font-mono text-gold-400"
+                  aria-label={`Elapsed time: ${formatTime(elapsedTime)}`}
+                >
                   {formatTime(elapsedTime)}
                 </div>
                 <div className={`text-xs font-medium flex items-center justify-end gap-1 ${
                   liveStats.accuracy >= 90 ? 'text-green-400' :
                   liveStats.accuracy >= 70 ? 'text-yellow-400' : 'text-red-400'
                 }`}>
-                  <Target className="w-3 h-3" />
-                  {liveStats.accuracy}%
+                  <Target className="w-3 h-3" aria-hidden="true" />
+                  <span aria-label={`Current accuracy: ${liveStats.accuracy} percent`}>
+                    {liveStats.accuracy}%
+                  </span>
                 </div>
               </motion.div>
             )}
@@ -677,7 +693,7 @@ export default function LiveRecitation({
       </header>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
+      <main id="main-recitation" className="flex-1 flex flex-col" role="main">
         {/* Loading State */}
         {phase === 'loading' && (
           <div className="flex-1 flex items-center justify-center">
@@ -791,7 +807,7 @@ export default function LiveRecitation({
                         {phase === 'ready' && (
                           <>
                             {/* Hint text */}
-                            <p className="text-xs text-night-500 mr-auto">
+                            <p className="text-xs text-night-500 mr-auto" id="start-hint">
                               Tap to start reciting
                             </p>
 
@@ -800,9 +816,11 @@ export default function LiveRecitation({
                               whileTap={{ scale: 0.92 }}
                               onClick={startRecording}
                               className="w-14 h-14 rounded-full bg-gold-500 flex items-center 
-                                justify-center shadow-glow-gold transition hover:bg-gold-400"
+                                justify-center shadow-glow-gold transition hover:bg-gold-400 focus:ring-2 focus:ring-gold-500/50 focus:outline-none"
+                              aria-label="Start recording recitation"
+                              aria-describedby="start-hint"
                             >
-                              <Mic className="w-6 h-6 text-night-950" />
+                              <Mic className="w-6 h-6 text-night-950" aria-hidden="true" />
                             </motion.button>
                           </>
                         )}
@@ -810,10 +828,16 @@ export default function LiveRecitation({
                         {phase === 'recording' && (
                           <>
                             {/* Audio visualizer */}
-                            <AudioVisualizer service={serviceRef.current} />
+                            <div aria-hidden="true">
+                              <AudioVisualizer service={serviceRef.current} />
+                            </div>
 
                             {/* Recording indicator */}
-                            <div className="flex items-center gap-2 mr-auto">
+                            <div 
+                              className="flex items-center gap-2 mr-auto"
+                              role="status"
+                              aria-label="Currently recording and listening"
+                            >
                               <motion.div
                                 className="w-2 h-2 rounded-full bg-red-500"
                                 animate={{ opacity: [1, 0.3, 1] }}
@@ -821,6 +845,7 @@ export default function LiveRecitation({
                                   duration: 1.2,
                                   repeat: Infinity,
                                 }}
+                                aria-hidden="true"
                               />
                               <span className="text-xs text-night-400">
                                 Listening...
@@ -832,9 +857,10 @@ export default function LiveRecitation({
                               whileTap={{ scale: 0.92 }}
                               onClick={stopRecording}
                               className="w-14 h-14 rounded-full bg-red-500/90 flex items-center 
-                                justify-center shadow-lg transition hover:bg-red-400"
+                                justify-center shadow-lg transition hover:bg-red-400 focus:ring-2 focus:ring-red-500/50 focus:outline-none"
+                              aria-label="Stop recording recitation"
                             >
-                              <Square className="w-5 h-5 text-white fill-white" />
+                              <Square className="w-5 h-5 text-white fill-white" aria-hidden="true" />
                             </motion.button>
                           </>
                         )}
@@ -862,7 +888,7 @@ export default function LiveRecitation({
               )}
             </>
           )}
-      </div>
+      </main>
     </div>
   );
 }

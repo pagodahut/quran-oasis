@@ -32,6 +32,23 @@ export interface Reciter {
   everyAyahFolder: string;  // Folder name on EveryAyah.com
 }
 
+interface AlQuranCloudApiAyah {
+  number: number;
+  numberInSurah: number;
+  text: string;
+  juz: number;
+  page: number;
+}
+
+interface AlQuranCloudApiSurah {
+  number: number;
+  name: string;
+  englishName: string;
+  englishNameTranslation: string;
+  numberOfAyahs: number;
+  revelationType: 'Meccan' | 'Medinan';
+}
+
 // ============ RECITERS ============
 
 export const RECITERS: Reciter[] = [
@@ -132,7 +149,7 @@ export async function fetchSurah(surahNumber: number): Promise<{ surah: Surah; a
       numberOfAyahs: data.data.numberOfAyahs,
       revelationType: data.data.revelationType
     },
-    ayahs: data.data.ayahs.map((a: any) => ({
+    ayahs: data.data.ayahs.map((a: AlQuranCloudApiAyah) => ({
       number: a.numberInSurah,
       numberInQuran: a.number,
       text: a.text,
@@ -158,7 +175,7 @@ export async function fetchSurahWithTranslation(
   const arabicData = await arabicRes.json();
   const transData = await transRes.json();
   
-  const ayahs: Ayah[] = arabicData.data.ayahs.map((a: any, i: number) => ({
+  const ayahs: Ayah[] = arabicData.data.ayahs.map((a: AlQuranCloudApiAyah, i: number) => ({
     number: a.numberInSurah,
     numberInQuran: a.number,
     text: a.text,

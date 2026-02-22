@@ -6,7 +6,14 @@
  */
 
 export interface AuthState {
-  user: any;
+  user: {
+    id: string;
+    emailAddresses?: Array<{ emailAddress: string }>;
+    firstName?: string | null;
+    lastName?: string | null;
+    imageUrl?: string;
+    createdAt?: Date;
+  } | null;
   isSignedIn: boolean;
   isLoaded: boolean;
   isGuest: boolean;

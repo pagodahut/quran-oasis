@@ -352,6 +352,10 @@ export default function SheikhChat({
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
         className={`${wrapperClasses[mode]} flex flex-col`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="sheikh-chat-title"
+        aria-describedby="sheikh-chat-subtitle"
       >
         {/* Backdrop */}
         {mode === 'panel' && onClose && (
@@ -380,11 +384,11 @@ export default function SheikhChat({
 
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-amber-500/15 flex items-center justify-center">
-                <BookReadIcon size={20} />
+                <BookReadIcon size={20} aria-hidden="true" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-white">Sheikh HIFZ</h3>
-                <p className="text-[11px] text-amber-400/70">{getSubtitle()}</p>
+                <h3 id="sheikh-chat-title" className="text-sm font-semibold text-white">Sheikh HIFZ</h3>
+                <p id="sheikh-chat-subtitle" className="text-[11px] text-amber-400/70">{getSubtitle()}</p>
               </div>
             </div>
 
@@ -392,7 +396,8 @@ export default function SheikhChat({
               {messages.length > 0 && (
                 <button
                   onClick={clearChat}
-                  className="text-[11px] text-gray-500 hover:text-gray-300 transition-colors px-2 py-1 rounded-lg hover:bg-white/5"
+                  className="text-[11px] text-gray-500 hover:text-gray-300 transition-colors px-2 py-1 rounded-lg hover:bg-white/5 focus:ring-2 focus:ring-amber-500/50 focus:outline-none"
+                  aria-label="Clear chat conversation"
                 >
                   Clear
                 </button>
@@ -400,7 +405,8 @@ export default function SheikhChat({
               {onClose && (
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all focus:ring-2 focus:ring-amber-500/50 focus:outline-none"
+                  aria-label="Close Sheikh chat"
                 >
                   ✕
                 </button>
@@ -412,6 +418,9 @@ export default function SheikhChat({
           <div
             className="flex-1 overflow-y-auto px-4 py-4 space-y-4 min-h-[200px] scroll-smooth"
             style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}
+            role="log"
+            aria-live="polite"
+            aria-label="Chat conversation with Sheikh AI"
           >
             {/* Welcome State */}
             {messages.length === 0 && !pendingQuestion && (
@@ -462,7 +471,8 @@ export default function SheikhChat({
                     const lastUserMsg = [...messages].reverse().find((m) => m.role === 'user');
                     if (lastUserMsg) sendMessage(lastUserMsg.content);
                   }}
-                  className="text-xs text-red-400 hover:text-red-300 underline mt-1"
+                  className="text-xs text-red-400 hover:text-red-300 underline mt-1 focus:ring-2 focus:ring-red-500/50 focus:outline-none rounded"
+                  aria-label="Retry the last message"
                 >
                   Try again
                 </button>
@@ -480,7 +490,8 @@ export default function SheikhChat({
                   onClick={stopStreaming}
                   className="text-[11px] text-gray-400 hover:text-white px-3 py-1 rounded-full 
                              border border-white/10 hover:border-white/20 hover:bg-white/5
-                             transition-all duration-200"
+                             transition-all duration-200 focus:ring-2 focus:ring-amber-500/50 focus:outline-none"
+                  aria-label="Stop AI response generation"
                 >
                   ■ Stop
                 </button>
@@ -489,7 +500,11 @@ export default function SheikhChat({
 
             <form onSubmit={handleSubmit} className="flex items-end gap-2">
               <div className="flex-1 relative">
+                <label htmlFor="sheikh-input" className="sr-only">
+                  Ask Sheikh HIFZ a question
+                </label>
                 <textarea
+                  id="sheikh-input"
                   ref={inputRef}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
@@ -510,21 +525,26 @@ export default function SheikhChat({
                              max-h-24 overflow-y-auto"
                   style={{ scrollbarWidth: 'none' }}
                   disabled={isLoading}
+                  aria-describedby="sheikh-help"
                 />
+                <p id="sheikh-help" className="sr-only">
+                  Type your question and press Enter to send, or Shift+Enter for a new line
+                </p>
               </div>
 
               <button
                 type="submit"
                 disabled={!inputValue.trim() || isLoading}
                 className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center
-                           transition-all duration-200
+                           transition-all duration-200 focus:ring-2 focus:ring-amber-500/50 focus:outline-none
                            ${
                              inputValue.trim() && !isLoading
                                ? 'bg-amber-500 text-black hover:bg-amber-400 active:scale-95'
                                : 'bg-white/5 text-gray-600 cursor-not-allowed'
                            }`}
+                aria-label="Send message"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4" aria-hidden="true">
                   <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
                 </svg>
               </button>

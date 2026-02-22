@@ -20,6 +20,16 @@ export interface QuranWord {
   audioUrl: string;
 }
 
+interface QuranApiWordResponse {
+  position: number;
+  text: string;
+  text_uthmani: string;
+  char_type_name: string;
+  translation?: { text: string };
+  transliteration?: { text: string };
+  audio_url?: string;
+}
+
 export interface VocabularyMatch {
   word: string;
   audioUrl: string;
@@ -271,8 +281,8 @@ export async function fetchVerseWords(surah: number, ayah: number): Promise<Qura
     }
     
     const words: QuranWord[] = verse.words
-      .filter((w: any) => w.char_type_name === 'word')
-      .map((w: any) => ({
+      .filter((w: QuranApiWordResponse) => w.char_type_name === 'word')
+      .map((w: QuranApiWordResponse) => ({
         position: w.position,
         text: w.text,
         textUthmani: w.text_uthmani,

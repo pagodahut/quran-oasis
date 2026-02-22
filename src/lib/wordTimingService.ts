@@ -21,6 +21,15 @@ export interface AyahWordTiming {
   totalDuration: number;
 }
 
+interface QuranApiWordResponse {
+  position: number;
+  text: string;
+  text_uthmani: string;
+  char_type_name: string;
+  translation?: { text: string };
+  transliteration?: { text: string };
+}
+
 // Cache for word timing data
 const timingCache = new Map<string, AyahWordTiming>();
 
@@ -115,12 +124,12 @@ export async function getAyahWordTiming(
     }
     
     // Filter out non-word elements (like verse numbers)
-    const wordObjects = verse.words.filter((w: any) => w.char_type_name === 'word');
+    const wordObjects = verse.words.filter((w: QuranApiWordResponse) => w.char_type_name === 'word');
     
     // Default duration if not provided (estimate ~0.8 sec per word)
     const duration = audioDuration || wordObjects.length * 0.8;
     
-    const words = wordObjects.map((w: any) => w.text_uthmani);
+    const words = wordObjects.map((w: QuranApiWordResponse) => w.text_uthmani);
     const wordTimings = estimateWordTimings(words, duration);
     
     // Enhance with additional data

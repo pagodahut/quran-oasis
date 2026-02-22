@@ -158,13 +158,15 @@ function DailyFocusCard({
     ? 'bg-gold-500/20 text-gold-400'
     : 'bg-sage-500/20 text-sage-400';
 
+  const ariaLabel = `${title}: ${subtitle}, ${meta}`;
+
   const content = (
     <motion.div
       variants={scaleIn}
       whileHover={{ scale: 1.02, y: -2 }}
       whileTap={{ scale: 0.98 }}
       className={`
-        relative overflow-hidden rounded-2xl p-5 cursor-pointer
+        relative overflow-hidden rounded-2xl p-5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-gold-500/50
         ${bgClass}
         border ${borderClass}
         transition-all duration-300
@@ -173,6 +175,15 @@ function DailyFocusCard({
         backdropFilter: 'blur(24px) saturate(160%)',
         WebkitBackdropFilter: 'blur(24px) saturate(160%)',
       }}
+      role="button"
+      tabIndex={0}
+      aria-label={ariaLabel}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
     >
       {/* Subtle pattern overlay */}
       <div className="absolute inset-0 opacity-30 pattern-arabesque" />
@@ -180,7 +191,7 @@ function DailyFocusCard({
       {/* Content */}
       <div className="relative z-10">
         <div className={`w-12 h-12 rounded-xl ${iconBgClass} flex items-center justify-center mb-4`}>
-          <Icon className="w-6 h-6" />
+          <Icon className="w-6 h-6" aria-hidden="true" />
         </div>
         
         <h3 className="text-lg font-semibold text-night-100 mb-1">{title}</h3>
@@ -188,14 +199,18 @@ function DailyFocusCard({
         
         <div className="flex items-center justify-between">
           <span className="text-xs uppercase tracking-wider text-night-500">{meta}</span>
-          <ChevronRight className="w-4 h-4 text-night-500" />
+          <ChevronRight className="w-4 h-4 text-night-500" aria-hidden="true" />
         </div>
       </div>
     </motion.div>
   );
 
   if (href) {
-    return <Link href={href}>{content}</Link>;
+    return (
+      <Link href={href} aria-label={ariaLabel} className="block">
+        {content}
+      </Link>
+    );
   }
   
   return <div onClick={onClick}>{content}</div>;
@@ -321,8 +336,13 @@ function QuickStat({
   color: string;
 }) {
   return (
-    <motion.div variants={scaleIn} className="liquid-card rounded-xl p-4 text-center">
-      <Icon className={`w-5 h-5 mx-auto mb-2 ${color}`} />
+    <motion.div 
+      variants={scaleIn} 
+      className="liquid-card rounded-xl p-4 text-center"
+      role="img"
+      aria-label={`${label}: ${value}`}
+    >
+      <Icon className={`w-5 h-5 mx-auto mb-2 ${color}`} aria-hidden="true" />
       <p className="text-xl font-bold text-night-100">{value}</p>
       <p className="text-xs text-night-500">{label}</p>
     </motion.div>
@@ -349,13 +369,14 @@ function RecentActivity({
   if (activities.length === 0) {
     return (
       <motion.div variants={fadeInUp} className="liquid-card rounded-2xl p-6 text-center">
-        <Sparkles className="w-8 h-8 text-night-600 mx-auto mb-3" />
+        <Sparkles className="w-8 h-8 text-night-600 mx-auto mb-3" aria-hidden="true" />
         <p className="text-night-400">Start your first lesson to see your activity!</p>
         <Link 
           href="/lessons" 
           className="inline-flex items-center gap-2 mt-4 text-gold-400 hover:text-gold-300 transition-colors"
+          aria-label="Begin learning to start tracking your activity"
         >
-          Begin learning <ArrowRight className="w-4 h-4" />
+          Begin learning <ArrowRight className="w-4 h-4" aria-hidden="true" />
         </Link>
       </motion.div>
     );
@@ -363,23 +384,25 @@ function RecentActivity({
   
   return (
     <motion.div variants={fadeInUp} className="liquid-card rounded-2xl p-4">
-      <div className="space-y-3">
+      <ul className="space-y-3" role="list">
         {activities.map((activity, i) => {
           const { icon: Icon, color, bg } = iconMap[activity.icon];
           return (
-            <div key={i} className="flex items-center gap-3">
+            <li key={i} className="flex items-center gap-3">
               <div className={`w-8 h-8 rounded-lg ${bg} flex items-center justify-center flex-shrink-0`}>
-                <Icon className={`w-4 h-4 ${color}`} />
+                <Icon className={`w-4 h-4 ${color}`} aria-hidden="true" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-night-200 text-sm truncate">{activity.action}</p>
                 <p className="text-night-500 text-xs">{activity.detail}</p>
               </div>
-              <span className="text-night-600 text-xs flex-shrink-0">{activity.time}</span>
-            </div>
+              <time className="text-night-600 text-xs flex-shrink-0" dateTime={activity.time}>
+                {activity.time}
+              </time>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </motion.div>
   );
 }
@@ -426,7 +449,7 @@ export default function DashboardPage() {
   // Compute derived data
   const displayName = useMemo(() => {
     if (isSignedIn && user) {
-      return user.firstName || user.username || 'Learner';
+      return user.firstName || 'Learner';
     }
     // Try localStorage for name
     if (typeof window !== 'undefined') {
@@ -540,8 +563,16 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-night-950">
+      {/* Skip to main content link */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-night-800 focus:text-night-100 focus:rounded-lg focus:border focus:border-gold-500"
+      >
+        Skip to main content
+      </a>
+      
       {/* Main Content */}
-      <main className="px-4 py-6 pb-32 max-w-2xl mx-auto">
+      <main id="main-content" className="px-4 py-6 pb-32 max-w-2xl mx-auto">
         <motion.div
           initial="hidden"
           animate="visible"
@@ -566,8 +597,10 @@ export default function DashboardPage() {
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3, type: 'spring' }}
                 className="flex items-center gap-2 px-4 py-2 rounded-full bg-night-900 border border-night-800"
+                role="img" 
+                aria-label={`Current learning streak: ${streakInfo.current} day${streakInfo.current !== 1 ? 's' : ''}`}
               >
-                <Flame className={`w-5 h-5 ${streakInfo.current > 0 ? 'text-orange-400' : 'text-night-600'}`} />
+                <Flame className={`w-5 h-5 ${streakInfo.current > 0 ? 'text-orange-400' : 'text-night-600'}`} aria-hidden="true" />
                 <span className="font-bold text-night-100">{streakInfo.current}</span>
                 <span className="text-night-500 text-sm">day{streakInfo.current !== 1 ? 's' : ''}</span>
               </motion.div>
@@ -589,17 +622,32 @@ export default function DashboardPage() {
           </motion.div>
           
           {/* Daily Goal Progress Mini */}
-          <motion.div variants={fadeInUp} className="liquid-glass-gold rounded-2xl p-4">
+          <motion.div 
+            variants={fadeInUp} 
+            className="liquid-glass-gold rounded-2xl p-4"
+            role="region"
+            aria-labelledby="goal-heading"
+          >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <Target className="w-4 h-4 text-gold-400" />
-                <span className="text-night-300 text-sm">Today's Goal</span>
+                <Target className="w-4 h-4 text-gold-400" aria-hidden="true" />
+                <span id="goal-heading" className="text-night-300 text-sm">Today's Goal</span>
               </div>
-              <span className="text-gold-400 font-medium">
+              <span 
+                className="text-gold-400 font-medium"
+                aria-label={`Progress: ${goalStatus.progress} of ${learningPrefs.dailyGoalVerses || goalStatus.target} verses completed`}
+              >
                 {goalStatus.progress}/{learningPrefs.dailyGoalVerses || goalStatus.target} verses
               </span>
             </div>
-            <div className="h-2 rounded-full bg-night-800 overflow-hidden">
+            <div 
+              className="h-2 rounded-full bg-night-800 overflow-hidden"
+              role="progressbar"
+              aria-valuenow={goalProgress}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`Goal progress: ${goalProgress} percent complete`}
+            >
               <motion.div
                 className="h-full bg-gradient-to-r from-gold-600 to-gold-400 rounded-full"
                 initial={{ width: 0 }}
@@ -608,16 +656,16 @@ export default function DashboardPage() {
               />
             </div>
             {goalProgress >= 100 && (
-              <p className="text-sage-400 text-xs mt-2 flex items-center gap-1">
-                <Sparkles className="w-3 h-3" />
+              <p className="text-sage-400 text-xs mt-2 flex items-center gap-1" aria-live="polite">
+                <Sparkles className="w-3 h-3" aria-hidden="true" />
                 Goal completed! Keep going to earn bonus XP.
               </p>
             )}
           </motion.div>
           
           {/* Quick Stats Grid - Memorization Progress */}
-          <motion.section variants={fadeInUp}>
-            <h2 className="text-night-500 text-xs uppercase tracking-wider mb-3 px-1">Your Progress</h2>
+          <motion.section variants={fadeInUp} role="region" aria-labelledby="progress-heading">
+            <h2 id="progress-heading" className="text-night-500 text-xs uppercase tracking-wider mb-3 px-1">Your Progress</h2>
             <div className="grid grid-cols-3 gap-3">
               <QuickStat
                 icon={BookOpen}
@@ -641,14 +689,15 @@ export default function DashboardPage() {
             <Link 
               href="/progress" 
               className="flex items-center justify-center gap-2 mt-3 text-night-400 hover:text-night-200 transition-colors text-sm"
+              aria-label="View detailed progress statistics"
             >
-              View detailed progress <ArrowRight className="w-4 h-4" />
+              View detailed progress <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </Link>
           </motion.section>
 
           {/* Daily Focus Cards */}
-          <motion.section variants={fadeInUp}>
-            <h2 className="text-night-500 text-xs uppercase tracking-wider mb-3 px-1">Daily Focus</h2>
+          <motion.section variants={fadeInUp} role="region" aria-labelledby="daily-focus-heading">
+            <h2 id="daily-focus-heading" className="text-night-500 text-xs uppercase tracking-wider mb-3 px-1">Daily Focus</h2>
             <div className="grid grid-cols-2 gap-3">
               <DailyFocusCard
                 variant="memorize"
@@ -668,23 +717,27 @@ export default function DashboardPage() {
               />
             </div>
             <div className="mt-3">
-              <Link href="/recite">
+              <Link 
+                href="/recite"
+                aria-label="Start live recitation practice with real-time tajweed feedback and word tracking"
+                className="block"
+              >
                 <motion.div
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
-                  className="liquid-card rounded-2xl p-4 cursor-pointer group bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-emerald-600/5 border-emerald-500/20"
+                  className="liquid-card rounded-2xl p-4 cursor-pointer group bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-emerald-600/5 border-emerald-500/20 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-                        <Mic className="w-5 h-5" />
+                        <Mic className="w-5 h-5" aria-hidden="true" />
                       </div>
                       <div>
                         <h4 className="text-night-100 font-medium">Live Recitation Practice</h4>
                         <p className="text-night-400 text-sm">Real-time tajweed feedback & word tracking</p>
                       </div>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-night-600 group-hover:text-night-400 transition-colors" />
+                    <ChevronRight className="w-5 h-5 text-night-600 group-hover:text-night-400 transition-colors" aria-hidden="true" />
                   </div>
                 </motion.div>
               </Link>
@@ -731,9 +784,11 @@ export default function DashboardPage() {
           )}
           
           {/* Recent Activity */}
-          <motion.section variants={fadeInUp}>
-            <h2 className="text-night-500 text-xs uppercase tracking-wider mb-3 px-1">Recent Activity</h2>
-            <RecentActivity activities={recentActivity} />
+          <motion.section variants={fadeInUp} role="region" aria-labelledby="activity-heading">
+            <h2 id="activity-heading" className="text-night-500 text-xs uppercase tracking-wider mb-3 px-1">Recent Activity</h2>
+            <div aria-live="polite" aria-label="Recent activity updates">
+              <RecentActivity activities={recentActivity} />
+            </div>
           </motion.section>
           
           {/* Quick Actions for New Users */}

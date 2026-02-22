@@ -81,6 +81,21 @@ export interface PracticeSession {
   audioUrl?: string;
 }
 
+interface PronunciationFeedback {
+  rule: string;
+  issue?: string;
+  correction?: string;
+}
+
+interface StoredPracticeSession {
+  id: string;
+  surah: number;
+  ayah: number;
+  timestamp: string; // Date as ISO string
+  feedback: TajweedFeedback;
+  audioUrl?: string;
+}
+
 // ============================================
 // Audio Recording
 // ============================================
@@ -336,7 +351,7 @@ async function analyzeWithClaude(
       overall: data.overall,
       accuracy: data.accuracy,
       transcription,
-      rulesAnalysis: (data.pronunciationFeedback || []).map((pf: any) => ({
+      rulesAnalysis: (data.pronunciationFeedback || []).map((pf: PronunciationFeedback) => ({
         rule: mapRuleToKey(pf.rule),
         status: pf.issue ? 'needs_work' : 'correct',
         feedback: pf.correction || pf.issue || 'Good pronunciation',
@@ -830,8 +845,8 @@ export function getPracticeSessions(): PracticeSession[] {
     const stored = localStorage.getItem(PRACTICE_STORAGE_KEY);
     if (!stored) return [];
     
-    const sessions = JSON.parse(stored);
-    return sessions.map((s: any) => ({
+    const sessions = JSON.parse(stored) as StoredPracticeSession[];
+    return sessions.map((s: StoredPracticeSession) => ({
       ...s,
       timestamp: new Date(s.timestamp),
     }));

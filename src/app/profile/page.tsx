@@ -191,8 +191,8 @@ export default function ProfilePage() {
   }, []);
 
   // Get user info
-  const displayName = user?.firstName || user?.username || 'Student of Quran';
-  const email = user?.primaryEmailAddress?.emailAddress;
+  const displayName = user?.firstName || 'Student of Quran';
+  const email = user?.emailAddresses?.[0]?.emailAddress;
   const avatarUrl = user?.imageUrl;
   const joinedDate = user?.createdAt 
     ? new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(user.createdAt)

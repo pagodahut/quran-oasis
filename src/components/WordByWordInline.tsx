@@ -29,6 +29,17 @@ interface WordData {
   audioUrl?: string;
 }
 
+interface QuranApiWord {
+  position: number;
+  text: string;
+  text_uthmani: string;
+  text_indopak?: string;
+  char_type_name: string;
+  translation?: { text: string };
+  transliteration?: { text: string };
+  audio_url?: string;
+}
+
 interface WordByWordInlineProps {
   surah: number;
   ayah: number;
@@ -77,8 +88,8 @@ async function fetchWordData(surah: number, ayah: number): Promise<WordData[]> {
   
   // Filter to actual words (not verse numbers)
   const words: WordData[] = verse.words
-    .filter((w: any) => w.char_type_name === 'word')
-    .map((w: any) => ({
+    .filter((w: QuranApiWord) => w.char_type_name === 'word')
+    .map((w: QuranApiWord) => ({
       position: w.position,
       text: w.text,
       textUthmani: w.text_uthmani,

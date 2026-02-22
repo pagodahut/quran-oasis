@@ -17,6 +17,7 @@ import {
   BookOpen,
   Repeat,
   Sparkles,
+  LucideIcon,
 } from 'lucide-react';
 import {
   playAyah,
@@ -42,7 +43,7 @@ interface MemorizationPracticeProps {
 
 type Phase = 'intro' | 'listen' | 'read' | 'memorize' | 'recall' | 'complete';
 
-const PHASE_INFO: Record<Phase, { title: string; description: string; icon: any }> = {
+const PHASE_INFO: Record<Phase, { title: string; description: string; icon: LucideIcon }> = {
   intro: {
     title: 'Getting Ready',
     description: 'Prepare yourself to memorize this beautiful verse',
