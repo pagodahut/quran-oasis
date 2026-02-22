@@ -1,338 +1,376 @@
 'use client';
 
 /**
- * Garden of Surahs — Reusable Explorer Component
- * Extracted from /browse page for embedding in Mushaf tab view.
+ * Garden of Surahs v2 — Fast, responsive, integrated search
+ * No per-card scroll tracking. Uniform grid. Verse search inline.
  */
 
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { Search, X, SlidersHorizontal } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, X, ArrowRight, BookOpen, Sparkles } from 'lucide-react';
 import { SURAHS, type SurahData } from '@/components/SurahBrowser';
 import { getSurahProgress } from '@/lib/progressStore';
+import { searchQuran, type Ayah } from '@/lib/quranData';
 
 const EASTERN_DIGITS = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
 function toEastern(n: number): string {
   return n.toString().split('').map(d => EASTERN_DIGITS[parseInt(d)]).join('');
 }
 
-type CardSize = 'lg' | 'md' | 'sm';
-function getCardSize(ayahs: number): CardSize {
-  if (ayahs >= 100) return 'lg';
-  if (ayahs >= 30) return 'md';
-  return 'sm';
-}
-
-type SortType = 'number' | 'revelation' | 'length' | 'alpha' | 'progress';
-type FilterRevelation = 'all' | 'makki' | 'madani';
-
-const SORT_OPTIONS: { value: SortType; label: string }[] = [
-  { value: 'number', label: 'Mushaf Order' },
-  { value: 'revelation', label: 'Revelation Order' },
-  { value: 'length', label: 'Length' },
-  { value: 'alpha', label: 'Alphabetical' },
-  { value: 'progress', label: 'Your Progress' },
-];
-
-function SurahCard({
-  surah, index, progress, isJuzAmma, onSelect,
+// ─── Compact Surah Row ───────────────────────────────────────────
+function SurahRow({
+  surah,
+  progress,
+  isJuzAmma,
+  onSelect,
 }: {
   surah: SurahData;
-  index: number;
-  progress: { versesMemorized: number; percentage: number };
+  progress: number;
   isJuzAmma: boolean;
-  onSelect?: (surahId: number) => void;
+  onSelect: (id: number) => void;
 }) {
-  const router = useRouter();
-  const cardRef = useRef<HTMLDivElement>(null);
   const isMakki = surah.revelation === 'makki';
-  const size = getCardSize(surah.ayahs);
-  const hasProgress = progress.versesMemorized > 0;
+  const accent = isMakki ? 'gold' : 'sage';
 
-  const { scrollYProgress } = useScroll({
-    target: cardRef,
-    offset: ['start end', 'end start'],
-  });
-  const y = useTransform(scrollYProgress, [0, 1], [8, -8]);
-
-  const handleClick = () => {
-    if (onSelect) {
-      onSelect(surah.id);
-    } else {
-      router.push(`/memorize/${surah.id}/1`);
-    }
-  };
-
-  const sizeClasses = {
-    lg: 'col-span-2 row-span-2 min-h-[280px]',
-    md: 'col-span-1 row-span-2 min-h-[240px]',
-    sm: 'col-span-1 row-span-1 min-h-[180px]',
-  };
-
-  return (
-    <motion.div
-      ref={cardRef}
-      initial={{ opacity: 0, y: 24, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ delay: Math.min(index * 0.03, 0.8), duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-      style={{ y }}
-      className={sizeClasses[size]}
-    >
-      <motion.button
-        onClick={handleClick}
-        whileHover={{ y: -4, transition: { duration: 0.25 } }}
-        whileTap={{ scale: 0.97 }}
-        className="w-full h-full p-5 rounded-3xl border text-left flex flex-col justify-between transition-shadow duration-500 group relative overflow-hidden bg-night-900/60 border-night-700/30 hover:shadow-xl"
-        style={{
-          background: hasProgress
-            ? isMakki
-              ? 'linear-gradient(135deg, rgba(196,148,58,0.06) 0%, rgba(15,15,20,0.8) 100%)'
-              : 'linear-gradient(135deg, rgba(45,212,150,0.06) 0%, rgba(15,15,20,0.8) 100%)'
-            : 'linear-gradient(135deg, rgba(25,25,35,0.7) 0%, rgba(15,15,20,0.9) 100%)',
-          borderColor: hasProgress
-            ? isMakki ? 'rgba(196,148,58,0.25)' : 'rgba(45,212,150,0.25)'
-            : 'rgba(40,40,55,0.5)',
-        }}
-      >
-        <div className="flex items-start justify-between">
-          <span className={`text-2xl font-light opacity-40 ${isMakki ? 'text-gold-400' : 'text-sage-400'}`} style={{ fontFamily: 'var(--font-arabic)' }}>
-            {toEastern(surah.id)}
-          </span>
-          <div className="flex flex-col items-end gap-1">
-            {isJuzAmma && (
-              <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400/80 border border-amber-500/20">
-                Juz ʿAmma
-              </span>
-            )}
-            <span className={`text-[10px] px-2 py-0.5 rounded-lg font-medium ${isMakki ? 'bg-gold-500/10 text-gold-400/80' : 'bg-sage-500/10 text-sage-400/80'}`}>
-              {isMakki ? '🕋 Makki' : '🕌 Madani'}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex-1 flex flex-col items-center justify-center py-3">
-          <p
-            className={`${size === 'lg' ? 'text-4xl' : size === 'md' ? 'text-3xl' : 'text-2xl'} leading-tight group-hover:scale-105 transition-transform duration-300 ${isMakki ? 'text-gold-400' : 'text-sage-400'}`}
-            style={{ fontFamily: 'var(--font-arabic)', direction: 'rtl' }}
-          >
-            {surah.arabic}
-          </p>
-          <p className={`font-medium text-night-100 mt-2 ${size === 'sm' ? 'text-sm' : 'text-base'}`}>{surah.name}</p>
-          <p className="text-xs text-night-500 italic mt-0.5">{surah.meaning}</p>
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-[10px] text-night-500">
-            <span>{surah.ayahs} verses</span>
-            <span className="opacity-60">#{surah.order} revealed</span>
-          </div>
-          {hasProgress ? (
-            <div>
-              <div className="h-1.5 bg-night-800/60 rounded-full overflow-hidden">
-                <motion.div
-                  className={`h-full rounded-full ${isMakki ? 'bg-gradient-to-r from-gold-600 to-gold-400' : 'bg-gradient-to-r from-sage-600 to-sage-400'}`}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progress.percentage}%` }}
-                  transition={{ duration: 0.6, delay: index * 0.02 }}
-                />
-              </div>
-              <p className="text-[9px] text-night-500 mt-0.5">{progress.versesMemorized}/{surah.ayahs} memorized</p>
-            </div>
-          ) : (
-            <div className="h-1.5 bg-night-800/30 rounded-full" />
-          )}
-        </div>
-
-        <div
-          className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-          style={{
-            background: isMakki
-              ? 'radial-gradient(ellipse at 50% 30%, rgba(196,148,58,0.06) 0%, transparent 70%)'
-              : 'radial-gradient(ellipse at 50% 30%, rgba(45,212,150,0.06) 0%, transparent 70%)',
-          }}
-        />
-      </motion.button>
-    </motion.div>
-  );
-}
-
-function Pill({ label, active, onClick, accent }: { label: string; active: boolean; onClick: () => void; accent?: 'gold' | 'sage' }) {
   return (
     <button
-      onClick={onClick}
-      className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${
-        active
-          ? accent === 'gold' ? 'bg-gold-500/15 text-gold-400 border border-gold-500/30'
-            : accent === 'sage' ? 'bg-sage-500/15 text-sage-400 border border-sage-500/30'
-            : 'bg-night-700/60 text-night-100 border border-night-600/50'
-          : 'bg-night-900/50 text-night-500 border border-night-700/30 hover:border-night-600/50'
-      }`}
+      onClick={() => onSelect(surah.id)}
+      className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all duration-200 active:scale-[0.98] group"
+      style={{
+        background: progress > 0
+          ? `linear-gradient(135deg, ${isMakki ? 'rgba(196,148,58,0.06)' : 'rgba(45,212,150,0.06)'} 0%, rgba(15,15,20,0.6) 100%)`
+          : 'rgba(20,20,30,0.4)',
+        border: `1px solid ${progress > 0 ? (isMakki ? 'rgba(196,148,58,0.15)' : 'rgba(45,212,150,0.15)') : 'rgba(40,40,55,0.4)'}`,
+      }}
     >
-      {label}
+      {/* Number circle */}
+      <div
+        className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-semibold shrink-0 ${
+          isMakki ? 'text-gold-400 bg-gold-500/10' : 'text-sage-400 bg-sage-500/10'
+        }`}
+      >
+        {surah.id}
+      </div>
+
+      {/* Name block */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-night-100 truncate">{surah.name}</span>
+          {isJuzAmma && (
+            <span className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400/70 border border-amber-500/15 shrink-0">
+              30
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-1.5 mt-0.5">
+          <span className="text-[11px] text-night-500">{surah.ayahs} verses</span>
+          <span className="text-night-700">·</span>
+          <span className={`text-[11px] ${isMakki ? 'text-gold-500/60' : 'text-sage-500/60'}`}>
+            {isMakki ? 'Makki' : 'Madani'}
+          </span>
+        </div>
+        {/* Progress bar */}
+        {progress > 0 && (
+          <div className="h-1 bg-night-800/40 rounded-full mt-1.5 overflow-hidden">
+            <div
+              className={`h-full rounded-full ${isMakki ? 'bg-gold-500/60' : 'bg-sage-500/60'}`}
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Arabic name */}
+      <span
+        className={`text-lg shrink-0 ${isMakki ? 'text-gold-400/70' : 'text-sage-400/70'} group-hover:text-gold-300 transition-colors`}
+        style={{ fontFamily: 'var(--font-arabic)', direction: 'rtl' }}
+      >
+        {surah.arabic}
+      </span>
     </button>
   );
 }
 
+// ─── Verse Result Card ───────────────────────────────────────────
+function VerseResult({
+  surah,
+  surahName,
+  ayah,
+  query,
+  onSelect,
+}: {
+  surah: number;
+  surahName: string;
+  ayah: Ayah;
+  query: string;
+  onSelect: (surah: number, ayah: number) => void;
+}) {
+  const highlightMatch = (text: string) => {
+    if (!query.trim()) return text;
+    const idx = text.toLowerCase().indexOf(query.toLowerCase());
+    if (idx === -1) return text;
+    return (
+      <>
+        {text.slice(0, idx)}
+        <mark className="bg-gold-500/25 text-gold-200 rounded px-0.5">{text.slice(idx, idx + query.length)}</mark>
+        {text.slice(idx + query.length)}
+      </>
+    );
+  };
+
+  return (
+    <button
+      onClick={() => onSelect(surah, ayah.numberInSurah)}
+      className="w-full p-4 rounded-2xl text-left transition-all duration-200 active:scale-[0.98] group"
+      style={{
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
+        border: '1px solid rgba(255,255,255,0.06)',
+      }}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-semibold text-gold-300 bg-gold-500/15 border border-gold-500/20">
+            {surah}
+          </div>
+          <div>
+            <span className="text-sm font-medium text-night-100">{surahName}</span>
+            <span className="text-night-600 text-xs ml-1.5">:{ayah.numberInSurah}</span>
+          </div>
+        </div>
+        <ArrowRight className="w-3.5 h-3.5 text-night-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+      </div>
+
+      {/* Arabic */}
+      <p
+        className="text-lg text-gold-200/80 leading-[2] mb-2"
+        style={{ fontFamily: 'var(--font-arabic)', direction: 'rtl' }}
+      >
+        {ayah.text.arabic}
+      </p>
+
+      {/* Translation */}
+      <p className="text-xs text-night-400 leading-relaxed line-clamp-2">
+        {highlightMatch(ayah.text.translations.sahih)}
+      </p>
+    </button>
+  );
+}
+
+// ─── Main Component ──────────────────────────────────────────────
 interface GardenOfSurahsProps {
   onSelectSurah?: (surahId: number) => void;
   showHeader?: boolean;
 }
 
 export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: GardenOfSurahsProps) {
-  const [search, setSearch] = useState('');
-  const [sort, setSort] = useState<SortType>('number');
-  const [filterRev, setFilterRev] = useState<FilterRevelation>('all');
-  const [filterJuz, setFilterJuz] = useState<number | null>(null);
-  const [filterInProgress, setFilterInProgress] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
-  const [progressMap, setProgressMap] = useState<Record<number, { versesMemorized: number; percentage: number }>>({});
+  const router = useRouter();
+  const [query, setQuery] = useState('');
+  const [progressMap, setProgressMap] = useState<Record<number, number>>({});
+  const [verseResults, setVerseResults] = useState<{ surah: number; surahName: string; ayah: Ayah }[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
+  // Load progress once
   useEffect(() => {
     try {
-      const map: Record<number, { versesMemorized: number; percentage: number }> = {};
+      const map: Record<number, number> = {};
       for (const s of SURAHS) {
         const p = getSurahProgress(s.id);
         if (p.versesMemorized > 0) {
-          map[s.id] = { versesMemorized: p.versesMemorized, percentage: Math.round((p.versesMemorized / s.ayahs) * 100) };
+          map[s.id] = Math.round((p.versesMemorized / s.ayahs) * 100);
         }
       }
       setProgressMap(map);
     } catch { /* SSR safety */ }
   }, []);
 
-  const filtered = useMemo(() => {
-    let result = [...SURAHS];
-    if (search) {
-      const q = search.toLowerCase();
-      result = result.filter(s => s.name.toLowerCase().includes(q) || s.meaning.toLowerCase().includes(q) || s.arabic.includes(q) || s.id.toString() === q);
+  const handleSelect = useCallback((surahId: number, ayah?: number) => {
+    if (onSelectSurah) {
+      onSelectSurah(surahId);
+    } else {
+      router.push(`/memorize/${surahId}/${ayah || 1}`);
     }
-    if (filterRev !== 'all') result = result.filter(s => s.revelation === filterRev);
-    if (filterJuz !== null) result = result.filter(s => s.juz.includes(filterJuz));
-    if (filterInProgress) result = result.filter(s => progressMap[s.id]?.versesMemorized > 0);
-    switch (sort) {
-      case 'revelation': result.sort((a, b) => a.order - b.order); break;
-      case 'length': result.sort((a, b) => b.ayahs - a.ayahs); break;
-      case 'alpha': result.sort((a, b) => a.name.localeCompare(b.name)); break;
-      case 'progress': result.sort((a, b) => (progressMap[b.id]?.percentage || 0) - (progressMap[a.id]?.percentage || 0)); break;
-      default: result.sort((a, b) => a.id - b.id);
-    }
-    return result;
-  }, [search, sort, filterRev, filterJuz, filterInProgress, progressMap]);
+  }, [onSelectSurah, router]);
 
-  const makkiCount = SURAHS.filter(s => s.revelation === 'makki').length;
-  const madaniCount = SURAHS.filter(s => s.revelation === 'madani').length;
+  // Handle search with verse lookup + direct reference parsing
+  const handleSearch = useCallback((q: string) => {
+    setQuery(q);
+
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+
+    if (!q.trim()) {
+      setVerseResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    // Direct verse reference: "2:255", "2.255", "surah 2 ayah 255"
+    const refMatch = q.match(/^(\d{1,3})\s*[:\.]\s*(\d{1,3})$/);
+    const longMatch = q.match(/^(?:surah\s+)?(\d{1,3})\s+(?:ayah\s+)?(\d{1,3})$/i);
+    const nameMatch = q.match(/^(al-?\w+)\s+(\d{1,3})$/i);
+
+    if (refMatch || longMatch) {
+      const m = (refMatch || longMatch)!;
+      const s = parseInt(m[1]), a = parseInt(m[2]);
+      if (s >= 1 && s <= 114) {
+        handleSelect(s, a);
+        return;
+      }
+    }
+    if (nameMatch) {
+      const name = nameMatch[1].toLowerCase().replace('al-', '').replace('-', '');
+      const match = SURAHS.find(s => s.name.toLowerCase().includes(name));
+      if (match) {
+        handleSelect(match.id, parseInt(nameMatch[2]));
+        return;
+      }
+    }
+
+    // Debounced verse search
+    setIsSearching(true);
+    searchTimerRef.current = setTimeout(() => {
+      const results = searchQuran(q, 'both');
+      setVerseResults(results.slice(0, 30));
+      setIsSearching(false);
+    }, 250);
+  }, [handleSelect]);
+
+  // Filter surahs by name/meaning/number
+  const filteredSurahs = useMemo(() => {
+    if (!query.trim()) return SURAHS;
+    const q = query.toLowerCase();
+    return SURAHS.filter(s =>
+      s.name.toLowerCase().includes(q) ||
+      s.meaning.toLowerCase().includes(q) ||
+      s.arabic.includes(q) ||
+      s.id.toString() === q
+    );
+  }, [query]);
+
   const inProgressCount = Object.keys(progressMap).length;
+  const totalMemorized = Object.values(progressMap).filter(p => p === 100).length;
 
   return (
-    <div className="relative">
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/3 w-[500px] h-[500px] bg-gradient-radial from-gold-500/[0.04] to-transparent blur-3xl" />
-        <div className="absolute bottom-1/3 right-0 w-[400px] h-[400px] bg-gradient-radial from-sage-500/[0.04] to-transparent blur-3xl" />
-      </div>
-
+    <div className="relative min-h-screen">
+      {/* Stats bar */}
       {showHeader && (
-        <header className="relative z-10 text-center px-5 pt-8 pb-4">
-          <p className="text-2xl text-gold-500/30 mb-2" style={{ fontFamily: 'var(--font-arabic)' }}>﷽</p>
-          <h1 className="text-3xl font-light tracking-[0.2em] text-night-100 mb-1">Garden of Surahs</h1>
-          <p className="text-xs text-night-500 tracking-wide">114 surahs · {makkiCount} Makki · {madaniCount} Madani · 6,236 āyāt</p>
-        </header>
-      )}
-
-      <div className="relative z-10 max-w-5xl mx-auto px-4 pb-3 space-y-3">
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-night-500" />
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search by name, meaning, or number…"
-            className="w-full bg-night-900/70 backdrop-blur-md border border-night-700/40 rounded-2xl py-3 pl-11 pr-20 text-sm text-night-100 placeholder:text-night-600 focus:outline-none focus:border-gold-500/30 transition-colors"
-          />
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-            {search && (
-              <button onClick={() => setSearch('')} className="p-1.5 text-night-500 hover:text-night-300">
-                <X className="w-4 h-4" />
-              </button>
+        <div className="px-4 pt-3 pb-1">
+          <div className="flex items-center gap-3 text-[11px] text-night-500">
+            <span>114 Surahs</span>
+            <span className="text-night-700">·</span>
+            <span>6,236 Ayahs</span>
+            {inProgressCount > 0 && (
+              <>
+                <span className="text-night-700">·</span>
+                <span className="text-sage-500/70">{inProgressCount} started</span>
+              </>
             )}
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`p-1.5 rounded-lg transition-colors ${showFilters ? 'text-gold-400 bg-gold-500/10' : 'text-night-500 hover:text-night-300'}`}
-            >
-              <SlidersHorizontal className="w-4 h-4" />
-            </button>
+            {totalMemorized > 0 && (
+              <>
+                <span className="text-night-700">·</span>
+                <span className="text-gold-500/70">{totalMemorized} complete</span>
+              </>
+            )}
           </div>
         </div>
+      )}
 
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-          {SORT_OPTIONS.map(opt => (
-            <Pill key={opt.value} label={opt.label} active={sort === opt.value} onClick={() => setSort(opt.value)} />
-          ))}
-        </div>
-
-        <AnimatePresence>
-          {showFilters && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden space-y-3">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-night-600 uppercase tracking-wider w-16 shrink-0">Type</span>
-                <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-                  <Pill label="All" active={filterRev === 'all'} onClick={() => setFilterRev('all')} />
-                  <Pill label={`🕋 Makki (${makkiCount})`} active={filterRev === 'makki'} onClick={() => setFilterRev('makki')} accent="gold" />
-                  <Pill label={`🕌 Madani (${madaniCount})`} active={filterRev === 'madani'} onClick={() => setFilterRev('madani')} accent="sage" />
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-night-600 uppercase tracking-wider w-16 shrink-0">Juz</span>
-                <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-1">
-                  <Pill label="All" active={filterJuz === null} onClick={() => setFilterJuz(null)} />
-                  {Array.from({ length: 30 }, (_, i) => i + 1).map(j => (
-                    <Pill key={j} label={j.toString()} active={filterJuz === j} onClick={() => setFilterJuz(filterJuz === j ? null : j)} />
-                  ))}
-                </div>
-              </div>
-              {inProgressCount > 0 && (
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-night-600 uppercase tracking-wider w-16 shrink-0">Status</span>
-                  <Pill label={`In Progress (${inProgressCount})`} active={filterInProgress} onClick={() => setFilterInProgress(!filterInProgress)} accent="sage" />
-                </div>
-              )}
-            </motion.div>
+      {/* Search */}
+      <div className="sticky top-0 z-20 px-4 py-3 backdrop-blur-xl bg-night-950/80">
+        <div className="relative">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-night-500" />
+          <input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onChange={e => handleSearch(e.target.value)}
+            placeholder="Search surahs, verses, or jump to 2:255…"
+            className="w-full bg-night-900/60 border border-night-700/30 rounded-xl py-2.5 pl-10 pr-10 text-sm text-night-100 placeholder:text-night-600 focus:outline-none focus:border-gold-500/30 transition-colors"
+          />
+          {query && (
+            <button
+              onClick={() => { setQuery(''); setVerseResults([]); }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-night-500 hover:text-night-300"
+            >
+              <X className="w-4 h-4" />
+            </button>
           )}
-        </AnimatePresence>
+          {isSearching && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              <div className="w-4 h-4 border-2 border-gold-400/30 border-t-gold-400 rounded-full animate-spin" />
+            </div>
+          )}
+        </div>
       </div>
 
-      {(search || filterRev !== 'all' || filterJuz !== null || filterInProgress) && (
-        <div className="relative z-10 max-w-5xl mx-auto px-5 pb-2">
-          <p className="text-xs text-night-600">{filtered.length} surah{filtered.length !== 1 ? 's' : ''}</p>
-        </div>
-      )}
-
-      <main className="relative z-10 max-w-5xl mx-auto px-4 pb-32">
-        {filtered.length === 0 ? (
-          <div className="text-center py-24">
-            <p className="text-4xl mb-4 opacity-30" style={{ fontFamily: 'var(--font-arabic)' }}>📖</p>
-            <p className="text-night-400">No surahs found</p>
-            <button onClick={() => { setSearch(''); setFilterRev('all'); setFilterJuz(null); setFilterInProgress(false); }} className="mt-3 text-gold-400 text-sm hover:underline">
-              Clear all filters
-            </button>
-          </div>
-        ) : (
-          <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 auto-rows-min">
-            <AnimatePresence mode="popLayout">
-              {filtered.map((surah, i) => (
-                <SurahCard
-                  key={surah.id}
-                  surah={surah}
-                  index={i}
-                  progress={progressMap[surah.id] || { versesMemorized: 0, percentage: 0 }}
-                  isJuzAmma={surah.juz.includes(30)}
-                  onSelect={onSelectSurah}
+      <div className="px-4 pb-32 space-y-2">
+        {/* Verse results (when searching) */}
+        {verseResults.length > 0 && (
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2 px-1">
+              <h3 className="text-xs uppercase tracking-widest text-night-400 font-medium flex items-center gap-1.5">
+                <Sparkles className="w-3 h-3 text-gold-400/60" />
+                Verses
+              </h3>
+              <span className="text-[10px] text-night-600">{verseResults.length}+ matches</span>
+            </div>
+            <div className="space-y-2">
+              {verseResults.slice(0, 8).map((r, i) => (
+                <VerseResult
+                  key={`${r.surah}-${r.ayah.numberInSurah}`}
+                  surah={r.surah}
+                  surahName={r.surahName}
+                  ayah={r.ayah}
+                  query={query}
+                  onSelect={(s, a) => handleSelect(s, a)}
                 />
               ))}
-            </AnimatePresence>
-          </motion.div>
+              {verseResults.length > 8 && (
+                <p className="text-center text-xs text-night-600 py-2">
+                  {verseResults.length - 8} more results — refine your search
+                </p>
+              )}
+            </div>
+          </div>
         )}
-      </main>
+
+        {/* Surah list */}
+        {filteredSurahs.length > 0 ? (
+          <>
+            {query && verseResults.length > 0 && (
+              <div className="flex items-center gap-1.5 px-1 mb-1 mt-2">
+                <BookOpen className="w-3 h-3 text-night-500" />
+                <h3 className="text-xs uppercase tracking-widest text-night-400 font-medium">Surahs</h3>
+              </div>
+            )}
+            <div className="space-y-1.5">
+              {filteredSurahs.map(surah => (
+                <SurahRow
+                  key={surah.id}
+                  surah={surah}
+                  progress={progressMap[surah.id] || 0}
+                  isJuzAmma={surah.juz.includes(30)}
+                  onSelect={(id) => handleSelect(id)}
+                />
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-16">
+            <p className="text-night-500 text-sm">No surahs match "{query}"</p>
+            {verseResults.length === 0 && !isSearching && (
+              <button
+                onClick={() => { setQuery(''); setVerseResults([]); }}
+                className="mt-2 text-gold-400/70 text-sm hover:underline"
+              >
+                Clear search
+              </button>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
