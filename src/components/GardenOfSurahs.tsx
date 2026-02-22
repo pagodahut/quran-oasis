@@ -95,21 +95,20 @@ function SurahCard({
             : 'rgba(40,40,55,0.5)',
         }}
       >
-        {isJuzAmma && (
-          <div className="absolute top-3 right-3">
-            <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400/80 border border-amber-500/20">
-              Juz ʿAmma
-            </span>
-          </div>
-        )}
-
         <div className="flex items-start justify-between">
           <span className={`text-2xl font-light opacity-40 ${isMakki ? 'text-gold-400' : 'text-sage-400'}`} style={{ fontFamily: 'var(--font-arabic)' }}>
             {toEastern(surah.id)}
           </span>
-          <span className={`text-[10px] px-2 py-0.5 rounded-lg font-medium ${isMakki ? 'bg-gold-500/10 text-gold-400/80' : 'bg-sage-500/10 text-sage-400/80'}`}>
-            {isMakki ? '🕋 Makki' : '🕌 Madani'}
-          </span>
+          <div className="flex flex-col items-end gap-1">
+            {isJuzAmma && (
+              <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400/80 border border-amber-500/20">
+                Juz ʿAmma
+              </span>
+            )}
+            <span className={`text-[10px] px-2 py-0.5 rounded-lg font-medium ${isMakki ? 'bg-gold-500/10 text-gold-400/80' : 'bg-sage-500/10 text-sage-400/80'}`}>
+              {isMakki ? '🕋 Makki' : '🕌 Madani'}
+            </span>
+          </div>
         </div>
 
         <div className="flex-1 flex flex-col items-center justify-center py-3">
