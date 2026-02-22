@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/tarteel/keep-warm",
+      "schedule": "*/4 * * * *"
+    }
+  ]
+}

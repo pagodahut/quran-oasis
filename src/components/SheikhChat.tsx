@@ -104,6 +104,42 @@ function renderMessageContent(content: string): JSX.Element[] {
   });
 }
 
+// ─── Avatar Icons ────────────────────────────────────────────────────
+function UserIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor">
+      <circle cx="12" cy="8" r="4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4 20c0-4 4-6 8-6s8 2 8 6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function SheikhIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      {/* Crescent moon */}
+      <path
+        d="M16 4C14.2 5.2 13 7.4 13 10C13 12.6 14.2 14.8 16 16C14.4 16.8 12.5 17 10.8 16.1C9.1 15.2 7.8 13.5 7.4 11.5C7 9.5 7.5 7.4 8.8 5.8C10.1 4.2 12 3.2 14.1 3.2C14.8 3.2 15.4 3.5 16 4Z"
+        fill="currentColor"
+        opacity="0.8"
+      />
+      {/* Star */}
+      <path
+        d="M18.5 6L19 7.5L20.5 7.5L19.3 8.4L19.7 9.9L18.5 9L17.3 9.9L17.7 8.4L16.5 7.5L18 7.5Z"
+        fill="currentColor"
+      />
+      {/* Book pages */}
+      <path
+        d="M5 19V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v14l-7-3-7 3z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        fill="none"
+        opacity="0.6"
+      />
+    </svg>
+  );
+}
+
 // ─── Message Bubble ──────────────────────────────────────────────────
 function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === 'user';
@@ -120,7 +156,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
           isUser ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
         }`}
       >
-        {isUser ? '👤' : '📖'}
+        {isUser ? <UserIcon className="w-4 h-4" /> : <SheikhIcon className="w-4 h-4" />}
       </div>
 
       <div

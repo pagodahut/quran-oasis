@@ -11,6 +11,7 @@
  * FeedbackButton goes bottom-left for symmetry.
  */
 
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSheikh } from '@/contexts/SheikhContext';
 
@@ -80,7 +81,31 @@ export default function AskSheikhButton({
     dismissStuckPrompt,
   } = useSheikh();
 
-  if (isSheikhOpen || !show) return null;
+  // Hide on scroll in mushaf page
+  const [isHidden, setIsHidden] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  
+  const handleScroll = useCallback(() => {
+    const scrollY = window.scrollY;
+    const isMushafPage = pageContext.page === 'mushaf';
+    
+    if (isMushafPage) {
+      // Hide completely on mushaf when scrolling down
+      if (scrollY > lastScrollY + 10 && scrollY > 100) {
+        setIsHidden(true);
+      } else if (scrollY < lastScrollY - 10) {
+        setIsHidden(false);
+      }
+      setLastScrollY(scrollY);
+    }
+  }, [pageContext.page, lastScrollY]);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
+  if (isSheikhOpen || !show || isHidden) return null;
 
   const handleClick = () => {
     if (isUserStuck) {

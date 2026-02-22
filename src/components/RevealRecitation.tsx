@@ -16,6 +16,7 @@ import {
   AlertCircle,
   Eye,
   Sparkles,
+  Zap,
 } from 'lucide-react';
 import { fetchTajweedSurah, type TajweedSurahData, type TajweedWord } from '@/lib/quranTajweedApi';
 import { TarteelService, checkBrowserSupport } from '@/lib/tarteelService';
@@ -47,7 +48,7 @@ export interface RevealResult {
 
 type WordRevealState = 'hidden' | 'correct' | 'partial' | 'missed' | 'flash-correct';
 
-type Phase = 'loading' | 'ready' | 'recording' | 'complete' | 'error';
+type Phase = 'loading' | 'preparing' | 'ready' | 'recording' | 'complete' | 'error';
 
 // ============ Sparkle Effect ============
 
@@ -457,6 +458,7 @@ export default function RevealRecitation({
   const [justRevealedIdx, setJustRevealedIdx] = useState<number | null>(null);
   const [flashingMissed, setFlashingMissed] = useState<Set<number>>(new Set());
   const [errorMessage, setErrorMessage] = useState('');
+  const [statusMessage, setStatusMessage] = useState('');
   const [elapsedTime, setElapsedTime] = useState(0);
   const [result, setResult] = useState<RevealResult | null>(null);
   const [activeProvider, setActiveProvider] = useState<'tarteel' | 'browser' | null>(null);
@@ -569,21 +571,59 @@ export default function RevealRecitation({
 
     const expectedText = tajweedData.plainWords.join(' ');
 
-    // Try Tarteel first, fall back to Web Speech API
+    // Try Tarteel first with extended health check and retry mechanism
     let useTarteel = false;
-    try {
-      // Check Tarteel health
-      const checkRes = await fetch('/api/tarteel', { signal: AbortSignal.timeout(3000) });
-      if (checkRes.ok) {
-        const checkData = await checkRes.json();
-        useTarteel = checkData.configured === true;
-        // Health check passed
-      } else {
-        console.warn('[Sheikh Hifz] Health check failed with status:', checkRes.status);
+    let healthCheckAttempts = 0;
+    const maxHealthCheckAttempts = 3;
+    
+    // Show "Warming up..." state immediately
+    setPhase('preparing');
+    setStatusMessage('Checking Tarteel service...');
+
+    while (healthCheckAttempts < maxHealthCheckAttempts && !useTarteel) {
+      try {
+        healthCheckAttempts++;
+        
+        if (healthCheckAttempts > 1) {
+          setStatusMessage(`Warming up Tarteel service... (attempt ${healthCheckAttempts}/${maxHealthCheckAttempts})`);
+        }
+        
+        // Increased timeout to 10 seconds to handle cold starts
+        const checkRes = await fetch('/api/tarteel', { 
+          signal: AbortSignal.timeout(10000) 
+        });
+        
+        if (checkRes.ok) {
+          const checkData = await checkRes.json();
+          useTarteel = checkData.configured === true;
+          if (useTarteel) {
+            setStatusMessage('Tarteel service ready!');
+            // Small delay to show success message
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+        } else if (checkRes.status === 504) {
+          // Timeout - try again if we have attempts left
+          console.warn(`[Sheikh Hifz] Tarteel timeout on attempt ${healthCheckAttempts}`);
+          if (healthCheckAttempts < maxHealthCheckAttempts) {
+            setStatusMessage('Service is warming up, trying again...');
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2s between retries
+          }
+        } else {
+          console.warn('[Sheikh Hifz] Health check failed with status:', checkRes.status);
+          break; // Don't retry for non-timeout errors
+        }
+      } catch (e) {
+        console.warn(`[Sheikh Hifz] Health check error on attempt ${healthCheckAttempts}:`, e);
+        if (healthCheckAttempts < maxHealthCheckAttempts) {
+          setStatusMessage('Connection issue, retrying...');
+          await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2s between retries
+        }
       }
-    } catch (e) {
-      console.warn('[Sheikh Hifz] Health check error, falling back to lite:', e);
-      useTarteel = false;
+    }
+    
+    if (!useTarteel && healthCheckAttempts >= maxHealthCheckAttempts) {
+      setStatusMessage('Tarteel service unavailable, using browser speech recognition');
+      await new Promise(resolve => setTimeout(resolve, 1500)); // Show fallback message
     }
 
     try {
@@ -751,6 +791,25 @@ export default function RevealRecitation({
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
               <Loader2 className="w-8 h-8 animate-spin text-gold-500 mx-auto mb-3" />
               <p className="text-night-400 text-sm">Loading verse text...</p>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Preparing (Service Warmup) */}
+        {phase === 'preparing' && (
+          <div className="flex-1 flex items-center justify-center">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                className="w-8 h-8 mx-auto mb-3"
+              >
+                <Zap className="w-8 h-8 text-gold-500" />
+              </motion.div>
+              <p className="text-night-200 text-sm font-medium mb-1">
+                {statusMessage || 'Preparing speech recognition...'}
+              </p>
+              <p className="text-night-400 text-xs">This may take a moment</p>
             </motion.div>
           </div>
         )}

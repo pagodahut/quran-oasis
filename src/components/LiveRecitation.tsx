@@ -242,6 +242,27 @@ export default function LiveRecitation({
   const [stats, setStats] = useState<SessionStats | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
 
+  // Calculate live accuracy from current word states
+  const liveStats = useMemo(() => {
+    const totalWords = wordStates.length;
+    const revealedWords = wordStates.filter(state => state === 'revealed').length;
+    const errorWords = wordStates.filter(state => state === 'error').length;
+    const missedWords = wordStates.filter(state => state === 'missed').length;
+    const matchedWords = revealedWords; // 'revealed' means correctly matched
+    
+    const processedWords = revealedWords + errorWords + missedWords;
+    const accuracy = processedWords > 0 ? Math.round((matchedWords / processedWords) * 100) : 100;
+    
+    return {
+      accuracy,
+      totalWords,
+      matchedWords,
+      errorWords,
+      missedWords,
+      duration: elapsedTime,
+    };
+  }, [wordStates, elapsedTime]);
+
   // Refs
   const serviceRef = useRef<RealtimeTajweedService | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -620,16 +641,25 @@ export default function LiveRecitation({
             </p>
           </div>
 
-          {/* Timer */}
-          <div className="min-w-[60px] text-right">
+          {/* Timer and Accuracy */}
+          <div className="min-w-[120px] text-right">
             {phase === 'recording' && (
-              <motion.span
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-sm font-mono text-gold-400"
+                className="space-y-1"
               >
-                {formatTime(elapsedTime)}
-              </motion.span>
+                <div className="text-sm font-mono text-gold-400">
+                  {formatTime(elapsedTime)}
+                </div>
+                <div className={`text-xs font-medium flex items-center justify-end gap-1 ${
+                  liveStats.accuracy >= 90 ? 'text-green-400' :
+                  liveStats.accuracy >= 70 ? 'text-yellow-400' : 'text-red-400'
+                }`}>
+                  <Target className="w-3 h-3" />
+                  {liveStats.accuracy}%
+                </div>
+              </motion.div>
             )}
           </div>
         </div>

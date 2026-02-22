@@ -171,6 +171,9 @@ export default function RootLayout({
   const content = (
     <html lang="en" dir="ltr" className={`dark ${fontVariables}`} data-scroll-behavior="smooth">
       <head>
+        {/* Prevent auto-translation of Arabic text */}
+        <meta name="google" content="notranslate" />
+        
         {/* Favicon */}
         <link rel="icon" href="/favicon.png" type="image/png" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />

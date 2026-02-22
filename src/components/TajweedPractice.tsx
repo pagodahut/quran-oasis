@@ -562,10 +562,21 @@ export default function TajweedPractice({
                     </button>
                   </div>
                   
-                  {!canUseRealtime && !isRealtimeSupported && (
-                    <p className="text-xs text-night-600">
-                      {`Real-time mode requires: ${missingFeatures.join(', ')}`}
-                    </p>
+                  {!canUseRealtime && (
+                    <div className="mt-3 p-3 rounded-lg bg-night-900/50 border border-night-800">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Info className="w-4 h-4 text-blue-400" />
+                        <span className="text-xs font-medium text-night-300">Real-time mode unavailable</span>
+                      </div>
+                      <p className="text-xs text-night-500">
+                        {!isRealtimeSupported 
+                          ? `Browser missing: ${missingFeatures.join(', ')}`
+                          : !isDeepgramConfigured 
+                          ? 'Speech recognition service not configured. Please try standard mode.'
+                          : 'Real-time mode is temporarily unavailable.'
+                        }
+                      </p>
+                    </div>
                   )}
                 </div>
 

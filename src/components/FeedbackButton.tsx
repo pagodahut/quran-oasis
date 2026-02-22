@@ -54,11 +54,27 @@ export default function FeedbackButton({
     return () => clearTimeout(timer);
   }, [hasGivenFeedback, currentPage]);
 
-  // Collapse on scroll (matching bottom nav behavior)
+  // Collapse on scroll (matching bottom nav behavior) and hide on mushaf page
+  const [isHidden, setIsHidden] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  
   const handleScroll = useCallback(() => {
     const scrollY = window.scrollY;
-    setIsCompact(scrollY > 100);
-  }, []);
+    const isMushafPage = currentPage === 'mushaf';
+    
+    if (isMushafPage) {
+      // Hide completely on mushaf when scrolling down
+      if (scrollY > lastScrollY + 10 && scrollY > 100) {
+        setIsHidden(true);
+      } else if (scrollY < lastScrollY - 10) {
+        setIsHidden(false);
+      }
+      setLastScrollY(scrollY);
+    } else {
+      // Just compact on other pages
+      setIsCompact(scrollY > 100);
+    }
+  }, [currentPage, lastScrollY]);
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -78,7 +94,7 @@ export default function FeedbackButton({
   return (
     <>
       <AnimatePresence>
-        {!isOpen && (
+        {!isOpen && !isHidden && (
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}

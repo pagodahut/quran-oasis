@@ -114,12 +114,20 @@ function TajweedWordDisplay({
     }
   }, [state]);
 
-  // Confidence-based color: green (>0.8), yellow (0.5-0.8), red (<0.5)
+  // Enhanced confidence-based color: green (>0.8), yellow (0.5-0.8), red (<0.5)
   const confidenceColor = useMemo(() => {
     if (state !== 'revealed' && state !== 'error') return null;
-    if (confidence > 0.8) return '#4ade80'; // green-400
-    if (confidence > 0.5) return '#facc15'; // yellow-400
+    if (confidence > 0.8) return '#22c55e'; // green-500 (more vibrant)
+    if (confidence > 0.5) return '#f59e0b'; // amber-500 (more visible)
     return '#ef4444'; // red-500
+  }, [state, confidence]);
+
+  // Enhanced background colors for more obvious feedback
+  const confidenceBackground = useMemo(() => {
+    if (state !== 'revealed' && state !== 'error') return null;
+    if (confidence > 0.8) return 'rgba(34, 197, 94, 0.15)'; // green background
+    if (confidence > 0.5) return 'rgba(245, 158, 11, 0.15)'; // amber background
+    return 'rgba(239, 68, 68, 0.2)'; // red background (more prominent for errors)
   }, [state, confidence]);
 
   const segments = useMemo(() => {
@@ -158,20 +166,16 @@ function TajweedWordDisplay({
       }}
       animate={{
         opacity,
-        scale: isCurrent ? 1.05 : 1,
+        scale: isCurrent ? 1.08 : state === 'error' && confidence < 0.5 ? [1, 1.05, 1] : 1,
         backgroundColor: isCurrent
           ? 'rgba(201, 162, 39, 0.12)'
-          : confidenceColor === '#ef4444'
-          ? 'rgba(239, 68, 68, 0.15)'
-          : confidenceColor === '#facc15'
-          ? 'rgba(250, 204, 21, 0.1)'
-          : confidenceColor === '#4ade80'
-          ? 'rgba(74, 222, 128, 0.08)'
-          : 'transparent',
+          : confidenceBackground || 'transparent',
+        x: state === 'error' && confidence < 0.5 ? [-2, 2, -2, 2, 0] : 0, // Shake animation for errors
       }}
       transition={{
-        duration: 0.3,
+        duration: state === 'error' && confidence < 0.5 ? 0.5 : 0.3,
         ease: 'easeOut',
+        repeat: state === 'error' && confidence < 0.5 ? 1 : 0,
       }}
       onClick={() => onTap?.(globalIndex)}
     >
@@ -181,11 +185,28 @@ function TajweedWordDisplay({
           className="absolute inset-0 rounded-md"
           style={{
             background:
-              'radial-gradient(ellipse at center, rgba(201, 162, 39, 0.15) 0%, transparent 70%)',
-            filter: 'blur(4px)',
+              'radial-gradient(ellipse at center, rgba(201, 162, 39, 0.25) 0%, rgba(201, 162, 39, 0.1) 50%, transparent 70%)',
+            filter: 'blur(6px)',
+            boxShadow: '0 0 8px rgba(201, 162, 39, 0.3)',
           }}
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          animate={{ 
+            opacity: [0.6, 1, 0.6],
+            scale: [0.95, 1.02, 0.95]
+          }}
+          transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      )}
+
+      {/* Success celebration effect */}
+      {state === 'revealed' && confidence > 0.8 && (
+        <motion.span
+          className="absolute inset-0 rounded-md pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse at center, rgba(34, 197, 94, 0.3) 0%, transparent 70%)',
+          }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: [0, 1, 0], scale: [0.8, 1.1, 1] }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
         />
       )}
       <span className="relative">{segments}</span>

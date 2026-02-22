@@ -120,23 +120,41 @@ export function useRealtimeTajweed(
   useEffect(() => {
     async function checkConfig() {
       try {
+        console.log('[useRealtimeTajweed] Checking Deepgram configuration...');
         const response = await fetch('/api/deepgram/token');
-        if (!response.ok) {
-          // Server error — don't disable, let it fail gracefully at recording time
-          setIsConfigured(true);
+        
+        if (response.status === 401) {
+          console.warn('[useRealtimeTajweed] Authentication required for Deepgram');
+          setIsConfigured(false);
           return;
         }
+        
+        if (response.status === 503) {
+          console.warn('[useRealtimeTajweed] Deepgram not configured on server');
+          setIsConfigured(false);
+          return;
+        }
+        
+        if (!response.ok) {
+          console.error('[useRealtimeTajweed] Deepgram token endpoint error:', response.status);
+          setIsConfigured(false);
+          return;
+        }
+        
         const data = await response.json();
+        console.log('[useRealtimeTajweed] Deepgram config response:', { configured: data.configured, hasApiKey: !!data.apiKey });
+        
         if (data.configured && data.apiKey) {
           setIsConfigured(true);
           setApiKey(data.apiKey);
-        } else if (data.configured === false) {
-          // Server explicitly says not configured
+          console.log('[useRealtimeTajweed] ✅ Deepgram configured and ready');
+        } else {
+          console.warn('[useRealtimeTajweed] Deepgram not properly configured:', data);
           setIsConfigured(false);
         }
-      } catch {
-        // Network error — assume configured, will fail gracefully when actually used
-        setIsConfigured(true);
+      } catch (error) {
+        console.error('[useRealtimeTajweed] Failed to check Deepgram config:', error);
+        setIsConfigured(false);
       }
     }
     checkConfig();

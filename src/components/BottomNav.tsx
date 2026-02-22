@@ -55,17 +55,30 @@ const navItems = [
 export default function BottomNav() {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+
+  // Check if we're on mushaf page
+  const isMushafPage = pathname === '/mushaf' || pathname.startsWith('/mushaf?');
 
   const handleScroll = useCallback(() => {
     const currentScrollY = window.scrollY;
     if (currentScrollY > lastScrollY + 10 && currentScrollY > 100) {
-      setIsCollapsed(true);
+      if (isMushafPage) {
+        // Fully hide on mushaf page
+        setIsHidden(true);
+        setIsCollapsed(false);
+      } else {
+        // Just collapse on other pages
+        setIsCollapsed(true);
+        setIsHidden(false);
+      }
     } else if (currentScrollY < lastScrollY - 10) {
       setIsCollapsed(false);
+      setIsHidden(false);
     }
     setLastScrollY(currentScrollY);
-  }, [lastScrollY]);
+  }, [lastScrollY, isMushafPage]);
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -77,8 +90,8 @@ export default function BottomNav() {
       role="navigation"
       aria-label="Main navigation"
       className={`fixed bottom-0 left-0 right-0 z-50 px-4 sm:px-6 transition-all duration-300 ease-out ${
-        isCollapsed ? 'pb-3' : 'pb-5 sm:pb-6'
-      }`}
+        isHidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'
+      } ${isCollapsed ? 'pb-3' : 'pb-5 sm:pb-6'}`}
       style={{ paddingBottom: `max(${isCollapsed ? '0.75rem' : '1.25rem'}, env(safe-area-inset-bottom))` }}
     >
       {/* Premium frosted glass floating nav - dynamic width based on item count */}

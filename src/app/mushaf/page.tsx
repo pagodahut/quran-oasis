@@ -28,6 +28,7 @@ import {
   Layers,
   Filter,
   MapPin,
+  Share2,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { 
@@ -46,13 +47,12 @@ import QuranSearch from '@/components/QuranSearch';
 import TafsirDrawer from '@/components/TafsirDrawer';
 import WordByWord from '@/components/WordByWord';
 import TajweedPractice from '@/components/TajweedPractice';
+import AyahShareCard from '@/components/AyahShareCard';
 import { useSheikh } from '@/contexts/SheikhContext';
 import { useBookmarks } from '@/lib/bookmarks';
 import { useReadingPreferences } from '@/hooks/useAppliedPreferences';
 import { surahs as allSurahsData, type Surah as SurahListItem } from '@/data/surahs';
-
-type FilterType = 'all' | 'Meccan' | 'Medinan';
-type SortType = 'number' | 'verses' | 'name';
+import GardenOfSurahs from '@/components/GardenOfSurahs';
 
 export default function MushafPage() {
   const router = useRouter();
@@ -66,36 +66,6 @@ export default function MushafPage() {
   // Browse mode: show surah browser when no surah param
   const surahParam = searchParams.get('surah');
   const [browseMode, setBrowseMode] = useState(!surahParam);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [browseFilter, setBrowseFilter] = useState<FilterType>('all');
-  const [browseSortBy, setBrowseSortBy] = useState<SortType>('number');
-  const [showBrowseFilters, setShowBrowseFilters] = useState(false);
-
-  // Filtered surahs for browse mode
-  const filteredSurahs = useMemo(() => {
-    let result = [...allSurahsData];
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(s =>
-        s.name.toLowerCase().includes(q) ||
-        s.arabicName.includes(q) ||
-        s.meaning.toLowerCase().includes(q) ||
-        s.number.toString() === q
-      );
-    }
-    if (browseFilter !== 'all') {
-      result = result.filter(s => s.revelationType === browseFilter);
-    }
-    switch (browseSortBy) {
-      case 'verses': result.sort((a, b) => b.verses - a.verses); break;
-      case 'name': result.sort((a, b) => a.name.localeCompare(b.name)); break;
-      default: result.sort((a, b) => a.number - b.number);
-    }
-    return result;
-  }, [searchQuery, browseFilter, browseSortBy]);
-
-  const meccanCount = allSurahsData.filter(s => s.revelationType === 'Meccan').length;
-  const medinanCount = allSurahsData.filter(s => s.revelationType === 'Medinan').length;
   
   // State - initialized from preferences
   const [currentSurah, setCurrentSurah] = useState<Surah | null>(null);
@@ -128,6 +98,8 @@ export default function MushafPage() {
   const [wordByWordMode, setWordByWordMode] = useState(false);
   const [showTajweedPractice, setShowTajweedPractice] = useState(false);
   const [tajweedPracticeAyah, setTajweedPracticeAyah] = useState(1);
+  const [showShareCard, setShowShareCard] = useState(false);
+  const [shareAyah, setShareAyah] = useState(1);
   
   // Refs
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -299,100 +271,18 @@ export default function MushafPage() {
         {browseMode ? (
           /* ── Browse Mode Header ── */
           <div className="px-3 py-3">
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-3">
               <Link href="/" className="liquid-icon-btn">
                 <ChevronLeft className="w-5 h-5" />
               </Link>
               <div className="flex-1">
-                <h1 className="font-display text-xl text-night-100">Quran</h1>
+                <h1 className="font-display text-xl text-night-100">Garden of Surahs</h1>
                 <p className="text-xs text-night-500">114 Surahs • 6,236 Ayahs</p>
               </div>
-              <button
-                onClick={() => setShowBrowseFilters(!showBrowseFilters)}
-                className={`liquid-icon-btn ${showBrowseFilters ? 'text-gold-400' : ''}`}
-              >
-                <Filter className="w-5 h-5" />
-              </button>
               <Link href="/bookmarks" className="liquid-icon-btn" aria-label="View bookmarks">
                 <Bookmark className="w-5 h-5" />
               </Link>
             </div>
-
-            {/* Search Bar */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-night-500" />
-              <input
-                type="text"
-                placeholder="Search Quran by name, meaning, or number..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="liquid-input pl-10 pr-10"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-night-500 hover:text-night-300"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              )}
-            </div>
-
-            {/* Expandable Filters */}
-            <AnimatePresence>
-              {showBrowseFilters && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div className="pt-4 space-y-3">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-night-500" />
-                      <span className="text-sm text-night-400 mr-2">Revelation:</span>
-                      <div className="flex gap-2 flex-wrap">
-                        {(['all', 'Meccan', 'Medinan'] as FilterType[]).map((f) => (
-                          <button
-                            key={f}
-                            onClick={() => setBrowseFilter(f)}
-                            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                              browseFilter === f
-                                ? 'bg-gold-500/20 text-gold-400 border border-gold-500/30'
-                                : 'bg-night-800/50 text-night-400 border border-night-700/50 hover:border-night-600'
-                            }`}
-                          >
-                            {f === 'all' ? 'All' : f}
-                            <span className={`ml-1.5 ${browseFilter === f ? 'text-gold-400/70' : 'text-night-500'}`}>
-                              ({f === 'all' ? 114 : f === 'Meccan' ? meccanCount : medinanCount})
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Layers className="w-4 h-4 text-night-500" />
-                      <span className="text-sm text-night-400 mr-2">Sort by:</span>
-                      <div className="flex gap-2 flex-wrap">
-                        {(['number', 'verses', 'name'] as SortType[]).map((s) => (
-                          <button
-                            key={s}
-                            onClick={() => setBrowseSortBy(s)}
-                            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                              browseSortBy === s
-                                ? 'bg-gold-500/20 text-gold-400 border border-gold-500/30'
-                                : 'bg-night-800/50 text-night-400 border border-night-700/50 hover:border-night-600'
-                            }`}
-                          >
-                            {s.charAt(0).toUpperCase() + s.slice(1)}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
         ) : (
           /* ── Reading Mode Header ── */
@@ -414,7 +304,7 @@ export default function MushafPage() {
               >
                 {currentSurah && (
                   <>
-                    <h1 className="quran-text text-xl text-gold-400" lang="ar" dir="rtl">{currentSurah.name}</h1>
+                    <h1 className="quran-text text-xl text-gold-400" lang="ar" dir="rtl" translate="no">{currentSurah.name}</h1>
                     <p className="text-xs text-night-400">{currentSurah.englishName}</p>
                   </>
                 )}
@@ -465,110 +355,11 @@ export default function MushafPage() {
 
       {/* Main Content */}
       {browseMode ? (
-        /* ── Surah Browser ── */
-        <main className="px-4 py-6 pb-40">
-          {filteredSurahs.length === 0 ? (
-            <div className="text-center py-20">
-              <BookOpen className="w-12 h-12 text-night-700 mx-auto mb-4" />
-              <p className="text-night-400">No surahs found</p>
-              <button
-                onClick={() => { setSearchQuery(''); setBrowseFilter('all'); }}
-                className="mt-4 text-gold-400 text-sm hover:underline"
-              >
-                Clear filters
-              </button>
-            </div>
-          ) : (
-            <>
-              <p className="text-sm text-night-500 mb-4">
-                {filteredSurahs.length} surah{filteredSurahs.length !== 1 ? 's' : ''} found
-              </p>
-
-              {/* Juz Amma Quick Access */}
-              {browseFilter === 'all' && !searchQuery && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mb-6"
-                >
-                  <div className="liquid-glass-gold rounded-2xl p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold text-night-100 flex items-center gap-2">
-                          <Star className="w-4 h-4 text-gold-400" />
-                          Juz Amma (Juz 30)
-                        </h3>
-                        <p className="text-sm text-night-400 mt-1">37 short surahs • Perfect for beginners</p>
-                      </div>
-                      <button
-                        onClick={() => selectSurahFromBrowse(78)}
-                        className="liquid-pill text-sm text-gold-400 hover:text-gold-300"
-                      >
-                        Start
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Surah Cards */}
-              <div className="space-y-3">
-                {filteredSurahs.map((surah, index) => (
-                  <motion.div
-                    key={surah.number}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.02, duration: 0.3 }}
-                  >
-                    <button
-                      onClick={() => selectSurahFromBrowse(surah.number)}
-                      className="liquid-card-interactive p-4 group w-full text-left"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="relative flex-shrink-0">
-                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gold-500/20 to-gold-600/10 flex items-center justify-center border border-gold-500/20 group-hover:border-gold-500/40 transition-colors">
-                            <span className="text-gold-400 font-semibold">{surah.number}</span>
-                          </div>
-                          {surah.juz === 30 && (
-                            <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-sage-500 flex items-center justify-center">
-                              <Star className="w-2.5 h-2.5 text-white fill-white" />
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold text-night-100 truncate">{surah.name}</h3>
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${
-                              surah.revelationType === 'Meccan'
-                                ? 'bg-amber-500/10 text-amber-400'
-                                : 'bg-emerald-500/10 text-emerald-400'
-                            }`}>
-                              {surah.revelationType}
-                            </span>
-                          </div>
-                          <p className="text-night-500 text-sm truncate">{surah.meaning}</p>
-                          <div className="flex items-center gap-3 mt-1 text-xs text-night-600">
-                            <span>{surah.verses} verses</span>
-                            <span>•</span>
-                            <span>Juz {surah.juz}</span>
-                          </div>
-                        </div>
-                        <div className="text-right flex-shrink-0">
-                          <p
-                            className="text-xl text-gold-400 group-hover:text-gold-300 transition-colors"
-                            style={{ fontFamily: 'var(--font-arabic)', direction: 'rtl' }}
-                          >
-                            {surah.arabicName}
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                  </motion.div>
-                ))}
-              </div>
-            </>
-          )}
-        </main>
+        /* ── Surah Browser - Garden of Surahs ── */
+        <GardenOfSurahs 
+          onSelectSurah={selectSurahFromBrowse}
+          showHeader={false}
+        />
       ) : (
 
       /* ── Reading Mode ── */
@@ -580,32 +371,50 @@ export default function MushafPage() {
         ) : currentSurah ? (
           <div className="px-4 py-6 max-w-3xl mx-auto">
             {/* Surah Header */}
-            <div className="text-center mb-8">
+            <div className="text-center mb-10">
               <h2 
                 className="surah-header"
                 style={{
+                  fontFamily: 'var(--font-quran)',
+                  fontSize: '2.5rem',
+                  lineHeight: '1.4',
                   direction: 'rtl',
                   textAlign: 'center',
                   width: '100%',
                   display: 'block',
+                  marginBottom: '1rem'
                 }}
+                translate="no"
+                lang="ar"
               >
                 {currentSurah.name}
               </h2>
-              <p className="text-night-400 text-center">
+              <p className="text-night-400 text-center text-lg">
                 {currentSurah.englishName} — {currentSurah.englishNameTranslation}
               </p>
             </div>
 
             {/* Bismillah */}
             {shouldShowBismillah(surahNumber) && (
-              <div className="text-center mb-8 py-4 border-y border-night-800/30">
-                <p className="bismillah">{BISMILLAH}</p>
+              <div className="text-center mb-10 py-6 border-y border-night-800/30">
+                <p 
+                  className="bismillah" 
+                  translate="no" 
+                  lang="ar"
+                  style={{
+                    fontFamily: 'var(--font-quran)',
+                    fontSize: '2rem',
+                    lineHeight: '1.8',
+                    letterSpacing: '0.05em'
+                  }}
+                >
+                  {BISMILLAH}
+                </p>
               </div>
             )}
 
             {/* Verses */}
-            <div className="space-y-4">
+            <div className="space-y-6">
               {currentSurah.ayahs.map((ayah) => {
                 const isCurrentVerse = currentAyah === ayah.numberInSurah && isPlaying;
                 
@@ -615,7 +424,7 @@ export default function MushafPage() {
                     ref={(el) => { verseRefs.current[ayah.numberInSurah] = el; }}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className={`verse-card ${isCurrentVerse ? 'active' : ''}`}
+                    className={`liquid-card-interactive ${isCurrentVerse ? 'liquid-glow-pulse' : ''} p-6 mb-4 cursor-pointer`}
                     onClick={() => playAyah(ayah.numberInSurah)}
                   >
                     {/* Arabic Text - Word by Word or Regular */}
@@ -635,9 +444,18 @@ export default function MushafPage() {
                     ) : (
                       <p 
                         className="quran-text text-night-100 mb-4"
-                        style={{ fontSize }}
+                        style={{ 
+                          fontSize,
+                          fontFamily: 'var(--font-quran)',
+                          lineHeight: '2.2',
+                          letterSpacing: '0.02em',
+                          wordSpacing: '0.25em',
+                          textAlign: 'right',
+                          direction: 'rtl'
+                        }}
                         lang="ar"
                         dir="rtl"
+                        translate="no"
                       >
                         {cleanAyahText(ayah.text.arabic, surahNumber, ayah.numberInSurah)}
                         <span className="verse-number" aria-label={`Verse ${ayah.numberInSurah}`}>{ayah.numberInSurah}</span>
@@ -729,6 +547,18 @@ export default function MushafPage() {
                           <BookOpen className="w-3.5 h-3.5" />
                           <span className="hidden sm:inline">Tafsir</span>
                         </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShareAyah(ayah.numberInSurah);
+                            setShowShareCard(true);
+                          }}
+                          className="text-xs text-night-500 hover:text-gold-400 transition-colors flex items-center gap-1 bg-night-800/30 px-2 py-1 rounded-lg"
+                          title="Share Ayah"
+                        >
+                          <Share2 className="w-3.5 h-3.5" />
+                          <span className="hidden sm:inline">Share</span>
+                        </button>
                       </div>
                     </div>
                   </motion.div>
@@ -745,7 +575,7 @@ export default function MushafPage() {
       )}
 
       {/* Audio Player - Premium Frosted Glass - positioned above BottomNav */}
-      {!browseMode && <div className="fixed bottom-20 left-2 right-2 z-40 liquid-glass-strong rounded-2xl">
+      {!browseMode && <div className="fixed bottom-20 left-2 right-2 z-40 liquid-glass-gold-premium rounded-2xl">
         <div className="px-4 py-3.5 max-w-3xl mx-auto">
           {/* Now Playing */}
           <div className="flex items-center justify-between mb-3">
@@ -872,7 +702,7 @@ export default function MushafPage() {
                         setShowLoopPicker(false);
                         playAyah(loopRange?.start || currentAyah);
                       }}
-                      className="mt-4 px-4 py-2 bg-gold-500 text-night-950 rounded-lg text-sm font-medium hover:bg-gold-400 transition-colors"
+                      className="mt-4 liquid-btn text-sm"
                     >
                       Start
                     </button>
@@ -1169,6 +999,20 @@ export default function MushafPage() {
             <Mic className="w-7 h-7 text-white" />
           </Link>
         </motion.div>
+      )}
+
+      {/* Ayah Share Card */}
+      {currentSurah && (
+        <AyahShareCard
+          surahNumber={surahNumber}
+          surahName={currentSurah.englishName}
+          surahNameArabic={currentSurah.name}
+          ayahNumber={shareAyah}
+          arabicText={cleanAyahText(currentSurah.ayahs.find(a => a.numberInSurah === shareAyah)?.text.arabic || '', surahNumber, shareAyah)}
+          translation={currentSurah.ayahs.find(a => a.numberInSurah === shareAyah)?.text.translations[translationEdition] || ''}
+          isOpen={showShareCard}
+          onClose={() => setShowShareCard(false)}
+        />
       )}
 
       {/* AI Sheikh FAB is now rendered globally via SheikhOverlay in layout */}
