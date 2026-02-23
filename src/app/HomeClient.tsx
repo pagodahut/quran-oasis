@@ -686,12 +686,6 @@ export default function HomePage() {
                     </span>
                   </button>
                 </SignUpButton>
-                <SignInButton mode="modal">
-                  <button className="liquid-btn-outline text-base px-8 py-4 flex items-center gap-3">
-                    <User className="w-5 h-5" />
-                    Sign In
-                  </button>
-                </SignInButton>
               </SignedOut>
               <Link href="/mushaf" className="liquid-btn-outline text-base px-10 py-4 flex items-center gap-3">
                 <BookOpen className="w-5 h-5" />
