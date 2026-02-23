@@ -1141,8 +1141,8 @@ Additional Notes:
         {/* ============ RESET SETTINGS ============ */}
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-              <RotateCcw className="w-5 h-5 text-amber-400" />
+            <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
+              <RotateCcw className="w-5 h-5 text-red-400" />
             </div>
             <div>
               <h2 className="font-semibold text-night-100">Reset Settings</h2>
@@ -1151,8 +1151,8 @@ Additional Notes:
           </div>
           <button
             onClick={() => setShowResetConfirm(true)}
-            className="w-full p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 
-                      text-amber-400 hover:bg-amber-500/20 transition-colors"
+            className="w-full p-4 rounded-xl bg-red-500/10 border border-red-500/20 
+                      text-red-400 hover:bg-red-500/20 transition-colors"
           >
             Reset All Settings
           </button>

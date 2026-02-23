@@ -60,7 +60,7 @@ function SurahCard({
       <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-night-800/80 
         flex items-center justify-center border border-night-700/30
         group-hover:border-gold-500/20 transition">
-        <span className="text-sm font-mono text-night-400 group-hover:text-gold-400 transition">
+        <span className="text-sm font-medium tabular-nums text-night-400 group-hover:text-gold-400 transition">
           {surah.number}
         </span>
       </div>

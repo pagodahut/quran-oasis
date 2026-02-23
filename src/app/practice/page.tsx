@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -37,7 +37,7 @@ type ViewState = 'dashboard' | 'review' | 'add-ayahs';
 // ─── Practice Page ─────────────────────────────────────────────────
 
 export default function PracticePage() {
-  const { user } = useUser();
+  const { user } = useAuth();
   const router = useRouter();
   const { setPageContext, userLevel, setUserLevel } = useSheikh();
 

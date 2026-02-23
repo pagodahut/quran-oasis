@@ -13,6 +13,7 @@ import {
   getJuzProgress,
 } from './motivationStore';
 import { SURAH_METADATA } from './surahMetadata';
+import { hapticSuccess } from './haptics';
 
 // ============ TYPES ============
 
@@ -268,6 +269,7 @@ export function markVerseMemorized(surah: number, ayah: number): VerseProgress {
     
     // Surah complete!
     if (memorizedInSurah === surahMeta.numberOfAyahs) {
+      hapticSuccess();
       triggerCelebration({
         type: 'surah_complete',
         surahNumber: surah,

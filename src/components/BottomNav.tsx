@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 
 // Custom geometric icons - cohesive Islamic-inspired design
@@ -56,29 +56,27 @@ export default function BottomNav() {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollY = useRef(0);
 
   // Check if we're on mushaf page
   const isMushafPage = pathname === '/mushaf' || pathname.startsWith('/mushaf?');
 
   const handleScroll = useCallback(() => {
     const currentScrollY = window.scrollY;
-    if (currentScrollY > lastScrollY + 10 && currentScrollY > 100) {
+    if (currentScrollY > lastScrollY.current + 10 && currentScrollY > 100) {
       if (isMushafPage) {
-        // Fully hide on mushaf page
         setIsHidden(true);
         setIsCollapsed(false);
       } else {
-        // Just collapse on other pages
         setIsCollapsed(true);
         setIsHidden(false);
       }
-    } else if (currentScrollY < lastScrollY - 10) {
+    } else if (currentScrollY < lastScrollY.current - 10) {
       setIsCollapsed(false);
       setIsHidden(false);
     }
-    setLastScrollY(currentScrollY);
-  }, [lastScrollY, isMushafPage]);
+    lastScrollY.current = currentScrollY;
+  }, [isMushafPage]);
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll, { passive: true });

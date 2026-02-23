@@ -253,11 +253,11 @@ export default function BookmarksPage() {
         {bookmarks.length === 0 ? (
           <div className="text-center py-20">
             <div className="w-16 h-16 rounded-2xl bg-night-800/50 flex items-center justify-center mx-auto mb-4">
-              <Bookmark className="w-8 h-8 text-night-600" />
+              <BookOpen className="w-8 h-8 text-gold-400" />
             </div>
             <h2 className="text-night-300 font-medium mb-2">No bookmarks yet</h2>
             <p className="text-night-500 text-sm mb-6 max-w-xs mx-auto">
-              Tap the bookmark icon while reading to save verses for later
+              No bookmarks yet — save your favorite ayahs while reading
             </p>
             <Link 
               href="/mushaf"

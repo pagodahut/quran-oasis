@@ -323,6 +323,14 @@ export function buildTajweedContext(results: TajweedResult[]): string {
  * Build the complete system prompt with all available context.
  * This is what the API route should use instead of manually concatenating.
  */
+import { isRamadan, getRamadanDay } from './islamic-calendar';
+
+function buildRamadanContext(): string {
+  if (!isRamadan()) return '';
+  const day = getRamadanDay();
+  return `\n\nIt is currently Ramadan (Day ${day}). The student may be fasting and doing extra worship. Be especially encouraging. Suggest Ramadan-relevant surahs and duas. Reference the virtues of Quran recitation during Ramadan.`;
+}
+
 export function buildFullSystemPrompt(options: {
   ayahContext?: Parameters<typeof buildAyahContext>[0];
   userProfile?: Parameters<typeof buildUserContext>[0];
@@ -349,6 +357,9 @@ export function buildFullSystemPrompt(options: {
   } else if (options.userLevel) {
     parts.push(buildUserContext({ level: options.userLevel }));
   }
+
+  const ramadanCtx = buildRamadanContext();
+  if (ramadanCtx) parts.push(ramadanCtx);
 
   return parts.join('\n\n');
 }

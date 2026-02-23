@@ -56,6 +56,7 @@ import { useBookmarks } from '@/lib/bookmarks';
 import { useReadingPreferences } from '@/hooks/useAppliedPreferences';
 import { surahs as allSurahsData, type Surah as SurahListItem } from '@/data/surahs';
 import GardenOfSurahs from '@/components/GardenOfSurahs';
+import { hapticLight } from '@/lib/haptics';
 
 export default function MushafPage() {
   const router = useRouter();
@@ -533,6 +534,7 @@ export default function MushafPage() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
+                            hapticLight();
                             toggleBookmark({
                               surah: surahNumber,
                               surahName: currentSurah.englishName,
@@ -639,7 +641,7 @@ export default function MushafPage() {
       {!browseMode && (!focusMode || chromeVisible) && (
         <motion.div
           layout
-          className={`fixed left-2 right-2 z-40 liquid-glass-gold-premium rounded-2xl cursor-pointer ${miniPlayer ? 'bottom-20' : 'bottom-20'}`}
+          className={`fixed left-2 right-2 z-40 liquid-glass-gold-premium rounded-2xl cursor-pointer ${miniPlayer ? 'bottom-24' : 'bottom-4'}`}
           onClick={() => miniPlayer && setMiniPlayer(false)}
         >
           <AnimatePresence mode="wait">

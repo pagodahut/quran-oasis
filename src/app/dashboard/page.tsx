@@ -34,6 +34,7 @@ import {
 import { getProgress } from '@/lib/progressStore';
 import { useLearningPreferences } from '@/lib/preferencesStore';
 import { SURAH_METADATA } from '@/lib/surahMetadata';
+import { isRamadan, isLastTenNights, isJummah, getRamadanDay } from '@/lib/islamic-calendar';
 
 // ============================================
 // Animation Variants
@@ -561,6 +562,11 @@ export default function DashboardPage() {
     return Math.min(100, Math.round((goalStatus.progress / target) * 100));
   }, [goalStatus, learningPrefs]);
 
+  const isRamadanNow = isRamadan();
+  const lastTenNights = isLastTenNights();
+  const ramadanDay = getRamadanDay();
+  const isJummahToday = isJummah();
+
   return (
     <div className="min-h-screen bg-night-950">
       {/* Skip to main content link */}
@@ -607,6 +613,39 @@ export default function DashboardPage() {
             </div>
           </motion.header>
           
+          {/* Ramadan Banner */}
+          {isRamadanNow && (
+            <motion.div variants={fadeInUp} className="liquid-card rounded-2xl p-5 border border-gold-500/20 bg-gradient-to-br from-gold-500/10 via-transparent to-night-900">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">🌙</span>
+                <div className="flex-1">
+                  <h2 className="text-gold-400 font-semibold text-lg mb-1">
+                    Ramadan Mubarak! Day {ramadanDay} of Ramadan
+                  </h2>
+                  {lastTenNights ? (
+                    <p className="text-night-300 text-sm">✨ The Last Ten Nights — seek Laylatul Qadr</p>
+                  ) : (
+                    <p className="text-night-400 text-sm">1 juz per day = complete the Quran this Ramadan</p>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Jummah Banner */}
+          {isJummahToday && (
+            <motion.div variants={fadeInUp}>
+              <Link href="/mushaf?surah=18" className="liquid-card rounded-2xl p-4 border border-gold-500/20 flex items-center gap-3 hover:bg-gold-500/5 transition-colors">
+                <span className="text-xl">🕌</span>
+                <div className="flex-1">
+                  <p className="text-night-100 font-medium">Jummah Mubarak!</p>
+                  <p className="text-night-400 text-sm">The Prophet ﷺ encouraged reciting Surah Al-Kahf on Fridays</p>
+                </div>
+                <span className="text-gold-400 text-sm font-medium whitespace-nowrap">Read →</span>
+              </Link>
+            </motion.div>
+          )}
+
           {/* Inspirational Message */}
           <motion.div variants={fadeInUp} className="liquid-card rounded-2xl p-4">
             <div className="flex items-start gap-3">
@@ -791,6 +830,35 @@ export default function DashboardPage() {
             </div>
           </motion.section>
           
+          {/* Ramadan Essentials */}
+          {isRamadanNow && (
+            <motion.section variants={fadeInUp}>
+              <h2 className="text-night-500 text-xs uppercase tracking-wider mb-3 px-1">Ramadan Essentials</h2>
+              <div className="space-y-2">
+                {[
+                  { name: 'Surah Al-Qadr', desc: 'The Night of Power', surah: 97 },
+                  { name: 'Al-Baqarah 183-187', desc: 'Fasting verses', surah: 2 },
+                  { name: 'Surah Al-Mulk', desc: 'Nightly recitation', surah: 67 },
+                  { name: 'Surah Ya-Sin', desc: 'Heart of the Quran', surah: 36 },
+                  { name: 'Surah Al-Kahf', desc: 'Friday special', surah: 18 },
+                ].map((item) => (
+                  <Link
+                    key={item.surah}
+                    href={`/mushaf?surah=${item.surah}`}
+                    className="liquid-card p-3 flex items-center gap-3 hover:bg-white/[0.04] transition-colors"
+                  >
+                    <span className="w-8 h-8 rounded-lg bg-gold-500/10 flex items-center justify-center text-xs font-medium tabular-nums text-gold-400">{item.surah}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-night-100 text-sm font-medium">{item.name}</p>
+                      <p className="text-night-500 text-xs">{item.desc}</p>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-night-600" />
+                  </Link>
+                ))}
+              </div>
+            </motion.section>
+          )}
+
           {/* Quick Actions for New Users */}
           {quranProgress.versesMemorized === 0 && (
             <motion.section variants={fadeInUp} className="mt-6">

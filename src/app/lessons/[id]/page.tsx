@@ -68,6 +68,7 @@ import {
   checkAndUnlockAchievements,
   getQuranProgress,
 } from '@/lib/motivationStore';
+import { hapticSuccess } from '@/lib/haptics';
 
 // ============================================
 // Audio Speaker Button Component
@@ -678,10 +679,12 @@ export default function LessonDetailPage() {
     // Trigger celebration based on results (after reflection closes)
     if (streakResult.newMilestone) {
       setTimeout(() => {
+        hapticSuccess();
         triggerCelebration({ type: 'streak_milestone', days: streakResult.newMilestone! });
       }, 5000);
     } else if (goalResult.goalMet) {
       setTimeout(() => {
+        hapticSuccess();
         triggerCelebration({ type: 'daily_goal_met' });
       }, 5000);
     }

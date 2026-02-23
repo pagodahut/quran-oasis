@@ -1,36 +1,77 @@
-import Link from 'next/link';
-import type { Metadata } from 'next';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Start Memorizing | HIFZ',
-  description: 'Choose a surah to start memorizing the Quran with AI-powered lessons, spaced repetition, and tajweed guidance.',
-};
+import { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { ChevronLeft, BookOpen, Search } from 'lucide-react';
+import BottomNav from '@/components/BottomNav';
+import { SURAH_METADATA } from '@/lib/surahMetadata';
 
 export default function MemorizePage() {
+  const router = useRouter();
+  const [search, setSearch] = useState('');
+
+  const filtered = SURAH_METADATA.filter(
+    (s) =>
+      s.englishName.toLowerCase().includes(search.toLowerCase()) ||
+      s.number.toString().includes(search)
+  );
+
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-8 px-4 text-center">
-      <div className="space-y-3">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-          Start Memorizing the Quran
-        </h1>
-        <p className="mx-auto max-w-md text-muted-foreground">
-          Choose how you&apos;d like to begin your memorization journey.
-        </p>
-      </div>
-      <div className="flex flex-col gap-4 sm:flex-row">
-        <Link
-          href="/lessons"
-          className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
-        >
-          📚 Start a Lesson
-        </Link>
-        <Link
-          href="/surahs"
-          className="inline-flex items-center justify-center rounded-lg border border-input bg-background px-6 py-3 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
-        >
-          📖 Browse Surahs
-        </Link>
-      </div>
+    <div className="min-h-screen">
+      {/* Header */}
+      <header className="sticky top-0 z-40 safe-area-top liquid-glass mx-2 mt-2 rounded-2xl">
+        <div className="px-4 py-3 flex items-center gap-3">
+          <Link href="/mushaf" className="liquid-icon-btn">
+            <ChevronLeft className="w-5 h-5" />
+          </Link>
+          <div className="flex-1">
+            <h1 className="font-display text-lg text-night-100">Start Memorizing</h1>
+            <p className="text-xs text-night-500">Choose a surah to begin</p>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-gold-500/10 flex items-center justify-center">
+            <BookOpen className="w-5 h-5 text-gold-400" />
+          </div>
+        </div>
+      </header>
+
+      <main className="px-4 py-4 pb-32 max-w-lg mx-auto">
+        {/* Search */}
+        <div className="relative mb-4">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-night-500" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search surahs..."
+            className="w-full pl-10 pr-4 py-3 rounded-xl bg-night-800/50 border border-night-700/50 text-night-100 placeholder-night-600 focus:outline-none focus:border-gold-500/50 focus:ring-1 focus:ring-gold-500/20 transition-colors text-sm"
+          />
+        </div>
+
+        {/* Surah list */}
+        <div className="space-y-2">
+          {filtered.map((surah) => (
+            <button
+              key={surah.number}
+              onClick={() => router.push(`/memorize/${surah.number}/1`)}
+              className="w-full liquid-card p-4 flex items-center gap-3 text-left hover:bg-white/[0.04] transition-colors"
+            >
+              <span className="w-8 h-8 rounded-lg bg-gold-500/10 flex items-center justify-center text-sm font-medium tabular-nums text-gold-400">
+                {surah.number}
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="text-night-100 font-medium">{surah.englishName}</p>
+                <p className="text-xs text-night-500">{surah.numberOfAyahs} ayahs · {surah.revelationType}</p>
+              </div>
+              <p className="text-gold-400 text-lg" style={{ fontFamily: 'var(--font-arabic)' }}>
+                {surah.name}
+              </p>
+            </button>
+          ))}
+        </div>
+      </main>
+
+      <BottomNav />
     </div>
   );
 }
