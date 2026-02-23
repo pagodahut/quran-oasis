@@ -301,7 +301,7 @@ export default function MushafPage() {
   const allSurahs = getAllSurahs();
 
   return (
-    <div className="min-h-screen bg-night-950">
+    <div className={`min-h-screen ${focusMode ? 'bg-black' : 'bg-night-950'}`} onClick={handleFocusTap}>
       {/* Audio Element */}
       <audio
         ref={audioRef}
@@ -437,21 +437,12 @@ export default function MushafPage() {
             <div className="animate-pulse text-gold-400">Loading...</div>
           </div>
         ) : currentSurah ? (
-          <div className="px-4 py-6 max-w-3xl mx-auto">
+          <div className={`max-w-3xl mx-auto ${focusMode ? 'px-6 py-10' : 'px-4 py-6'}`}>
             {/* Surah Header */}
             <div className="text-center mb-10">
               <h2 
-                className="surah-header"
-                style={{
-                  fontFamily: 'var(--font-quran)',
-                  fontSize: '2.5rem',
-                  lineHeight: '1.4',
-                  direction: 'rtl',
-                  textAlign: 'center',
-                  width: '100%',
-                  display: 'block',
-                  marginBottom: '1rem'
-                }}
+                className="surah-header quran-text-xl text-center w-full block mb-4"
+                style={{ fontFamily: 'var(--font-quran)', direction: 'rtl' }}
                 translate="no"
                 lang="ar"
               >
@@ -466,15 +457,10 @@ export default function MushafPage() {
             {shouldShowBismillah(surahNumber) && (
               <div className="text-center mb-10 py-6 border-y border-night-800/30">
                 <p 
-                  className="bismillah" 
+                  className="bismillah quran-text-xl tracking-wider" 
                   translate="no" 
                   lang="ar"
-                  style={{
-                    fontFamily: 'var(--font-quran)',
-                    fontSize: '2rem',
-                    lineHeight: '1.8',
-                    letterSpacing: '0.05em'
-                  }}
+                  style={{ fontFamily: 'var(--font-quran)' }}
                 >
                   {BISMILLAH}
                 </p>
@@ -649,209 +635,223 @@ export default function MushafPage() {
         )}
       </AnimatePresence>
 
-      {/* Audio Player - Premium Frosted Glass - positioned above BottomNav */}
-      {!browseMode && <div className="fixed bottom-20 left-2 right-2 z-40 liquid-glass-gold-premium rounded-2xl">
-        <div className="px-4 py-3.5 max-w-3xl mx-auto">
-          {/* Now Playing */}
-          <div className="flex items-center justify-between mb-3">
-            <div className="text-sm">
-              <span className="text-night-500 text-xs">Now Playing</span>
-              <p className="text-night-200 font-medium">
-                {currentSurah?.englishName} {surahNumber}:{currentAyah}
-                {loopRange && (
-                  <span className="text-gold-400 ml-2 text-xs font-normal">
-                    (loop {loopRange.start}-{loopRange.end})
-                  </span>
-                )}
-              </p>
-            </div>
-            <div className="flex items-center gap-1.5">
-              {/* Word-by-word toggle */}
-              <button
-                onClick={() => setWordByWordMode(!wordByWordMode)}
-                className={`text-xs px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 min-h-[32px] ${
-                  wordByWordMode 
-                    ? 'bg-sage-500/15 text-sage-400 border border-sage-500/30' 
-                    : 'bg-white/5 text-night-400 border border-white/5 hover:bg-white/10'
-                }`}
-                title="Word-by-word highlighting"
-              >
-                <Type className="w-3 h-3" />
-                Word
-              </button>
-              {/* Multi-ayah loop button */}
-              <button
-                onClick={() => setShowLoopPicker(!showLoopPicker)}
-                className={`text-xs px-2.5 py-1.5 rounded-lg transition-all min-h-[32px] ${
-                  loopRange 
-                    ? 'bg-gold-500/15 text-gold-400 border border-gold-500/30' 
-                    : 'bg-white/5 text-night-400 border border-white/5 hover:bg-white/10'
-                }`}
-              >
-                {loopRange ? `${loopRange.start}-${loopRange.end}` : 'Range'}
-              </button>
-              <button
-                onClick={cycleRepeatMode}
-                className={`text-xs px-2.5 py-1.5 rounded-lg transition-all flex items-center min-h-[32px] ${
-                  repeatMode !== 1 
-                    ? 'bg-gold-500/15 text-gold-400 border border-gold-500/30' 
-                    : 'bg-white/5 text-night-400 border border-white/5 hover:bg-white/10'
-                }`}
-              >
-                <Repeat className="w-3 h-3 mr-1" />
-                {repeatMode === 'infinite' ? '∞' : `${repeatMode}x`}
-                {repeatMode !== 1 && repeatCount > 0 && (
-                  <span className="ml-1 opacity-70">({repeatCount + 1})</span>
-                )}
-              </button>
-            </div>
-          </div>
-          
-          {/* Loop Range Picker */}
-          <AnimatePresence>
-            {showLoopPicker && currentSurah && (
+      {/* Audio Player - Mini/Full with transition (Task 2) */}
+      {!browseMode && (!focusMode || chromeVisible) && (
+        <motion.div
+          layout
+          className={`fixed left-2 right-2 z-40 liquid-glass-gold-premium rounded-2xl cursor-pointer ${miniPlayer ? 'bottom-20' : 'bottom-20'}`}
+          onClick={() => miniPlayer && setMiniPlayer(false)}
+        >
+          <AnimatePresence mode="wait">
+            {miniPlayer ? (
+              /* ── Mini Player ── */
               <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden mb-3"
+                key="mini"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="flex items-center justify-between px-4 py-2.5 max-w-3xl mx-auto"
               >
-                <div className="bg-night-900/80 rounded-xl p-3 border border-night-800">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-night-400 font-medium">Loop Ayah Range</span>
-                    {loopRange && (
-                      <button
-                        onClick={() => setLoopRange(null)}
-                        className="text-xs text-red-400 hover:text-red-300"
-                      >
-                        Clear
-                      </button>
-                    )}
+                <p className="text-sm text-night-200 font-medium truncate flex-1">
+                  {currentSurah?.englishName} {surahNumber}:{currentAyah}
+                </p>
+                <button
+                  onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+                  className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-gold-500 text-night-950 ml-3"
+                  aria-label={isPlaying ? 'Pause' : 'Play'}
+                >
+                  {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
+                </button>
+              </motion.div>
+            ) : (
+              /* ── Full Player ── */
+              <motion.div
+                key="full"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="px-4 py-3.5 max-w-3xl mx-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Now Playing */}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-sm">
+                    <span className="text-night-500 text-xs">Now Playing</span>
+                    <p className="text-night-200 font-medium">
+                      {currentSurah?.englishName} {surahNumber}:{currentAyah}
+                      {loopRange && (
+                        <span className="text-gold-400 ml-2 text-xs font-normal">
+                          (loop {loopRange.start}-{loopRange.end})
+                        </span>
+                      )}
+                    </p>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1">
-                      <label className="text-xs text-night-500 block mb-1">From</label>
-                      <select
-                        value={loopRange?.start || currentAyah}
-                        onChange={(e) => {
-                          const start = parseInt(e.target.value);
-                          const end = loopRange?.end || Math.min(start + 2, currentSurah.numberOfAyahs);
-                          setLoopRange({ start, end: Math.max(start, end) });
-                        }}
-                        className="w-full bg-night-800 text-night-200 text-sm rounded-lg px-3 py-2 border border-night-700"
-                      >
-                        {Array.from({ length: currentSurah.numberOfAyahs }, (_, i) => i + 1).map((num) => (
-                          <option key={num} value={num}>
-                            Ayah {num}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <span className="text-night-600 mt-4">→</span>
-                    <div className="flex-1">
-                      <label className="text-xs text-night-500 block mb-1">To</label>
-                      <select
-                        value={loopRange?.end || Math.min(currentAyah + 2, currentSurah.numberOfAyahs)}
-                        onChange={(e) => {
-                          const end = parseInt(e.target.value);
-                          const start = loopRange?.start || currentAyah;
-                          setLoopRange({ start: Math.min(start, end), end });
-                        }}
-                        className="w-full bg-night-800 text-night-200 text-sm rounded-lg px-3 py-2 border border-night-700"
-                      >
-                        {Array.from({ length: currentSurah.numberOfAyahs }, (_, i) => i + 1).map((num) => (
-                          <option key={num} value={num}>
-                            Ayah {num}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                  <div className="flex items-center gap-1.5">
                     <button
-                      onClick={() => {
-                        if (!loopRange) {
-                          setLoopRange({ 
-                            start: currentAyah, 
-                            end: Math.min(currentAyah + 2, currentSurah.numberOfAyahs) 
-                          });
-                        }
-                        setShowLoopPicker(false);
-                        playAyah(loopRange?.start || currentAyah);
-                      }}
-                      className="mt-4 liquid-btn text-sm"
+                      onClick={() => setWordByWordMode(!wordByWordMode)}
+                      className={`text-xs px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 min-h-[32px] ${
+                        wordByWordMode 
+                          ? 'bg-sage-500/15 text-sage-400 border border-sage-500/30' 
+                          : 'bg-white/5 text-night-400 border border-white/5 hover:bg-white/10'
+                      }`}
+                      title="Word-by-word highlighting"
                     >
-                      Start
+                      <Type className="w-3 h-3" />
+                      Word
+                    </button>
+                    <button
+                      onClick={() => setShowLoopPicker(!showLoopPicker)}
+                      className={`text-xs px-2.5 py-1.5 rounded-lg transition-all min-h-[32px] ${
+                        loopRange 
+                          ? 'bg-gold-500/15 text-gold-400 border border-gold-500/30' 
+                          : 'bg-white/5 text-night-400 border border-white/5 hover:bg-white/10'
+                      }`}
+                    >
+                      {loopRange ? `${loopRange.start}-${loopRange.end}` : 'Range'}
+                    </button>
+                    <button
+                      onClick={cycleRepeatMode}
+                      className={`text-xs px-2.5 py-1.5 rounded-lg transition-all flex items-center min-h-[32px] ${
+                        repeatMode !== 1 
+                          ? 'bg-gold-500/15 text-gold-400 border border-gold-500/30' 
+                          : 'bg-white/5 text-night-400 border border-white/5 hover:bg-white/10'
+                      }`}
+                    >
+                      <Repeat className="w-3 h-3 mr-1" />
+                      {repeatMode === 'infinite' ? '∞' : `${repeatMode}x`}
+                      {repeatMode !== 1 && repeatCount > 0 && (
+                        <span className="ml-1 opacity-70">({repeatCount + 1})</span>
+                      )}
+                    </button>
+                    {/* Collapse to mini */}
+                    <button onClick={() => setMiniPlayer(true)} className="liquid-icon-btn !w-8 !h-8 !min-w-[32px] !min-h-[32px]">
+                      <Minimize className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                  <p className="text-xs text-night-500 mt-2">
-                    Loop a range of ayahs continuously. Each ayah will repeat {repeatMode === 'infinite' ? '∞' : repeatMode}x before moving to the next.
-                  </p>
+                </div>
+
+                {/* Loop Range Picker */}
+                <AnimatePresence>
+                  {showLoopPicker && currentSurah && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden mb-3"
+                    >
+                      <div className="bg-night-900/80 rounded-xl p-3 border border-night-800">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs text-night-400 font-medium">Loop Ayah Range</span>
+                          {loopRange && (
+                            <button onClick={() => setLoopRange(null)} className="text-xs text-red-400 hover:text-red-300">Clear</button>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1">
+                            <label className="text-xs text-night-500 block mb-1">From</label>
+                            <select
+                              value={loopRange?.start || currentAyah}
+                              onChange={(e) => {
+                                const start = parseInt(e.target.value);
+                                const end = loopRange?.end || Math.min(start + 2, currentSurah.numberOfAyahs);
+                                setLoopRange({ start, end: Math.max(start, end) });
+                              }}
+                              className="w-full bg-night-800 text-night-200 text-sm rounded-lg px-3 py-2 border border-night-700"
+                            >
+                              {Array.from({ length: currentSurah.numberOfAyahs }, (_, i) => i + 1).map((num) => (
+                                <option key={num} value={num}>Ayah {num}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <span className="text-night-600 mt-4">→</span>
+                          <div className="flex-1">
+                            <label className="text-xs text-night-500 block mb-1">To</label>
+                            <select
+                              value={loopRange?.end || Math.min(currentAyah + 2, currentSurah.numberOfAyahs)}
+                              onChange={(e) => {
+                                const end = parseInt(e.target.value);
+                                const start = loopRange?.start || currentAyah;
+                                setLoopRange({ start: Math.min(start, end), end });
+                              }}
+                              className="w-full bg-night-800 text-night-200 text-sm rounded-lg px-3 py-2 border border-night-700"
+                            >
+                              {Array.from({ length: currentSurah.numberOfAyahs }, (_, i) => i + 1).map((num) => (
+                                <option key={num} value={num}>Ayah {num}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <button
+                            onClick={() => {
+                              if (!loopRange) {
+                                setLoopRange({ start: currentAyah, end: Math.min(currentAyah + 2, currentSurah.numberOfAyahs) });
+                              }
+                              setShowLoopPicker(false);
+                              playAyah(loopRange?.start || currentAyah);
+                            }}
+                            className="mt-4 liquid-btn text-sm"
+                          >
+                            Start
+                          </button>
+                        </div>
+                        <p className="text-xs text-night-500 mt-2">
+                          Loop a range of ayahs continuously. Each ayah will repeat {repeatMode === 'infinite' ? '∞' : repeatMode}x before moving to the next.
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Controls */}
+                <div className="flex items-center justify-center gap-3">
+                  <button onClick={playPrevious} className="liquid-icon-btn !w-12 !h-12" aria-label="Previous verse">
+                    <SkipBack className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={togglePlay}
+                    className="w-16 h-16 rounded-full flex items-center justify-center transition-all active:scale-95"
+                    style={{
+                      background: isPlaying 
+                        ? 'linear-gradient(135deg, rgba(201,162,39,1) 0%, rgba(180,140,30,1) 100%)'
+                        : 'linear-gradient(135deg, rgba(201,162,39,0.95) 0%, rgba(180,140,30,1) 100%)',
+                      boxShadow: isPlaying 
+                        ? '0 0 32px rgba(201,162,39,0.5), 0 8px 24px rgba(0,0,0,0.3)'
+                        : '0 4px 20px rgba(201,162,39,0.35), 0 8px 24px rgba(0,0,0,0.2)',
+                      border: '1px solid rgba(255,255,255,0.2)',
+                    }}
+                    aria-label={isPlaying ? 'Pause' : 'Play'}
+                  >
+                    {isPlaying ? <Pause className="w-7 h-7 text-night-950" /> : <Play className="w-7 h-7 text-night-950 ml-1" />}
+                  </button>
+                  <button onClick={playNext} className="liquid-icon-btn !w-12 !h-12" aria-label="Next verse">
+                    <SkipForward className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Reciter & Speed */}
+                <div className="flex items-center justify-center gap-3 mt-3 text-xs text-night-400">
+                  <span className="text-night-500">{RECITERS.find(r => r.id === selectedReciter)?.name}</span>
+                  <span className="text-night-700">•</span>
+                  <select
+                    value={playbackRate}
+                    onChange={(e) => {
+                      const rate = parseFloat(e.target.value);
+                      setPlaybackRate(rate);
+                      if (audioRef.current) audioRef.current.playbackRate = rate;
+                    }}
+                    className="bg-white/5 text-night-300 text-xs px-2 py-1 rounded-lg border border-white/5 min-h-[28px]"
+                  >
+                    <option value={0.5}>0.5x</option>
+                    <option value={0.75}>0.75x</option>
+                    <option value={1}>1x</option>
+                    <option value={1.25}>1.25x</option>
+                    <option value={1.5}>1.5x</option>
+                  </select>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-
-          {/* Controls - Larger touch targets */}
-          <div className="flex items-center justify-center gap-3">
-            <button 
-              onClick={playPrevious} 
-              className="liquid-icon-btn !w-12 !h-12"
-              aria-label="Previous verse"
-            >
-              <SkipBack className="w-5 h-5" />
-            </button>
-            
-            <button
-              onClick={togglePlay}
-              className="w-16 h-16 rounded-full flex items-center justify-center transition-all active:scale-95"
-              style={{
-                background: isPlaying 
-                  ? 'linear-gradient(135deg, rgba(201,162,39,1) 0%, rgba(180,140,30,1) 100%)'
-                  : 'linear-gradient(135deg, rgba(201,162,39,0.95) 0%, rgba(180,140,30,1) 100%)',
-                boxShadow: isPlaying 
-                  ? '0 0 32px rgba(201,162,39,0.5), 0 8px 24px rgba(0,0,0,0.3)'
-                  : '0 4px 20px rgba(201,162,39,0.35), 0 8px 24px rgba(0,0,0,0.2)',
-                border: '1px solid rgba(255,255,255,0.2)',
-              }}
-              aria-label={isPlaying ? 'Pause' : 'Play'}
-            >
-              {isPlaying ? (
-                <Pause className="w-7 h-7 text-night-950" />
-              ) : (
-                <Play className="w-7 h-7 text-night-950 ml-1" />
-              )}
-            </button>
-            
-            <button 
-              onClick={playNext} 
-              className="liquid-icon-btn !w-12 !h-12"
-              aria-label="Next verse"
-            >
-              <SkipForward className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Reciter & Speed */}
-          <div className="flex items-center justify-center gap-3 mt-3 text-xs text-night-400">
-            <span className="text-night-500">{RECITERS.find(r => r.id === selectedReciter)?.name}</span>
-            <span className="text-night-700">•</span>
-            <select
-              value={playbackRate}
-              onChange={(e) => {
-                const rate = parseFloat(e.target.value);
-                setPlaybackRate(rate);
-                if (audioRef.current) audioRef.current.playbackRate = rate;
-              }}
-              className="bg-white/5 text-night-300 text-xs px-2 py-1 rounded-lg border border-white/5 min-h-[28px]"
-            >
-              <option value={0.5}>0.5x</option>
-              <option value={0.75}>0.75x</option>
-              <option value={1}>1x</option>
-              <option value={1.25}>1.25x</option>
-              <option value={1.5}>1.5x</option>
-            </select>
-          </div>
-        </div>
-      </div>}
+        </motion.div>
+      )}
 
       {/* Surah List Sheet */}
       <AnimatePresence>
@@ -1015,7 +1015,7 @@ export default function MushafPage() {
         )}
       </AnimatePresence>
       
-      <BottomNav />
+      {!focusMode && <BottomNav />}
       
       {/* Quran Search */}
       <QuranSearch
