@@ -52,15 +52,20 @@ function SurahCard({
       whileTap={{ scale: 0.97 }}
       onClick={() => onSelect(surah.number)}
       className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl 
-        bg-night-900/40 border border-night-800/50 
-        hover:bg-night-800/60 hover:border-night-700/50 
         transition-all group text-left"
+      style={{
+        background: 'rgba(80,40,5,0.18)',
+        border: '1px solid rgba(201,162,39,0.12)',
+      }}
+      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(201,162,39,0.3)'; (e.currentTarget as HTMLElement).style.background = 'rgba(100,55,8,0.28)'; }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(201,162,39,0.12)'; (e.currentTarget as HTMLElement).style.background = 'rgba(80,40,5,0.18)'; }}
     >
       {/* Number badge */}
-      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-night-800/80 
-        flex items-center justify-center border border-night-700/30
-        group-hover:border-gold-500/20 transition">
-        <span className="text-sm font-medium tabular-nums text-night-400 group-hover:text-gold-400 transition">
+      <div className="flex-shrink-0 w-10 h-10 rounded-lg
+        flex items-center justify-center transition"
+        style={{ background: 'rgba(120,60,10,0.4)', border: '1px solid rgba(201,162,39,0.2)' }}
+      >
+        <span className="text-sm font-medium tabular-nums" style={{ color: 'rgba(251,191,36,0.8)' }}>
           {surah.number}
         </span>
       </div>
@@ -72,7 +77,8 @@ function SurahCard({
             {surah.englishName}
           </h3>
           <span
-            className="text-lg font-arabic text-night-300 mr-1 flex-shrink-0"
+            className="text-lg font-arabic mr-1 flex-shrink-0"
+            style={{ color: 'rgba(251,191,36,0.7)' }}
             dir="rtl"
             lang="ar"
           >
@@ -563,7 +569,7 @@ export default function RecitePage() {
         {/* Quick Access - Only show when not searching */}
         {!searchQuery.trim() && (
           <section>
-            <h2 className="text-xs font-semibold text-night-400 uppercase tracking-wider mb-3">
+            <h2 className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(251,191,36,0.5)' }}>
               Popular Surahs
             </h2>
             <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
@@ -572,10 +578,15 @@ export default function RecitePage() {
                   key={surah.number}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleSelectSurah(surah.number)}
-                  className="flex-shrink-0 px-4 py-2.5 rounded-xl bg-night-900/50 border border-night-800/40
-                    hover:bg-night-800/60 hover:border-gold-500/20 transition group"
+                  className="flex-shrink-0 px-4 py-2.5 rounded-xl transition group"
+                  style={{
+                    background: 'rgba(120,60,10,0.25)',
+                    border: '1px solid rgba(201,162,39,0.15)',
+                  }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(201,162,39,0.4)'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(201,162,39,0.15)'; }}
                 >
-                  <span className="text-xs font-medium text-night-300 group-hover:text-gold-400 transition whitespace-nowrap">
+                  <span className="text-xs font-medium whitespace-nowrap" style={{ color: 'rgba(251,191,36,0.8)' }}>
                     {surah.englishName}
                   </span>
                 </motion.button>
@@ -587,7 +598,7 @@ export default function RecitePage() {
         {/* Surah List */}
         <section>
           {!searchQuery.trim() && (
-            <h2 className="text-xs font-semibold text-night-400 uppercase tracking-wider mb-3">
+            <h2 className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(251,191,36,0.5)' }}>
               All Surahs
             </h2>
           )}
