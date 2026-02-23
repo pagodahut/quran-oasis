@@ -324,13 +324,21 @@ export default function ProfilePage() {
                 <p className="text-night-400 text-sm mb-3">
                   Sign in to save your progress across devices
                 </p>
-                <Link 
-                  href="/sign-in"
-                  className="liquid-btn text-sm px-6 py-2 inline-flex items-center gap-2"
-                >
-                  <User className="w-4 h-4" />
-                  Sign In
-                </Link>
+                <div className="flex gap-3">
+                  <Link 
+                    href="/sign-in"
+                    className="liquid-btn text-sm px-6 py-2.5 inline-flex items-center gap-2"
+                  >
+                    <User className="w-4 h-4" />
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/sign-up"
+                    className="liquid-btn-outline text-sm px-6 py-2.5 inline-flex items-center gap-2"
+                  >
+                    Create Account
+                  </Link>
+                </div>
               </div>
             )}
             {/* Local mode indicator when Clerk is not configured */}

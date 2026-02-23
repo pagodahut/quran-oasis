@@ -414,7 +414,7 @@ export default function SheikhChat({
 
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-gold-500/15 flex items-center justify-center">
-                <BookReadIcon size={20} aria-hidden="true" />
+                <MosqueIcon size={20} aria-hidden="true" />
               </div>
               <div>
                 <h3 id="sheikh-chat-title" className="text-sm font-semibold text-white">Sheikh HIFZ</h3>

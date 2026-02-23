@@ -657,18 +657,42 @@ export default function HomePage() {
               transition={{ delay: 0.8 }}
               className="flex flex-col sm:flex-row gap-4 justify-center mb-8"
             >
-              <Link href="/onboarding/welcome" className="group relative">
-                <motion.div
-                  className="absolute -inset-1 bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-70 transition-opacity"
-                  animate={{ scale: [1, 1.02, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-                <span className="relative liquid-btn text-base px-10 py-4 flex items-center gap-3">
-                  <Sparkles className="w-5 h-5" />
-                  Begin Your Journey
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </Link>
+              <SignedIn>
+                <Link href="/dashboard" className="group relative">
+                  <motion.div
+                    className="absolute -inset-1 bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-70 transition-opacity"
+                    animate={{ scale: [1, 1.02, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                  <span className="relative liquid-btn text-base px-10 py-4 flex items-center gap-3">
+                    <Sparkles className="w-5 h-5" />
+                    Continue Learning
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </Link>
+              </SignedIn>
+              <SignedOut>
+                <SignUpButton mode="modal">
+                  <button className="group relative">
+                    <motion.div
+                      className="absolute -inset-1 bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-70 transition-opacity"
+                      animate={{ scale: [1, 1.02, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                    <span className="relative liquid-btn text-base px-10 py-4 flex items-center gap-3">
+                      <Sparkles className="w-5 h-5" />
+                      Begin Your Journey
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                  </button>
+                </SignUpButton>
+                <SignInButton mode="modal">
+                  <button className="liquid-btn-outline text-base px-8 py-4 flex items-center gap-3">
+                    <User className="w-5 h-5" />
+                    Sign In
+                  </button>
+                </SignInButton>
+              </SignedOut>
               <Link href="/mushaf" className="liquid-btn-outline text-base px-10 py-4 flex items-center gap-3">
                 <BookOpen className="w-5 h-5" />
                 Explore the Quran
@@ -994,10 +1018,20 @@ export default function HomePage() {
                   animate={{ scale: [1, 1.02, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
-                <Link href="/onboarding/welcome" className="relative liquid-btn text-lg px-10 py-4 inline-flex items-center gap-3">
-                  Start Today — It's Free
-                  <Sparkles className="w-5 h-5" />
-                </Link>
+                <SignedIn>
+                  <Link href="/dashboard" className="relative liquid-btn text-lg px-10 py-4 inline-flex items-center gap-3">
+                    Go to Dashboard
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
+                </SignedIn>
+                <SignedOut>
+                  <SignUpButton mode="modal">
+                    <button className="relative liquid-btn text-lg px-10 py-4 inline-flex items-center gap-3">
+                      Start Today — It&#39;s Free
+                      <Sparkles className="w-5 h-5" />
+                    </button>
+                  </SignUpButton>
+                </SignedOut>
               </motion.div>
             </div>
           </motion.div>

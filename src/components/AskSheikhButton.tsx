@@ -14,6 +14,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSheikh } from '@/contexts/SheikhContext';
+import { MosqueIcon } from '@/components/icons';
 
 interface AskSheikhButtonProps {
   initialQuestion?: string;
@@ -166,7 +167,7 @@ export default function AskSheikhButton({
           
           {/* Glass surface */}
           <span className="sheikh-fab__surface">
-            <SheikhIcon />
+            <MosqueIcon size={28} />
           </span>
         </motion.button>
       </motion.div>
