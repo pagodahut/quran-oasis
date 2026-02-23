@@ -1,5 +1,8 @@
 import React from 'react';
 
+// MosqueIcon is defined in its own file for reuse
+export { MosqueIcon } from './MosqueIcon';
+
 interface IconProps {
   size?: number;
   className?: string;
@@ -76,28 +79,7 @@ export function SparkleIcon({ size = 24, className = '' }: IconProps) {
   </>);
 }
 
-/** 🕌 Mosque silhouette */
-export function MosqueIcon({ size = 24, className = '' }: IconProps) {
-  return svgBase(size, className, <>
-    {/* Central dome with finial */}
-    <path d="M12 3l-.5.5C10.5 4.5 9 6.5 9 9v2h6V9c0-2.5-1.5-4.5-2.5-5.5L12 3Z" />
-    <line x1="12" y1="1.5" x2="12" y2="3" />
-    {/* Left minaret */}
-    <rect x="4" y="10" width="3" height="10" rx="0.5" />
-    <path d="M5.5 10V8.5a1 1 0 0 1 1-1h0a1 1 0 0 1 1 1V10" />
-    <path d="M4.8 14h1.4" />
-    {/* Right minaret */}
-    <rect x="17" y="10" width="3" height="10" rx="0.5" />
-    <path d="M18.5 10V8.5a1 1 0 0 0-1-1h0a1 1 0 0 0-1 1V10" />
-    <path d="M17.8 14h1.4" />
-    {/* Central body */}
-    <rect x="8" y="11" width="8" height="9" rx="0.5" />
-    {/* Arched doorway */}
-    <path d="M10 20v-3a2 2 0 0 1 4 0v3" />
-    {/* Base */}
-    <line x1="3" y1="20" x2="21" y2="20" />
-  </>);
-}
+// MosqueIcon is re-exported from ./MosqueIcon.tsx (see top of file)
 
 /** 🌙 Crescent moon */
 export function CrescentIcon({ size = 24, className = '' }: IconProps) {
