@@ -204,6 +204,22 @@ export default function MushafPage() {
     }
   };
 
+  // Escape key: exit focus mode AND fullscreen in one action
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && focusMode) {
+        // Exit focus mode and fullscreen together
+        setFocusMode(false);
+        setChromeVisible(true);
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [focusMode]);
+
   const handleFocusTap = () => {
     if (focusMode) setChromeVisible(prev => !prev);
   };

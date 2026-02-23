@@ -379,10 +379,16 @@ export function cleanAyahText(text: string, surahNumber: number, ayahNumber: num
   }
   
   // Remove Bismillah prefix if present
+  // Use Unicode NFC normalization to handle combining mark ordering differences
   let cleaned = text.trim();
+  const normalizedCleaned = cleaned.normalize('NFC');
   for (const pattern of BISMILLAH_PATTERNS) {
-    if (cleaned.startsWith(pattern)) {
-      cleaned = cleaned.slice(pattern.length).trim();
+    const normalizedPattern = pattern.normalize('NFC');
+    if (normalizedCleaned.startsWith(normalizedPattern)) {
+      // Find the actual length to slice by matching normalized positions
+      // Since NFC normalization preserves string length for Arabic text,
+      // we can safely use the pattern length
+      cleaned = normalizedCleaned.slice(normalizedPattern.length).trim();
       break;
     }
   }
