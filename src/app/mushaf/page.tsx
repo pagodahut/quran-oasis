@@ -375,6 +375,9 @@ export default function MushafPage() {
                 <button onClick={() => setShowSurahList(true)} className="liquid-icon-btn">
                   <List className="w-5 h-5" />
                 </button>
+                <button onClick={() => setShowSearch(true)} className="liquid-icon-btn" aria-label="Search Quran">
+                  <Search className="w-5 h-5" aria-hidden="true" />
+                </button>
               </div>
 
               {/* Surah Title */}
@@ -391,9 +394,6 @@ export default function MushafPage() {
               </button>
 
               <div className="flex items-center gap-1.5">
-                <button onClick={() => setShowSearch(true)} className="liquid-icon-btn" aria-label="Search Quran">
-                  <Search className="w-5 h-5" aria-hidden="true" />
-                </button>
                 <Link href="/bookmarks" className="liquid-icon-btn" aria-label="View bookmarks">
                   <Bookmark className="w-5 h-5" />
                 </Link>
@@ -1082,13 +1082,13 @@ export default function MushafPage() {
         )}
       </AnimatePresence>
       
-      {/* Recite Floating Action Button */}
+      {/* Recite Floating Action Button — left side to avoid overlap with AI Sheikh (right-4) */}
       {!browseMode && currentSurah && (
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0, opacity: 0 }}
-          className="fixed bottom-32 right-4 z-30"
+          className="fixed bottom-24 left-4 z-30"
         >
           <Link
             href={`/recite?surah=${surahNumber}&from=mushaf`}
