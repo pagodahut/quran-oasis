@@ -785,102 +785,8 @@ export default function HomePage() {
                 </motion.svg>
               ))}
               
-              {/* Scroll-Triggered Opening Animation */}
-              <motion.div 
-                className="flex justify-center mb-8"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-50px" }}
-              >
-                <motion.svg
-                  width="300"
-                  height="60"
-                  viewBox="0 0 300 60"
-                  className="overflow-visible"
-                >
-                  <defs>
-                    <linearGradient id="revealGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#c9a227" />
-                      <stop offset="50%" stopColor="#d4af37" />
-                      <stop offset="100%" stopColor="#c9a227" />
-                    </linearGradient>
-                    <filter id="revealGlow">
-                      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                      <feMerge>
-                        <feMergeNode in="coloredBlur"/>
-                        <feMergeNode in="SourceGraphic"/>
-                      </feMerge>
-                    </filter>
-                  </defs>
-                  {/* Left line drawing in */}
-                  <motion.line
-                    x1="150" y1="30" x2="20" y2="30"
-                    stroke="url(#revealGradient)"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    filter="url(#revealGlow)"
-                    variants={{
-                      hidden: { pathLength: 0, opacity: 0 },
-                      visible: { pathLength: 1, opacity: 1, transition: { duration: 0.8, ease: "easeOut" } }
-                    }}
-                  />
-                  {/* Right line drawing in */}
-                  <motion.line
-                    x1="150" y1="30" x2="280" y2="30"
-                    stroke="url(#revealGradient)"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    filter="url(#revealGlow)"
-                    variants={{
-                      hidden: { pathLength: 0, opacity: 0 },
-                      visible: { pathLength: 1, opacity: 1, transition: { duration: 0.8, ease: "easeOut" } }
-                    }}
-                  />
-                  {/* Left decorative end */}
-                  <motion.path
-                    d="M 20 20 L 10 30 L 20 40"
-                    stroke="url(#revealGradient)"
-                    strokeWidth="2"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    filter="url(#revealGlow)"
-                    variants={{
-                      hidden: { opacity: 0, scale: 0 },
-                      visible: { opacity: 1, scale: 1, transition: { delay: 0.6, duration: 0.3 } }
-                    }}
-                  />
-                  {/* Right decorative end */}
-                  <motion.path
-                    d="M 280 20 L 290 30 L 280 40"
-                    stroke="url(#revealGradient)"
-                    strokeWidth="2"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    filter="url(#revealGlow)"
-                    variants={{
-                      hidden: { opacity: 0, scale: 0 },
-                      visible: { opacity: 1, scale: 1, transition: { delay: 0.6, duration: 0.3 } }
-                    }}
-                  />
-                  {/* Center star/diamond */}
-                  <motion.path
-                    d="M 150 15 L 158 30 L 150 45 L 142 30 Z"
-                    fill="#c9a227"
-                    filter="url(#revealGlow)"
-                    variants={{
-                      hidden: { scale: 0, opacity: 0, rotate: -180 },
-                      visible: { 
-                        scale: 1, 
-                        opacity: 1, 
-                        rotate: 0,
-                        transition: { delay: 0.3, duration: 0.5, type: "spring", stiffness: 200 } 
-                      }
-                    }}
-                  />
-                </motion.svg>
-              </motion.div>
+              {/* Scroll-Triggered Divider */}
+              <GeometricDivider className="mb-8" />
 
               <motion.div variants={fadeInUp} className="text-center mb-12">
                 <h2 id="features" className="font-display text-3xl md:text-5xl text-night-100 mb-4 heading-illuminated">
@@ -895,47 +801,32 @@ export default function HomePage() {
               <div className="relative">
 
                 {/* Feature Cards with staggered animation */}
-                <div className="grid md:grid-cols-3 gap-6 relative z-10">
-                  <motion.div
-                    initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.2, duration: 0.5, type: "spring" }}
-                  >
-                    <FeatureCard
-                      iconComponent={PersonalizedIcon}
-                      title="Recite & Get Feedback"
-                      description="Real-time voice recognition tracks your recitation word-by-word with accuracy scoring"
-                      gradient="from-gold-500 to-gold-600"
-                    />
-                  </motion.div>
-                  <motion.div
-                    initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.5, duration: 0.5, type: "spring" }}
-                  >
-                    <FeatureCard
-                      iconComponent={SpacedRepIcon}
-                      title="Recite to Reveal"
-                      description="Quran text stays hidden until you recite correctly — the ultimate memorization test"
-                      gradient="from-purple-500 to-pink-500"
-                    />
-                  </motion.div>
-                  <motion.div
-                    initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.8, duration: 0.5, type: "spring" }}
-                  >
-                    <FeatureCard
-                      iconComponent={ProgressIcon}
-                      title="Identify Any Verse"
-                      description="Like Shazam for Quran — recite any ayah and instantly find which surah it's from"
-                      gradient="from-sage-500 to-emerald-500"
-                    />
-                  </motion.div>
-                </div>
+                <motion.div 
+                  className="grid md:grid-cols-3 gap-6 relative z-10"
+                  variants={staggerContainer}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                >
+                  <FeatureCard
+                    iconComponent={PersonalizedIcon}
+                    title="Recite & Get Feedback"
+                    description="Real-time voice recognition tracks your recitation word-by-word with accuracy scoring"
+                    gradient="from-gold-500 to-gold-600"
+                  />
+                  <FeatureCard
+                    iconComponent={SpacedRepIcon}
+                    title="Recite to Reveal"
+                    description="Quran text stays hidden until you recite correctly — the ultimate memorization test"
+                    gradient="from-purple-500 to-pink-500"
+                  />
+                  <FeatureCard
+                    iconComponent={ProgressIcon}
+                    title="Identify Any Verse"
+                    description="Like Shazam for Quran — recite any ayah and instantly find which surah it's from"
+                    gradient="from-sage-500 to-emerald-500"
+                  />
+                </motion.div>
               </div>
             </div>
           </motion.div>

@@ -592,6 +592,63 @@ export default function MushafPage() {
       </main>
       )}
 
+      {/* Overflow Action Sheet (Task 1) */}
+      <AnimatePresence>
+        {overflowAyah !== null && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-night-950/80 backdrop-blur-sm"
+            onClick={() => setOverflowAyah(null)}
+          >
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+              className="fixed bottom-0 left-0 right-0 liquid-glass rounded-t-3xl p-4 pb-safe"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sheet-handle" />
+              <p className="text-xs text-night-500 text-center mb-4">Verse {overflowAyah} Actions</p>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => { setTajweedPracticeAyah(overflowAyah); setShowTajweedPractice(true); setOverflowAyah(null); }}
+                  className="flex items-center gap-3 min-h-[52px] px-4 py-3 rounded-2xl bg-emerald-500/10 text-emerald-400 transition-colors active:scale-95"
+                >
+                  <Mic className="w-5 h-5" /> <span className="text-sm font-medium">Tajweed</span>
+                </button>
+                <button
+                  onClick={() => { router.push(`/memorize/${surahNumber}/${overflowAyah}`); setOverflowAyah(null); }}
+                  className="flex items-center gap-3 min-h-[52px] px-4 py-3 rounded-2xl bg-gold-500/10 text-gold-400 transition-colors active:scale-95"
+                >
+                  <Brain className="w-5 h-5" /> <span className="text-sm font-medium">Memorize</span>
+                </button>
+                <button
+                  onClick={() => { router.push(`/recite?surah=${surahNumber}&mode=reveal&start=${overflowAyah}`); setOverflowAyah(null); }}
+                  className="flex items-center gap-3 min-h-[52px] px-4 py-3 rounded-2xl bg-sage-500/10 text-sage-400 transition-colors active:scale-95"
+                >
+                  <Play className="w-5 h-5" /> <span className="text-sm font-medium">Reveal</span>
+                </button>
+                <button
+                  onClick={() => { setTafsirAyah(overflowAyah); setShowTafsir(true); setOverflowAyah(null); }}
+                  className="flex items-center gap-3 min-h-[52px] px-4 py-3 rounded-2xl bg-night-800/50 text-night-300 transition-colors active:scale-95"
+                >
+                  <BookOpen className="w-5 h-5" /> <span className="text-sm font-medium">Tafsir</span>
+                </button>
+                <button
+                  onClick={() => { setShareAyah(overflowAyah); setShowShareCard(true); setOverflowAyah(null); }}
+                  className="flex items-center gap-3 min-h-[52px] px-4 py-3 rounded-2xl bg-night-800/50 text-night-300 transition-colors active:scale-95 col-span-2"
+                >
+                  <Share2 className="w-5 h-5" /> <span className="text-sm font-medium">Share Ayah</span>
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Audio Player - Premium Frosted Glass - positioned above BottomNav */}
       {!browseMode && <div className="fixed bottom-20 left-2 right-2 z-40 liquid-glass-gold-premium rounded-2xl">
         <div className="px-4 py-3.5 max-w-3xl mx-auto">
