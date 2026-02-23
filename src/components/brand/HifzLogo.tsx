@@ -97,7 +97,7 @@ export function HifzIcon({ size = 40, className = '', animated = true }: LogoPro
   );
 }
 
-// Simple icon for small contexts (nav, tabs)
+// Simple icon for small contexts (nav, tabs) — uses the actual brand SVG
 export function HifzIconSimple({
   size = 24,
   className = '',
@@ -105,7 +105,7 @@ export function HifzIconSimple({
   size?: number;
   className?: string;
 }) {
-  return <HifzLogoInline size={size} className={className} />;
+  return <HifzLogoImage size={size} className={className} />;
 }
 
 // The HIFZ wordmark (text logo)
