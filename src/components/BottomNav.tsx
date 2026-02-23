@@ -92,26 +92,69 @@ export default function BottomNav() {
       } ${isCollapsed ? 'pb-3' : 'pb-5 sm:pb-6'}`}
       style={{ paddingBottom: `max(${isCollapsed ? '0.75rem' : '1.25rem'}, env(safe-area-inset-bottom))` }}
     >
-      {/* Premium frosted glass floating nav - dynamic width based on item count */}
-      <motion.div 
+      {/* ── Premium frosted-glass floating nav ────────────────────────────── */}
+      <motion.div
         layout
-        className={`mx-auto overflow-hidden ${
-          isCollapsed 
-            ? `rounded-full` 
-            : 'max-w-sm rounded-2xl'
+        className={`relative mx-auto overflow-hidden ${
+          isCollapsed ? 'rounded-full' : 'max-w-sm rounded-2xl'
         }`}
         style={{
-          maxWidth: isCollapsed 
+          maxWidth: isCollapsed
             ? `${Math.min(4 * 52 + 32, 340)}px`
             : undefined,
-          background: 'var(--theme-glass-base)',
-          backdropFilter: 'blur(64px) saturate(200%)',
-          WebkitBackdropFilter: 'blur(64px) saturate(200%)',
-          border: '1px solid var(--theme-glass-border)',
-          boxShadow: '0 -2px 20px rgba(0, 0, 0, 0.15), 0 4px 24px rgba(0, 0, 0, 0.25), 0 8px 32px rgba(0, 0, 0, 0.12)',
+
+          /* ── Frosted glass base ──────────────────────────── */
+          background:
+            'linear-gradient(180deg, rgba(20,26,34,0.88) 0%, rgba(14,19,26,0.92) 100%)',
+          backdropFilter:       'blur(64px) saturate(200%) brightness(0.95)',
+          WebkitBackdropFilter: 'blur(64px) saturate(200%) brightness(0.95)',
+
+          /* ── Multi-layer shadow ──────────────────────────── */
+          border: '1px solid rgba(255,255,255,0.07)',
+          boxShadow: [
+            '0 -1px 0 rgba(255,255,255,0.06)',
+            '0 -4px 24px rgba(0,0,0,0.22)',
+            '0 4px 32px rgba(0,0,0,0.28)',
+            '0 16px 48px rgba(0,0,0,0.18)',
+            '0 0 60px rgba(201,162,39,0.05)',
+            'inset 0 1px 0 rgba(255,255,255,0.10)',
+            'inset 0 -1px 0 rgba(0,0,0,0.12)',
+          ].join(', '),
+
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
+        {/* ── Prismatic top-edge highlight ─────────────────────────────── */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute top-0 left-[5%] right-[5%] h-px z-20"
+          style={{
+            background:
+              'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 15%, rgba(255,255,255,0.18) 35%, rgba(244,212,124,0.20) 50%, rgba(255,255,255,0.18) 65%, rgba(255,255,255,0.06) 85%, transparent 100%)',
+          }}
+        />
+
+        {/* ── Warm amber light-leak ─────────────────────────────────────── */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-10"
+          style={{
+            background:
+              'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,162,39,0.07) 0%, transparent 60%)',
+          }}
+        />
+
+        {/* ── SVG noise grain (frosted glass texture) ──────────────────── */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-10"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+            opacity:      0.045,
+            mixBlendMode: 'overlay',
+          }}
+        />
         <div className={`relative flex items-center justify-around ${
           isCollapsed ? 'px-4 py-2' : 'px-2 sm:px-4 py-2.5 sm:py-3'
         }`}

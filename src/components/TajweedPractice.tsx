@@ -399,7 +399,12 @@ export default function TajweedPractice({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-night-950/95 backdrop-blur-sm flex items-end sm:items-center justify-center"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+      style={{
+        background: 'rgba(6,9,14,0.80)',
+        backdropFilter: 'blur(12px) saturate(140%)',
+        WebkitBackdropFilter: 'blur(12px) saturate(140%)',
+      }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
       role="dialog"
       aria-modal="true"
@@ -410,7 +415,7 @@ export default function TajweedPractice({
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.95, y: 100 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        className="liquid-modal w-full sm:max-w-lg max-h-[95vh] sm:max-h-[90vh] overflow-y-auto 
+        className="liquid-modal-v2 w-full sm:max-w-lg max-h-[95vh] sm:max-h-[90vh] overflow-y-auto 
                    rounded-t-3xl sm:rounded-3xl sm:mx-4"
         onClick={(e) => e.stopPropagation()}
       >
@@ -418,7 +423,7 @@ export default function TajweedPractice({
         <div className="sm:hidden sheet-handle" />
         
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-night-800/50 sticky top-0 bg-night-900/95 backdrop-blur-sm z-10">
+        <div className="flex items-center justify-between p-4 border-b border-white/[0.06] sticky top-0 z-10" style={{ background: 'rgba(16,21,30,0.92)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)' }}>
           <div>
             <h2 id="tajweed-practice-title" className="font-semibold text-night-100">Tajweed Practice</h2>
             <p className="text-xs text-night-500">Surah {surah}, Ayah {ayah}</p>

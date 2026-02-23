@@ -3682,3 +3682,362 @@ html.no-transitions * {
 .dark .liquid-btn {
   box-shadow: 0 2px 12px rgba(201, 162, 39, 0.3), 0 8px 28px rgba(201, 162, 39, 0.2);
 }
+
+/* ============================================
+   LIQUID GLASS — PHASE II ENHANCEMENTS
+   Distortion, texture, refraction, depth
+   ============================================ */
+
+/* ── SVG Noise shorthand ─────────────────────────────────────────────────── */
+/* Applied via utility class so any element can get the grain overlay        */
+@layer utilities {
+  .glass-noise {
+    position: relative;
+  }
+
+  .glass-noise::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.045;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+}
+
+/* ── Gradient mesh backgrounds ───────────────────────────────────────────── */
+/* The luminous, colour-rich "background behind the glass"                   */
+@layer components {
+  /* Warm gold + deep navy mesh — the primary Hifz palette */
+  .mesh-bg-warm {
+    background:
+      radial-gradient(ellipse 80%  80%  at 10%  0%,  rgba(201,162,39,0.12)  0%, transparent 50%),
+      radial-gradient(ellipse 60%  60%  at 90%  20%, rgba(78,122,81,0.08)   0%, transparent 40%),
+      radial-gradient(ellipse 70%  70%  at 50%  80%, rgba(30,58,95,0.10)    0%, transparent 50%),
+      radial-gradient(ellipse 90%  40%  at 0%   50%, rgba(201,162,39,0.06)  0%, transparent 60%),
+      linear-gradient(180deg, #080c12 0%, #0f1419 50%, #0a0e14 100%);
+  }
+
+  /* Cooler, deeper — for modal backdrops */
+  .mesh-bg-deep {
+    background:
+      radial-gradient(ellipse 60% 60% at 20% 10%,  rgba(30,58,95,0.18)    0%, transparent 50%),
+      radial-gradient(ellipse 50% 50% at 80% 80%,  rgba(201,162,39,0.07)  0%, transparent 40%),
+      radial-gradient(ellipse 70% 40% at 50% 50%,  rgba(15,20,35,0.40)    0%, transparent 60%),
+      linear-gradient(180deg, #060a10 0%, #0a0f18 100%);
+  }
+
+  /* Ambient gold spotlight — for hero sections */
+  .mesh-bg-gold {
+    background:
+      radial-gradient(ellipse 50% 40% at 50%   0%,  rgba(212,175,55,0.14)  0%, transparent 55%),
+      radial-gradient(ellipse 40% 30% at 80%  20%,  rgba(244,212,124,0.08) 0%, transparent 40%),
+      radial-gradient(ellipse 60% 50% at 20%  70%,  rgba(201,162,39,0.06)  0%, transparent 50%),
+      linear-gradient(180deg, #0a0e14 0%, #0f1419 100%);
+  }
+}
+
+/* ── Enhanced .liquid-glass — deeper, textured ───────────────────────────── */
+/* Overrides & augments the original declaration with more depth              */
+@layer components {
+  /* Upgrade: add noise grain pseudo and stronger shadows */
+  .liquid-glass-v2 {
+    position: relative;
+    overflow: hidden;
+    background:
+      linear-gradient(180deg, rgba(18,24,32,0.82) 0%, rgba(12,16,24,0.78) 100%);
+    backdrop-filter:       blur(56px) saturate(190%) brightness(0.95);
+    -webkit-backdrop-filter: blur(56px) saturate(190%) brightness(0.95);
+    border: 1px solid rgba(255,255,255,0.07);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.05),
+      0 4px 24px rgba(0,0,0,0.26),
+      0 16px 48px rgba(0,0,0,0.18),
+      0 0 60px rgba(201,162,39,0.04),
+      inset 0 1px 0 rgba(255,255,255,0.11),
+      inset 0 -1px 0 rgba(0,0,0,0.12);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Top prismatic edge */
+  .liquid-glass-v2::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255,255,255,0.05) 10%,
+      rgba(255,255,255,0.18) 30%,
+      rgba(244,212,124,0.18) 50%,
+      rgba(255,255,255,0.18) 70%,
+      rgba(255,255,255,0.05) 90%,
+      transparent 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Noise grain + ambient glow combined */
+  .liquid-glass-v2::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    /* noise */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.045;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: 1;
+  }
+}
+
+/* ── Enhanced .liquid-modal — richer depth ───────────────────────────────── */
+@layer components {
+  /* Override: deeper blur + noise + better shadow for modal dialogs */
+  .liquid-modal-v2 {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.5rem;
+    background:
+      radial-gradient(ellipse 80% 30% at 50% 0%, rgba(201,162,39,0.06) 0%, transparent 50%),
+      linear-gradient(180deg, rgba(22,27,36,0.97) 0%, rgba(15,19,28,0.99) 100%);
+    backdrop-filter:       blur(48px) saturate(200%);
+    -webkit-backdrop-filter: blur(48px) saturate(200%);
+    border: 1px solid rgba(255,255,255,0.09);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.04),
+      0 0 40px rgba(201,162,39,0.06),
+      0 24px 80px rgba(0,0,0,0.54),
+      0 8px 32px rgba(0,0,0,0.32),
+      inset 0 1px 0 rgba(255,255,255,0.11);
+  }
+
+  .liquid-modal-v2::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(244,212,124,0.14) 30%,
+      rgba(255,255,255,0.24) 50%,
+      rgba(244,212,124,0.14) 70%,
+      transparent 100%
+    );
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .liquid-modal-v2::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.04;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: 1;
+  }
+}
+
+/* ── Mushaf reader glass background ─────────────────────────────────────── */
+@layer components {
+  .mushaf-glass-bg {
+    position: relative;
+    /* deep frosted parchment feel */
+    background:
+      radial-gradient(ellipse 60% 40% at 30% 10%, rgba(201,162,39,0.07) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 50% at 70% 90%, rgba(78,122,81,0.05)  0%, transparent 40%),
+      radial-gradient(ellipse 80% 60% at 50% 50%, rgba(10,14,20,0.40)   0%, transparent 70%),
+      linear-gradient(180deg, #08090e 0%, #0d1118 100%);
+  }
+
+  .mushaf-glass-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.45' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.025;
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+/* ── Edge refraction animations ─────────────────────────────────────────── */
+@keyframes glass-edge-shimmer {
+  0%   { opacity: 0.06; transform: scaleX(0.8); }
+  50%  { opacity: 0.14; transform: scaleX(1.0); }
+  100% { opacity: 0.06; transform: scaleX(0.8); }
+}
+
+@keyframes glass-breathe {
+  0%, 100% { backdrop-filter: blur(48px) saturate(180%) brightness(0.95); }
+  50%       { backdrop-filter: blur(56px) saturate(200%) brightness(0.94); }
+}
+
+@keyframes amber-leak-pulse {
+  0%, 100% { opacity: 0.06; }
+  50%       { opacity: 0.11; }
+}
+
+@layer utilities {
+  /* Subtle pulsing amber glow for focal glass elements */
+  .glass-amber-pulse::before {
+    animation: amber-leak-pulse 4s ease-in-out infinite;
+  }
+
+  /* Edge highlight shimmer */
+  .glass-shimmer-edge::after {
+    animation: glass-edge-shimmer 6s ease-in-out infinite;
+  }
+}
+
+/* ── Glass card hover — richer than base ─────────────────────────────────── */
+@layer components {
+  @media (hover: hover) and (pointer: fine) {
+    .liquid-card-interactive:hover {
+      background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.07) 0%,
+        rgba(255,255,255,0.025) 100%
+      );
+      border-color: rgba(255,255,255,0.12);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.06),
+        0 8px 28px rgba(0,0,0,0.22),
+        0 20px 56px rgba(0,0,0,0.14),
+        0 0 40px rgba(201,162,39,0.05),
+        inset 0 1px 0 rgba(255,255,255,0.10);
+      transform: translateY(-4px);
+    }
+  }
+}
+
+/* ── Enhanced bottom sheet / drawer glass ────────────────────────────────── */
+@layer components {
+  .liquid-sheet-v2 {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.5rem 1.5rem 0 0;
+    background:
+      linear-gradient(180deg, rgba(20,26,36,0.96) 0%, rgba(14,18,26,0.99) 100%);
+    backdrop-filter:       blur(56px) saturate(190%);
+    -webkit-backdrop-filter: blur(56px) saturate(190%);
+    border-top: 1px solid rgba(255,255,255,0.07);
+    box-shadow:
+      0 -1px 0 rgba(255,255,255,0.07),
+      0 -4px 32px rgba(0,0,0,0.28),
+      0 -16px 64px rgba(0,0,0,0.20),
+      0 0 80px rgba(201,162,39,0.04),
+      inset 0 1px 0 rgba(255,255,255,0.10);
+  }
+
+  /* Top edge refraction highlight */
+  .liquid-sheet-v2::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 5%;
+    right: 5%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255,255,255,0.06) 15%,
+      rgba(255,255,255,0.20) 40%,
+      rgba(244,212,124,0.18) 50%,
+      rgba(255,255,255,0.20) 60%,
+      rgba(255,255,255,0.06) 85%,
+      transparent 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Noise grain */
+  .liquid-sheet-v2::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.04;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: 1;
+  }
+}
+
+/* ── Upgrade existing liquid-glass & liquid-glass-gold-premium ───────────── */
+/* Adding noise grain via ::after override (stacks with existing styles)     */
+@layer components {
+  /* Strengthen existing liquid-glass with noise & stronger shadows */
+  .liquid-glass {
+    backdrop-filter:       blur(56px) saturate(185%) brightness(0.95);
+    -webkit-backdrop-filter: blur(56px) saturate(185%) brightness(0.95);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.05),
+      0 4px 24px rgba(0,0,0,0.24),
+      0 16px 48px rgba(0,0,0,0.16),
+      0 0 60px rgba(201,162,39,0.04),
+      inset 0 1px 0 rgba(255,255,255,0.10),
+      inset 0 -1px 0 rgba(0,0,0,0.10);
+  }
+
+  /* The ::before already defined — ::after adds noise (won't conflict) */
+  .liquid-glass.glass-noise::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.045;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* Strengthen gold-premium glass */
+  .liquid-glass-gold-premium {
+    backdrop-filter:       blur(40px) saturate(185%) brightness(0.95);
+    -webkit-backdrop-filter: blur(40px) saturate(185%) brightness(0.95);
+    box-shadow:
+      0 0 0 1px rgba(201,162,39,0.10),
+      0 0 32px rgba(201,162,39,0.14),
+      0 4px 24px rgba(0,0,0,0.24),
+      0 16px 56px rgba(0,0,0,0.16),
+      inset 0 1px 0 rgba(255,255,255,0.09);
+  }
+
+  /* Modals get even deeper */
+  .liquid-modal {
+    backdrop-filter:       blur(56px) saturate(200%);
+    -webkit-backdrop-filter: blur(56px) saturate(200%);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.06),
+      0 0 48px rgba(201,162,39,0.07),
+      0 32px 96px rgba(0,0,0,0.60),
+      0 8px 32px rgba(0,0,0,0.34),
+      inset 0 1px 0 rgba(255,255,255,0.12);
+  }
+}
+
+/* ── Reduced motion: turn off grain animation ────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .glass-amber-pulse::before,
+  .glass-shimmer-edge::after {
+    animation: none !important;
+  }
+}

@@ -445,7 +445,7 @@ function FeatureCard({
       variants={scaleIn}
       whileHover={{ y: -6, scale: 1.01 }}
       transition={{ type: "spring", stiffness: 300 }}
-      className="liquid-card-interactive p-6 group text-center"
+      className="liquid-card-interactive glass-noise p-6 group text-center"
     >
       {/* Golden Arabic calligraphy icon with subtle glow - CENTERED */}
       <div className="relative w-20 h-20 rounded-2xl bg-night-900/60 border border-gold-500/30 flex items-center justify-center mb-5 group-hover:border-gold-500/50 transition-colors mx-auto">
@@ -475,7 +475,7 @@ function MethodCard({
   return (
     <motion.div
       variants={fadeInUp}
-      className="flex gap-5 p-5 liquid-card"
+      className="flex gap-5 p-5 liquid-card glass-noise"
     >
       <div 
         className="flex-shrink-0 w-20 h-20 rounded-2xl liquid-glass-gold flex items-center justify-center relative overflow-hidden"
@@ -506,9 +506,9 @@ export default function HomePage() {
 
   return (
     <div ref={containerRef} className="min-h-screen relative overflow-x-hidden">
-      {/* Enhanced Animated Background */}
-      <motion.div 
-        className="fixed inset-0 bg-gradient-divine-warm"
+      {/* Enhanced Animated Background — gradient mesh */}
+      <motion.div
+        className="fixed inset-0 mesh-bg-warm"
         style={{ scale: bgScale }}
       />
       
@@ -552,7 +552,7 @@ export default function HomePage() {
         {/* Header - Premium Frosted Glass */}
         <header className="fixed top-0 left-0 right-0 z-50 safe-area-top">
           <div className="mx-3 mt-3">
-            <div className="liquid-glass rounded-2xl">
+            <div className="liquid-glass glass-noise rounded-2xl">
               <div className="px-4 sm:px-6 py-3 sm:py-4 max-w-7xl mx-auto">
                 <div className="flex items-center justify-between">
                   <HifzLogo iconSize={32} animated={true} />
@@ -912,7 +912,7 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             className="max-w-4xl mx-auto"
           >
-            <div className="liquid-glass-gold-premium rounded-3xl p-10 md:p-16 flex flex-col items-center justify-center min-h-[280px] relative overflow-hidden">
+            <div className="liquid-glass-gold-premium glass-noise rounded-3xl p-10 md:p-16 flex flex-col items-center justify-center min-h-[280px] relative overflow-hidden">
               {/* Animated corner accents */}
               <div className="absolute top-4 left-4">
                 <GeometricAccent size={8} className="text-gold-500/25" animated />
@@ -979,7 +979,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="max-w-2xl mx-auto text-center"
           >
-            <div className="liquid-glass-gold-premium rounded-3xl p-10 md:p-16 relative overflow-hidden">
+            <div className="liquid-glass-gold-premium glass-noise rounded-3xl p-10 md:p-16 relative overflow-hidden">
               {/* Subtle corner accent */}
               <div className="absolute top-6 right-6 opacity-15">
                 <GeometricAccent size={20} className="text-gold-400" />

@@ -110,9 +110,9 @@ export default function TafsirDrawer({ isOpen, onClose, surahNumber, ayahNumber 
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50"
             style={{
-              background: 'rgba(10, 10, 15, 0.85)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
+              background: 'rgba(6,9,14,0.75)',
+              backdropFilter: 'blur(16px) saturate(140%)',
+              WebkitBackdropFilter: 'blur(16px) saturate(140%)',
             }}
             onClick={onClose}
           />
@@ -126,11 +126,17 @@ export default function TafsirDrawer({ isOpen, onClose, surahNumber, ayahNumber 
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
             className="fixed right-0 top-0 bottom-0 w-full max-w-md z-50 overflow-hidden flex flex-col"
             style={{
-              background: 'linear-gradient(180deg, rgba(20, 20, 25, 0.97) 0%, rgba(15, 15, 20, 0.99) 100%)',
-              backdropFilter: 'blur(40px) saturate(200%)',
-              WebkitBackdropFilter: 'blur(40px) saturate(200%)',
-              borderLeft: '1px solid rgba(255, 255, 255, 0.08)',
-              boxShadow: '-24px 0 80px rgba(0, 0, 0, 0.5)',
+              background: 'linear-gradient(180deg, rgba(18,24,32,0.97) 0%, rgba(12,16,24,0.99) 100%)',
+              backdropFilter: 'blur(56px) saturate(190%) brightness(0.95)',
+              WebkitBackdropFilter: 'blur(56px) saturate(190%) brightness(0.95)',
+              borderLeft: '1px solid rgba(255,255,255,0.07)',
+              boxShadow: [
+                '-1px 0 0 rgba(255,255,255,0.06)',
+                '-24px 0 80px rgba(0,0,0,0.50)',
+                '-48px 0 120px rgba(0,0,0,0.30)',
+                '0 0 80px rgba(201,162,39,0.04)',
+                'inset 1px 0 0 rgba(255,255,255,0.09)',
+              ].join(', '),
             }}
             onClick={e => e.stopPropagation()}
             role="dialog"
@@ -138,10 +144,30 @@ export default function TafsirDrawer({ isOpen, onClose, surahNumber, ayahNumber 
             aria-labelledby="tafsir-drawer-title"
           >
             {/* Top Glow Effect */}
-            <div 
+            <div
               className="absolute top-0 left-0 right-0 h-40 pointer-events-none"
               style={{
-                background: 'radial-gradient(ellipse at 50% 0%, rgba(201, 162, 39, 0.08) 0%, transparent 70%)',
+                background: 'radial-gradient(ellipse at 50% 0%, rgba(201,162,39,0.10) 0%, transparent 70%)',
+              }}
+            />
+
+            {/* Left edge prismatic highlight (curved glass refraction) */}
+            <div
+              aria-hidden="true"
+              className="absolute top-0 bottom-0 left-0 w-px pointer-events-none"
+              style={{
+                background: 'linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(244,212,124,0.08) 40%, rgba(255,255,255,0.12) 60%, rgba(255,255,255,0.06) 100%)',
+              }}
+            />
+
+            {/* SVG noise grain overlay */}
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+                opacity: 0.038,
+                mixBlendMode: 'overlay',
               }}
             />
 

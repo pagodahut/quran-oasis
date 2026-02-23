@@ -368,7 +368,8 @@ export default function SheikhChat({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[49] bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 z-[49]"
+        style={{ background: 'rgba(6,9,14,0.72)', backdropFilter: 'blur(14px) saturate(130%)', WebkitBackdropFilter: 'blur(14px) saturate(130%)' }}
         onClick={onClose}
       />
     )}
@@ -392,12 +393,31 @@ export default function SheikhChat({
 
         {/* Chat Container */}
         <div
-          className={`relative flex flex-col bg-gradient-to-b from-night-900/95 to-night-950/98 
-                      backdrop-blur-xl border-t border-white/10 
+          className={`relative flex flex-col overflow-hidden
                       ${mode === 'panel' ? 'rounded-t-3xl max-h-[85vh]' : ''}
                       ${mode === 'fullpage' ? 'h-full' : ''}
-                      ${mode === 'inline' ? 'rounded-2xl border border-white/10 max-h-[500px]' : ''}`}
+                      ${mode === 'inline' ? 'rounded-2xl max-h-[500px]' : ''}`}
+          style={{
+            background: 'linear-gradient(180deg, rgba(18,24,32,0.97) 0%, rgba(12,16,24,0.99) 100%)',
+            backdropFilter: 'blur(56px) saturate(185%) brightness(0.95)',
+            WebkitBackdropFilter: 'blur(56px) saturate(185%) brightness(0.95)',
+            borderTop: mode === 'panel' ? '1px solid rgba(255,255,255,0.08)' : undefined,
+            border: mode === 'inline' ? '1px solid rgba(255,255,255,0.07)' : undefined,
+            boxShadow: mode === 'panel'
+              ? '0 -1px 0 rgba(255,255,255,0.07), 0 -4px 32px rgba(0,0,0,0.28), 0 0 80px rgba(201,162,39,0.04), inset 0 1px 0 rgba(255,255,255,0.10)'
+              : undefined,
+          }}
         >
+          {/* Top-edge prismatic highlight */}
+          {mode === 'panel' && (
+            <span aria-hidden="true" className="pointer-events-none absolute top-0 left-[5%] right-[5%] h-px z-10"
+              style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 15%, rgba(255,255,255,0.20) 40%, rgba(244,212,124,0.16) 50%, rgba(255,255,255,0.20) 60%, rgba(255,255,255,0.06) 85%, transparent 100%)' }}
+            />
+          )}
+          {/* SVG noise grain */}
+          <span aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1]"
+            style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")", opacity: 0.038, mixBlendMode: 'overlay' as const }}
+          />
           {/* Drag handle — tappable close target */}
           {mode === 'panel' && onClose && (
             <button
@@ -513,7 +533,7 @@ export default function SheikhChat({
           </div>
 
           {/* Input Area */}
-          <div className="border-t border-white/5 px-4 py-3 bg-night-900/40">
+          <div className="border-t border-white/[0.06] px-4 py-3" style={{ background: 'rgba(14,18,26,0.80)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)' }}>
             {isLoading && (
               <div className="flex justify-center mb-2">
                 <button

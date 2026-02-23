@@ -329,7 +329,7 @@ export default function MushafPage() {
   const allSurahs = getAllSurahs();
 
   return (
-    <div className={`min-h-screen ${focusMode ? 'bg-black' : 'bg-night-950'}`} onClick={handleFocusTap}>
+    <div className={`min-h-screen ${focusMode ? 'bg-black' : 'mushaf-glass-bg'}`} onClick={handleFocusTap}>
       {/* Audio Element */}
       <audio
         ref={audioRef}
@@ -346,7 +346,7 @@ export default function MushafPage() {
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: -100, opacity: 0 }}
         transition={{ duration: 0.25 }}
-        className="sticky top-0 z-40 safe-area-top liquid-glass rounded-b-2xl mx-2 mt-2"
+        className="sticky top-0 z-40 safe-area-top liquid-glass glass-noise rounded-b-2xl mx-2 mt-2"
       >
         {browseMode ? (
           /* ── Browse Mode Header ── */
