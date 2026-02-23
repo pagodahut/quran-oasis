@@ -635,13 +635,13 @@ export default function MushafPage() {
                   <Mic className="w-5 h-5" /> <span className="text-sm font-medium">Tajweed</span>
                 </button>
                 <button
-                  onClick={() => { router.push(`/memorize/${surahNumber}/${overflowAyah}`); setOverflowAyah(null); }}
+                  onClick={() => { router.push(`/memorize/${surahNumber}/${overflowAyah}?from=mushaf`); setOverflowAyah(null); }}
                   className="flex items-center gap-3 min-h-[52px] px-4 py-3 rounded-2xl bg-gold-500/10 text-gold-400 transition-colors active:scale-95"
                 >
                   <Brain className="w-5 h-5" /> <span className="text-sm font-medium">Memorize</span>
                 </button>
                 <button
-                  onClick={() => { router.push(`/recite?surah=${surahNumber}&mode=reveal&start=${overflowAyah}`); setOverflowAyah(null); }}
+                  onClick={() => { router.push(`/recite?surah=${surahNumber}&mode=reveal&start=${overflowAyah}&from=mushaf`); setOverflowAyah(null); }}
                   className="flex items-center gap-3 min-h-[52px] px-4 py-3 rounded-2xl bg-sage-500/10 text-sage-400 transition-colors active:scale-95"
                 >
                   <Play className="w-5 h-5" /> <span className="text-sm font-medium">Reveal</span>
@@ -1091,7 +1091,7 @@ export default function MushafPage() {
           className="fixed bottom-32 right-4 z-30"
         >
           <Link
-            href={`/recite?surah=${surahNumber}`}
+            href={`/recite?surah=${surahNumber}&from=mushaf`}
             className="w-16 h-16 rounded-full flex items-center justify-center transition-all active:scale-95 shadow-lg"
             style={{
               background: 'linear-gradient(135deg, rgba(34,197,94,0.95) 0%, rgba(22,163,74,1) 100%)',

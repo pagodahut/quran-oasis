@@ -2,14 +2,23 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ChevronLeft, BookOpen, Search } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 import { SURAH_METADATA } from '@/lib/surahMetadata';
 
 export default function MemorizePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [search, setSearch] = useState('');
+
+  // Track origin for return navigation
+  const fromOrigin = searchParams.get('from');
+  const originSurah = searchParams.get('surah');
+
+  const backHref = fromOrigin === 'mushaf'
+    ? (originSurah ? `/mushaf?surah=${originSurah}` : '/mushaf')
+    : '/mushaf';
 
   const filtered = SURAH_METADATA.filter(
     (s) =>
@@ -22,7 +31,7 @@ export default function MemorizePage() {
       {/* Header */}
       <header className="sticky top-0 z-40 safe-area-top liquid-glass mx-2 mt-2 rounded-2xl">
         <div className="px-4 py-3 flex items-center gap-3">
-          <Link href="/mushaf" className="liquid-icon-btn">
+          <Link href={backHref} className="liquid-icon-btn">
             <ChevronLeft className="w-5 h-5" />
           </Link>
           <div className="flex-1">
@@ -53,7 +62,12 @@ export default function MemorizePage() {
           {filtered.map((surah) => (
             <button
               key={surah.number}
-              onClick={() => router.push(`/memorize/${surah.number}/1`)}
+              onClick={() => {
+                const suffix = fromOrigin === 'mushaf'
+                  ? `?from=mushaf&surah=${originSurah || surah.number}`
+                  : '';
+                router.push(`/memorize/${surah.number}/1${suffix}`);
+              }}
               className="w-full liquid-card p-4 flex items-center gap-3 text-left hover:bg-white/[0.04] transition-colors"
             >
               <span className="w-8 h-8 rounded-lg bg-gold-500/10 flex items-center justify-center text-sm font-medium tabular-nums text-gold-400">

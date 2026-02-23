@@ -435,14 +435,20 @@ export default function RecitePage() {
   );
 
   const handleBack = useCallback(() => {
+    const from = searchParams.get('from');
+    const surahParam = searchParams.get('surah');
+
     if (selectedSurah) {
       setSelectedSurah(null);
     } else if (selectingSurah) {
       setSelectingSurah(null);
+    } else if (from === 'mushaf') {
+      // Return to mushaf at the surah we came from
+      router.push(surahParam ? `/mushaf?surah=${surahParam}` : '/mushaf');
     } else {
       router.push('/practice');
     }
-  }, [selectedSurah, selectingSurah, router]);
+  }, [selectedSurah, selectingSurah, router, searchParams]);
 
   // ============ Active Recitation ============
 
@@ -484,40 +490,69 @@ export default function RecitePage() {
 
   // ============ Surah Selection ============
 
+  const fromOrigin = searchParams.get('from');
+  const originSurah = searchParams.get('surah');
+
+  const handleOriginBack = useCallback(() => {
+    if (fromOrigin === 'mushaf') {
+      router.push(originSurah ? `/mushaf?surah=${originSurah}` : '/mushaf');
+    } else {
+      router.push('/practice');
+    }
+  }, [fromOrigin, originSurah, router]);
+
   return (
     <div className="min-h-screen pb-32">
-      {/* Header */}
-      <header className="sticky top-0 z-20 bg-[var(--theme-surface)]/90 backdrop-blur-xl border-b border-night-800/30">
+      {/* Header — amber/gold theme to differentiate from recitation experience */}
+      <header className="sticky top-0 z-20 backdrop-blur-xl border-b"
+        style={{
+          background: 'linear-gradient(135deg, rgba(120,60,10,0.92) 0%, rgba(90,50,8,0.95) 100%)',
+          borderColor: 'rgba(201,162,39,0.15)',
+        }}
+      >
         <div className="px-4 pt-safe-top">
-          <div className="flex items-center justify-between py-4">
-            <div>
-              <h1 className="text-xl font-bold text-night-100">Recite</h1>
-              <p className="text-xs text-night-500 mt-0.5">
+          <div className="flex items-center gap-3 py-4">
+            {/* Back button — always visible */}
+            <button
+              onClick={handleOriginBack}
+              className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors hover:bg-white/10 active:bg-white/15 flex-shrink-0"
+              title={fromOrigin === 'mushaf' ? 'Back to Mushaf' : 'Back to Practice'}
+            >
+              <ChevronLeft className="w-5 h-5 text-amber-300" />
+            </button>
+
+            <div className="flex-1">
+              <h1 className="text-xl font-bold text-amber-100">Recite</h1>
+              <p className="text-xs mt-0.5" style={{ color: 'rgba(251,191,36,0.6)' }}>
                 Live recitation with tajweed tracking
               </p>
             </div>
             <button
               onClick={() => router.push('/recite/history')}
-              className="w-10 h-10 rounded-full bg-night-800/60 border border-night-700/30 
-                flex items-center justify-center hover:bg-night-700/60 transition"
+              className="w-10 h-10 rounded-full border flex items-center justify-center transition hover:bg-white/10"
+              style={{ background: 'rgba(255,255,255,0.07)', borderColor: 'rgba(201,162,39,0.25)' }}
               title="Recitation History"
             >
-              <History className="w-5 h-5 text-night-300" />
+              <History className="w-5 h-5 text-amber-300" />
             </button>
           </div>
 
           {/* Search */}
           <div className="pb-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-night-500" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(251,191,36,0.5)' }} />
               <input
                 type="text"
                 placeholder="Search surah..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-night-900/60 border border-night-800/50 
-                  text-sm text-night-100 placeholder:text-night-600 focus:outline-none 
-                  focus:border-gold-500/30 focus:ring-1 focus:ring-gold-500/10 transition"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm text-amber-100 placeholder:text-amber-900 focus:outline-none transition"
+                style={{
+                  background: 'rgba(0,0,0,0.25)',
+                  border: '1px solid rgba(201,162,39,0.2)',
+                }}
+                onFocus={(e) => { e.target.style.borderColor = 'rgba(201,162,39,0.45)'; }}
+                onBlur={(e) => { e.target.style.borderColor = 'rgba(201,162,39,0.2)'; }}
               />
             </div>
           </div>

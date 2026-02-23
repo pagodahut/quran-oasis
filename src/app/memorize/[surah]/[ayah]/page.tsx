@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useCalibrationGuard } from '@/hooks/useCalibrationGuard';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -402,7 +402,12 @@ function AudioControls({
 export default function MemorizePage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isChecking: isCheckingCalibration } = useCalibrationGuard();
+  
+  // Navigation origin — if came from mushaf, return there on close/complete
+  const fromOrigin = searchParams.get('from');
+  const originSurah = searchParams.get('surah') || String(parseInt(params.surah as string));
   
   // Get preferences
   const prefs = useReadingPreferences();
@@ -641,8 +646,11 @@ export default function MemorizePage() {
 
   const goToNextVerse = () => {
     const surah = getSurah(surahNum);
+    const fromSuffix = fromOrigin === 'mushaf' ? `?from=mushaf&surah=${originSurah}` : '';
     if (surah && ayahNum < surah.numberOfAyahs) {
-      router.push(`/memorize/${surahNum}/${ayahNum + 1}`);
+      router.push(`/memorize/${surahNum}/${ayahNum + 1}${fromSuffix}`);
+    } else if (fromOrigin === 'mushaf') {
+      router.push(`/mushaf?surah=${originSurah}`);
     } else {
       router.push('/practice');
     }
@@ -667,7 +675,13 @@ export default function MemorizePage() {
       <header className="glass sticky top-0 z-40 safe-area-top">
         <div className="flex items-center justify-between px-4 py-3">
           <button 
-            onClick={() => router.push('/dashboard')} 
+            onClick={() => {
+              if (fromOrigin === 'mushaf') {
+                router.push(`/mushaf?surah=${originSurah}`);
+              } else {
+                router.push('/dashboard');
+              }
+            }} 
             className="p-2 hover:bg-night-800 rounded-xl transition-colors"
           >
             <X className="w-5 h-5 text-night-400" />
@@ -1264,11 +1278,17 @@ export default function MemorizePage() {
           ) : (
             <div className="w-full flex gap-4">
               <button
-                onClick={() => router.push('/practice')}
+                onClick={() => {
+                  if (fromOrigin === 'mushaf') {
+                    router.push(`/mushaf?surah=${originSurah}`);
+                  } else {
+                    router.push('/practice');
+                  }
+                }}
                 className="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl bg-night-800 hover:bg-night-700 text-night-300 transition-colors"
               >
                 <BookOpen className="w-5 h-5" />
-                Back to Practice
+                {fromOrigin === 'mushaf' ? 'Back to Mushaf' : 'Back to Practice'}
               </button>
               
               <motion.button
