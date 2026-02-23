@@ -25,6 +25,8 @@ import {
   checkBrowserSupport,
   type TranscribedWord,
 } from '@/lib/realtimeTajweedService';
+import { TarteelService, type TarteelState } from '@/lib/tarteelService';
+import { WebSpeechService } from '@/lib/webSpeechService';
 import { SURAH_METADATA } from '@/lib/surahMetadata';
 
 // ============ Types ============
@@ -57,7 +59,7 @@ function formatTime(seconds: number): string {
 
 // ============ Audio Visualizer ============
 
-function AudioVisualizer({ service }: { service: RealtimeTajweedService | null }) {
+function AudioVisualizer({ service }: { service: TarteelService | WebSpeechService | RealtimeTajweedService | null }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
 
@@ -264,7 +266,7 @@ export default function LiveRecitation({
   }, [wordStates, elapsedTime]);
 
   // Refs
-  const serviceRef = useRef<RealtimeTajweedService | null>(null);
+  const serviceRef = useRef<TarteelService | WebSpeechService | RealtimeTajweedService | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const wordElementsRef = useRef<Map<number, HTMLElement>>(new Map());
@@ -391,99 +393,183 @@ export default function LiveRecitation({
     [tajweedData]
   );
 
-  // ============ Deepgram Integration ============
+  // ============ Recording — Tarteel → WebSpeech → Deepgram ============
+  //
+  // Provider priority follows the unified Tarteel Whisper backend policy:
+  //   1. TarteelService   — Modal Tarteel Whisper (primary, Quran-optimised)
+  //   2. WebSpeechService — Browser built-in Arabic ASR (fast fallback)
+  //   3. RealtimeTajweedService — Deepgram WebSocket (legacy, needs DEEPGRAM_API_KEY)
 
   const startRecording = useCallback(async () => {
     if (!tajweedData) return;
 
+    const expectedText = tajweedData.plainWords.join(' ');
+
+    // ── Provider detection ──────────────────────────────────────────────────
+    let useTarteel = false;
+    let deepgramKey: string | null = null;
+
+    // 1. Try Tarteel health check (allow up to 8 s for cold starts)
     try {
-      // Get Deepgram API key
-      const tokenRes = await fetch('/api/deepgram/token');
-      const tokenData = await tokenRes.json();
-
-      // Handle authentication errors
-      if (tokenRes.status === 401) {
-        setErrorMessage(
-          'Authentication required for live recitation. Please sign in or check your configuration.'
-        );
-        setPhase('error');
-        return;
+      const res = await fetch('/api/tarteel', { signal: AbortSignal.timeout(8000) });
+      if (res.ok) {
+        const data = await res.json();
+        useTarteel = data.configured === true;
       }
+    } catch {
+      console.warn('[LiveRecitation] Tarteel health check failed, trying fallbacks');
+    }
 
-      // Handle configuration errors
-      if (tokenRes.status === 503 || !tokenData.configured || !tokenData.apiKey) {
-        setErrorMessage(
-          'Live recitation is not available. Please try again later.'
-        );
-        setPhase('error');
-        return;
-      }
+    // 2. If Tarteel unavailable, check WebSpeech (synchronous, always fast)
+    const webSpeechAvailable = !useTarteel && WebSpeechService.isSupported();
 
-      // Build expected text from tajweed data
-      const expectedText = tajweedData.plainWords.join(' ');
-
-      // Create service
-      const service = new RealtimeTajweedService({
-        apiKey: tokenData.apiKey,
-        expectedText,
-      });
-
-      serviceRef.current = service;
-
-      // Handle state changes from the service
-      service.onStateChange((state) => {
-        if (state.words.length > 0) {
-          processTranscribedWords(state.words, true);
-        }
-
-        // Update current word index
-        const lastMatched = state.alignments
-          .filter(
-            (a) => a.status === 'matched' || a.status === 'partial' || a.status === 'current'
-          )
-          .map((a) => a.expectedIndex)
-          .filter((i) => i >= 0);
-
-        if (lastMatched.length > 0) {
-          const maxIdx = Math.max(...lastMatched);
-          setCurrentWordIndex(maxIdx);
-        }
-      });
-
-      // Handle individual word events
-      service.onWord((index, word) => {
-        setCurrentWordIndex(index);
-
-        setWordStates((prev) => {
-          const newStates = [...prev];
-          if (index >= 0 && index < newStates.length) {
-            if (newStates[index] === 'hidden' || newStates[index] === 'current') {
-              const sim = arabicSimilarity(
-                word.word,
-                tajweedData.plainWords[index] || ''
-              );
-              newStates[index] = sim > 0.75 ? 'revealed' : 'error';
-            }
+    // 3. If neither, try Deepgram token as last resort
+    if (!useTarteel && !webSpeechAvailable) {
+      try {
+        const tokenRes = await fetch('/api/deepgram/token');
+        if (tokenRes.ok) {
+          const tokenData = await tokenRes.json();
+          if (tokenData.configured && tokenData.apiKey) {
+            deepgramKey = tokenData.apiKey as string;
           }
-          return newStates;
+        }
+      } catch {
+        // Deepgram not available either
+      }
+    }
+
+    if (!useTarteel && !webSpeechAvailable && !deepgramKey) {
+      setErrorMessage('Speech recognition is not available. Please use Chrome/Edge or configure a transcription service.');
+      setPhase('error');
+      return;
+    }
+
+    // ── Start the chosen provider ───────────────────────────────────────────
+    try {
+      if (useTarteel) {
+        // Tarteel Whisper — chunked polling, Quran-optimised
+        const service = new TarteelService({
+          expectedText,
+          chunkIntervalMs: 2500,
+
+          onWord: (index, _word, confidence) => {
+            setCurrentWordIndex(index);
+            setWordStates(prev => {
+              const next = [...prev];
+              if (index >= 0 && index < next.length &&
+                  (next[index] === 'hidden' || next[index] === 'current')) {
+                next[index] = confidence > 0.75 ? 'revealed' : 'error';
+              }
+              return next;
+            });
+          },
+
+          onStateChange: (tarteelState: TarteelState) => {
+            // Surface missed words from alignment
+            tarteelState.alignments.forEach((a, i) => {
+              if (a.status === 'missed') {
+                setWordStates(prev => {
+                  if (prev[i] !== 'hidden') return prev;
+                  const next = [...prev];
+                  next[i] = 'missed';
+                  return next;
+                });
+              }
+            });
+            if (tarteelState.currentWordIndex >= 0) {
+              setCurrentWordIndex(tarteelState.currentWordIndex);
+            }
+          },
+
+          onError: (err) => console.error('[LiveRecitation] Tarteel error:', err),
         });
-      });
 
-      service.onError((error) => {
-        console.error('Deepgram error:', error);
-      });
+        serviceRef.current = service;
+        await service.start();
 
-      // Start
-      await service.start();
+      } else if (webSpeechAvailable) {
+        // Web Speech API — browser built-in, no server needed
+        const service = new WebSpeechService({
+          expectedText,
+
+          onWord: (index, word, confidence) => {
+            setCurrentWordIndex(index);
+            setWordStates(prev => {
+              const next = [...prev];
+              if (index >= 0 && index < next.length &&
+                  (next[index] === 'hidden' || next[index] === 'current')) {
+                const sim = arabicSimilarity(word, tajweedData.plainWords[index] || '');
+                next[index] = sim > 0.75 ? 'revealed' : 'error';
+              }
+              return next;
+            });
+          },
+
+          onStateChange: (wsState) => {
+            wsState.alignments.forEach((a, i) => {
+              if (a.status === 'missed') {
+                setWordStates(prev => {
+                  if (prev[i] !== 'hidden') return prev;
+                  const next = [...prev];
+                  next[i] = 'missed';
+                  return next;
+                });
+              }
+            });
+            if (wsState.currentWordIndex >= 0) {
+              setCurrentWordIndex(wsState.currentWordIndex);
+            }
+          },
+
+          onError: (err) => console.error('[LiveRecitation] WebSpeech error:', err),
+        });
+
+        serviceRef.current = service;
+        await service.start();
+
+      } else if (deepgramKey) {
+        // Deepgram WebSocket — legacy path, keeps backward compatibility
+        const service = new RealtimeTajweedService({
+          apiKey: deepgramKey,
+          expectedText,
+        });
+
+        serviceRef.current = service;
+
+        service.onStateChange((dgState) => {
+          if (dgState.words.length > 0) {
+            processTranscribedWords(dgState.words, true);
+          }
+          const lastMatched = dgState.alignments
+            .filter(a => a.status === 'matched' || a.status === 'partial' || a.status === 'current')
+            .map(a => a.expectedIndex)
+            .filter(i => i >= 0);
+          if (lastMatched.length > 0) setCurrentWordIndex(Math.max(...lastMatched));
+        });
+
+        service.onWord((index, word) => {
+          setCurrentWordIndex(index);
+          setWordStates(prev => {
+            const next = [...prev];
+            if (index >= 0 && index < next.length &&
+                (next[index] === 'hidden' || next[index] === 'current')) {
+              const sim = arabicSimilarity(word.word, tajweedData.plainWords[index] || '');
+              next[index] = sim > 0.75 ? 'revealed' : 'error';
+            }
+            return next;
+          });
+        });
+
+        service.onError((err) => console.error('[LiveRecitation] Deepgram error:', err));
+        await service.start();
+      }
+
       setPhase('recording');
       setElapsedTime(0);
+      timerRef.current = setInterval(() => setElapsedTime(prev => prev + 1), 1000);
 
-      // Start timer
-      timerRef.current = setInterval(() => {
-        setElapsedTime((prev) => prev + 1);
-      }, 1000);
     } catch (err) {
-      console.error('Failed to start recording:', err);
+      console.error('[LiveRecitation] Failed to start recording:', err);
       setErrorMessage(
         err instanceof Error
           ? err.message
