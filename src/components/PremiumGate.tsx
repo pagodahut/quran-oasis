@@ -99,7 +99,7 @@ export function PremiumUpgradeModal({
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
             className="fixed inset-x-4 top-1/2 -translate-y-1/2 z-50 
                        max-w-md mx-auto
-                       bg-gradient-to-b from-gray-900 to-gray-950
+                       bg-gradient-to-b from-night-900 to-night-950
                        border border-amber-500/20
                        rounded-3xl p-6 shadow-2xl"
           >
@@ -117,17 +117,17 @@ export function PremiumUpgradeModal({
                 Upgrade to Premium
               </h2>
               {feature === 'sheikh' && usedCount !== undefined && maxCount !== undefined && (
-                <p className="text-gray-400 text-sm">
+                <p className="text-night-400 text-sm">
                   You&apos;ve used {usedCount}/{maxCount} free Sheikh conversations today
                 </p>
               )}
               {feature === 'study-plan' && (
-                <p className="text-gray-400 text-sm">
+                <p className="text-night-400 text-sm">
                   AI-generated study plans are a premium feature
                 </p>
               )}
               {feature === 'speech' && (
-                <p className="text-gray-400 text-sm">
+                <p className="text-night-400 text-sm">
                   Advanced speech recognition is a premium feature
                 </p>
               )}
@@ -143,14 +143,14 @@ export function PremiumUpgradeModal({
               ].map(({ icon, text }) => (
                 <div key={text} className="flex items-center gap-3 text-sm">
                   <span className="text-lg">{icon}</span>
-                  <span className="text-gray-200">{text}</span>
+                  <span className="text-night-200">{text}</span>
                 </div>
               ))}
             </div>
 
             {/* Free tier reminder */}
             <div className="bg-white/5 rounded-2xl p-4 mb-6 border border-white/10">
-              <p className="text-xs text-gray-400 text-center">
+              <p className="text-xs text-night-400 text-center">
                 <span className="text-amber-400 font-medium">Free tier includes:</span>{' '}
                 All lessons, quizzes, flashcards, recitation practice, progress tracking,
                 and 3 daily Sheikh conversations.
@@ -172,7 +172,7 @@ export function PremiumUpgradeModal({
 
             <button
               onClick={onClose}
-              className="w-full py-3 text-gray-400 text-sm hover:text-gray-300 transition-colors"
+              className="w-full py-3 text-night-400 text-sm hover:text-night-300 transition-colors"
             >
               Maybe later
             </button>

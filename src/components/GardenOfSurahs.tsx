@@ -72,7 +72,7 @@ function SurahRow({
         </div>
         {/* Progress bar */}
         {progress > 0 && (
-          <div className="h-1 bg-night-800/40 rounded-full mt-1.5 overflow-hidden">
+          <div className="h-1.5 bg-night-800/40 rounded-full mt-1.5 overflow-hidden">
             <div
               className={`h-full rounded-full ${isMakki ? 'bg-gold-500/60' : 'bg-sage-500/60'}`}
               style={{ width: `${progress}%` }}

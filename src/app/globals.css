@@ -11,8 +11,8 @@
 :root {
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-display: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-arabic: 'KFGQPC Hafs Uthmani', 'Amiri Quran', 'Amiri', serif;
-  --font-quran: 'KFGQPC Hafs Uthmani', 'Amiri Quran', 'Amiri', serif;
+  --font-arabic: var(--font-kitab), 'Amiri Quran', 'Amiri', serif;
+  --font-quran: var(--font-kitab), 'Amiri Quran', 'Amiri', serif;
   --font-indopak: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
   
   /* Safe Areas */
@@ -2385,6 +2385,12 @@ input[type="range"]::-moz-range-thumb {
    ============================================ */
 @layer components {
   /* Responsive Arabic text */
+  /* Quran text size utilities */
+  .quran-text-sm { font-size: 1.25rem; line-height: 2.2; }
+  .quran-text-md { font-size: 1.5rem; line-height: 2.3; }
+  .quran-text-lg { font-size: 1.75rem; line-height: 2.4; }
+  .quran-text-xl { font-size: 2rem; line-height: 2.5; }
+
   .quran-text-responsive {
     font-family: var(--font-quran);
     direction: rtl;

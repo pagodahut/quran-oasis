@@ -108,31 +108,10 @@ function IslamicGeometricBackground() {
         </svg>
       </motion.div>
 
-      {/* Second layer - counter-rotating tessellation */}
-      <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-        animate={{ rotate: -360 }}
-        transition={{ duration: 180, repeat: Infinity, ease: "linear" }}
-        style={{ willChange: 'transform' }}
-      >
-        <svg viewBox="0 0 400 400" width={600} height={600} className="opacity-[0.03]">
-          <defs>
-            <pattern id="hexTile" x="0" y="0" width="60" height="52" patternUnits="userSpaceOnUse">
-              <polygon points="30,0 60,15 60,37 30,52 0,37 0,15" fill="none" stroke="#c9a227" strokeWidth="0.8"/>
-              <circle cx="30" cy="26" r="3" fill="#c9a227" opacity="0.6"/>
-            </pattern>
-          </defs>
-          <rect width="400" height="400" fill="url(#hexTile)"/>
-        </svg>
-      </motion.div>
-
       {/* Pulsing 8-pointed stars scattered */}
       {[
-        { x: '15%', y: '20%', size: 30, delay: 0, duration: 8 },
-        { x: '80%', y: '15%', size: 24, delay: 2, duration: 10 },
-        { x: '70%', y: '70%', size: 28, delay: 4, duration: 9 },
-        { x: '20%', y: '75%', size: 22, delay: 1, duration: 11 },
-        { x: '50%', y: '30%', size: 20, delay: 3, duration: 7 },
+        { x: '15%', y: '20%', size: 28, delay: 0, duration: 9 },
+        { x: '75%', y: '65%', size: 24, delay: 3, duration: 10 },
       ].map((star, i) => (
         <motion.div
           key={`star-${i}`}
@@ -288,18 +267,11 @@ function FloatingParticles() {
   const particles = useMemo(() => [
     { id: 0, x: 12, y: 18, size: 4, duration: 10, delay: 0 },
     { id: 1, x: 85, y: 25, size: 5, duration: 12, delay: 1 },
-    { id: 2, x: 45, y: 72, size: 3.5, duration: 9, delay: 2 },
     { id: 3, x: 28, y: 45, size: 6, duration: 11, delay: 0.5 },
-    { id: 4, x: 72, y: 88, size: 4.5, duration: 13, delay: 1.5 },
     { id: 5, x: 92, y: 55, size: 3, duration: 8, delay: 3 },
     { id: 6, x: 18, y: 82, size: 5.5, duration: 10, delay: 2.5 },
-    { id: 7, x: 55, y: 12, size: 4, duration: 14, delay: 0.8 },
-    { id: 8, x: 38, y: 92, size: 6.5, duration: 9, delay: 1.2 },
     { id: 9, x: 78, y: 38, size: 3.5, duration: 11, delay: 3.5 },
     { id: 10, x: 8, y: 62, size: 5, duration: 12, delay: 0.3 },
-    { id: 11, x: 62, y: 48, size: 4.5, duration: 10, delay: 2.8 },
-    { id: 12, x: 95, y: 15, size: 3, duration: 8, delay: 1.8 },
-    { id: 13, x: 32, y: 28, size: 5.5, duration: 13, delay: 0.6 },
     { id: 14, x: 48, y: 65, size: 4, duration: 11, delay: 2.2 },
   ], []);
 
@@ -435,60 +407,26 @@ function AnimatedCounter({ value, suffix = '' }: { value: number; suffix?: strin
   return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
 }
 
-// Arabic calligraphy icons for Path to Memorization - large, golden, elegant
-function PersonalizedIcon({ className = "" }: { className?: string }) {
-  // Arabic: تَعَلُّم (ta'allum - learning/personalized learning)
+// Arabic calligraphy icon - reusable for feature cards
+const arabicIconStyle = { 
+  fontFamily: 'var(--font-arabic)', 
+  direction: 'rtl' as const,
+  textShadow: '0 0 20px rgba(201, 162, 39, 0.5), 0 2px 4px rgba(0,0,0,0.3)'
+};
+
+function ArabicIcon({ text, className = "" }: { text: string; className?: string }) {
   return (
     <div className={`${className} flex items-center justify-center`}>
-      <span 
-        className="text-3xl font-bold leading-none text-gold-400"
-        style={{ 
-          fontFamily: 'var(--font-arabic)', 
-          direction: 'rtl',
-          textShadow: '0 0 20px rgba(201, 162, 39, 0.5), 0 2px 4px rgba(0,0,0,0.3)'
-        }}
-      >
-        تَعَلُّم
+      <span className="text-3xl font-bold leading-none text-gold-400" style={arabicIconStyle}>
+        {text}
       </span>
     </div>
   );
 }
 
-function SpacedRepIcon({ className = "" }: { className?: string }) {
-  // Arabic: تَكرار (takraar - repetition)
-  return (
-    <div className={`${className} flex items-center justify-center`}>
-      <span 
-        className="text-3xl font-bold leading-none text-gold-400"
-        style={{ 
-          fontFamily: 'var(--font-arabic)', 
-          direction: 'rtl',
-          textShadow: '0 0 20px rgba(201, 162, 39, 0.5), 0 2px 4px rgba(0,0,0,0.3)'
-        }}
-      >
-        تَكرار
-      </span>
-    </div>
-  );
-}
-
-function ProgressIcon({ className = "" }: { className?: string }) {
-  // Arabic: تَقَدُّم (taqaddum - progress)
-  return (
-    <div className={`${className} flex items-center justify-center`}>
-      <span 
-        className="text-3xl font-bold leading-none text-gold-400"
-        style={{ 
-          fontFamily: 'var(--font-arabic)', 
-          direction: 'rtl',
-          textShadow: '0 0 20px rgba(201, 162, 39, 0.5), 0 2px 4px rgba(0,0,0,0.3)'
-        }}
-      >
-        تَقَدُّم
-      </span>
-    </div>
-  );
-}
+const PersonalizedIcon = ({ className }: { className?: string }) => <ArabicIcon text="تَعَلُّم" className={className} />;
+const SpacedRepIcon = ({ className }: { className?: string }) => <ArabicIcon text="تَكرار" className={className} />;
+const ProgressIcon = ({ className }: { className?: string }) => <ArabicIcon text="تَقَدُّم" className={className} />;
 
 // Feature card with custom icon - CENTERED layout
 function FeatureCard({ 
@@ -968,7 +906,7 @@ export default function HomePage() {
                       iconComponent={PersonalizedIcon}
                       title="Recite & Get Feedback"
                       description="Real-time voice recognition tracks your recitation word-by-word with accuracy scoring"
-                      gradient="from-gold-500 to-amber-600"
+                      gradient="from-gold-500 to-gold-600"
                     />
                   </motion.div>
                   <motion.div

@@ -153,7 +153,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
     >
       <div
         className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm ${
-          isUser ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
+          isUser ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gold-500/20 text-gold-400'
         }`}
       >
         {isUser ? <UserIcon className="w-4 h-4" /> : <SheikhIcon className="w-4 h-4" />}
@@ -163,22 +163,22 @@ function MessageBubble({ message }: { message: ChatMessage }) {
         className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
           isUser
             ? 'bg-emerald-600/30 text-emerald-50 backdrop-blur-sm border border-emerald-500/20 rounded-br-md'
-            : 'bg-white/5 text-gray-100 backdrop-blur-sm border border-white/10 rounded-bl-md'
+            : 'bg-white/5 text-night-100 backdrop-blur-sm border border-white/10 rounded-bl-md'
         }`}
       >
         {message.content ? (
           <div className="space-y-0.5">{renderMessageContent(message.content)}</div>
         ) : message.isStreaming ? (
           <div className="flex items-center gap-1.5 py-1">
-            <motion.div className="w-1.5 h-1.5 bg-amber-400 rounded-full" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.2, repeat: Infinity, delay: 0 }} />
-            <motion.div className="w-1.5 h-1.5 bg-amber-400 rounded-full" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.2, repeat: Infinity, delay: 0.2 }} />
-            <motion.div className="w-1.5 h-1.5 bg-amber-400 rounded-full" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.2, repeat: Infinity, delay: 0.4 }} />
+            <motion.div className="w-1.5 h-1.5 bg-gold-400 rounded-full" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.2, repeat: Infinity, delay: 0 }} />
+            <motion.div className="w-1.5 h-1.5 bg-gold-400 rounded-full" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.2, repeat: Infinity, delay: 0.2 }} />
+            <motion.div className="w-1.5 h-1.5 bg-gold-400 rounded-full" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.2, repeat: Infinity, delay: 0.4 }} />
           </div>
         ) : null}
 
         {message.isStreaming && message.content && (
           <motion.span
-            className="inline-block w-0.5 h-4 bg-amber-400 ml-0.5 align-middle"
+            className="inline-block w-0.5 h-4 bg-gold-400 ml-0.5 align-middle"
             animate={{ opacity: [0, 1, 0] }}
             transition={{ duration: 0.8, repeat: Infinity }}
           />
@@ -197,10 +197,10 @@ function QuestionChip({ question, onClick, delay }: { question: string; onClick:
       transition={{ duration: 0.3, delay }}
       whileTap={{ scale: 0.97 }}
       onClick={onClick}
-      className="px-3.5 py-2 rounded-xl text-xs text-amber-200/90 bg-amber-500/10 
-                 border border-amber-500/20 backdrop-blur-sm
-                 hover:bg-amber-500/20 hover:border-amber-500/30
-                 active:bg-amber-500/30
+      className="px-3.5 py-2 rounded-xl text-xs text-gold-200/90 bg-gold-500/10 
+                 border border-gold-500/20 backdrop-blur-sm
+                 hover:bg-gold-500/20 hover:border-gold-500/30
+                 active:bg-gold-500/30
                  transition-colors duration-200 text-left"
     >
       {question}
@@ -392,7 +392,7 @@ export default function SheikhChat({
 
         {/* Chat Container */}
         <div
-          className={`relative flex flex-col bg-gradient-to-b from-gray-900/95 to-gray-950/98 
+          className={`relative flex flex-col bg-gradient-to-b from-night-900/95 to-night-950/98 
                       backdrop-blur-xl border-t border-white/10 
                       ${mode === 'panel' ? 'rounded-t-3xl max-h-[85vh]' : ''}
                       ${mode === 'fullpage' ? 'h-full' : ''}
@@ -413,12 +413,12 @@ export default function SheikhChat({
           <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/5">
 
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-amber-500/15 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-full bg-gold-500/15 flex items-center justify-center">
                 <BookReadIcon size={20} aria-hidden="true" />
               </div>
               <div>
                 <h3 id="sheikh-chat-title" className="text-sm font-semibold text-white">Sheikh HIFZ</h3>
-                <p id="sheikh-chat-subtitle" className="text-[11px] text-amber-400/70">{getSubtitle()}</p>
+                <p id="sheikh-chat-subtitle" className="text-[11px] text-gold-400/70">{getSubtitle()}</p>
               </div>
             </div>
 
@@ -426,7 +426,7 @@ export default function SheikhChat({
               {messages.length > 0 && (
                 <button
                   onClick={clearChat}
-                  className="text-[11px] text-gray-500 hover:text-gray-300 transition-colors px-2 py-1 rounded-lg hover:bg-white/5 focus:ring-2 focus:ring-amber-500/50 focus:outline-none"
+                  className="text-[11px] text-night-500 hover:text-night-300 transition-colors px-2 py-1 rounded-lg hover:bg-white/5 focus:ring-2 focus:ring-gold-500/50 focus:outline-none"
                   aria-label="Clear chat conversation"
                 >
                   Clear
@@ -435,7 +435,7 @@ export default function SheikhChat({
               {onClose && (
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all focus:ring-2 focus:ring-amber-500/50 focus:outline-none"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-night-400 hover:text-white hover:bg-white/10 transition-all focus:ring-2 focus:ring-gold-500/50 focus:outline-none"
                   aria-label="Close Sheikh chat"
                 >
                   ✕
@@ -460,13 +460,13 @@ export default function SheikhChat({
                 transition={{ duration: 0.4 }}
                 className="flex flex-col items-center text-center py-6"
               >
-                <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-4 border border-amber-500/20">
+                <div className="w-16 h-16 rounded-2xl bg-gold-500/10 flex items-center justify-center mb-4 border border-gold-500/20">
                   <MosqueIcon size={32} />
                 </div>
                 <h4 className="text-base font-semibold text-white mb-1.5">
                   بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
                 </h4>
-                <p className="text-sm text-gray-400 mb-6 max-w-xs">
+                <p className="text-sm text-night-400 mb-6 max-w-xs">
                   {getWelcomeMessage()}
                 </p>
 
@@ -513,14 +513,14 @@ export default function SheikhChat({
           </div>
 
           {/* Input Area */}
-          <div className="border-t border-white/5 px-4 py-3 bg-black/20">
+          <div className="border-t border-white/5 px-4 py-3 bg-night-900/40">
             {isLoading && (
               <div className="flex justify-center mb-2">
                 <button
                   onClick={stopStreaming}
-                  className="text-[11px] text-gray-400 hover:text-white px-3 py-1 rounded-full 
+                  className="text-[11px] text-night-400 hover:text-white px-3 py-1 rounded-full 
                              border border-white/10 hover:border-white/20 hover:bg-white/5
-                             transition-all duration-200 focus:ring-2 focus:ring-amber-500/50 focus:outline-none"
+                             transition-all duration-200 focus:ring-2 focus:ring-gold-500/50 focus:outline-none"
                   aria-label="Stop AI response generation"
                 >
                   ■ Stop
@@ -548,9 +548,9 @@ export default function SheikhChat({
                   }
                   rows={1}
                   className="w-full resize-none rounded-xl bg-white/5 border border-white/10 
-                             text-sm text-white placeholder-gray-500 
+                             text-sm text-white placeholder-night-500 
                              px-4 py-2.5 pr-10
-                             focus:outline-none focus:border-amber-500/40 focus:bg-white/[0.07]
+                             focus:outline-none focus:border-gold-500/40 focus:bg-white/[0.07]
                              transition-colors duration-200
                              max-h-24 overflow-y-auto"
                   style={{ scrollbarWidth: 'none' }}
@@ -566,11 +566,11 @@ export default function SheikhChat({
                 type="submit"
                 disabled={!inputValue.trim() || isLoading}
                 className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center
-                           transition-all duration-200 focus:ring-2 focus:ring-amber-500/50 focus:outline-none
+                           transition-all duration-200 focus:ring-2 focus:ring-gold-500/50 focus:outline-none
                            ${
                              inputValue.trim() && !isLoading
-                               ? 'bg-amber-500 text-black hover:bg-amber-400 active:scale-95'
-                               : 'bg-white/5 text-gray-600 cursor-not-allowed'
+                               ? 'bg-gold-500 text-black hover:bg-gold-400 active:scale-95'
+                               : 'bg-white/5 text-night-600 cursor-not-allowed'
                            }`}
                 aria-label="Send message"
               >
@@ -580,7 +580,7 @@ export default function SheikhChat({
               </button>
             </form>
 
-            <p className="text-[10px] text-gray-600 text-center mt-2">
+            <p className="text-[10px] text-night-600 text-center mt-2">
               AI-powered guidance · Always verify with qualified scholars
             </p>
           </div>

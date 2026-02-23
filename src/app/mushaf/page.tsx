@@ -29,6 +29,9 @@ import {
   Filter,
   MapPin,
   Share2,
+  MoreHorizontal,
+  Maximize,
+  Minimize,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { 
@@ -101,6 +104,17 @@ export default function MushafPage() {
   const [showShareCard, setShowShareCard] = useState(false);
   const [shareAyah, setShareAyah] = useState(1);
   
+  // Overflow menu state (Task 1)
+  const [overflowAyah, setOverflowAyah] = useState<number | null>(null);
+  
+  // Mini player state (Task 2)
+  const [miniPlayer, setMiniPlayer] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  
+  // Focus mode state (Task 3)
+  const [focusMode, setFocusMode] = useState(false);
+  const [chromeVisible, setChromeVisible] = useState(true);
+  
   // Refs
   const audioRef = useRef<HTMLAudioElement>(null);
   const verseRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
@@ -162,6 +176,36 @@ export default function MushafPage() {
       }
     }
   }, [currentSurah, currentAyah, surahNumber, translationEdition, setAyahContext]);
+
+  // Scroll detection for mini player (Task 2)
+  useEffect(() => {
+    let lastY = 0;
+    const handleScroll = () => {
+      const y = window.scrollY;
+      if (y > 200 && y > lastY) setMiniPlayer(true);
+      else if (y < lastY - 50) setMiniPlayer(false);
+      lastY = y;
+      setScrollY(y);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Focus mode toggle (Task 3)
+  const toggleFocusMode = () => {
+    const entering = !focusMode;
+    setFocusMode(entering);
+    setChromeVisible(!entering);
+    if (entering && document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else if (!entering && document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    }
+  };
+
+  const handleFocusTap = () => {
+    if (focusMode) setChromeVisible(prev => !prev);
+  };
 
   // Audio handlers
   const playAyah = (ayahNum: number) => {
@@ -267,7 +311,15 @@ export default function MushafPage() {
       />
 
       {/* Header - Premium Frosted Glass */}
-      <header className="sticky top-0 z-40 safe-area-top liquid-glass rounded-b-2xl mx-2 mt-2">
+      <AnimatePresence>
+      {(!focusMode || chromeVisible) && (
+      <motion.header
+        initial={{ y: 0, opacity: 1 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: -100, opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className="sticky top-0 z-40 safe-area-top liquid-glass rounded-b-2xl mx-2 mt-2"
+      >
         {browseMode ? (
           /* ── Browse Mode Header ── */
           <div className="px-3 py-3">
@@ -317,6 +369,9 @@ export default function MushafPage() {
                 <Link href="/bookmarks" className="liquid-icon-btn" aria-label="View bookmarks">
                   <Bookmark className="w-5 h-5" />
                 </Link>
+                <button onClick={toggleFocusMode} className="liquid-icon-btn" aria-label="Focus mode">
+                  {focusMode ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+                </button>
                 <button onClick={() => setShowSettings(true)} className="liquid-icon-btn">
                   <Settings className="w-5 h-5" />
                 </button>
@@ -351,7 +406,20 @@ export default function MushafPage() {
             </div>
           </>
         )}
-      </header>
+      </motion.header>
+      )}
+      </AnimatePresence>
+
+      {/* Focus mode back button when chrome hidden */}
+      {focusMode && !chromeVisible && (
+        <button
+          onClick={() => setChromeVisible(true)}
+          className="fixed top-4 left-4 z-50 liquid-icon-btn !bg-night-900/80"
+          aria-label="Show controls"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+      )}
 
       {/* Main Content */}
       {browseMode ? (
@@ -443,15 +511,11 @@ export default function MushafPage() {
                       </div>
                     ) : (
                       <p 
-                        className="quran-text text-night-100 mb-4"
+                        className={`quran-text quran-text-lg text-night-100 mb-4 text-right ${focusMode ? 'quran-text-xl' : ''}`}
                         style={{ 
-                          fontSize,
                           fontFamily: 'var(--font-quran)',
-                          lineHeight: '2.2',
                           letterSpacing: '0.02em',
                           wordSpacing: '0.25em',
-                          textAlign: 'right',
-                          direction: 'rtl'
                         }}
                         lang="ar"
                         dir="rtl"
@@ -470,27 +534,16 @@ export default function MushafPage() {
                     )}
 
                     {/* Verse Meta */}
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-3 pt-3 border-t border-night-800/20 gap-2">
+                    {!focusMode && (
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-night-800/20">
                       <div className="flex items-center gap-3 text-[10px] sm:text-xs text-night-500">
                         <span>Juz {ayah.juz}</span>
                         <span>Pg {ayah.page}</span>
                         <span>Ruku {ayah.ruku}</span>
                         {ayah.sajda && <span className="text-gold-400">۩ Sajda</span>}
                       </div>
-                      <div className="flex items-center gap-1.5 sm:gap-2">
-                        {/* Practice Tajweed Button */}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setTajweedPracticeAyah(ayah.numberInSurah);
-                            setShowTajweedPractice(true);
-                          }}
-                          className="text-xs text-emerald-500 hover:text-emerald-400 transition-colors flex items-center gap-1 bg-emerald-500/10 px-2 py-1 rounded-lg"
-                          title="Practice Tajweed - Record & analyze pronunciation"
-                        >
-                          <Mic className="w-3.5 h-3.5" />
-                          <span className="hidden sm:inline">Tajweed</span>
-                        </button>
+                      <div className="flex items-center gap-2">
+                        {/* Bookmark button */}
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -503,64 +556,29 @@ export default function MushafPage() {
                               translation: ayah.text.translations[translationEdition].slice(0, 100),
                             });
                           }}
-                          className={`text-xs transition-colors flex items-center gap-1 px-2 py-1 rounded-lg ${
+                          className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl transition-colors ${
                             isBookmarked(surahNumber, ayah.numberInSurah)
                               ? 'text-gold-400 bg-gold-500/20'
                               : 'text-night-500 hover:text-gold-400 bg-night-800/50'
                           }`}
                           title={isBookmarked(surahNumber, ayah.numberInSurah) ? 'Saved' : 'Save'}
                         >
-                          <Bookmark className={`w-3.5 h-3.5 ${isBookmarked(surahNumber, ayah.numberInSurah) ? 'fill-gold-400' : ''}`} />
-                          <span className="hidden sm:inline">{isBookmarked(surahNumber, ayah.numberInSurah) ? 'Saved' : 'Save'}</span>
+                          <Bookmark className={`w-4 h-4 ${isBookmarked(surahNumber, ayah.numberInSurah) ? 'fill-gold-400' : ''}`} />
                         </button>
+                        {/* Overflow menu button */}
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            router.push(`/memorize/${surahNumber}/${ayah.numberInSurah}`);
+                            setOverflowAyah(overflowAyah === ayah.numberInSurah ? null : ayah.numberInSurah);
                           }}
-                          className="text-xs text-gold-500 hover:text-gold-400 transition-colors flex items-center gap-1 bg-gold-500/10 px-2 py-1 rounded-lg"
-                          title="Memorize"
+                          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-night-500 hover:text-night-300 bg-night-800/50 transition-colors"
+                          title="More actions"
                         >
-                          <Brain className="w-3.5 h-3.5" />
-                          <span className="hidden sm:inline">Memorize</span>
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            router.push(`/recite?surah=${surahNumber}&mode=reveal&start=${ayah.numberInSurah}`);
-                          }}
-                          className="text-xs text-sage-500 hover:text-sage-400 transition-colors flex items-center gap-1 bg-sage-500/10 px-2 py-1 rounded-lg"
-                          title="Recite to Reveal"
-                        >
-                          <Play className="w-3.5 h-3.5" />
-                          <span className="hidden sm:inline">Reveal</span>
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setTafsirAyah(ayah.numberInSurah);
-                            setShowTafsir(true);
-                          }}
-                          className="text-xs text-night-500 hover:text-gold-400 transition-colors flex items-center gap-1 bg-night-800/30 px-2 py-1 rounded-lg"
-                          title="Tafsir"
-                        >
-                          <BookOpen className="w-3.5 h-3.5" />
-                          <span className="hidden sm:inline">Tafsir</span>
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setShareAyah(ayah.numberInSurah);
-                            setShowShareCard(true);
-                          }}
-                          className="text-xs text-night-500 hover:text-gold-400 transition-colors flex items-center gap-1 bg-night-800/30 px-2 py-1 rounded-lg"
-                          title="Share Ayah"
-                        >
-                          <Share2 className="w-3.5 h-3.5" />
-                          <span className="hidden sm:inline">Share</span>
+                          <MoreHorizontal className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
+                    )}
                   </motion.div>
                 );
               })}

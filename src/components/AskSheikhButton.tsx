@@ -142,7 +142,7 @@ export default function AskSheikhButton({
             </p>
             <button
               onClick={() => dismissStuckPrompt()}
-              className="text-[10px] text-gray-500 hover:text-gray-400 mt-1"
+              className="text-[10px] text-night-500 hover:text-night-400 mt-1"
             >
               Dismiss
             </button>

@@ -89,10 +89,10 @@ export function OfflineModelLoader({
   
   // Full view for settings page
   return (
-    <div className={`p-4 rounded-xl bg-gray-900/50 border border-gray-800 ${className}`}>
+    <div className={`p-4 rounded-xl bg-night-900/50 border border-night-800 ${className}`}>
       <div className="flex items-start gap-3">
         {/* Icon */}
-        <div className="p-2 rounded-lg bg-gray-800">
+        <div className="p-2 rounded-lg bg-night-800">
           <svg 
             className="w-6 h-6 text-gold" 
             fill="none" 
@@ -111,15 +111,15 @@ export function OfflineModelLoader({
         {/* Content */}
         <div className="flex-1">
           <h3 className="font-semibold text-white">Offline Mode</h3>
-          <p className="text-sm text-gray-400 mt-1">
+          <p className="text-sm text-night-400 mt-1">
             Download the AI model to practice without internet
           </p>
           
           {/* Status-specific content */}
           <div className="mt-3">
             {status === 'checking' && (
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <div className="w-4 h-4 border-2 border-gray-600 border-t-transparent rounded-full animate-spin" />
+              <div className="flex items-center gap-2 text-sm text-night-500">
+                <div className="w-4 h-4 border-2 border-night-600 border-t-transparent rounded-full animate-spin" />
                 Checking...
               </div>
             )}
@@ -137,17 +137,17 @@ export function OfflineModelLoader({
             {status === 'loading' && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-400">Downloading...</span>
+                  <span className="text-night-400">Downloading...</span>
                   <span className="text-gold font-medium">{progress}%</span>
                 </div>
-                <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-night-800 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-gradient-to-r from-gold to-amber-400 rounded-full 
                                transition-all duration-300 ease-out"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-night-500">
                   Please keep this page open during download
                 </p>
               </div>
@@ -192,10 +192,10 @@ export function OfflineModelLoader({
       
       {/* Info footer */}
       {status !== 'ready' && (
-        <div className="mt-4 pt-3 border-t border-gray-800">
+        <div className="mt-4 pt-3 border-t border-night-800">
           <div className="flex items-start gap-2">
             <svg 
-              className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" 
+              className="w-4 h-4 text-night-500 mt-0.5 flex-shrink-0" 
               fill="currentColor" 
               viewBox="0 0 20 20"
             >
@@ -205,7 +205,7 @@ export function OfflineModelLoader({
                 clipRule="evenodd" 
               />
             </svg>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-night-500">
               The offline model enables Quran recitation practice without internet.
               Model is stored locally and only downloaded once.
             </p>

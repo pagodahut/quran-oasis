@@ -102,7 +102,7 @@ export default function FeedbackPanel({
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="fixed bottom-0 left-0 right-0 z-50 
-                       bg-gray-900/95 backdrop-blur-xl 
+                       bg-night-900/95 backdrop-blur-xl 
                        border-t border-white/10
                        rounded-t-3xl
                        max-h-[85vh] overflow-y-auto
@@ -132,7 +132,7 @@ export default function FeedbackPanel({
                   <h3 className="text-xl font-semibold text-white mb-2">
                     JazakAllah Khair!
                   </h3>
-                  <p className="text-gray-400 text-center">
+                  <p className="text-night-400 text-center">
                     Your feedback helps us improve the experience.
                   </p>
                 </motion.div>
@@ -144,7 +144,7 @@ export default function FeedbackPanel({
                       <h3 className="text-xl font-semibold text-white">
                         Share Feedback
                       </h3>
-                      <p className="text-sm text-gray-400 mt-1">
+                      <p className="text-sm text-night-400 mt-1">
                         Help us improve your learning experience
                       </p>
                     </div>
@@ -153,7 +153,7 @@ export default function FeedbackPanel({
                       className="p-2 hover:bg-white/10 rounded-full transition-colors"
                       aria-label="Close"
                     >
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-night-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
@@ -161,7 +161,7 @@ export default function FeedbackPanel({
 
                   {/* Category Selector */}
                   <div className="mb-5">
-                    <p className="text-sm text-gray-300 mb-3">Category</p>
+                    <p className="text-sm text-night-300 mb-3">Category</p>
                     <div className="flex gap-2">
                       {CATEGORIES.map(({ type, emoji, label }) => (
                         <motion.button
@@ -172,7 +172,7 @@ export default function FeedbackPanel({
                                      border transition-all text-sm
                                      ${category === type
                                        ? 'bg-amber-500/20 border-amber-500/50 text-amber-200'
-                                       : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
+                                       : 'bg-white/5 border-white/10 text-night-300 hover:bg-white/10'
                                      }`}
                         >
                           <span>{emoji}</span>
@@ -184,7 +184,7 @@ export default function FeedbackPanel({
 
                   {/* Text Input */}
                   <div className="mb-5">
-                    <label className="block text-sm text-gray-300 mb-2">
+                    <label className="block text-sm text-night-300 mb-2">
                       {category === 'bug' ? 'What went wrong?' :
                        category === 'feature' ? 'What would you like to see?' :
                        'Your feedback'}
@@ -202,7 +202,7 @@ export default function FeedbackPanel({
                       rows={4}
                       className="w-full px-4 py-3 rounded-xl
                                 bg-white/5 border border-white/10
-                                text-white placeholder:text-gray-500
+                                text-white placeholder:text-night-500
                                 focus:outline-none focus:ring-2 focus:ring-amber-500/50
                                 resize-none"
                       autoFocus
@@ -210,7 +210,7 @@ export default function FeedbackPanel({
                   </div>
 
                   {/* Page URL indicator */}
-                  <div className="mb-6 flex items-center gap-2 text-xs text-gray-500">
+                  <div className="mb-6 flex items-center gap-2 text-xs text-night-500">
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                     </svg>
@@ -227,7 +227,7 @@ export default function FeedbackPanel({
                                transition-all shadow-lg
                                ${message.trim()
                                  ? 'bg-gradient-to-r from-amber-600 to-amber-500 text-black shadow-amber-500/25'
-                                 : 'bg-white/10 text-gray-500 cursor-not-allowed'
+                                 : 'bg-white/10 text-night-500 cursor-not-allowed'
                                }`}
                   >
                     {isSubmitting ? (
@@ -243,7 +243,7 @@ export default function FeedbackPanel({
                     )}
                   </motion.button>
 
-                  <p className="text-xs text-gray-500 text-center mt-4">
+                  <p className="text-xs text-night-500 text-center mt-4">
                     Feedback is anonymous and helps us improve the app.
                   </p>
                 </>

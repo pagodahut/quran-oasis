@@ -29,6 +29,8 @@ import {
   Loader2,
   TrendingUp,
   Zap,
+  Mic,
+  Sparkles,
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 import AgentPanel from '@/components/AgentPanel';
@@ -486,6 +488,9 @@ export default function ProfilePage() {
               <SettingsRow icon={TrendingUp} label="Detailed Progress" href="/progress" />
               <SettingsRow icon={Bookmark} label="Bookmarks" href="/bookmarks" />
               <SettingsRow icon={List} label="Surah Index" href="/surahs" />
+              <SettingsRow icon={BookOpen} label="Lessons" href="/lessons" />
+              <SettingsRow icon={Mic} label="Recite" href="/recite" />
+              <SettingsRow icon={Sparkles} label="Techniques" href="/techniques" />
             </div>
           </motion.div>
 

@@ -27,13 +27,13 @@ export const notoNastaliqUrdu = Noto_Nastaliq_Urdu({
   preload: false, // Only load when selected
 });
 
-// Kitab / Modern style font
+// Kitab / Uthmani-style font — closest to KFGQPC Hafs Uthmani available on Google Fonts
 export const scheherazadeNew = Scheherazade_New({
   weight: ['400', '500', '600', '700'],
   subsets: ['arabic'],
   display: 'swap',
   variable: '--font-kitab',
-  preload: false, // Only load when selected
+  preload: true, // Preload — used as primary Quran font
 });
 
 // Sans-serif for UI

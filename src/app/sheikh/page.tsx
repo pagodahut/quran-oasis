@@ -72,20 +72,20 @@ export default function SheikhPage() {
   const ayah = SAMPLE_AYAHS[selectedAyah];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-white">
+    <div className="min-h-screen bg-gradient-to-b from-night-950 via-night-900 to-night-950 text-white">
       {/* Header */}
-      <header className="border-b border-white/5 bg-black/30 backdrop-blur-xl sticky top-0 z-30">
+      <header className="border-b border-white/5 bg-night-900/60 backdrop-blur-xl sticky top-0 z-30">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <a href="/" className="text-lg">📖</a>
+            <a href="/" className="text-lg font-semibold text-gold-400">H</a>
             <div>
               <h1 className="text-sm font-semibold">Sheikh HIFZ</h1>
-              <p className="text-[11px] text-gray-500">AI Quran Teacher</p>
+              <p className="text-[11px] text-night-500">AI Quran Teacher</p>
             </div>
           </div>
           <a
             href="/mushaf"
-            className="text-xs text-gray-400 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
+            className="text-xs text-night-400 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
           >
             Open Mushaf →
           </a>
@@ -95,7 +95,7 @@ export default function SheikhPage() {
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Ayah Selector */}
         <div className="mb-4">
-          <label className="text-[11px] uppercase tracking-wider text-gray-500 mb-2 block">
+          <label className="text-[11px] uppercase tracking-wider text-night-500 mb-2 block">
             Select Ayah to Study
           </label>
           <div className="flex flex-wrap gap-2">
@@ -105,8 +105,8 @@ export default function SheikhPage() {
                 onClick={() => setSelectedAyah(key)}
                 className={`px-3 py-1.5 rounded-lg text-xs transition-all duration-200 ${
                   selectedAyah === key
-                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                    : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                    ? 'bg-gold-500/20 text-gold-300 border border-gold-500/30'
+                    : 'bg-white/5 text-night-400 border border-white/10 hover:bg-white/10'
                 }`}
               >
                 {a.surahName} {a.ayahNumber > 1 ? `· ${a.ayahNumber}` : ''}
@@ -117,7 +117,7 @@ export default function SheikhPage() {
 
         {/* Level Selector */}
         <div className="mb-6">
-          <label className="text-[11px] uppercase tracking-wider text-gray-500 mb-2 block">
+          <label className="text-[11px] uppercase tracking-wider text-night-500 mb-2 block">
             Your Level
           </label>
           <div className="flex gap-2">
@@ -128,7 +128,7 @@ export default function SheikhPage() {
                 className={`px-3 py-1.5 rounded-lg text-xs capitalize transition-all duration-200 ${
                   userLevel === level
                     ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                    : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                    : 'bg-white/5 text-night-400 border border-white/10 hover:bg-white/10'
                 }`}
               >
                 {level}
@@ -145,23 +145,23 @@ export default function SheikhPage() {
           className="mb-6 p-5 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-sm"
         >
           <div className="text-right mb-3">
-            <p className="font-arabic text-2xl leading-loose text-amber-100/90">
+            <p className="font-arabic text-2xl leading-loose text-gold-100/90">
               {ayah.arabicText}
             </p>
           </div>
           {ayah.transliteration && (
-            <p className="text-xs text-gray-500 italic mb-2">{ayah.transliteration}</p>
+            <p className="text-xs text-night-500 italic mb-2">{ayah.transliteration}</p>
           )}
-          <p className="text-sm text-gray-300 leading-relaxed">{ayah.translation}</p>
+          <p className="text-sm text-night-300 leading-relaxed">{ayah.translation}</p>
           <div className="flex items-center gap-2 mt-3">
-            <span className="text-[10px] text-gray-600 bg-white/5 px-2 py-0.5 rounded">
+            <span className="text-[10px] text-night-600 bg-white/5 px-2 py-0.5 rounded">
               {ayah.surahName} ({ayah.surahNameArabic})
             </span>
-            <span className="text-[10px] text-gray-600 bg-white/5 px-2 py-0.5 rounded">
+            <span className="text-[10px] text-night-600 bg-white/5 px-2 py-0.5 rounded">
               Ayah {ayah.ayahNumber}
             </span>
             {ayah.juz && (
-              <span className="text-[10px] text-gray-600 bg-white/5 px-2 py-0.5 rounded">
+              <span className="text-[10px] text-night-600 bg-white/5 px-2 py-0.5 rounded">
                 Juz {ayah.juz}
               </span>
             )}

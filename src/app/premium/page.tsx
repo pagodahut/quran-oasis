@@ -49,12 +49,12 @@ export default function PremiumPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950">
+    <div className="min-h-screen bg-gradient-to-b from-night-950 via-night-900 to-night-950">
       {/* Back button */}
       <div className="p-4">
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
+          className="inline-flex items-center gap-2 text-night-400 hover:text-white transition-colors text-sm"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -74,7 +74,7 @@ export default function PremiumPage() {
           <h1 className="text-3xl font-bold text-white mb-3">
             HIFZ Premium
           </h1>
-          <p className="text-gray-400">
+          <p className="text-night-400">
             Accelerate your Quran memorization journey with AI-powered tools
           </p>
         </motion.div>
@@ -102,11 +102,11 @@ export default function PremiumPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   ) : (
-                    <svg className="w-4 h-4 text-gray-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-night-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   )}
-                  <span className={included ? 'text-gray-200' : 'text-gray-500'}>
+                  <span className={included ? 'text-night-200' : 'text-night-500'}>
                     {text}
                   </span>
                 </div>
@@ -143,11 +143,11 @@ export default function PremiumPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   ) : (
-                    <svg className="w-4 h-4 text-gray-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-night-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   )}
-                  <span className="text-gray-200">{text}</span>
+                  <span className="text-night-200">{text}</span>
                 </div>
               ))}
             </div>
@@ -180,7 +180,7 @@ export default function PremiumPage() {
               <h3 className="text-lg font-semibold text-white mb-1">
                 JazakAllah Khair!
               </h3>
-              <p className="text-gray-400 text-sm">
+              <p className="text-night-400 text-sm">
                 We&apos;ll notify you when Premium launches, insha&apos;Allah.
               </p>
             </motion.div>
@@ -189,7 +189,7 @@ export default function PremiumPage() {
               <h3 className="text-lg font-semibold text-white mb-2">
                 Get Early Access
               </h3>
-              <p className="text-gray-400 text-sm mb-4">
+              <p className="text-night-400 text-sm mb-4">
                 Be the first to know when Premium launches
               </p>
               <form onSubmit={handleEmailSubmit} className="flex gap-2">
@@ -201,7 +201,7 @@ export default function PremiumPage() {
                   required
                   className="flex-1 px-4 py-2.5 rounded-xl text-sm
                            bg-white/5 border border-white/10
-                           text-white placeholder:text-gray-500
+                           text-white placeholder:text-night-500
                            focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                 />
                 <motion.button
