@@ -216,8 +216,19 @@ export default function MushafPage() {
         }
       }
     };
+    // Also listen for fullscreen change — if user exits fullscreen via browser UI, sync focus mode
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement && focusMode) {
+        setFocusMode(false);
+        setChromeVisible(true);
+      }
+    };
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
   }, [focusMode]);
 
   const handleFocusTap = () => {
