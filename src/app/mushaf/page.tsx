@@ -108,6 +108,9 @@ export default function MushafPage() {
   // Overflow menu state (Task 1)
   const [overflowAyah, setOverflowAyah] = useState<number | null>(null);
   
+  // Reciter picker in expanded player
+  const [showReciterInPlayer, setShowReciterInPlayer] = useState(false);
+  
   // Mini player state (Task 2)
   const [miniPlayer, setMiniPlayer] = useState(false);
   const [scrollY, setScrollY] = useState(0);
@@ -670,11 +673,16 @@ export default function MushafPage() {
         )}
       </AnimatePresence>
 
-      {/* Audio Player - Mini/Full with transition (Task 2) */}
+      {/* Audio Player - Mini/Full with GPU-accelerated transitions */}
       {!browseMode && (!focusMode || chromeVisible) && (
         <motion.div
-          layout
-          className={`fixed left-2 right-2 z-40 liquid-glass-gold-premium rounded-2xl cursor-pointer ${miniPlayer ? 'bottom-24' : 'bottom-4'}`}
+          className="fixed left-2 right-2 z-40 liquid-glass-gold-premium rounded-2xl cursor-pointer"
+          initial={false}
+          animate={{ 
+            y: 0, 
+            bottom: miniPlayer ? 88 : 16,
+          }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           onClick={() => miniPlayer && setMiniPlayer(false)}
         >
           <AnimatePresence mode="wait">
@@ -682,9 +690,10 @@ export default function MushafPage() {
               /* ── Mini Player ── */
               <motion.div
                 key="mini"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
                 className="flex items-center justify-between px-4 py-2.5 max-w-3xl mx-auto"
               >
                 <p className="text-sm text-night-200 font-medium truncate flex-1">
@@ -702,9 +711,10 @@ export default function MushafPage() {
               /* ── Full Player ── */
               <motion.div
                 key="full"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
                 className="px-4 py-3.5 max-w-3xl mx-auto"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -862,9 +872,15 @@ export default function MushafPage() {
                   </button>
                 </div>
 
-                {/* Reciter & Speed */}
+                {/* Reciter Switcher & Speed */}
                 <div className="flex items-center justify-center gap-3 mt-3 text-xs text-night-400">
-                  <span className="text-night-500">{RECITERS.find(r => r.id === selectedReciter)?.name}</span>
+                  <button
+                    onClick={() => setShowReciterInPlayer(!showReciterInPlayer)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 transition-colors min-h-[28px]"
+                  >
+                    <Volume2 className="w-3 h-3 text-gold-400" />
+                    <span className="text-night-300">{RECITERS.find(r => r.id === selectedReciter)?.name}</span>
+                  </button>
                   <span className="text-night-700">•</span>
                   <select
                     value={playbackRate}
@@ -882,6 +898,36 @@ export default function MushafPage() {
                     <option value={1.5}>1.5x</option>
                   </select>
                 </div>
+
+                {/* Reciter Picker (inline in expanded player) */}
+                <AnimatePresence>
+                  {showReciterInPlayer && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 8 }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                      className="mt-3 overflow-hidden"
+                    >
+                      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                        {RECITERS.map((reciter) => (
+                          <button
+                            key={reciter.id}
+                            onClick={() => { setSelectedReciter(reciter.id); setShowReciterInPlayer(false); }}
+                            className={`flex-shrink-0 px-3 py-2 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${
+                              selectedReciter === reciter.id
+                                ? 'bg-gold-500/20 text-gold-400 border border-gold-500/30'
+                                : 'bg-white/5 text-night-400 border border-white/5 hover:bg-white/10'
+                            }`}
+                          >
+                            <span className="block">{reciter.name}</span>
+                            <span className="block text-[10px] opacity-60 mt-0.5">{reciter.style}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
             )}
           </AnimatePresence>
