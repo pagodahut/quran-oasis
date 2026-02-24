@@ -653,8 +653,14 @@ export default function MushafPage() {
                   <BookOpen className="w-5 h-5" /> <span className="text-sm font-medium">Tafsir</span>
                 </button>
                 <button
+                  onClick={() => { router.push(`/recite?surah=${surahNumber}&start=${overflowAyah}&from=mushaf`); setOverflowAyah(null); }}
+                  className="flex items-center gap-3 min-h-[52px] px-4 py-3 rounded-2xl bg-emerald-500/10 text-emerald-400 transition-colors active:scale-95"
+                >
+                  <Mic className="w-5 h-5" /> <span className="text-sm font-medium">Recite</span>
+                </button>
+                <button
                   onClick={() => { setShareAyah(overflowAyah); setShowShareCard(true); setOverflowAyah(null); }}
-                  className="flex items-center gap-3 min-h-[52px] px-4 py-3 rounded-2xl bg-night-800/50 text-night-300 transition-colors active:scale-95 col-span-2"
+                  className="flex items-center gap-3 min-h-[52px] px-4 py-3 rounded-2xl bg-night-800/50 text-night-300 transition-colors active:scale-95"
                 >
                   <Share2 className="w-5 h-5" /> <span className="text-sm font-medium">Share Ayah</span>
                 </button>
@@ -1082,28 +1088,9 @@ export default function MushafPage() {
         )}
       </AnimatePresence>
       
-      {/* Recite Floating Action Button — left side to avoid overlap with AI Sheikh (right-4) */}
-      {!browseMode && currentSurah && (
-        <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0, opacity: 0 }}
-          className="fixed bottom-32 left-4 z-30"
-        >
-          <Link
-            href={`/recite?surah=${surahNumber}&from=mushaf`}
-            className="w-16 h-16 rounded-full flex items-center justify-center transition-all active:scale-95 shadow-lg"
-            style={{
-              background: 'linear-gradient(135deg, rgba(34,197,94,0.95) 0%, rgba(22,163,74,1) 100%)',
-              boxShadow: '0 8px 24px rgba(34,197,94,0.4), 0 4px 12px rgba(0,0,0,0.3)',
-              border: '1px solid rgba(255,255,255,0.2)',
-            }}
-            title="Start Recitation Practice"
-          >
-            <Mic className="w-7 h-7 text-white" />
-          </Link>
-        </motion.div>
-      )}
+      {/* Recite FAB removed — recitation is now accessible via verse action sheet
+          and the audio player's recite button. This keeps the mushaf reading
+          experience clean with only the AI Sheikh as a persistent FAB. */}
 
       {/* Ayah Share Card */}
       {currentSurah && (
