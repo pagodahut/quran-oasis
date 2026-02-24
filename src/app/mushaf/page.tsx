@@ -57,6 +57,7 @@ import { useReadingPreferences } from '@/hooks/useAppliedPreferences';
 import { surahs as allSurahsData, type Surah as SurahListItem } from '@/data/surahs';
 import GardenOfSurahs from '@/components/GardenOfSurahs';
 import { hapticLight } from '@/lib/haptics';
+import FeedbackFooterLink from '@/components/FeedbackFooterLink';
 
 export default function MushafPage() {
   const router = useRouter();
@@ -1096,7 +1097,12 @@ export default function MushafPage() {
         )}
       </AnimatePresence>
       
-      {!focusMode && <BottomNav />}
+      {!focusMode && (
+        <>
+          <FeedbackFooterLink currentPage="mushaf" className="pb-32" />
+          <BottomNav />
+        </>
+      )}
       
       {/* Quran Search */}
       <QuranSearch
