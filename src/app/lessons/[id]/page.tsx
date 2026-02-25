@@ -743,7 +743,7 @@ export default function LessonDetailPage() {
               </div>
               <div>
                 <h5 className="font-semibold text-gold-400 mb-1 flex items-center gap-1.5"><MemorizeIcon size={16} /> Memory Trick</h5>
-                <p className="text-night-300 text-sm leading-relaxed">{trickContent || lines[++i]}</p>
+                <p className="text-night-300 text-sm leading-relaxed">{renderInline(trickContent || lines[++i], i)}</p>
               </div>
             </div>
           </div>
@@ -791,7 +791,7 @@ export default function LessonDetailPage() {
                   <h5 className="font-semibold text-sage-400 mb-1 flex items-center gap-1.5"><TargetIcon size={16} /> Practice</h5>
                   <div className="text-night-300 text-sm leading-relaxed space-y-1">
                     {practiceLines.map((pLine, pIdx) => (
-                      <p key={pIdx}>{pLine}</p>
+                      <p key={pIdx}>{renderInline(pLine, i * 100 + pIdx)}</p>
                     ))}
                   </div>
                 </div>
@@ -814,7 +814,7 @@ export default function LessonDetailPage() {
               </div>
               <div>
                 <h5 className="font-semibold text-sage-400 mb-1 flex items-center gap-1.5"><TipIcon size={16} /> Tip</h5>
-                <p className="text-night-300 text-sm leading-relaxed">{tipContent || lines[++i]}</p>
+                <p className="text-night-300 text-sm leading-relaxed">{renderInline(tipContent || lines[++i], i)}</p>
               </div>
             </div>
           </div>
