@@ -49,3 +49,6 @@ coverage/
 # clerk configuration (can include secrets)
 /.clerk/
 __pycache__/
+agent-orchestrator.yaml
+.claude/
+tmp/
