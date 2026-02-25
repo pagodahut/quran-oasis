@@ -171,6 +171,7 @@ export default function BottomNav() {
               (item.href === '/dashboard' && pathname === '/') ||
               (item.href === '/mushaf' && ['/surahs', '/browse', '/identify', '/recite'].some(p => pathname.startsWith(p))) ||
               (item.href === '/profile' && pathname.startsWith('/settings')) ||
+              (item.href === '/practice' && pathname.startsWith('/lessons')) ||
               (item.href !== '/' && item.href !== '/dashboard' && pathname.startsWith(item.href));
             
             return (
