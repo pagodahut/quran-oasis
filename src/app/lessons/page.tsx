@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { useCalibrationGuard } from '@/hooks/useCalibrationGuard';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -489,6 +490,7 @@ function AdvancedIcon() {
 function LessonsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { isChecking: isCheckingCalibration } = useCalibrationGuard();
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
   const [currentStreak, setCurrentStreak] = useState(0);
   const [totalXP, setTotalXP] = useState(0);
@@ -529,6 +531,22 @@ function LessonsContent() {
   const nextLesson = ALL_BEGINNER_LESSONS.find(
     lesson => !completedLessons.includes(lesson.id) && isLessonUnlocked(lesson.id, completedLessons)
   );
+
+  // Show loading while checking calibration
+  if (isCheckingCalibration) {
+    return (
+      <div className="min-h-screen bg-night-950 flex items-center justify-center">
+        <div className="text-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-8 h-8 border-2 border-gold-500 border-t-transparent rounded-full mx-auto mb-4"
+          />
+          <p className="text-night-400">Loading lessons...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

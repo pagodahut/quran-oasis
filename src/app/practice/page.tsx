@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
+import { useCalibrationGuard } from '@/hooks/useCalibrationGuard';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -40,6 +41,7 @@ export default function PracticePage() {
   const { user } = useAuth();
   const router = useRouter();
   const { setPageContext, userLevel, setUserLevel } = useSheikh();
+  const { isChecking: isCheckingCalibration } = useCalibrationGuard();
 
   const [view, setView] = useState<ViewState>('dashboard');
   const [isLoading, setIsLoading] = useState(true);
@@ -151,6 +153,23 @@ export default function PracticePage() {
     setView('dashboard');
     refreshCounts();
   };
+
+  // ─── Loading/Calibration States ─────────────────────────────────
+
+  if (isCheckingCalibration || isLoading) {
+    return (
+      <div className="min-h-screen bg-night-950 flex items-center justify-center">
+        <div className="text-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-8 h-8 border-2 border-gold-500 border-t-transparent rounded-full mx-auto mb-4"
+          />
+          <p className="text-night-400">Loading your practice session...</p>
+        </div>
+      </div>
+    );
+  }
 
   // ─── Review View ─────────────────────────────────────────────────
 

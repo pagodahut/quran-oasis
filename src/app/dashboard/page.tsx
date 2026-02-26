@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
+import { useCalibrationGuard } from '@/hooks/useCalibrationGuard';
 import {
   Flame,
   BookOpen,
@@ -415,6 +416,7 @@ function RecentActivity({
 export default function DashboardPage() {
   const { user, isLoaded, isSignedIn } = useAuth();
   const { learning: learningPrefs } = useLearningPreferences();
+  const { isChecking } = useCalibrationGuard();
   
   // State
   const [streakInfo, setStreakInfo] = useState(getStreakInfo());
@@ -566,6 +568,22 @@ export default function DashboardPage() {
   const lastTenNights = isLastTenNights();
   const ramadanDay = getRamadanDay();
   const isJummahToday = isJummah();
+
+  // Show loading while checking calibration
+  if (isChecking) {
+    return (
+      <div className="min-h-screen bg-night-950 flex items-center justify-center">
+        <div className="text-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-8 h-8 border-2 border-gold-500 border-t-transparent rounded-full mx-auto mb-4"
+          />
+          <p className="text-night-400">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-night-950">
