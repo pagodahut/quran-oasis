@@ -2389,7 +2389,7 @@ input[type="range"]::-moz-range-thumb {
   }
 
   .review-session__tab:active {
-    @apply transform scale-98;
+    @apply transform scale-[0.98];
   }
 
   .review-session__tab-left {
