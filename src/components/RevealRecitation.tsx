@@ -571,21 +571,26 @@ export default function RevealRecitation({
 
     const expectedText = tajweedData.plainWords.join(' ');
 
-    // Try Tarteel first with extended health check and retry mechanism
+    // ── Robust provider detection with comprehensive error handling ──────────────────────────
     let useTarteel = false;
+    let webSpeechAvailable = false;
     let healthCheckAttempts = 0;
     const maxHealthCheckAttempts = 3;
+    let providerErrors: string[] = [];
     
     // Show "Warming up..." state immediately
     setPhase('preparing');
-    setStatusMessage('Checking Tarteel service...');
+    setStatusMessage('Initializing speech recognition...');
 
+    // 1. Try Tarteel first with extended health check and retry mechanism
     while (healthCheckAttempts < maxHealthCheckAttempts && !useTarteel) {
       try {
         healthCheckAttempts++;
         
         if (healthCheckAttempts > 1) {
           setStatusMessage(`Warming up Tarteel service... (attempt ${healthCheckAttempts}/${maxHealthCheckAttempts})`);
+        } else {
+          setStatusMessage('Checking Tarteel service...');
         }
         
         // Increased timeout to 10 seconds to handle cold starts
@@ -600,69 +605,122 @@ export default function RevealRecitation({
             setStatusMessage('Tarteel service ready!');
             // Small delay to show success message
             await new Promise(resolve => setTimeout(resolve, 500));
+            break;
+          } else {
+            providerErrors.push('Tarteel service not configured');
+            break; // Don't retry if not configured
           }
         } else if (checkRes.status === 504) {
           // Timeout - try again if we have attempts left
-          console.warn(`[Sheikh Hifz] Tarteel timeout on attempt ${healthCheckAttempts}`);
+          console.warn(`[RevealRecitation] Tarteel timeout on attempt ${healthCheckAttempts}`);
+          providerErrors.push(`Tarteel timeout (attempt ${healthCheckAttempts})`);
           if (healthCheckAttempts < maxHealthCheckAttempts) {
             setStatusMessage('Service is warming up, trying again...');
             await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2s between retries
           }
         } else {
-          console.warn('[Sheikh Hifz] Health check failed with status:', checkRes.status);
+          console.warn('[RevealRecitation] Health check failed with status:', checkRes.status);
+          providerErrors.push(`Tarteel service unavailable (${checkRes.status})`);
           break; // Don't retry for non-timeout errors
         }
       } catch (e) {
-        console.warn(`[Sheikh Hifz] Health check error on attempt ${healthCheckAttempts}:`, e);
-        if (healthCheckAttempts < maxHealthCheckAttempts) {
+        const errorMsg = e instanceof Error ? e.message : 'Connection failed';
+        console.warn(`[RevealRecitation] Health check error on attempt ${healthCheckAttempts}:`, e);
+        providerErrors.push(`Tarteel error: ${errorMsg}`);
+        if (healthCheckAttempts < maxHealthCheckAttempts && (e as Error)?.name === 'AbortError') {
           setStatusMessage('Connection issue, retrying...');
           await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2s between retries
+        } else {
+          break; // Don't retry for non-timeout errors
         }
       }
     }
     
-    if (!useTarteel && healthCheckAttempts >= maxHealthCheckAttempts) {
-      setStatusMessage('Tarteel service unavailable, using browser speech recognition');
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Show fallback message
+    // 2. Check WebSpeech availability
+    webSpeechAvailable = WebSpeechService.isSupported();
+    if (!webSpeechAvailable) {
+      providerErrors.push('Browser speech recognition not supported');
     }
 
+    // 3. If no providers are available, show detailed error
+    if (!useTarteel && !webSpeechAvailable) {
+      const detailedError = `Speech recognition is not available. Tried providers:\n${providerErrors.map(e => `• ${e}`).join('\n')}\n\nRecommendations:\n• Use Chrome or Edge browser for built-in speech recognition\n• Check your internet connection\n• Contact support if the issue persists`;
+      setErrorMessage(detailedError);
+      setPhase('error');
+      return;
+    }
+
+    // Show fallback message if using WebSpeech
+    if (!useTarteel && webSpeechAvailable) {
+      setStatusMessage('Using browser speech recognition...');
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Show fallback message
+    }
+
+    // ── Start the chosen provider with comprehensive error handling ──────────────────────────
     try {
       if (useTarteel) {
-        // Using Tarteel (full) provider
-        const service = new TarteelService({
-          expectedText,
-          chunkIntervalMs: 2500,
-          onWord: handleRevealWord,
-          onStateChange: handleRevealStateChange,
-          onError: (err) => console.error('Tarteel error:', err),
-        });
-        serviceRef.current = service;
-        await service.start();
-        setActiveProvider('tarteel');
-      } else {
-        // Using WebSpeech (lite) provider
-        if (!WebSpeechService.isSupported()) {
-          setErrorMessage('Speech recognition is not supported. Please use Chrome or Edge.');
-          setPhase('error');
-          return;
+        // Using Tarteel (full) provider with error handling
+        try {
+          const service = new TarteelService({
+            expectedText,
+            chunkIntervalMs: 2500,
+            onWord: handleRevealWord,
+            onStateChange: handleRevealStateChange,
+            onError: (err) => {
+              console.error('[RevealRecitation] Tarteel error:', err);
+              // Don't crash on individual errors, just log them
+            },
+          });
+          serviceRef.current = service;
+          await service.start();
+          setActiveProvider('tarteel');
+        } catch (tarteelError) {
+          console.error('[RevealRecitation] TarteelService initialization failed:', tarteelError);
+          
+          // Graceful fallback to WebSpeech if available
+          if (webSpeechAvailable) {
+            console.info('[RevealRecitation] Falling back to WebSpeech after Tarteel failure');
+            useTarteel = false;
+            setStatusMessage('Falling back to browser speech recognition...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          } else {
+            throw new Error(`Tarteel service failed: ${tarteelError instanceof Error ? tarteelError.message : 'Unknown error'}`);
+          }
         }
-        const service = new WebSpeechService({
-          expectedText,
-          onWord: handleRevealWord,
-          onStateChange: handleRevealStateChange,
-          onError: (err) => console.error('WebSpeech error:', err),
-        });
-        serviceRef.current = service;
-        await service.start();
-        setActiveProvider('browser');
+      }
+      
+      if (!useTarteel && webSpeechAvailable) {
+        // Using WebSpeech (lite) provider with error handling
+        try {
+          const service = new WebSpeechService({
+            expectedText,
+            onWord: handleRevealWord,
+            onStateChange: handleRevealStateChange,
+            onError: (err) => {
+              console.error('[RevealRecitation] WebSpeech error:', err);
+              // Don't crash on individual errors, just log them
+            },
+          });
+          serviceRef.current = service;
+          await service.start();
+          setActiveProvider('browser');
+        } catch (webSpeechError) {
+          console.error('[RevealRecitation] WebSpeechService initialization failed:', webSpeechError);
+          throw new Error(`Browser speech recognition failed: ${webSpeechError instanceof Error ? webSpeechError.message : 'Unknown error'}`);
+        }
       }
 
       setPhase('recording');
       setElapsedTime(0);
       timerRef.current = setInterval(() => setElapsedTime(p => p + 1), 1000);
+      
     } catch (err) {
-      console.error('Failed to start:', err);
-      setErrorMessage(err instanceof Error ? err.message : 'Failed to start recording.');
+      console.error('[RevealRecitation] Failed to start recording:', err);
+      setErrorMessage(
+        err instanceof Error
+          ? `Failed to start recording: ${err.message}\n\nPlease ensure:\n• Microphone access is allowed\n• You're using a supported browser (Chrome/Edge recommended)\n• Your internet connection is stable`
+          : 'Failed to start recording. Please allow microphone access and try again.'
+      );
       setPhase('error');
     }
   }, [tajweedData, totalWords, handleRevealWord, handleRevealStateChange]);

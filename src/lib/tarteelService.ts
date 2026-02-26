@@ -129,25 +129,43 @@ export class TarteelService {
       this.mediaStream = null;
     }
     
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true,
-        sampleRate: 16000,
-      },
-    });
-    
-    this.mediaStream = stream;
-    
-    // Set up audio analysis for visualization
-    this.audioContext = new AudioContext({ sampleRate: 16000 });
-    this.analyser = this.audioContext.createAnalyser();
-    const source = this.audioContext.createMediaStreamSource(stream);
-    source.connect(this.analyser);
-    this.analyser.fftSize = 256;
-    
-    return stream;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 16000,
+        },
+      });
+      
+      this.mediaStream = stream;
+      
+      // Set up audio analysis for visualization with error handling
+      try {
+        this.audioContext = new AudioContext({ sampleRate: 16000 });
+        this.analyser = this.audioContext.createAnalyser();
+        const source = this.audioContext.createMediaStreamSource(stream);
+        source.connect(this.analyser);
+        this.analyser.fftSize = 256;
+      } catch (audioContextError) {
+        console.warn('[TarteelService] Audio visualization setup failed:', audioContextError);
+        // Continue without visualization - the core functionality still works
+      }
+      
+      return stream;
+    } catch (mediaError) {
+      if (mediaError instanceof Error) {
+        if (mediaError.name === 'NotAllowedError') {
+          throw new Error('Microphone access denied. Please allow microphone access and try again.');
+        } else if (mediaError.name === 'NotFoundError') {
+          throw new Error('No microphone found. Please ensure a microphone is connected.');
+        } else if (mediaError.name === 'NotReadableError') {
+          throw new Error('Microphone is being used by another application. Please close other apps and try again.');
+        }
+      }
+      throw new Error('Failed to access microphone. Please check your microphone settings and try again.');
+    }
   }
   
   /**
@@ -305,10 +323,19 @@ export class TarteelService {
     try {
       const stream = await this.initializeAudio();
       
-      // Create MediaRecorder
-      this.mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus',
-      });
+      // Create MediaRecorder with fallback MIME types
+      let mimeType = 'audio/webm;codecs=opus';
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'audio/webm';
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'audio/wav';
+          if (!MediaRecorder.isTypeSupported(mimeType)) {
+            throw new Error('No supported audio format found for recording');
+          }
+        }
+      }
+      
+      this.mediaRecorder = new MediaRecorder(stream, { mimeType });
       
       this.audioChunks = [];
       
@@ -318,8 +345,22 @@ export class TarteelService {
         }
       };
       
+      this.mediaRecorder.onerror = (event) => {
+        console.error('[TarteelService] MediaRecorder error:', event);
+        this.emitError('Recording error occurred. Please try again.');
+      };
+      
+      this.mediaRecorder.onstop = () => {
+        console.info('[TarteelService] MediaRecorder stopped');
+      };
+      
       // Start recording with timeslice to get chunks regularly
-      this.mediaRecorder.start(500); // Get data every 500ms
+      try {
+        this.mediaRecorder.start(500); // Get data every 500ms
+      } catch (startError) {
+        console.error('[TarteelService] Failed to start MediaRecorder:', startError);
+        throw new Error('Failed to start audio recording. Please try again.');
+      }
       
       this.startTime = Date.now();
       this.state.isRecording = true;
@@ -331,6 +372,16 @@ export class TarteelService {
       }, this.config.chunkIntervalMs);
       
     } catch (error) {
+      // Clean up on error
+      if (this.mediaStream) {
+        this.mediaStream.getTracks().forEach(track => track.stop());
+        this.mediaStream = null;
+      }
+      if (this.audioContext) {
+        this.audioContext.close().catch(() => {});
+        this.audioContext = null;
+      }
+      
       this.emitError(
         error instanceof Error
           ? error.message
