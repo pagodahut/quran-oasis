@@ -31,6 +31,9 @@ export default function SignUpPage() {
             socialButtonsBlockButtonText: 'text-night-100',
             footerActionLink: 'text-gold-400 hover:text-gold-300',
             badge: 'text-gold-400 bg-night-800/50',
+            // Hide name fields — we collect name during onboarding
+            'formField__firstName': 'hidden',
+            'formField__lastName': 'hidden',
           },
           variables: {
             colorPrimary: '#c9a227',

@@ -11,7 +11,7 @@
  * FeedbackButton goes bottom-left for symmetry.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSheikh } from '@/contexts/SheikhContext';
 import { MosqueIcon } from '@/components/icons';
@@ -82,6 +82,78 @@ export default function AskSheikhButton({
     dismissStuckPrompt,
   } = useSheikh();
 
+  // Draggable position
+  const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
+  const isDragging = useRef(false);
+  const dragStart = useRef<{ x: number; y: number; posX: number; posY: number } | null>(null);
+  const hasMoved = useRef(false);
+
+  // Load saved position from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('sheikh_fab_position');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Validate position is still on screen
+        if (parsed.x >= 0 && parsed.x <= window.innerWidth - 64 &&
+            parsed.y >= 0 && parsed.y <= window.innerHeight - 64) {
+          setPosition(parsed);
+        }
+      }
+    } catch {}
+  }, []);
+
+  const handleDragStart = useCallback((clientX: number, clientY: number) => {
+    const currentPos = position || {
+      x: window.innerWidth - 64 - 16, // default right-4
+      y: window.innerHeight - 80 - 64, // default bottom-20
+    };
+    isDragging.current = true;
+    hasMoved.current = false;
+    dragStart.current = { x: clientX, y: clientY, posX: currentPos.x, posY: currentPos.y };
+  }, [position]);
+
+  const handleDragMove = useCallback((clientX: number, clientY: number) => {
+    if (!isDragging.current || !dragStart.current) return;
+    const dx = clientX - dragStart.current.x;
+    const dy = clientY - dragStart.current.y;
+    if (Math.abs(dx) > 5 || Math.abs(dy) > 5) hasMoved.current = true;
+    const newX = Math.max(0, Math.min(window.innerWidth - 64, dragStart.current.posX + dx));
+    const newY = Math.max(0, Math.min(window.innerHeight - 64, dragStart.current.posY + dy));
+    setPosition({ x: newX, y: newY });
+  }, []);
+
+  const handleDragEnd = useCallback(() => {
+    isDragging.current = false;
+    dragStart.current = null;
+    if (position) {
+      try { localStorage.setItem('sheikh_fab_position', JSON.stringify(position)); } catch {}
+    }
+  }, [position]);
+
+  useEffect(() => {
+    const onTouchMove = (e: TouchEvent) => {
+      if (isDragging.current) {
+        e.preventDefault();
+        handleDragMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    };
+    const onTouchEnd = () => handleDragEnd();
+    const onMouseMove = (e: MouseEvent) => handleDragMove(e.clientX, e.clientY);
+    const onMouseUp = () => handleDragEnd();
+
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', onTouchEnd);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => {
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [handleDragMove, handleDragEnd]);
+
   // Hide on scroll in mushaf page
   const [isHidden, setIsHidden] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -109,6 +181,7 @@ export default function AskSheikhButton({
   if (isSheikhOpen || !show || isHidden) return null;
 
   const handleClick = () => {
+    if (hasMoved.current) return; // Ignore click after drag
     if (isUserStuck) {
       const stuckQuestion = ayahContext
         ? `I'm having trouble with ${ayahContext.surahName} ayah ${ayahContext.ayahNumber}. Can you help me break it down?`
@@ -125,7 +198,16 @@ export default function AskSheikhButton({
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed bottom-20 right-4 z-40 flex flex-col items-end gap-3"
+        className="fixed z-[9999] flex flex-col items-end gap-3"
+        style={position ? {
+          left: position.x,
+          top: position.y,
+          right: 'auto',
+          bottom: 'auto',
+        } : {
+          bottom: '5rem',
+          right: '1rem',
+        }}
       >
         {/* "Stuck?" nudge */}
         {isUserStuck && (
@@ -159,7 +241,9 @@ export default function AskSheikhButton({
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.9 }}
           onClick={handleClick}
-          className="sheikh-fab"
+          onTouchStart={(e) => handleDragStart(e.touches[0].clientX, e.touches[0].clientY)}
+          onMouseDown={(e) => handleDragStart(e.clientX, e.clientY)}
+          className="sheikh-fab touch-none"
           aria-label="Ask Sheikh"
         >
           {/* Breathing glow ring */}

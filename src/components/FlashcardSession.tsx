@@ -131,7 +131,7 @@ export default function FlashcardSession({
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-40 safe-area-top px-4 pt-4">
+      <header className="sticky top-0 z-40 safe-area-top px-4 pt-1">
         <div className="liquid-glass rounded-2xl p-3">
           <div className="flex items-center justify-between mb-3">
             <button
@@ -192,11 +192,11 @@ export default function FlashcardSession({
                 <button
                   onClick={playAudio}
                   disabled={isPlaying || !audioAvailable}
-                  className={`liquid-icon-btn !w-10 !h-10 ${!audioAvailable ? 'opacity-30 cursor-not-allowed' : ''}`}
+                  className={`liquid-icon-btn !w-10 !h-10 !bg-transparent !border-transparent !backdrop-blur-none ${!audioAvailable ? 'opacity-30 cursor-not-allowed' : ''}`}
                   aria-label={audioAvailable ? 'Play audio' : 'Audio not available'}
                   title={audioAvailable ? 'Play audio' : 'Audio not available'}
                 >
-                  <Volume2 className={`w-5 h-5 ${isPlaying ? 'text-gold-400 animate-pulse' : !audioAvailable ? 'text-night-600' : ''}`} />
+                  <Volume2 className={`w-5 h-5 ${isPlaying ? 'text-gold-400 animate-pulse' : !audioAvailable ? 'text-night-600' : 'text-night-400'}`} />
                 </button>
               </div>
               

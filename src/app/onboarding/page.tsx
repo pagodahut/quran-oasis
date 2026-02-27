@@ -193,7 +193,7 @@ export default function OnboardingPage() {
       </header>
 
       {/* Content */}
-      <main className="flex-1 flex flex-col px-6 py-6 relative z-10">
+      <main className="flex-1 flex flex-col px-6 py-4 pb-safe relative z-10 overflow-hidden">
         <AnimatePresence mode="wait">
           {/* Step 0: Name */}
           {step === 'name' && (
@@ -217,7 +217,7 @@ export default function OnboardingPage() {
                     if (e.key === 'Enter' && data.name.trim()) goNext();
                   }}
                   placeholder="Enter your name..."
-                  className="w-full px-5 py-4 rounded-2xl text-night-100 text-lg placeholder-night-600 outline-none transition-all duration-300 focus:shadow-[0_0_0_1px_rgba(201,162,39,0.4),0_0_20px_rgba(201,162,39,0.1)]"
+                  className="w-full px-5 py-4 rounded-2xl text-night-100 text-[16px] sm:text-lg placeholder-night-600 outline-none transition-all duration-300 focus:shadow-[0_0_0_1px_rgba(201,162,39,0.4),0_0_20px_rgba(201,162,39,0.1)]"
                   style={{
                     background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
                     border: '1px solid rgba(255,255,255,0.08)',

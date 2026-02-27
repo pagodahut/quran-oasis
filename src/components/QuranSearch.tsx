@@ -211,7 +211,7 @@ export default function QuranSearch({ isOpen, onClose, onSelectResult }: QuranSe
                   value={query}
                   onChange={e => setQuery(e.target.value)}
                   placeholder="Search verses or try '2:255', 'surah 18 ayah 10', or 'Al-Baqarah 255'..."
-                  className="w-full pl-12 pr-4 py-4 rounded-2xl text-night-100 placeholder:text-night-500 transition-all duration-300 focus:ring-2 focus:ring-gold-500/50"
+                  className="w-full pl-12 pr-4 py-4 rounded-2xl text-night-100 text-base placeholder:text-night-500 transition-all duration-300 focus:ring-2 focus:ring-gold-500/50"
                   style={{
                     background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
                     border: '1px solid rgba(255,255,255,0.1)',
@@ -298,7 +298,94 @@ export default function QuranSearch({ isOpen, onClose, onSelectResult }: QuranSe
               aria-live="polite"
               aria-label="Search results"
             >
-              {/* Verse Results - Primary Focus */}
+              {/* Surah Matches - Show on top */}
+              {surahMatches.length > 0 && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-6"
+                >
+                  <h3 className="text-xs uppercase tracking-widest text-night-500 mb-3 px-1 font-semibold">Surahs</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {surahMatches.map((surah, i) => {
+                      const cardSize = getSurahCardSize(surah.numberOfAyahs);
+                      const isMakki = surah.revelationType === 'Meccan';
+                      const sizeClasses = {
+                        lg: 'col-span-2 min-h-[140px]',
+                        md: 'col-span-1 min-h-[120px]',
+                        sm: 'col-span-1 min-h-[100px]',
+                      };
+                      
+                      return (
+                        <motion.button
+                          key={surah.number}
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: i * 0.05 }}
+                          whileHover={{ y: -2, transition: { duration: 0.2 } }}
+                          whileTap={{ scale: 0.97 }}
+                          onClick={() => {
+                            onSelectResult(surah.number, 1);
+                            onClose();
+                          }}
+                          className={`${sizeClasses[cardSize]} p-4 rounded-2xl text-left flex flex-col justify-between group relative overflow-hidden transition-all duration-300 focus:ring-2 focus:ring-gold-500/50 focus:outline-none`}
+                          style={{
+                            background: isMakki
+                              ? 'linear-gradient(135deg, rgba(196,148,58,0.08) 0%, rgba(15,15,20,0.9) 100%)'
+                              : 'linear-gradient(135deg, rgba(45,212,150,0.08) 0%, rgba(15,15,20,0.9) 100%)',
+                            border: isMakki 
+                              ? '1px solid rgba(196,148,58,0.25)' 
+                              : '1px solid rgba(45,212,150,0.25)',
+                            backdropFilter: 'blur(12px)',
+                          }}
+                          aria-label={`Go to ${surah.englishName} (${surah.englishNameTranslation}), Surah ${surah.number}, ${surah.numberOfAyahs} verses, ${surah.revelationType}`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <span className={`text-xl font-light opacity-40 ${isMakki ? 'text-gold-400' : 'text-sage-400'}`}>
+                              {surah.number}
+                            </span>
+                            <span className={`text-[9px] px-2 py-0.5 rounded-lg font-medium ${
+                              isMakki 
+                                ? 'bg-gold-500/10 text-gold-400/80' 
+                                : 'bg-sage-500/10 text-sage-400/80'
+                            }`}>
+                              {isMakki ? '🕋 Makki' : '🕌 Madani'}
+                            </span>
+                          </div>
+
+                          <div className="flex-1 flex flex-col items-center justify-center py-2">
+                            <p
+                              className={`${cardSize === 'lg' ? 'text-2xl' : cardSize === 'md' ? 'text-xl' : 'text-lg'} leading-tight group-hover:scale-105 transition-transform duration-300 ${isMakki ? 'text-gold-400' : 'text-sage-400'} mb-1`}
+                              style={{ fontFamily: 'var(--font-arabic)', direction: 'rtl' }}
+                            >
+                              {surah.name}
+                            </p>
+                            <p className={`font-medium text-night-100 text-center ${cardSize === 'sm' ? 'text-sm' : 'text-base'}`}>
+                              {highlightMatch(surah.englishName, query)}
+                            </p>
+                            <p className="text-xs text-night-500 italic text-center">{surah.englishNameTranslation}</p>
+                          </div>
+
+                          <div className="text-center">
+                            <div className="flex items-center justify-between text-[10px] text-night-500 mb-1">
+                              <span>{surah.numberOfAyahs} verses</span>
+                              <span className="opacity-60">#{surah.revelationType === 'Meccan' ? 'M' : 'Md'}</span>
+                            </div>
+                            <div className="h-1 bg-night-800/60 rounded-full">
+                              <div 
+                                className={`h-full rounded-full ${isMakki ? 'bg-gradient-to-r from-gold-600 to-gold-400' : 'bg-gradient-to-r from-sage-600 to-sage-400'}`}
+                                style={{ width: '0%' }}
+                              />
+                            </div>
+                          </div>
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Verse Results */}
               {results.length > 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -307,10 +394,10 @@ export default function QuranSearch({ isOpen, onClose, onSelectResult }: QuranSe
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xs uppercase tracking-widest text-night-300 font-semibold flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-gold-400" />
-                      Verses Found
+                      Verses
                     </h3>
                     <span className="text-xs text-night-500 bg-night-800/50 px-2 py-1 rounded-lg">
-                      {results.length}{results.length >= 50 ? '+' : ''} results
+                      {results.length}{results.length >= 50 ? '+' : ''} matches
                     </span>
                   </div>
                   <div className="space-y-3">
@@ -395,102 +482,6 @@ export default function QuranSearch({ isOpen, onClose, onSelectResult }: QuranSe
                 </motion.div>
               )}
 
-              {/* Surah Matches - Garden of Surahs Style */}
-              {surahMatches.length > 0 && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mb-6"
-                >
-                  <h3 className="text-xs uppercase tracking-widest text-night-500 mb-3 px-1 font-semibold">Surahs</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    {surahMatches.map((surah, i) => {
-                      const cardSize = getSurahCardSize(surah.numberOfAyahs);
-                      const isMakki = surah.revelationType === 'Meccan';
-                      const sizeClasses = {
-                        lg: 'col-span-2 min-h-[140px]',
-                        md: 'col-span-1 min-h-[120px]',
-                        sm: 'col-span-1 min-h-[100px]',
-                      };
-                      
-                      return (
-                        <motion.button
-                          key={surah.number}
-                          initial={{ opacity: 0, scale: 0.95 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: i * 0.05 }}
-                          whileHover={{ y: -2, transition: { duration: 0.2 } }}
-                          whileTap={{ scale: 0.97 }}
-                          onClick={() => {
-                            onSelectResult(surah.number, 1);
-                            onClose();
-                          }}
-                          className={`${sizeClasses[cardSize]} p-4 rounded-2xl text-left flex flex-col justify-between group relative overflow-hidden transition-all duration-300 focus:ring-2 focus:ring-gold-500/50 focus:outline-none`}
-                          style={{
-                            background: isMakki
-                              ? 'linear-gradient(135deg, rgba(196,148,58,0.08) 0%, rgba(15,15,20,0.9) 100%)'
-                              : 'linear-gradient(135deg, rgba(45,212,150,0.08) 0%, rgba(15,15,20,0.9) 100%)',
-                            border: isMakki 
-                              ? '1px solid rgba(196,148,58,0.25)' 
-                              : '1px solid rgba(45,212,150,0.25)',
-                            backdropFilter: 'blur(12px)',
-                          }}
-                          aria-label={`Go to ${surah.englishName} (${surah.englishNameTranslation}), Surah ${surah.number}, ${surah.numberOfAyahs} verses, ${surah.revelationType}`}
-                        >
-                          <div className="flex items-start justify-between">
-                            <span className={`text-xl font-light opacity-40 ${isMakki ? 'text-gold-400' : 'text-sage-400'}`}>
-                              {surah.number}
-                            </span>
-                            <span className={`text-[9px] px-2 py-0.5 rounded-lg font-medium ${
-                              isMakki 
-                                ? 'bg-gold-500/10 text-gold-400/80' 
-                                : 'bg-sage-500/10 text-sage-400/80'
-                            }`}>
-                              {isMakki ? '🕋 Makki' : '🕌 Madani'}
-                            </span>
-                          </div>
-
-                          <div className="flex-1 flex flex-col items-center justify-center py-2">
-                            <p
-                              className={`${cardSize === 'lg' ? 'text-2xl' : cardSize === 'md' ? 'text-xl' : 'text-lg'} leading-tight group-hover:scale-105 transition-transform duration-300 ${isMakki ? 'text-gold-400' : 'text-sage-400'} mb-1`}
-                              style={{ fontFamily: 'var(--font-arabic)', direction: 'rtl' }}
-                            >
-                              {surah.name}
-                            </p>
-                            <p className={`font-medium text-night-100 text-center ${cardSize === 'sm' ? 'text-sm' : 'text-base'}`}>
-                              {highlightMatch(surah.englishName, query)}
-                            </p>
-                            <p className="text-xs text-night-500 italic text-center">{surah.englishNameTranslation}</p>
-                          </div>
-
-                          <div className="text-center">
-                            <div className="flex items-center justify-between text-[10px] text-night-500 mb-1">
-                              <span>{surah.numberOfAyahs} verses</span>
-                              <span className="opacity-60">#{surah.revelationType === 'Meccan' ? 'M' : 'Md'}</span>
-                            </div>
-                            <div className="h-1 bg-night-800/60 rounded-full">
-                              <div 
-                                className={`h-full rounded-full ${isMakki ? 'bg-gradient-to-r from-gold-600 to-gold-400' : 'bg-gradient-to-r from-sage-600 to-sage-400'}`}
-                                style={{ width: '0%' }}
-                              />
-                            </div>
-                          </div>
-
-                          <div
-                            className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                            style={{
-                              background: isMakki
-                                ? 'radial-gradient(ellipse at 50% 30%, rgba(196,148,58,0.06) 0%, transparent 70%)'
-                                : 'radial-gradient(ellipse at 50% 30%, rgba(45,212,150,0.06) 0%, transparent 70%)',
-                            }}
-                          />
-                        </motion.button>
-                      );
-                    })}
-                  </div>
-                </motion.div>
-              )}
-              
               {/* Empty State */}
               {query && !isSearching && results.length === 0 && surahMatches.length === 0 && (
                 <motion.div 
