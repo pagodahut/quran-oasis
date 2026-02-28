@@ -58,7 +58,7 @@ function SurahRow({
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-night-100 truncate">{surah.name}</span>
           {isJuzAmma && (
-            <span className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400/70 border border-amber-500/15 shrink-0">
+            <span aria-hidden="true" className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400/70 border border-amber-500/15 shrink-0">
               30
             </span>
           )}

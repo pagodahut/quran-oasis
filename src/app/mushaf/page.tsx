@@ -4,11 +4,10 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  Menu, 
-  Bookmark, 
+import {
+  ChevronLeft,
+  ChevronRight,
+  Bookmark,
   Settings,
   List,
   Play,
@@ -22,22 +21,17 @@ import {
   BookOpen,
   Star,
   Brain,
-  BookmarkPlus,
   Mic,
   Type,
-  Layers,
-  Filter,
-  MapPin,
   Share2,
   MoreHorizontal,
   Maximize,
   Minimize,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { 
-  getSurah, 
-  getAllSurahs, 
-  getAudioUrl, 
+import {
+  getSurah,
+  getAudioUrl,
   RECITERS,
   BISMILLAH,
   shouldShowBismillah,
@@ -54,7 +48,7 @@ import AyahShareCard from '@/components/AyahShareCard';
 import { useSheikh } from '@/contexts/SheikhContext';
 import { useBookmarks } from '@/lib/bookmarks';
 import { useReadingPreferences } from '@/hooks/useAppliedPreferences';
-import { surahs as allSurahsData, type Surah as SurahListItem } from '@/data/surahs';
+import { useReadingPosition } from '@/hooks/useReadingPosition';
 import GardenOfSurahs from '@/components/GardenOfSurahs';
 import { hapticLight } from '@/lib/haptics';
 import FeedbackFooterLink from '@/components/FeedbackFooterLink';
@@ -64,14 +58,16 @@ export default function MushafPage() {
   const searchParams = useSearchParams();
   const { toggle: toggleBookmark, check: isBookmarked } = useBookmarks();
   const { setPageContext, setAyahContext } = useSheikh();
-  
+
   // Get preferences
   const prefs = useReadingPreferences();
-  
-  // Browse mode: show surah browser when no surah param
+
+  // Reading position persistence
+  const { position: savedPosition, loaded: positionLoaded, updateSurah: savePositionSurah, updateAyah: savePositionAyah } = useReadingPosition();
+
+  // Surah param from URL (e.g., /mushaf?surah=2)
   const surahParam = searchParams.get('surah');
-  const [browseMode, setBrowseMode] = useState(!surahParam);
-  
+
   // State - initialized from preferences
   const [currentSurah, setCurrentSurah] = useState<Surah | null>(null);
   const [surahNumber, setSurahNumber] = useState(surahParam ? parseInt(surahParam) : 1);
@@ -133,30 +129,46 @@ export default function MushafPage() {
     setPlaybackRate(prefs.playbackSpeed);
   }, [prefs]);
 
-  // Sync browseMode with URL param
+  // Restore reading position from localStorage on mount (if no URL param)
+  useEffect(() => {
+    if (!positionLoaded) return;
+    if (surahParam) {
+      setSurahNumber(parseInt(surahParam));
+    } else {
+      setSurahNumber(savedPosition.surah);
+      // Restore scroll position after render
+      if (savedPosition.scrollY > 0) {
+        requestAnimationFrame(() => {
+          window.scrollTo(0, savedPosition.scrollY);
+        });
+      }
+    }
+    // Only run once when position first loads
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [positionLoaded]);
+
+  // Sync with URL param changes
   useEffect(() => {
     if (surahParam) {
-      setBrowseMode(false);
       setSurahNumber(parseInt(surahParam));
     }
   }, [surahParam]);
 
   // Load surah
   useEffect(() => {
-    if (browseMode) return;
     setLoading(true);
     const surah = getSurah(surahNumber);
     setCurrentSurah(surah || null);
     setCurrentAyah(1);
     setLoading(false);
-  }, [surahNumber, browseMode]);
+  }, [surahNumber]);
 
-  // Select a surah from browse mode
-  const selectSurahFromBrowse = (num: number) => {
-    setSurahNumber(num);
-    setBrowseMode(false);
-    router.push(`/mushaf?surah=${num}`, { scroll: false });
-  };
+  // Save reading position when surah changes
+  useEffect(() => {
+    if (positionLoaded) {
+      savePositionSurah(surahNumber);
+    }
+  }, [surahNumber, positionLoaded, savePositionSurah]);
 
   // Set Sheikh context — tell the AI which page we're on and what ayah is selected
   useEffect(() => {
@@ -330,8 +342,6 @@ export default function MushafPage() {
     setRepeatCount(0);
   };
 
-  const allSurahs = getAllSurahs();
-
   return (
     <div className={`min-h-screen ${focusMode ? 'bg-black' : 'mushaf-glass-bg'}`} onClick={handleFocusTap}>
       {/* Audio Element */}
@@ -352,30 +362,11 @@ export default function MushafPage() {
         transition={{ duration: 0.25 }}
         className="sticky top-0 z-40 safe-area-top liquid-glass glass-noise rounded-b-2xl mx-2 mt-2"
       >
-        {browseMode ? (
-          /* ── Browse Mode Header ── */
-          <div className="px-3 py-3">
-            <div className="flex items-center gap-3">
-              <Link href="/" className="liquid-icon-btn">
-                <ChevronLeft className="w-5 h-5" />
-              </Link>
-              <div className="flex-1">
-                <h1 className="font-display text-xl text-night-100">Garden of Surahs</h1>
-                <p className="text-xs text-night-500">114 Surahs • 6,236 Ayahs</p>
-              </div>
-              <Link href="/bookmarks" className="liquid-icon-btn" aria-label="View bookmarks">
-                <Bookmark className="w-5 h-5" />
-              </Link>
-            </div>
-          </div>
-        ) : (
-          /* ── Reading Mode Header ── */
-          <>
             <div className="flex items-center justify-between px-3 py-3">
               <div className="flex items-center gap-1.5">
-                <button onClick={() => { setBrowseMode(true); router.push('/mushaf', { scroll: false }); }} className="liquid-icon-btn">
+                <Link href="/" className="liquid-icon-btn">
                   <ChevronLeft className="w-5 h-5" />
-                </button>
+                </Link>
                 <button onClick={() => setShowSurahList(true)} className="liquid-icon-btn">
                   <List className="w-5 h-5" />
                 </button>
@@ -436,8 +427,6 @@ export default function MushafPage() {
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
-          </>
-        )}
       </motion.header>
       )}
       </AnimatePresence>
@@ -453,16 +442,7 @@ export default function MushafPage() {
         </button>
       )}
 
-      {/* Main Content */}
-      {browseMode ? (
-        /* ── Surah Browser - Garden of Surahs ── */
-        <GardenOfSurahs 
-          onSelectSurah={selectSurahFromBrowse}
-          showHeader={false}
-        />
-      ) : (
-
-      /* ── Reading Mode ── */
+      {/* Main Content — always reading mode */}
       <main className="pb-56">
         {loading ? (
           <div className="flex items-center justify-center py-20">
@@ -609,7 +589,6 @@ export default function MushafPage() {
           </div>
         )}
       </main>
-      )}
 
       {/* Overflow Action Sheet (Task 1) */}
       <AnimatePresence>
@@ -675,7 +654,7 @@ export default function MushafPage() {
       </AnimatePresence>
 
       {/* Audio Player - Mini/Full with GPU-accelerated transitions */}
-      {!browseMode && (!focusMode || chromeVisible) && (
+      {(!focusMode || chromeVisible) && (
         <motion.div
           className="fixed left-2 right-2 z-40 liquid-glass-gold-premium rounded-2xl cursor-pointer"
           initial={false}
@@ -935,7 +914,7 @@ export default function MushafPage() {
         </motion.div>
       )}
 
-      {/* Surah List Sheet */}
+      {/* Surah List Sheet — with search via GardenOfSurahs */}
       <AnimatePresence>
         {showSurahList && (
           <motion.div
@@ -954,42 +933,22 @@ export default function MushafPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="sheet-handle" />
-              
+
               <div className="flex items-center justify-between px-4 py-3 border-b border-night-800/50">
                 <h2 className="font-semibold text-night-100">Select Surah</h2>
                 <button onClick={() => setShowSurahList(false)} className="btn-icon">
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              
-              <div className="overflow-y-auto max-h-[70vh] pb-safe">
-                {allSurahs.map((surah) => (
-                  <button
-                    key={surah.number}
-                    onClick={() => {
-                      setSurahNumber(surah.number);
-                      setShowSurahList(false);
-                    }}
-                    className={`w-full flex items-center gap-4 px-4 py-3 hover:bg-night-800/50 transition-colors ${
-                      surah.number === surahNumber ? 'bg-gold-500/10' : ''
-                    }`}
-                  >
-                    <span className={`w-10 h-10 flex items-center justify-center rounded-lg text-sm font-medium ${
-                      surah.number === surahNumber 
-                        ? 'bg-gold-500 text-night-950' 
-                        : 'bg-night-800 text-night-400'
-                    }`}>
-                      {surah.number}
-                    </span>
-                    <div className="flex-1 text-left">
-                      <p className="text-night-100">{surah.englishName}</p>
-                      <p className="text-xs text-night-500">
-                        {surah.englishNameTranslation} • {surah.numberOfAyahs} verses
-                      </p>
-                    </div>
-                    <p className="quran-text text-gold-400/80 text-lg">{surah.name}</p>
-                  </button>
-                ))}
+
+              <div className="overflow-y-auto max-h-[70vh]">
+                <GardenOfSurahs
+                  onSelectSurah={(id) => {
+                    setSurahNumber(id);
+                    setShowSurahList(false);
+                  }}
+                  showHeader={false}
+                />
               </div>
             </motion.div>
           </motion.div>
