@@ -30,6 +30,7 @@ import { srs, srsStateToDueRefs, type ReviewQuality } from '@/lib/spaced-repetit
 import { enrichSRSRefs } from '@/lib/ayah-service';
 import BottomNav from '@/components/BottomNav';
 import type { ReviewType, SessionResult, ReviewAyah } from '@/hooks/useSheikhReview';
+import { ALL_LESSONS, getLessonById } from '@/lib/lesson-content';
 
 // ─── Types ─────────────────────────────────────────────────────────
 
@@ -62,10 +63,17 @@ export default function PracticePage() {
   const [loadingReview, setLoadingReview] = useState(false);
 
   const [isCalibrated, setIsCalibrated] = useState(true);
+  const [completedLessons, setCompletedLessons] = useState<string[]>([]);
 
   // Load profile and SRS state
   useEffect(() => {
     setPageContext({ page: 'practice' });
+    
+    // Load completed lessons from localStorage
+    try {
+      const saved = localStorage.getItem('quranOasis_completedLessons');
+      if (saved) setCompletedLessons(JSON.parse(saved));
+    } catch {}
 
     async function init() {
       const calibrated = await isCalibrationComplete();
@@ -441,6 +449,31 @@ export default function PracticePage() {
 
             {/* Stats */}
             <section>
+              {/* Lesson Progress */}
+              {completedLessons.length > 0 && (
+                <div className="mb-6">
+                  <h2 className="text-xs font-semibold text-night-500 uppercase tracking-wider mb-3">Lesson Progress</h2>
+                  <Link href="/lessons" className="liquid-card p-4 block hover:bg-white/[0.04] transition-colors">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-night-100 font-medium text-sm">{completedLessons.length} of {ALL_LESSONS.length} lessons complete</span>
+                      <span className="text-gold-400 text-sm font-medium">{Math.round((completedLessons.length / ALL_LESSONS.length) * 100)}%</span>
+                    </div>
+                    <div className="w-full h-2 bg-night-800 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-gold-500 to-gold-400 rounded-full transition-all duration-500"
+                        style={{ width: `${(completedLessons.length / ALL_LESSONS.length) * 100}%` }}
+                      />
+                    </div>
+                    {(() => {
+                      const nextLesson = ALL_LESSONS.find(l => !completedLessons.includes(l.id));
+                      return nextLesson ? (
+                        <p className="text-xs text-night-500 mt-2">Next: <span className="text-night-300">{nextLesson.title}</span></p>
+                      ) : null;
+                    })()}
+                  </Link>
+                </div>
+              )}
+
               <h2 className="text-xs font-semibold text-night-500 uppercase tracking-wider mb-3">Your Progress</h2>
               <div className="grid grid-cols-2 gap-3">
                 <StatCard label="Total Ayahs" value={stats.totalAyahs} icon={BookOpen} iconColor="text-gold-400" />

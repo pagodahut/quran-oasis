@@ -23,6 +23,8 @@ interface WordByWordProps {
   audioRef: React.RefObject<HTMLAudioElement | null>;
   fontSize?: number;
   showWordTranslation?: boolean;
+  showTransliteration?: boolean;
+  showInlineTranslation?: boolean;
   onWordTap?: (wordIndex: number, word: WordData) => void;
 }
 
@@ -35,6 +37,8 @@ export default function WordByWord({
   audioRef,
   fontSize,
   showWordTranslation = false,
+  showTransliteration = false,
+  showInlineTranslation = false,
   onWordTap,
 }: WordByWordProps) {
   // Use preferences
@@ -242,9 +246,21 @@ export default function WordByWord({
                 </motion.div>
               )}
               
-              {/* Word translation tooltip */}
+              {/* Inline transliteration + translation (always visible when enabled) */}
+              {(showTransliteration || showInlineTranslation) && (
+                <div className="mt-1.5 text-center" style={{ direction: 'ltr' }}>
+                  {showTransliteration && word.transliteration && (
+                    <p className="text-[11px] text-gold-400/80 leading-tight">{word.transliteration}</p>
+                  )}
+                  {showInlineTranslation && word.translation && (
+                    <p className="text-[10px] text-night-500 leading-tight">{word.translation}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Word translation tooltip (hover fallback when inline is off) */}
               <AnimatePresence>
-                {showWordTranslation && isHovered && word.translation && (
+                {showWordTranslation && !showTransliteration && !showInlineTranslation && isHovered && word.translation && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}

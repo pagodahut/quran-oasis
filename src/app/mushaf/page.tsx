@@ -74,6 +74,8 @@ export default function MushafPage() {
   const [loading, setLoading] = useState(true);
   const [selectedReciter, setSelectedReciter] = useState(prefs.reciter);
   const [showTranslation, setShowTranslation] = useState(prefs.showTranslation);
+  const [showTransliteration, setShowTransliteration] = useState(false);
+  const [showWordTranslation, setShowWordTranslation] = useState(false);
   const [translationEdition, setTranslationEdition] = useState<'sahih' | 'asad'>(prefs.translation);
   const [fontSize, setFontSize] = useState(prefs.arabicFontSize);
   
@@ -505,6 +507,8 @@ export default function MushafPage() {
                           audioRef={audioRef}
                           fontSize={fontSize}
                           showWordTranslation={true}
+                          showTransliteration={showTransliteration}
+                          showInlineTranslation={showWordTranslation}
                         />
                       </div>
                     ) : (
@@ -1032,6 +1036,41 @@ export default function MushafPage() {
                     </select>
                   )}
                 </div>
+
+                {/* Word-by-Word Options (only in word-by-word mode) */}
+                {wordByWordMode && (
+                <div>
+                  <label className="text-sm text-night-400 mb-3 block">Word-by-Word Display</label>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-night-200">Transliteration</span>
+                      <button
+                        onClick={() => setShowTransliteration(!showTransliteration)}
+                        className={`w-12 h-6 rounded-full transition-colors ${
+                          showTransliteration ? 'bg-gold-500' : 'bg-night-700'
+                        }`}
+                      >
+                        <div className={`w-5 h-5 rounded-full bg-white transition-transform ${
+                          showTransliteration ? 'translate-x-6' : 'translate-x-0.5'
+                        }`} />
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-night-200">Word Translation</span>
+                      <button
+                        onClick={() => setShowWordTranslation(!showWordTranslation)}
+                        className={`w-12 h-6 rounded-full transition-colors ${
+                          showWordTranslation ? 'bg-gold-500' : 'bg-night-700'
+                        }`}
+                      >
+                        <div className={`w-5 h-5 rounded-full bg-white transition-transform ${
+                          showWordTranslation ? 'translate-x-6' : 'translate-x-0.5'
+                        }`} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                )}
 
                 {/* Font Size */}
                 <div>

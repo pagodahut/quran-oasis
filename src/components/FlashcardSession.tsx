@@ -66,10 +66,8 @@ export default function FlashcardSession({
           setCardState('answer');
         }
       } else if (cardState === 'answer') {
-        if (e.code === 'Digit1') handleGrade(1);
-        else if (e.code === 'Digit2') handleGrade(2);
-        else if (e.code === 'Digit3') handleGrade(3);
-        else if (e.code === 'Digit4') handleGrade(4);
+        if (e.code === 'Digit1' || e.code === 'ArrowLeft') handleGrade(1);
+        else if (e.code === 'Digit2' || e.code === 'ArrowRight') handleGrade(4);
       }
     };
     
@@ -305,55 +303,30 @@ export default function FlashcardSession({
             <span className="text-night-950/50 text-sm">(Space)</span>
           </motion.button>
         ) : (
-          <div className="space-y-3">
-            <p className="text-center text-night-400 text-sm mb-3">How well did you know this?</p>
-            
-            <div className="grid grid-cols-4 gap-2">
-              {/* Again */}
+          <div className="grid grid-cols-2 gap-3">
               <motion.button
                 onClick={() => handleGrade(1)}
                 whileTap={{ scale: 0.95 }}
-                className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-red-900/30 border border-red-700/30 hover:bg-red-900/50 transition-colors"
+                className="flex items-center justify-center gap-2 py-4 rounded-2xl bg-red-900/30 border border-red-700/30 hover:bg-red-900/50 transition-colors"
               >
-                <ThumbsDown className="w-5 h-5 text-red-400" />
-                <span className="text-red-400 text-xs font-medium">Again</span>
-                <span className="text-night-600 text-[10px]">1</span>
+                <X className="w-5 h-5 text-red-400" />
+                <span className="text-red-400 font-semibold">Missed It</span>
               </motion.button>
               
-              {/* Hard */}
               <motion.button
-                onClick={() => handleGrade(2)}
+                onClick={() => handleGrade(4)}
                 whileTap={{ scale: 0.95 }}
-                className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-orange-900/30 border border-orange-700/30 hover:bg-orange-900/50 transition-colors"
+                className="flex items-center justify-center gap-2 py-4 rounded-2xl font-semibold"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(201,162,39,0.9) 0%, rgba(180,140,30,1) 100%)',
+                  boxShadow: '0 8px 32px rgba(201,162,39,0.3)',
+                  color: '#0a0a0f',
+                }}
               >
-                <Brain className="w-5 h-5 text-orange-400" />
-                <span className="text-orange-400 text-xs font-medium">Hard</span>
-                <span className="text-night-600 text-[10px]">2</span>
-              </motion.button>
-              
-              {/* Good */}
-              <motion.button
-                onClick={() => handleGrade(3)}
-                whileTap={{ scale: 0.95 }}
-                className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-sage-900/30 border border-sage-700/30 hover:bg-sage-900/50 transition-colors"
-              >
-                <Check className="w-5 h-5 text-sage-400" />
-                <span className="text-sage-400 text-xs font-medium">Good</span>
-                <span className="text-night-600 text-[10px]">3</span>
-              </motion.button>
-              
-              {/* Easy */}
-              <motion.button
-                onClick={() => handleGrade(5)}
-                whileTap={{ scale: 0.95 }}
-                className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-gold-900/30 border border-gold-700/30 hover:bg-gold-900/50 transition-colors"
-              >
-                <Sparkles className="w-5 h-5 text-gold-400" />
-                <span className="text-gold-400 text-xs font-medium">Easy</span>
-                <span className="text-night-600 text-[10px]">4</span>
+                <Check className="w-5 h-5" />
+                <span>Got It</span>
               </motion.button>
             </div>
-          </div>
         )}
       </div>
     </div>
