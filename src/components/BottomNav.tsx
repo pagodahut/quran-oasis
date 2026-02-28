@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useLearningMode } from '@/hooks/useLearningMode';
 
@@ -72,28 +72,27 @@ function ProfileIcon({ className = "", strokeWidth = 2 }: { className?: string; 
 export default function BottomNav() {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollYRef = useRef(0);
   const { showLearn, showPractice, isLoaded } = useLearningMode();
 
   // Collapse nav on scroll down, expand on scroll up (iOS-style)
-  // Using useCallback for better performance
-  const handleScroll = useCallback(() => {
-    const currentScrollY = window.scrollY;
-    
-    // Add hysteresis to prevent flickering
-    if (currentScrollY > lastScrollY + 10 && currentScrollY > 100) {
-      setIsCollapsed(true);
-    } else if (currentScrollY < lastScrollY - 10) {
-      setIsCollapsed(false);
-    }
-    
-    setLastScrollY(currentScrollY);
-  }, [lastScrollY]);
-
   useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Add hysteresis to prevent flickering
+      if (currentScrollY > lastScrollYRef.current + 10 && currentScrollY > 100) {
+        setIsCollapsed(true);
+      } else if (currentScrollY < lastScrollYRef.current - 10) {
+        setIsCollapsed(false);
+      }
+
+      lastScrollYRef.current = currentScrollY;
+    };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [handleScroll]);
+  }, []);
 
   // Build nav items based on learning mode
   // Navigation Updates:

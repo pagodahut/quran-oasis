@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import logger from '@/lib/logger';
 
 /**
@@ -11,6 +12,15 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 export async function POST(request: NextRequest) {
   try {
+    // Authentication check - require signed-in user for expensive API calls
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
     if (!OPENAI_API_KEY) {
       return NextResponse.json(
         { error: 'Transcription service not configured' },

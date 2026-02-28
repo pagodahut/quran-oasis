@@ -616,7 +616,8 @@ export function getSurahProgressList(): Record<string, { name: string; progress:
   const surahProgress: Record<string, { name: string; progress: number }> = {};
   
   Object.entries(progress.verses).forEach(([key, verse]) => {
-    const surah = parseInt(key.split(':')[0]);
+    const surah = parseInt(key.split(':')[0], 10);
+    if (isNaN(surah)) return;
     if (!surahProgress[surah]) {
       surahProgress[surah] = {
         name: surahNames[surah] || `Surah ${surah}`,
