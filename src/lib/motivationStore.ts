@@ -330,9 +330,10 @@ export function updateDailyProgress(amount: number): { goalMet: boolean; percent
   }
   
   state.dailyGoal.todayProgress += amount;
-  
-  const percentage = Math.min(100, (state.dailyGoal.todayProgress / state.dailyGoal.target) * 100);
-  const goalMet = state.dailyGoal.todayProgress >= state.dailyGoal.target;
+
+  const target = state.dailyGoal.target || 1;
+  const percentage = Math.min(100, (state.dailyGoal.todayProgress / target) * 100);
+  const goalMet = state.dailyGoal.todayProgress >= target;
   
   saveMotivationState(state);
   
@@ -354,14 +355,15 @@ export function getDailyGoalStatus() {
     };
   }
   
-  const percentage = Math.min(100, (state.dailyGoal.todayProgress / state.dailyGoal.target) * 100);
-  
+  const target = state.dailyGoal.target || 1;
+  const percentage = Math.min(100, (state.dailyGoal.todayProgress / target) * 100);
+
   return {
     type: state.dailyGoal.type,
     target: state.dailyGoal.target,
     progress: state.dailyGoal.todayProgress,
     percentage,
-    goalMet: state.dailyGoal.todayProgress >= state.dailyGoal.target,
+    goalMet: state.dailyGoal.todayProgress >= target,
   };
 }
 
@@ -537,7 +539,8 @@ export function getSurahProgressList(): SurahProgressItem[] {
         Object.entries(parsed.verses || {}).forEach(([key, value]) => {
           const v = value as { status: string; lastReview?: string };
           if (v.status === 'memorized' || v.status === 'reviewing' || v.status === 'learning') {
-            const surah = parseInt(key.split(':')[0]);
+            const surah = parseInt(key.split(':')[0], 10);
+            if (isNaN(surah)) return;
             const current = memorizedVerses.get(surah) || { count: 0, startedAt: null };
             current.count++;
             if (!current.startedAt && v.lastReview) {

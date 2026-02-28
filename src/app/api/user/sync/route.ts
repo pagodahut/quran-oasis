@@ -156,8 +156,12 @@ export async function POST(request: NextRequest) {
     // Sync progress (verses)
     if (progress?.verses) {
       for (const [key, verse] of Object.entries(progress.verses) as [string, SyncVerse][]) {
-        const [surah, ayah] = key.split(':').map(Number);
-        
+        const parts = key.split(':');
+        const surah = Number(parts[0]);
+        const ayah = Number(parts[1]);
+
+        if (!surah || !ayah || isNaN(surah) || isNaN(ayah)) continue;
+
         await prisma.memorizationProgress.upsert({
           where: {
             userId_surahNumber_ayahNumber: {

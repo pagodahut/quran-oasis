@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from "@clerk/nextjs/server";
+import logger from "@/lib/logger";
 
 /**
  * Tajweed Analysis API Route
@@ -31,6 +33,15 @@ interface TajweedAnalysis {
 
 export async function POST(request: NextRequest) {
   try {
+    // Authentication check - require signed-in user for expensive AI calls
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
     // Check for API key
     if (!ANTHROPIC_API_KEY) {
       return NextResponse.json(
