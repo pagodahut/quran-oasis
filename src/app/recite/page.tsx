@@ -452,6 +452,16 @@ function RecitePageInner() {
     [selectingSurah]
   );
 
+  const handleOriginBack = useCallback(() => {
+    const fromOrigin = searchParams.get('from');
+    const originSurah = searchParams.get('surah');
+    if (fromOrigin === 'mushaf') {
+      router.push(originSurah ? `/mushaf?surah=${originSurah}` : '/mushaf');
+    } else {
+      router.push('/practice');
+    }
+  }, [searchParams, router]);
+
   const handleBack = useCallback(() => {
     const from = searchParams.get('from');
     const surahParam = searchParams.get('surah');
@@ -508,17 +518,6 @@ function RecitePageInner() {
 
   // ============ Surah Selection ============
 
-  const fromOrigin = searchParams.get('from');
-  const originSurah = searchParams.get('surah');
-
-  const handleOriginBack = useCallback(() => {
-    if (fromOrigin === 'mushaf') {
-      router.push(originSurah ? `/mushaf?surah=${originSurah}` : '/mushaf');
-    } else {
-      router.push('/practice');
-    }
-  }, [fromOrigin, originSurah, router]);
-
   return (
     <div className="min-h-screen pb-32">
       {/* Header — amber/gold theme to differentiate from recitation experience */}
@@ -534,7 +533,7 @@ function RecitePageInner() {
             <button
               onClick={handleOriginBack}
               className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors hover:bg-white/10 active:bg-white/15 flex-shrink-0"
-              title={fromOrigin === 'mushaf' ? 'Back to Mushaf' : 'Back to Practice'}
+              title={searchParams.get('from') === 'mushaf' ? 'Back to Mushaf' : 'Back to Practice'}
             >
               <ChevronLeft className="w-5 h-5 text-amber-300" />
             </button>
