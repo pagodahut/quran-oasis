@@ -376,13 +376,77 @@ export async function playVocabulary(
     onError?: (error: string) => void;
   } = {}
 ): Promise<boolean> {
+  // Try static map first (instant)
   const audioUrl = getVocabularyAudioUrl(word);
-  
-  if (!audioUrl) {
-    return false;
+  if (audioUrl) {
+    return playVocabularyAudio(audioUrl, options);
   }
   
-  return playVocabularyAudio(audioUrl, options);
+  // Async fallback: search Quran.com for the word and use matching audio
+  const foundUrl = await searchWordAudio(word);
+  if (foundUrl) {
+    return playVocabularyAudio(foundUrl, options);
+  }
+  
+  return false;
+}
+
+/**
+ * Search Quran.com API for a word and return its audio URL.
+ * Caches results so repeat lookups are instant.
+ */
+async function searchWordAudio(word: string): Promise<string | null> {
+  const normalized = normalizeArabic(word);
+  
+  // Check cache
+  const cached = wordCache.get(normalized);
+  if (cached) return cached.audioUrl;
+  
+  // Skip Names of Allah that aren't in our verified map
+  for (const name of NAMES_OF_ALLAH_TEXTS) {
+    if (normalizeArabic(name) === normalized) return null;
+  }
+  
+  try {
+    // Search for the word in the Quran
+    const res = await fetch(
+      `${QURAN_API_BASE}/search?q=${encodeURIComponent(word)}&size=1&language=en`
+    );
+    if (!res.ok) return null;
+    
+    const data = await res.json();
+    const result = data?.search?.results?.[0];
+    if (!result?.verse_key) return null;
+    
+    const [surah, ayah] = result.verse_key.split(':').map(Number);
+    
+    // Fetch the words for that verse
+    const words = await fetchVerseWords(surah, ayah);
+    
+    // Find the best matching word
+    for (const w of words) {
+      if (normalizeArabic(w.text) === normalized || normalizeArabic(w.textUthmani) === normalized) {
+        const audioFullUrl = w.audioUrl.startsWith('http') ? w.audioUrl : `${AUDIO_CDN_BASE}/${w.audioUrl}`;
+        wordCache.set(normalized, { word, audioUrl: audioFullUrl, surah, ayah, position: w.position });
+        return audioFullUrl;
+      }
+    }
+    
+    // Looser matching: strip diacritics from both sides
+    const strippedTarget = word.replace(/[\u064B-\u0652\u0670\u0671]/g, '');
+    for (const w of words) {
+      const strippedWord = w.text.replace(/[\u064B-\u0652\u0670\u0671]/g, '');
+      if (strippedWord === strippedTarget) {
+        const audioFullUrl = w.audioUrl.startsWith('http') ? w.audioUrl : `${AUDIO_CDN_BASE}/${w.audioUrl}`;
+        wordCache.set(normalized, { word, audioUrl: audioFullUrl, surah, ayah, position: w.position });
+        return audioFullUrl;
+      }
+    }
+  } catch (err) {
+    console.warn('[VocabAudio] Search fallback failed for:', word, err);
+  }
+  
+  return null;
 }
 
 /**
