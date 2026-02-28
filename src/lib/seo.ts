@@ -32,7 +32,7 @@ export const organizationSchema = {
   '@type': 'Organization',
   name: SITE_NAME,
   url: SITE_URL,
-  logo: `${SITE_URL}/icon.svg`,
+  logo: `${SITE_URL}/hifz-logo.png`,
   description: defaultMeta.description,
   sameAs: [],
 };

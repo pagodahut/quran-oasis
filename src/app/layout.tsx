@@ -176,7 +176,7 @@ export default function RootLayout({
         
         {/* Favicon */}
         <link rel="icon" href="/favicon.png" type="image/png" />
-        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/hifz-logo.png" type="image/png" sizes="668x669" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         
         {/* Preconnect to external resources */}

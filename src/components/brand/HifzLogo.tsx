@@ -12,69 +12,21 @@ interface LogoProps {
 }
 
 /**
- * HIFZ Logo - New SVG logo with gold background and white calligraphic design
- * viewBox: 0 0 1952 2176
+ * HIFZ Logo - Gold crescent + open book emblem on transparent background
+ * Source: Artboard 1.svg (668x669 raster PNG with alpha)
  */
 
-// SVG-file based logo (uses the full detailed SVG)
+// PNG-based logo with transparent background — works in both light and dark modes
 function HifzLogoImage({ size = 40, className = '' }: { size?: number; className?: string }) {
   return (
     <Image
-      src="/hifz-logo.svg"
+      src="/hifz-logo.png"
       alt="HIFZ"
       width={size}
-      height={Math.round(size * (2176 / 1952))}
-      className={`rounded-lg ${className}`}
+      height={size}
+      className={className}
       priority
     />
-  );
-}
-
-// Simplified inline SVG for small contexts - gold rounded rect with stylized "H" calligraphy
-function HifzLogoInline({ size = 40, className = '' }: { size?: number; className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 100 112"
-      width={size}
-      height={Math.round(size * 1.12)}
-      className={`rounded-lg ${className}`}
-      aria-label="HIFZ"
-    >
-      <rect width="100" height="112" rx="12" fill="#C9A340" />
-      {/* Simplified calligraphic paths representing the logo shape */}
-      <path
-        d="M50 15 C65 15 78 25 78 40 C78 50 72 58 63 62 L63 85 C63 90 58 95 50 95 C42 95 37 90 37 85 L37 62 C28 58 22 50 22 40 C22 25 35 15 50 15Z"
-        fill="none"
-        stroke="white"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-      <path
-        d="M35 45 Q50 55 65 45"
-        fill="none"
-        stroke="white"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      />
-      <path
-        d="M30 70 L50 82 L70 70"
-        fill="none"
-        stroke="white"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M33 80 L50 92 L67 80"
-        fill="none"
-        stroke="white"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        opacity="0.7"
-      />
-    </svg>
   );
 }
 
@@ -92,12 +44,12 @@ export function HifzIcon({ size = 40, className = '', animated = true }: LogoPro
         transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
       })}
     >
-      <HifzLogoImage size={size} />
+      <HifzLogoImage size={size} className="drop-shadow-sm" />
     </Container>
   );
 }
 
-// Simple icon for small contexts (nav, tabs) — uses the actual brand SVG
+// Simple icon for small contexts (nav, tabs)
 export function HifzIconSimple({
   size = 24,
   className = '',
