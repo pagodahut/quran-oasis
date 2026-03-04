@@ -47,7 +47,7 @@ interface PreLessonBriefingProps {
   /** Lesson title for display */
   lessonTitle: string;
   /** Ayahs the student will study */
-  ayahs: AyahInfo[];
+  ayahs?: AyahInfo[];
   /** User's learning level */
   userLevel: 'beginner' | 'intermediate' | 'advanced';
   /** Whether this is a review lesson */
@@ -77,13 +77,13 @@ export default function PreLessonBriefing({
   const [dismissed, setDismissed] = useState(false);
   const [animateIn, setAnimateIn] = useState(false);
 
+  const safeAyahs = ayahs ?? [];
+
   // Generate briefing on mount
   useEffect(() => {
-    if (ayahs.length === 0) return;
-
     const ctx: BriefingContext = {
       lessonTitle,
-      ayahs,
+      ayahs: safeAyahs,
       userLevel,
       isReview,
     };
@@ -123,7 +123,7 @@ export default function PreLessonBriefing({
   };
 
   const handleLearnMore = () => {
-    const question = briefing
+    const question = briefing && safeAyahs.length > 0
       ? `Tell me more about ${lessonTitle} — what makes these ayahs special?`
       : `What should I know about ${lessonTitle} before I start?`;
     openSheikh(question);
