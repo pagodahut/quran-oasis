@@ -24,6 +24,8 @@ import {
 } from 'lucide-react';
 import { MosqueIcon, BookReadIcon, TreeIcon, TargetIcon, CalendarIcon, StarIcon as IslamicStarIcon, CrescentIcon, CrownIcon } from '@/components/icons';
 import SheikhReviewSession from '@/components/SheikhReviewSession';
+import GlassPanel from '@/components/ui/GlassPanel';
+import LiquidButton from '@/components/ui/LiquidButton';
 import { useSheikh } from '@/contexts/SheikhContext';
 import { loadUserProfile, isCalibrationComplete } from '@/lib/user-profile-sync';
 import { srs, srsStateToDueRefs, type ReviewQuality } from '@/lib/spaced-repetition';
@@ -211,14 +213,14 @@ export default function PracticePage() {
 
         <main className="px-4 py-6 pb-32 max-w-lg mx-auto space-y-6">
           {/* Sheikh message */}
-          <div className="liquid-card p-4 flex gap-3">
+          <GlassPanel className="p-4 flex gap-3">
             <div className="w-10 h-10 rounded-xl bg-gold-500/10 flex items-center justify-center flex-shrink-0">
               <BookMarked className="w-5 h-5 text-gold-400" />
             </div>
             <p className="text-night-300 text-sm leading-relaxed">
               Which ayahs are you working on? I&apos;ll schedule them into your daily review cycle.
             </p>
-          </div>
+          </GlassPanel>
 
           {/* Form */}
           <div className="space-y-4">
@@ -260,14 +262,16 @@ export default function PracticePage() {
               </div>
             </div>
 
-            <button
+            <LiquidButton
+              variant="primary"
+              size="lg"
               onClick={handleAddAyahs}
               disabled={!addSurah || !addStart}
-              className="w-full liquid-btn py-3.5 text-base disabled:opacity-40 disabled:cursor-not-allowed"
+              icon={<Plus className="w-5 h-5" />}
+              className="w-full"
             >
-              <Plus className="w-5 h-5 mr-2" />
               Add to Review Queue
-            </button>
+            </LiquidButton>
           </div>
 
           {/* Quick Add Presets */}
@@ -364,24 +368,16 @@ export default function PracticePage() {
                   )}
                 </div>
 
-                <motion.button
-                  whileTap={{ scale: 0.98 }}
+                <LiquidButton
+                  variant="primary"
+                  size="lg"
                   onClick={startReview}
                   disabled={loadingReview}
-                  className="w-full mt-4 liquid-btn py-3.5 text-base disabled:opacity-50"
+                  icon={loadingReview ? <div className="w-4 h-4 border-2 border-night-950 border-t-transparent rounded-full animate-spin" /> : <BookOpen className="w-5 h-5" />}
+                  className="w-full mt-4"
                 >
-                  {loadingReview ? (
-                    <span className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-night-950 border-t-transparent rounded-full animate-spin" />
-                      Loading...
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-2">
-                      <BookOpen className="w-5 h-5" />
-                      Start Review Session ({dueCount.total} ayahs)
-                    </span>
-                  )}
-                </motion.button>
+                  {loadingReview ? 'Loading...' : `Start Review Session (${dueCount.total} ayahs)`}
+                </LiquidButton>
               </section>
             )}
 
@@ -389,60 +385,56 @@ export default function PracticePage() {
             <section>
               <h2 className="text-xs font-semibold text-night-500 uppercase tracking-wider mb-3">Practice Tools</h2>
               <div className="space-y-2">
-                <Link
-                  href="/recite"
-                  className="liquid-card p-4 flex items-center gap-3 hover:bg-white/[0.04] transition-colors"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                    <Mic className="w-5 h-5 text-emerald-400" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-night-100 font-medium">Live Recitation</p>
-                    <p className="text-xs text-night-500">Real-time word tracking and tajweed feedback</p>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-night-600" />
+                <Link href="/recite">
+                  <GlassPanel className="p-4 flex items-center gap-3 hover:bg-white/[0.04] transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                      <Mic className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-night-100 font-medium">Live Recitation</p>
+                      <p className="text-xs text-night-500">Real-time word tracking and tajweed feedback</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-night-600" />
+                  </GlassPanel>
                 </Link>
 
-                <Link
-                  href="/practice/flashcards"
-                  className="liquid-card p-4 flex items-center gap-3 hover:bg-white/[0.04] transition-colors"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-amber-400" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-night-100 font-medium">Flashcards</p>
-                    <p className="text-xs text-night-500">Test your recall with spaced repetition cards</p>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-night-600" />
+                <Link href="/practice/flashcards">
+                  <GlassPanel className="p-4 flex items-center gap-3 hover:bg-white/[0.04] transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                      <Sparkles className="w-5 h-5 text-amber-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-night-100 font-medium">Flashcards</p>
+                      <p className="text-xs text-night-500">Test your recall with spaced repetition cards</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-night-600" />
+                  </GlassPanel>
                 </Link>
 
-                <Link
-                  href="/practice/review"
-                  className="liquid-card p-4 flex items-center gap-3 hover:bg-white/[0.04] transition-colors"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                    <Brain className="w-5 h-5 text-purple-400" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-night-100 font-medium">Smart Review</p>
-                    <p className="text-xs text-night-500">AI-prioritized verses based on difficulty</p>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-night-600" />
+                <Link href="/practice/review">
+                  <GlassPanel className="p-4 flex items-center gap-3 hover:bg-white/[0.04] transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                      <Brain className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-night-100 font-medium">Smart Review</p>
+                      <p className="text-xs text-night-500">AI-prioritized verses based on difficulty</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-night-600" />
+                  </GlassPanel>
                 </Link>
 
-                <Link
-                  href="/lessons"
-                  className="liquid-card p-4 flex items-center gap-3 hover:bg-white/[0.04] transition-colors"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-teal-500/10 flex items-center justify-center">
-                    <BookOpen className="w-5 h-5 text-teal-400" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-night-100 font-medium">Lessons</p>
-                    <p className="text-xs text-night-500">Structured learning with guided instruction</p>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-night-600" />
+                <Link href="/lessons">
+                  <GlassPanel className="p-4 flex items-center gap-3 hover:bg-white/[0.04] transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-teal-500/10 flex items-center justify-center">
+                      <BookOpen className="w-5 h-5 text-teal-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-night-100 font-medium">Lessons</p>
+                      <p className="text-xs text-night-500">Structured learning with guided instruction</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-night-600" />
+                  </GlassPanel>
                 </Link>
               </div>
             </section>
@@ -453,7 +445,8 @@ export default function PracticePage() {
               {completedLessons.length > 0 && (
                 <div className="mb-6">
                   <h2 className="text-xs font-semibold text-night-500 uppercase tracking-wider mb-3">Lesson Progress</h2>
-                  <Link href="/lessons" className="liquid-card p-4 block hover:bg-white/[0.04] transition-colors">
+                  <Link href="/lessons" className="block">
+                  <GlassPanel className="p-4 hover:bg-white/[0.04] transition-colors">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-night-100 font-medium text-sm">{completedLessons.length} of {ALL_LESSONS.length} lessons complete</span>
                       <span className="text-gold-400 text-sm font-medium">{Math.round((completedLessons.length / ALL_LESSONS.length) * 100)}%</span>
@@ -470,6 +463,7 @@ export default function PracticePage() {
                         <p className="text-xs text-night-500 mt-2">Next: <span className="text-night-300">{nextLesson.title}</span></p>
                       ) : null;
                     })()}
+                  </GlassPanel>
                   </Link>
                 </div>
               )}
@@ -485,18 +479,19 @@ export default function PracticePage() {
 
             {/* Add More */}
             {stats.totalAyahs > 0 && (
-              <button
+              <LiquidButton
+                variant="secondary"
                 onClick={() => setView('add-ayahs')}
-                className="w-full liquid-card p-4 flex items-center justify-center gap-2 text-gold-400 hover:bg-gold-500/5 transition-colors"
+                icon={<Plus className="w-5 h-5" />}
+                className="w-full"
               >
-                <Plus className="w-5 h-5" />
-                <span className="font-medium">Add Ayahs to Memorize</span>
-              </button>
+                Add Ayahs to Memorize
+              </LiquidButton>
             )}
 
             {/* Sheikh Nudge */}
             {dueCount.total === 0 && stats.totalAyahs > 0 && (
-              <div className="liquid-card p-4 flex gap-3">
+              <GlassPanel tint="gold" className="p-4 flex gap-3">
                 <div className="w-10 h-10 rounded-xl bg-gold-500/10 flex items-center justify-center flex-shrink-0">
                   <Star className="w-5 h-5 text-gold-400" />
                 </div>
@@ -504,7 +499,7 @@ export default function PracticePage() {
                   Masha&apos;Allah, you&apos;re all caught up! Consider adding new ayahs
                   or reviewing your manzil for extra retention.
                 </p>
-              </div>
+              </GlassPanel>
             )}
 
             {/* Empty State — Quick Start */}
@@ -522,18 +517,17 @@ export default function PracticePage() {
                 </div>
 
                 {/* Quick Start Review */}
-                <Link
-                  href="/practice/review"
-                  className="liquid-card p-4 flex items-center gap-3 bg-gold-500/5 border-gold-500/20 hover:bg-gold-500/10 transition-colors"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-gold-500/10 flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-gold-400" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-night-100 font-medium">Try a Quick Review</p>
-                    <p className="text-xs text-night-500">Experience a sample review session</p>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-gold-500" />
+                <Link href="/practice/review">
+                  <GlassPanel tint="gold" glow className="p-4 flex items-center gap-3 hover:bg-gold-500/10 transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-gold-500/10 flex items-center justify-center">
+                      <Sparkles className="w-5 h-5 text-gold-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-night-100 font-medium">Try a Quick Review</p>
+                      <p className="text-xs text-night-500">Experience a sample review session</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-gold-500" />
+                  </GlassPanel>
                 </Link>
 
                 {/* Popular Starting Points */}
@@ -595,13 +589,14 @@ export default function PracticePage() {
                 </section>
 
                 {/* Secondary: manual add */}
-                <button
+                <LiquidButton
+                  variant="ghost"
                   onClick={() => setView('add-ayahs')}
-                  className="w-full liquid-card p-4 flex items-center justify-center gap-2 text-night-400 hover:text-gold-400 hover:bg-gold-500/5 transition-colors"
+                  icon={<Plus className="w-4 h-4" />}
+                  className="w-full"
                 >
-                  <Plus className="w-4 h-4" />
-                  <span className="text-sm font-medium">Add specific ayahs manually</span>
-                </button>
+                  Add specific ayahs manually
+                </LiquidButton>
               </div>
             )}
           </>
@@ -619,11 +614,7 @@ function ReviewCard({ emoji, icon: Icon, label, description, count, accent, acce
   emoji: string; icon: React.ElementType; label: string; description: string; count: number; accent: string; accentBg: string;
 }) {
   return (
-    <motion.div
-      whileHover={{ scale: 1.01 }}
-      whileTap={{ scale: 0.98 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-      className="liquid-card p-4 flex items-center justify-between cursor-default">
+    <GlassPanel className="p-4 flex items-center justify-between cursor-default">
       <div className="flex items-center gap-3">
         <div className={`w-10 h-10 rounded-xl ${accentBg} flex items-center justify-center`}>
           <Icon className={`w-5 h-5 ${accent}`} />
@@ -637,17 +628,17 @@ function ReviewCard({ emoji, icon: Icon, label, description, count, accent, acce
         <span className={`text-xl font-bold ${accent}`}>{count}</span>
         <p className="text-[10px] text-night-600 uppercase tracking-wider">due</p>
       </div>
-    </motion.div>
+    </GlassPanel>
   );
 }
 
 function StatCard({ label, value, icon: Icon, iconColor }: { label: string; value: string | number; icon: React.ElementType; iconColor: string }) {
   return (
-    <div className="liquid-card p-4 flex flex-col items-center gap-1.5 text-center">
+    <GlassPanel className="p-4 flex flex-col items-center gap-1.5 text-center">
       <Icon className={`w-5 h-5 ${iconColor}`} />
       <span className="text-lg font-bold text-gold-400">{value}</span>
       <span className="text-[10px] text-night-500 uppercase tracking-wider">{label}</span>
-    </div>
+    </GlassPanel>
   );
 }
 
