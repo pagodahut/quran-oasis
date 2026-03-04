@@ -61,6 +61,9 @@ import { useLearningMode } from '@/hooks/useLearningMode';
 import { LearningMode, LEARNING_MODE_OPTIONS } from '@/lib/learningMode';
 import { useAppTheme, THEME_LIST, type ThemeId } from '@/contexts/ThemeContext';
 import { OfflineModelLoader } from '@/components/OfflineModelLoader';
+import GlassPanel from '@/components/ui/GlassPanel';
+import LiquidToggle from '@/components/ui/LiquidToggle';
+import LiquidButton from '@/components/ui/LiquidButton';
 
 // ============================================
 // Components
@@ -185,40 +188,21 @@ function ReciterOption({
   );
 }
 
-function ToggleSwitch({ 
-  enabled, 
+function ToggleSwitch({
+  enabled,
   onToggle,
-  label 
-}: { 
+  label
+}: {
   enabled: boolean;
   onToggle: () => void;
   label: string;
 }) {
   return (
-    <button
-      onClick={onToggle}
-      className={`relative w-14 h-8 rounded-full transition-all duration-300 ease-in-out focus-visible-ring ${
-        enabled 
-          ? 'bg-gold-500/80 shadow-[0_0_12px_rgba(201,162,39,0.3)]' 
-          : 'bg-white/10 backdrop-blur-md border border-white/10'
-      }`}
-      role="switch"
-      aria-checked={enabled}
-      aria-label={label}
-    >
-      <motion.div
-        layout
-        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-        className={`absolute top-1 w-6 h-6 rounded-full shadow-md ${
-          enabled 
-            ? 'left-7 bg-white' 
-            : 'left-1 bg-night-300'
-        }`}
-        style={{
-          backdropFilter: enabled ? undefined : 'blur(4px)',
-        }}
-      />
-    </button>
+    <LiquidToggle
+      checked={enabled}
+      onChange={() => onToggle()}
+      label={label}
+    />
   );
 }
 
@@ -232,13 +216,13 @@ function SettingRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center justify-between p-4 rounded-xl bg-night-800/50">
+    <GlassPanel blur="sm" tint="neutral" noise={false} className="flex items-center justify-between p-4">
       <div className="flex-1 mr-4">
         <p className="text-night-100">{label}</p>
         {description && <p className="text-xs text-night-500 mt-0.5">{description}</p>}
       </div>
       {children}
-    </div>
+    </GlassPanel>
   );
 }
 
@@ -1149,13 +1133,13 @@ Additional Notes:
               <p className="text-xs text-night-500">Return settings to defaults (keeps progress)</p>
             </div>
           </div>
-          <button
+          <LiquidButton
+            variant="secondary"
             onClick={() => setShowResetConfirm(true)}
-            className="w-full p-4 rounded-xl bg-red-500/10 border border-red-500/20 
-                      text-red-400 hover:bg-red-500/20 transition-colors"
+            className="w-full !bg-red-500/10 !border-red-500/20 text-red-400 hover:!bg-red-500/20"
           >
             Reset All Settings
-          </button>
+          </LiquidButton>
         </div>
 
         <div className="liquid-divider" />
@@ -1166,12 +1150,12 @@ Additional Notes:
             <Moon className="w-5 h-5 text-gold-400" />
             About <span className="tracking-wider">HIFZ</span>
           </h2>
-          <div className="liquid-card p-4 space-y-4">
+          <GlassPanel tint="neutral" className="p-4 space-y-4">
             <p className="text-night-400 text-sm leading-relaxed">
-              <span className="text-gold-400 font-semibold tracking-wider">HIFZ</span> is a free, open-source Quran memorization app built with love for the Ummah. 
+              <span className="text-gold-400 font-semibold tracking-wider">HIFZ</span> is a free, open-source Quran memorization app built with love for the Ummah.
               It combines traditional Tahfiz methods with modern technology to help you on your journey to becoming a Hafiz.
             </p>
-            
+
             <div className="flex items-center justify-center gap-2 text-night-500 text-sm">
               Made with <Heart className="w-4 h-4 text-rose-500 fill-rose-500" /> for the Ummah
             </div>
@@ -1187,7 +1171,7 @@ Additional Notes:
                 <span className="text-night-400">Text:</span> Tanzil.net
               </p>
             </div>
-          </div>
+          </GlassPanel>
         </div>
       </main>
 
@@ -1222,18 +1206,20 @@ Additional Notes:
                   This will reset all your preferences to their default values. Your bookmarks and progress will not be affected.
                 </p>
                 <div className="flex gap-3">
-                  <button
+                  <LiquidButton
+                    variant="secondary"
                     onClick={() => setShowResetConfirm(false)}
-                    className="flex-1 py-3 rounded-xl bg-night-800 text-night-200 hover:bg-night-700 transition-colors"
+                    className="flex-1"
                   >
                     Cancel
-                  </button>
-                  <button
+                  </LiquidButton>
+                  <LiquidButton
+                    variant="primary"
                     onClick={handleReset}
-                    className="flex-1 py-3 rounded-xl bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors"
+                    className="flex-1 !bg-amber-500/80"
                   >
                     Reset
-                  </button>
+                  </LiquidButton>
                 </div>
               </div>
             </motion.div>
@@ -1281,18 +1267,20 @@ Additional Notes:
                   This action cannot be undone!
                 </p>
                 <div className="flex gap-3">
-                  <button
+                  <LiquidButton
+                    variant="secondary"
                     onClick={() => setShowClearDataConfirm(false)}
-                    className="flex-1 py-3 rounded-xl bg-night-800 text-night-200 hover:bg-night-700 transition-colors"
+                    className="flex-1"
                   >
                     Cancel
-                  </button>
-                  <button
+                  </LiquidButton>
+                  <LiquidButton
+                    variant="primary"
                     onClick={handleClearData}
-                    className="flex-1 py-3 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
+                    className="flex-1 !bg-red-500/80"
                   >
                     Clear All
-                  </button>
+                  </LiquidButton>
                 </div>
               </div>
             </motion.div>

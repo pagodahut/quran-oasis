@@ -30,6 +30,8 @@ import {
   saveFlashcardProgress,
 } from '@/lib/flashcardSystem';
 import { playArabic } from '@/lib/audioService';
+import GlassPanel from '@/components/ui/GlassPanel';
+import LiquidButton from '@/components/ui/LiquidButton';
 
 interface FlashcardSessionProps {
   cards: Flashcard[];
@@ -130,15 +132,16 @@ export default function FlashcardSession({
     <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-40 safe-area-top px-4 pt-1">
-        <div className="liquid-glass rounded-2xl p-3">
+        <GlassPanel className="p-3">
           <div className="flex items-center justify-between mb-3">
-            <button
+            <LiquidButton
+              variant="icon"
+              size="sm"
               onClick={onExit}
-              className="liquid-icon-btn"
               aria-label="Exit"
             >
               <X className="w-5 h-5" />
-            </button>
+            </LiquidButton>
             
             <div className="text-center">
               <h1 className="font-semibold text-night-100 text-sm">{deckName}</h1>
@@ -149,7 +152,7 @@ export default function FlashcardSession({
             
             <div className="w-10" />
           </div>
-          
+
           {/* Progress bar */}
           <div className="h-1.5 bg-night-800 rounded-full overflow-hidden">
             <motion.div
@@ -159,7 +162,7 @@ export default function FlashcardSession({
               transition={{ duration: 0.3 }}
             />
           </div>
-        </div>
+        </GlassPanel>
       </header>
       
       {/* Card Area */}
@@ -174,28 +177,23 @@ export default function FlashcardSession({
             className="w-full max-w-md"
           >
             {/* Main Card */}
-            <div
-              className="relative rounded-3xl p-8 min-h-[400px] flex flex-col"
-              style={{
-                background: 'linear-gradient(135deg, rgba(201,162,39,0.08) 0%, rgba(201,162,39,0.02) 100%)',
-                border: '1px solid rgba(201,162,39,0.2)',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05)',
-              }}
-            >
+            <GlassPanel tint="gold" glow rounded="rounded-3xl" className="relative p-8 min-h-[400px] flex flex-col">
               {/* Category badge */}
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xs text-gold-400/70 uppercase tracking-wider font-medium">
                   {currentCard.category}
                 </span>
-                <button
+                <LiquidButton
+                  variant="icon"
+                  size="sm"
                   onClick={playAudio}
                   disabled={isPlaying || !audioAvailable}
-                  className={`liquid-icon-btn !w-10 !h-10 !bg-transparent !border-transparent !backdrop-blur-none ${!audioAvailable ? 'opacity-30 cursor-not-allowed' : ''}`}
                   aria-label={audioAvailable ? 'Play audio' : 'Audio not available'}
                   title={audioAvailable ? 'Play audio' : 'Audio not available'}
+                  className={!audioAvailable ? 'opacity-30' : ''}
                 >
                   <Volume2 className={`w-5 h-5 ${isPlaying ? 'text-gold-400 animate-pulse' : !audioAvailable ? 'text-night-600' : 'text-night-400'}`} />
-                </button>
+                </LiquidButton>
               </div>
               
               {/* Arabic (always shown) */}
@@ -279,53 +277,43 @@ export default function FlashcardSession({
                   />
                 ))}
               </div>
-            </div>
+            </GlassPanel>
           </motion.div>
         </AnimatePresence>
       </main>
-      
+
       {/* Bottom Controls */}
       <div className="fixed bottom-0 left-0 right-0 p-6 pb-8 safe-area-bottom">
         {cardState === 'question' ? (
-          <motion.button
+          <LiquidButton
+            variant="primary"
+            size="lg"
             onClick={handleReveal}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full py-4 rounded-2xl font-semibold text-lg flex items-center justify-center gap-3"
-            style={{
-              background: 'linear-gradient(135deg, rgba(201,162,39,0.9) 0%, rgba(180,140,30,1) 100%)',
-              boxShadow: '0 8px 32px rgba(201,162,39,0.3)',
-              color: '#0a0a0f',
-            }}
+            icon={<Eye className="w-5 h-5" />}
+            className="w-full"
           >
-            <Eye className="w-5 h-5" />
-            Show Answer
-            <span className="text-night-950/50 text-sm">(Space)</span>
-          </motion.button>
+            Show Answer <span className="text-night-950/50 text-sm ml-1">(Space)</span>
+          </LiquidButton>
         ) : (
           <div className="grid grid-cols-2 gap-3">
-              <motion.button
+              <LiquidButton
+                variant="secondary"
+                size="lg"
                 onClick={() => handleGrade(1)}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center justify-center gap-2 py-4 rounded-2xl bg-red-900/30 border border-red-700/30 hover:bg-red-900/50 transition-colors"
+                icon={<X className="w-5 h-5 text-red-400" />}
+                className="!bg-red-900/30 !border-red-700/30 hover:!bg-red-900/50 text-red-400"
               >
-                <X className="w-5 h-5 text-red-400" />
-                <span className="text-red-400 font-semibold">Missed It</span>
-              </motion.button>
-              
-              <motion.button
+                Missed It
+              </LiquidButton>
+
+              <LiquidButton
+                variant="primary"
+                size="lg"
                 onClick={() => handleGrade(4)}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center justify-center gap-2 py-4 rounded-2xl font-semibold"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(201,162,39,0.9) 0%, rgba(180,140,30,1) 100%)',
-                  boxShadow: '0 8px 32px rgba(201,162,39,0.3)',
-                  color: '#0a0a0f',
-                }}
+                icon={<Check className="w-5 h-5" />}
               >
-                <Check className="w-5 h-5" />
-                <span>Got It</span>
-              </motion.button>
+                Got It
+              </LiquidButton>
             </div>
         )}
       </div>
@@ -420,24 +408,24 @@ export function SessionComplete({
         transition={{ delay: 0.7 }}
         className="flex flex-col gap-3 w-full max-w-xs"
       >
-        <button
+        <LiquidButton
+          variant="primary"
+          size="lg"
           onClick={onRestart}
-          className="w-full py-4 rounded-2xl font-semibold flex items-center justify-center gap-2"
-          style={{
-            background: 'linear-gradient(135deg, rgba(201,162,39,0.9) 0%, rgba(180,140,30,1) 100%)',
-            color: '#0a0a0f',
-          }}
+          icon={<RotateCcw className="w-5 h-5" />}
+          className="w-full"
         >
-          <RotateCcw className="w-5 h-5" />
           Practice Again
-        </button>
-        
-        <button
+        </LiquidButton>
+
+        <LiquidButton
+          variant="secondary"
+          size="lg"
           onClick={onExit}
-          className="w-full py-4 rounded-2xl font-semibold text-night-300 bg-night-900/50 border border-night-800 hover:bg-night-800/50 transition-colors"
+          className="w-full"
         >
           Done
-        </button>
+        </LiquidButton>
       </motion.div>
     </motion.div>
   );

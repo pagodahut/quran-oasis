@@ -34,6 +34,8 @@ import {
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 import AgentPanel from '@/components/AgentPanel';
+import GlassPanel from '@/components/ui/GlassPanel';
+import LiquidButton from '@/components/ui/LiquidButton';
 import { getProgressStats, getSurahProgressList } from '@/lib/progressStore';
 import { StreakDisplay, GoalProgressRing } from '@/components/Celebrations';
 import { 
@@ -62,28 +64,27 @@ const stagger = {
   }
 };
 
-function StatCard({ icon: Icon, value, label, color }: { 
-  icon: React.ElementType; 
-  value: string | number; 
-  label: string; 
+function StatCard({ icon: Icon, value, label, color }: {
+  icon: React.ElementType;
+  value: string | number;
+  label: string;
   color: string;
 }) {
   return (
-    <motion.div 
-      variants={fadeInUp}
-      className="liquid-card p-4 flex flex-col items-center text-center"
-    >
-      <div 
-        className={`w-10 h-10 rounded-xl flex items-center justify-center mb-2 ${color}`}
-        style={{
-          background: 'linear-gradient(135deg, currentColor 0%, transparent 100%)',
-          opacity: 0.15,
-        }}
-      >
-        <Icon className={`w-5 h-5 ${color}`} />
-      </div>
-      <span className="text-xl font-bold text-night-100">{value}</span>
-      <span className="text-xs text-night-500">{label}</span>
+    <motion.div variants={fadeInUp}>
+      <GlassPanel className="p-4 flex flex-col items-center text-center">
+        <div
+          className={`w-10 h-10 rounded-xl flex items-center justify-center mb-2 ${color}`}
+          style={{
+            background: 'linear-gradient(135deg, currentColor 0%, transparent 100%)',
+            opacity: 0.15,
+          }}
+        >
+          <Icon className={`w-5 h-5 ${color}`} />
+        </div>
+        <span className="text-xl font-bold text-night-100">{value}</span>
+        <span className="text-xs text-night-500">{label}</span>
+      </GlassPanel>
     </motion.div>
   );
 }
@@ -289,13 +290,15 @@ export default function ProfilePage() {
             
             {/* Edit Profile Button (Clerk) */}
             {isSignedIn && (
-              <button 
+              <LiquidButton
+                variant="ghost"
+                size="sm"
                 onClick={() => openUserProfile()}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-night-800/50 text-night-300 text-sm hover:bg-night-800 transition-colors mb-3"
+                icon={<Edit3 className="w-3 h-3" />}
+                className="mb-3"
               >
-                <Edit3 className="w-3 h-3" />
                 Edit Profile
-              </button>
+              </LiquidButton>
             )}
             
             {/* Enhanced Streak Display */}
@@ -396,7 +399,7 @@ export default function ProfilePage() {
                 View All
               </Link>
             </div>
-            <div className="liquid-card divide-y divide-white/5">
+            <GlassPanel className="divide-y divide-white/5">
               {recentSurahs.map((surah) => (
                 <div key={surah.number} className="flex items-center justify-between p-4">
                   <div className="flex items-center gap-3">
@@ -429,7 +432,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
               ))}
-            </div>
+            </GlassPanel>
           </motion.div>
 
           {/* Daily Goal - Enhanced */}
@@ -441,7 +444,7 @@ export default function ProfilePage() {
                 {learningPrefs.dailyGoalVerses} verses / day
               </Link>
             </div>
-            <div className="liquid-card p-4">
+            <GlassPanel className="p-4">
               <div className="flex items-center gap-4">
                 <GoalProgressRing
                   progress={goalStatus.progress}
@@ -486,30 +489,30 @@ export default function ProfilePage() {
                   )}
                 </div>
               </div>
-            </div>
+            </GlassPanel>
           </motion.div>
 
           {/* Quick Links */}
           <motion.div variants={fadeInUp}>
             <h3 className="text-sm font-medium text-night-400 mb-3 px-1">Quick Access</h3>
-            <div className="liquid-card overflow-hidden">
+            <GlassPanel tint="neutral" className="overflow-hidden">
               <SettingsRow icon={TrendingUp} label="Detailed Progress" href="/progress" />
               <SettingsRow icon={Bookmark} label="Bookmarks" href="/bookmarks" />
               <SettingsRow icon={List} label="Surah Index" href="/surahs" />
               <SettingsRow icon={BookOpen} label="Lessons" href="/lessons" />
               <SettingsRow icon={Mic} label="Recite" href="/recite" />
               <SettingsRow icon={Sparkles} label="Techniques" href="/techniques" />
-            </div>
+            </GlassPanel>
           </motion.div>
 
           {/* Settings Sections */}
           <motion.div variants={fadeInUp}>
             <h3 className="text-sm font-medium text-night-400 mb-3 px-1">Settings</h3>
-            <div className="liquid-card overflow-hidden">
+            <GlassPanel tint="neutral" className="overflow-hidden">
               <SettingsRow icon={Volume2} label="Audio & Reciter" href="/settings" />
               <SettingsRow icon={Target} label="Daily Goal" href="/settings" />
               <SettingsRow icon={Palette} label="Preferences" href="/settings" />
-            </div>
+            </GlassPanel>
           </motion.div>
 
           {/* Agent Actions */}
@@ -520,10 +523,10 @@ export default function ProfilePage() {
 
           <motion.div variants={fadeInUp}>
             <h3 className="text-sm font-medium text-night-400 mb-3 px-1">Support</h3>
-            <div className="liquid-card overflow-hidden">
+            <GlassPanel tint="neutral" className="overflow-hidden">
               <SettingsRow icon={HelpCircle} label="Help Center" />
               <SettingsRow icon={Shield} label="Privacy Policy" />
-            </div>
+            </GlassPanel>
           </motion.div>
 
           {/* Sign Out - visible at bottom */}
@@ -533,10 +536,13 @@ export default function ProfilePage() {
               return (
                 <motion.div variants={fadeInUp} className="pt-4">
                   <SignOutButton redirectUrl="/">
-                    <button className="w-full py-3 px-4 rounded-xl text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2">
-                      <LogOut className="w-5 h-5" />
-                      <span>Sign Out</span>
-                    </button>
+                    <LiquidButton
+                      variant="ghost"
+                      icon={<LogOut className="w-5 h-5" />}
+                      className="w-full text-red-400"
+                    >
+                      Sign Out
+                    </LiquidButton>
                   </SignOutButton>
                 </motion.div>
               );

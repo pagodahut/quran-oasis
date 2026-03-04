@@ -23,9 +23,12 @@ import {
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 import { StreakDisplay } from '@/components/Celebrations';
-import { 
-  getStreakInfo, 
-  getDailyGoalStatus, 
+import { GlassPanel } from '@/components/ui/GlassPanel';
+import LiquidButton from '@/components/ui/LiquidButton';
+import LiquidPill from '@/components/ui/LiquidPill';
+import {
+  getStreakInfo,
+  getDailyGoalStatus,
   getQuranProgress,
   getAchievements,
   getSurahProgressList,
@@ -43,8 +46,8 @@ import { isRamadan, isLastTenNights, isJummah, getRamadanDay } from '@/lib/islam
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] }
   }
@@ -60,8 +63,8 @@ const stagger = {
 
 const scaleIn = {
   hidden: { opacity: 0, scale: 0.9 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     scale: 1,
     transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] }
   }
@@ -106,10 +109,10 @@ function getInspirationMessage(): string {
 
 function getIslamicDate(): string {
   // Simple approximation - for accurate dates would need a proper Islamic calendar library
-  const options: Intl.DateTimeFormatOptions = { 
-    weekday: 'long', 
-    month: 'short', 
-    day: 'numeric' 
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric'
   };
   return new Date().toLocaleDateString('en-US', options);
 }
@@ -120,7 +123,7 @@ function formatLastActive(dateStr: string | null): string {
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays === 0) return 'Today';
   if (diffDays === 1) return 'Yesterday';
   if (diffDays < 7) return `${diffDays} days ago`;
@@ -131,7 +134,7 @@ function formatLastActive(dateStr: string | null): string {
 // Components
 // ============================================
 
-function DailyFocusCard({ 
+function DailyFocusCard({
   variant,
   icon: Icon,
   title,
@@ -139,7 +142,7 @@ function DailyFocusCard({
   meta,
   href,
   onClick,
-}: { 
+}: {
   variant: 'memorize' | 'review';
   icon: React.ElementType;
   title: string;
@@ -148,14 +151,6 @@ function DailyFocusCard({
   href?: string;
   onClick?: () => void;
 }) {
-  const bgClass = variant === 'memorize' 
-    ? 'bg-gradient-to-br from-gold-500/20 via-gold-500/10 to-gold-600/5'
-    : 'bg-gradient-to-br from-sage-500/20 via-sage-500/10 to-sage-600/5';
-  
-  const borderClass = variant === 'memorize'
-    ? 'border-gold-500/20 hover:border-gold-500/40'
-    : 'border-sage-500/20 hover:border-sage-500/40';
-  
   const iconBgClass = variant === 'memorize'
     ? 'bg-gold-500/20 text-gold-400'
     : 'bg-sage-500/20 text-sage-400';
@@ -167,16 +162,6 @@ function DailyFocusCard({
       variants={scaleIn}
       whileHover={{ scale: 1.02, y: -2 }}
       whileTap={{ scale: 0.98 }}
-      className={`
-        relative overflow-hidden rounded-2xl p-5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-gold-500/50
-        ${bgClass}
-        border ${borderClass}
-        transition-all duration-300
-      `}
-      style={{
-        backdropFilter: 'blur(24px) saturate(160%)',
-        WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-      }}
       role="button"
       tabIndex={0}
       aria-label={ariaLabel}
@@ -187,23 +172,30 @@ function DailyFocusCard({
         }
       }}
     >
-      {/* Subtle pattern overlay */}
-      <div className="absolute inset-0 opacity-30 pattern-arabesque" />
-      
-      {/* Content */}
-      <div className="relative z-10">
-        <div className={`w-12 h-12 rounded-xl ${iconBgClass} flex items-center justify-center mb-4`}>
-          <Icon className="w-6 h-6" aria-hidden="true" />
+      <GlassPanel
+        tint={variant === 'memorize' ? 'gold' : 'sage'}
+        blur="md"
+        glow={variant === 'memorize'}
+        className="p-5 cursor-pointer"
+      >
+        {/* Subtle pattern overlay */}
+        <div className="absolute inset-0 opacity-30 pattern-arabesque" />
+
+        {/* Content */}
+        <div className="relative z-10">
+          <div className={`w-12 h-12 rounded-xl ${iconBgClass} flex items-center justify-center mb-4`}>
+            <Icon className="w-6 h-6" aria-hidden="true" />
+          </div>
+
+          <h3 className="text-lg font-semibold text-night-100 mb-1">{title}</h3>
+          <p className="text-night-300 text-base mb-3">{subtitle}</p>
+
+          <div className="flex items-center justify-between">
+            <span className="text-xs uppercase tracking-wider text-night-500">{meta}</span>
+            <ChevronRight className="w-4 h-4 text-night-500" aria-hidden="true" />
+          </div>
         </div>
-        
-        <h3 className="text-lg font-semibold text-night-100 mb-1">{title}</h3>
-        <p className="text-night-300 text-base mb-3">{subtitle}</p>
-        
-        <div className="flex items-center justify-between">
-          <span className="text-xs uppercase tracking-wider text-night-500">{meta}</span>
-          <ChevronRight className="w-4 h-4 text-night-500" aria-hidden="true" />
-        </div>
-      </div>
+      </GlassPanel>
     </motion.div>
   );
 
@@ -214,7 +206,7 @@ function DailyFocusCard({
       </Link>
     );
   }
-  
+
   return <div onClick={onClick}>{content}</div>;
 }
 
@@ -237,36 +229,39 @@ function ContinueCard({
         variants={fadeInUp}
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
-        className="liquid-card rounded-2xl p-5 cursor-pointer group"
       >
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gold-500/20 flex items-center justify-center text-gold-400 font-semibold">
-              {surahNumber}
+        <GlassPanel tint="neutral" blur="md" className="p-5 cursor-pointer group">
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gold-500/20 flex items-center justify-center text-gold-400 font-semibold">
+                  {surahNumber}
+                </div>
+                <div>
+                  <h4 className="text-night-100 font-medium">{surahName}</h4>
+                  <p className="text-night-500 text-sm">Ayah {ayahNumber}</p>
+                </div>
+              </div>
+              <motion.div
+                className="w-10 h-10 rounded-full bg-gold-500 flex items-center justify-center text-night-950 group-hover:scale-110 transition-transform"
+              >
+                <Play className="w-5 h-5 ml-0.5" />
+              </motion.div>
             </div>
-            <div>
-              <h4 className="text-night-100 font-medium">{surahName}</h4>
-              <p className="text-night-500 text-sm">Ayah {ayahNumber}</p>
+
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-2 rounded-full bg-night-800 overflow-hidden">
+                <motion.div
+                  className="h-full bg-gradient-to-r from-gold-600 to-gold-400 rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progress}%` }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                />
+              </div>
+              <span className="text-night-400 text-sm font-medium">{progress}%</span>
             </div>
           </div>
-          <motion.div 
-            className="w-10 h-10 rounded-full bg-gold-500 flex items-center justify-center text-night-950 group-hover:scale-110 transition-transform"
-          >
-            <Play className="w-5 h-5 ml-0.5" />
-          </motion.div>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          <div className="flex-1 h-2 rounded-full bg-night-800 overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-gold-600 to-gold-400 rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            />
-          </div>
-          <span className="text-night-400 text-sm font-medium">{progress}%</span>
-        </div>
+        </GlassPanel>
       </motion.div>
     </Link>
   );
@@ -293,9 +288,9 @@ function UpNextItem({
     weak: { bg: 'bg-rose-500/20', text: 'text-rose-400', label: 'Needs review' },
     new: { bg: 'bg-teal-500/20', text: 'text-teal-400', label: 'New' },
   };
-  
+
   const style = statusStyles[status];
-  
+
   return (
     <Link href={href}>
       <motion.div
@@ -326,27 +321,26 @@ function UpNextItem({
   );
 }
 
-function QuickStat({ 
-  icon: Icon, 
-  value, 
-  label, 
-  color 
-}: { 
-  icon: React.ElementType; 
-  value: string | number; 
-  label: string; 
+function QuickStat({
+  icon: Icon,
+  value,
+  label,
+  color
+}: {
+  icon: React.ElementType;
+  value: string | number;
+  label: string;
   color: string;
 }) {
   return (
-    <motion.div 
-      variants={scaleIn} 
-      className="liquid-card rounded-xl p-4 text-center"
-      role="img"
-      aria-label={`${label}: ${value}`}
-    >
-      <Icon className={`w-5 h-5 mx-auto mb-2 ${color}`} aria-hidden="true" />
-      <p className="text-xl font-bold text-night-100">{value}</p>
-      <p className="text-xs text-night-500">{label}</p>
+    <motion.div variants={scaleIn}>
+      <GlassPanel tint="neutral" blur="sm" rounded="rounded-xl" className="p-4 text-center" role="img" aria-label={`${label}: ${value}`}>
+        <div className="relative z-10">
+          <Icon className={`w-5 h-5 mx-auto mb-2 ${color}`} aria-hidden="true" />
+          <p className="text-xl font-bold text-night-100">{value}</p>
+          <p className="text-xs text-night-500">{label}</p>
+        </div>
+      </GlassPanel>
     </motion.div>
   );
 }
@@ -367,44 +361,50 @@ function RecentActivity({
     streak: { icon: Flame, color: 'text-orange-400', bg: 'bg-orange-500/20' },
     achievement: { icon: Award, color: 'text-purple-400', bg: 'bg-purple-500/20' },
   };
-  
+
   if (activities.length === 0) {
     return (
-      <motion.div variants={fadeInUp} className="liquid-card rounded-2xl p-6 text-center">
-        <Sparkles className="w-8 h-8 text-night-600 mx-auto mb-3" aria-hidden="true" />
-        <p className="text-night-400">Start your first lesson to see your activity!</p>
-        <Link 
-          href="/lessons" 
-          className="inline-flex items-center gap-2 mt-4 text-gold-400 hover:text-gold-300 transition-colors"
-          aria-label="Begin learning to start tracking your activity"
-        >
-          Begin learning <ArrowRight className="w-4 h-4" aria-hidden="true" />
-        </Link>
+      <motion.div variants={fadeInUp}>
+        <GlassPanel tint="neutral" blur="md" className="p-6 text-center">
+          <div className="relative z-10">
+            <Sparkles className="w-8 h-8 text-night-600 mx-auto mb-3" aria-hidden="true" />
+            <p className="text-night-400">Start your first lesson to see your activity!</p>
+            <Link
+              href="/lessons"
+              className="inline-flex items-center gap-2 mt-4 text-gold-400 hover:text-gold-300 transition-colors"
+              aria-label="Begin learning to start tracking your activity"
+            >
+              Begin learning <ArrowRight className="w-4 h-4" aria-hidden="true" />
+            </Link>
+          </div>
+        </GlassPanel>
       </motion.div>
     );
   }
-  
+
   return (
-    <motion.div variants={fadeInUp} className="liquid-card rounded-2xl p-4">
-      <ul className="space-y-3" role="list">
-        {activities.map((activity, i) => {
-          const { icon: Icon, color, bg } = iconMap[activity.icon];
-          return (
-            <li key={i} className="flex items-center gap-3">
-              <div className={`w-8 h-8 rounded-lg ${bg} flex items-center justify-center flex-shrink-0`}>
-                <Icon className={`w-4 h-4 ${color}`} aria-hidden="true" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-night-200 text-sm truncate">{activity.action}</p>
-                <p className="text-night-500 text-xs">{activity.detail}</p>
-              </div>
-              <time className="text-night-600 text-xs flex-shrink-0" dateTime={activity.time}>
-                {activity.time}
-              </time>
-            </li>
-          );
-        })}
-      </ul>
+    <motion.div variants={fadeInUp}>
+      <GlassPanel tint="neutral" blur="md" className="p-4">
+        <ul className="relative z-10 space-y-3" role="list">
+          {activities.map((activity, i) => {
+            const { icon: Icon, color, bg } = iconMap[activity.icon];
+            return (
+              <li key={i} className="flex items-center gap-3">
+                <div className={`w-8 h-8 rounded-lg ${bg} flex items-center justify-center flex-shrink-0`}>
+                  <Icon className={`w-4 h-4 ${color}`} aria-hidden="true" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-night-200 text-sm truncate">{activity.action}</p>
+                  <p className="text-night-500 text-xs">{activity.detail}</p>
+                </div>
+                <time className="text-night-600 text-xs flex-shrink-0" dateTime={activity.time}>
+                  {activity.time}
+                </time>
+              </li>
+            );
+          })}
+        </ul>
+      </GlassPanel>
     </motion.div>
   );
 }
@@ -417,7 +417,7 @@ export default function DashboardPage() {
   const { user, isLoaded, isSignedIn } = useAuth();
   const { learning: learningPrefs } = useLearningPreferences();
   const { isChecking } = useCalibrationGuard();
-  
+
   // State
   const [streakInfo, setStreakInfo] = useState(getStreakInfo());
   const [goalStatus, setGoalStatus] = useState(getDailyGoalStatus());
@@ -425,7 +425,7 @@ export default function DashboardPage() {
   const [achievements, setAchievements] = useState(getAchievements());
   const [surahProgress, setSurahProgress] = useState<SurahProgressItem[]>([]);
   const [userProgress, setUserProgress] = useState(getProgress());
-  
+
   // Load all data
   useEffect(() => {
     const loadData = () => {
@@ -436,19 +436,19 @@ export default function DashboardPage() {
       setSurahProgress(getSurahProgressList());
       setUserProgress(getProgress());
     };
-    
+
     loadData();
-    
+
     // Listen for updates
     window.addEventListener('motivation-updated', loadData);
     window.addEventListener('progress-updated', loadData);
-    
+
     return () => {
       window.removeEventListener('motivation-updated', loadData);
       window.removeEventListener('progress-updated', loadData);
     };
   }, []);
-  
+
   // Compute derived data
   const displayName = useMemo(() => {
     if (isSignedIn && user) {
@@ -461,17 +461,17 @@ export default function DashboardPage() {
     }
     return 'Learner';
   }, [isSignedIn, user]);
-  
+
   // Find last active surah/ayah
   const lastActiveVerse = useMemo(() => {
     const verses = userProgress.verses;
     const verseEntries = Object.entries(verses);
-    
+
     if (verseEntries.length === 0) {
       // Default to Al-Fatihah if no progress
       return { surah: 1, ayah: 1, surahName: 'Al-Fatihah', progress: 0 };
     }
-    
+
     // Find most recently updated verse
     let mostRecent = verseEntries[0];
     for (const entry of verseEntries) {
@@ -479,22 +479,22 @@ export default function DashboardPage() {
         mostRecent = entry;
       }
     }
-    
+
     const [key] = mostRecent;
     const [surah, ayah] = key.split(':').map(Number);
     const surahMeta = SURAH_METADATA[surah];
-    
+
     // Calculate progress for this surah
     const surahData = surahProgress.find(s => s.surahNumber === surah);
-    
-    return { 
-      surah, 
-      ayah, 
+
+    return {
+      surah,
+      ayah,
       surahName: surahMeta?.name || `Surah ${surah}`,
       progress: surahData?.percentage || 0,
     };
   }, [userProgress, surahProgress]);
-  
+
   // Get surahs that need review
   const reviewQueue = useMemo(() => {
     return surahProgress
@@ -502,7 +502,7 @@ export default function DashboardPage() {
       .sort((a, b) => a.percentage - b.percentage)
       .slice(0, 4)
       .map(s => {
-        const status: 'due' | 'tomorrow' | 'weak' | 'new' = 
+        const status: 'due' | 'tomorrow' | 'weak' | 'new' =
           s.percentage < 30 ? 'weak' : s.percentage === 100 ? 'due' : 'new';
         return {
           number: s.surahNumber,
@@ -513,7 +513,7 @@ export default function DashboardPage() {
         };
       });
   }, [surahProgress]);
-  
+
   // Recent activity (mock for now - would come from a proper activity log)
   const recentActivity = useMemo(() => {
     const activities: Array<{
@@ -522,7 +522,7 @@ export default function DashboardPage() {
       time: string;
       icon: 'complete' | 'review' | 'streak' | 'achievement';
     }> = [];
-    
+
     // Add streak activity if active
     if (streakInfo.isActiveToday) {
       activities.push({
@@ -532,7 +532,7 @@ export default function DashboardPage() {
         icon: 'streak',
       });
     }
-    
+
     // Add achievement if recently unlocked
     const recentAchievement = achievements.unlocked[achievements.unlocked.length - 1];
     if (recentAchievement) {
@@ -543,7 +543,7 @@ export default function DashboardPage() {
         icon: 'achievement',
       });
     }
-    
+
     // Add recent surah progress
     const recentSurah = surahProgress.find(s => s.status === 'in_progress');
     if (recentSurah) {
@@ -554,10 +554,10 @@ export default function DashboardPage() {
         icon: 'review',
       });
     }
-    
+
     return activities.slice(0, 3);
   }, [streakInfo, achievements, surahProgress]);
-  
+
   // Goal progress percentage
   const goalProgress = useMemo(() => {
     const target = learningPrefs.dailyGoalVerses || goalStatus.target;
@@ -588,13 +588,13 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-night-950">
       {/* Skip to main content link */}
-      <a 
-        href="#main-content" 
+      <a
+        href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-night-800 focus:text-night-100 focus:rounded-lg focus:border focus:border-gold-500"
       >
         Skip to main content
       </a>
-      
+
       {/* Main Content */}
       <main id="main-content" className="px-4 py-6 pb-32 max-w-2xl mx-auto">
         <motion.div
@@ -614,112 +614,127 @@ export default function DashboardPage() {
                   {getIslamicDate()}
                 </p>
               </div>
-              
-              {/* Streak Badge */}
+
+              {/* Streak Badge — LiquidPill */}
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3, type: 'spring' }}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-night-900 border border-night-800"
-                role="img" 
-                aria-label={`Current learning streak: ${streakInfo.current} day${streakInfo.current !== 1 ? 's' : ''}`}
               >
-                <Flame className={`w-5 h-5 ${streakInfo.current > 0 ? 'text-orange-400' : 'text-night-600'}`} aria-hidden="true" />
-                <span className="font-bold text-night-100">{streakInfo.current}</span>
-                <span className="text-night-500 text-sm">day{streakInfo.current !== 1 ? 's' : ''}</span>
+                <LiquidPill
+                  selected={streakInfo.current > 0}
+                  className="px-4 py-2 text-sm"
+                >
+                  <Flame className={`w-4 h-4 ${streakInfo.current > 0 ? 'text-orange-400' : 'text-night-600'}`} aria-hidden="true" />
+                  <span className="font-bold text-night-100">{streakInfo.current}</span>
+                  <span className="text-night-500 text-xs">day{streakInfo.current !== 1 ? 's' : ''}</span>
+                </LiquidPill>
               </motion.div>
             </div>
           </motion.header>
-          
+
           {/* Ramadan Banner */}
           {isRamadanNow && (
-            <motion.div variants={fadeInUp} className="liquid-card rounded-2xl p-5 border border-gold-500/20 bg-gradient-to-br from-gold-500/10 via-transparent to-night-900">
-              <div className="flex items-start gap-3">
-                <span className="text-2xl">🌙</span>
-                <div className="flex-1">
-                  <h2 className="text-gold-400 font-semibold text-lg mb-1">
-                    Ramadan Mubarak! Day {ramadanDay} of Ramadan
-                  </h2>
-                  {lastTenNights ? (
-                    <p className="text-night-300 text-sm">✨ The Last Ten Nights — seek Laylatul Qadr</p>
-                  ) : (
-                    <p className="text-night-400 text-sm">1 juz per day = complete the Quran this Ramadan</p>
-                  )}
+            <motion.div variants={fadeInUp}>
+              <GlassPanel tint="gold" blur="md" glow>
+                <div className="relative z-10 p-5">
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl">🌙</span>
+                    <div className="flex-1">
+                      <h2 className="text-gold-400 font-semibold text-lg mb-1">
+                        Ramadan Mubarak! Day {ramadanDay} of Ramadan
+                      </h2>
+                      {lastTenNights ? (
+                        <p className="text-night-300 text-sm">✨ The Last Ten Nights — seek Laylatul Qadr</p>
+                      ) : (
+                        <p className="text-night-400 text-sm">1 juz per day = complete the Quran this Ramadan</p>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </GlassPanel>
             </motion.div>
           )}
 
           {/* Jummah Banner */}
           {isJummahToday && (
             <motion.div variants={fadeInUp}>
-              <Link href="/mushaf?surah=18" className="liquid-card rounded-2xl p-4 border border-gold-500/20 flex items-center gap-3 hover:bg-gold-500/5 transition-colors">
-                <span className="text-xl">🕌</span>
-                <div className="flex-1">
-                  <p className="text-night-100 font-medium">Jummah Mubarak!</p>
-                  <p className="text-night-400 text-sm">The Prophet ﷺ encouraged reciting Surah Al-Kahf on Fridays</p>
-                </div>
-                <span className="text-gold-400 text-sm font-medium whitespace-nowrap">Read →</span>
+              <Link href="/mushaf?surah=18" className="block">
+                <GlassPanel tint="gold" blur="md" className="hover:opacity-90 transition-opacity">
+                  <div className="relative z-10 p-4 flex items-center gap-3">
+                    <span className="text-xl">🕌</span>
+                    <div className="flex-1">
+                      <p className="text-night-100 font-medium">Jummah Mubarak!</p>
+                      <p className="text-night-400 text-sm">The Prophet ﷺ encouraged reciting Surah Al-Kahf on Fridays</p>
+                    </div>
+                    <span className="text-gold-400 text-sm font-medium whitespace-nowrap">Read →</span>
+                  </div>
+                </GlassPanel>
               </Link>
             </motion.div>
           )}
 
           {/* Inspirational Message */}
-          <motion.div variants={fadeInUp} className="liquid-card rounded-2xl p-4">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gold-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Sparkles className="w-4 h-4 text-gold-400" />
+          <motion.div variants={fadeInUp}>
+            <GlassPanel tint="neutral" blur="md" className="p-4">
+              <div className="relative z-10 flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-gold-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Sparkles className="w-4 h-4 text-gold-400" />
+                </div>
+                <div>
+                  <p className="text-night-200 text-sm leading-relaxed italic">
+                    {getInspirationMessage()}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-night-200 text-sm leading-relaxed italic">
-                  {getInspirationMessage()}
-                </p>
-              </div>
-            </div>
+            </GlassPanel>
           </motion.div>
-          
-          {/* Daily Goal Progress Mini */}
-          <motion.div 
-            variants={fadeInUp} 
-            className="liquid-glass-gold rounded-2xl p-4"
+
+          {/* Daily Goal Progress */}
+          <motion.div
+            variants={fadeInUp}
             role="region"
             aria-labelledby="goal-heading"
           >
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Target className="w-4 h-4 text-gold-400" aria-hidden="true" />
-                <span id="goal-heading" className="text-night-300 text-sm">Today's Goal</span>
+            <GlassPanel tint="gold" blur="md" className="p-4">
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Target className="w-4 h-4 text-gold-400" aria-hidden="true" />
+                    <span id="goal-heading" className="text-night-300 text-sm">Today&apos;s Goal</span>
+                  </div>
+                  <span
+                    className="text-gold-400 font-medium"
+                    aria-label={`Progress: ${goalStatus.progress} of ${learningPrefs.dailyGoalVerses || goalStatus.target} verses completed`}
+                  >
+                    {goalStatus.progress}/{learningPrefs.dailyGoalVerses || goalStatus.target} verses
+                  </span>
+                </div>
+                <div
+                  className="h-2 rounded-full bg-night-800 overflow-hidden"
+                  role="progressbar"
+                  aria-valuenow={goalProgress}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`Goal progress: ${goalProgress} percent complete`}
+                >
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-gold-600 to-gold-400 rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${goalProgress}%` }}
+                    transition={{ duration: 0.5 }}
+                  />
+                </div>
+                {goalProgress >= 100 && (
+                  <p className="text-sage-400 text-xs mt-2 flex items-center gap-1" aria-live="polite">
+                    <Sparkles className="w-3 h-3" aria-hidden="true" />
+                    Goal completed! Keep going to earn bonus XP.
+                  </p>
+                )}
               </div>
-              <span 
-                className="text-gold-400 font-medium"
-                aria-label={`Progress: ${goalStatus.progress} of ${learningPrefs.dailyGoalVerses || goalStatus.target} verses completed`}
-              >
-                {goalStatus.progress}/{learningPrefs.dailyGoalVerses || goalStatus.target} verses
-              </span>
-            </div>
-            <div 
-              className="h-2 rounded-full bg-night-800 overflow-hidden"
-              role="progressbar"
-              aria-valuenow={goalProgress}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-label={`Goal progress: ${goalProgress} percent complete`}
-            >
-              <motion.div
-                className="h-full bg-gradient-to-r from-gold-600 to-gold-400 rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${goalProgress}%` }}
-                transition={{ duration: 0.5 }}
-              />
-            </div>
-            {goalProgress >= 100 && (
-              <p className="text-sage-400 text-xs mt-2 flex items-center gap-1" aria-live="polite">
-                <Sparkles className="w-3 h-3" aria-hidden="true" />
-                Goal completed! Keep going to earn bonus XP.
-              </p>
-            )}
+            </GlassPanel>
           </motion.div>
-          
+
           {/* Quick Stats Grid - Memorization Progress */}
           <motion.section variants={fadeInUp} role="region" aria-labelledby="progress-heading">
             <h2 id="progress-heading" className="text-night-500 text-xs uppercase tracking-wider mb-3 px-1">Your Progress</h2>
@@ -743,8 +758,8 @@ export default function DashboardPage() {
                 color="text-purple-400"
               />
             </div>
-            <Link 
-              href="/progress" 
+            <Link
+              href="/progress"
               className="flex items-center justify-center gap-2 mt-3 text-night-400 hover:text-night-200 transition-colors text-sm"
               aria-label="View detailed progress statistics"
             >
@@ -774,7 +789,7 @@ export default function DashboardPage() {
               />
             </div>
             <div className="mt-3">
-              <Link 
+              <Link
                 href="/recite"
                 aria-label="Start live recitation practice with real-time tajweed feedback and word tracking"
                 className="block"
@@ -782,25 +797,28 @@ export default function DashboardPage() {
                 <motion.div
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
-                  className="liquid-card rounded-2xl p-4 cursor-pointer group bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-emerald-600/5 border-emerald-500/20 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-                        <Mic className="w-5 h-5" aria-hidden="true" />
-                      </div>
-                      <div>
-                        <h4 className="text-night-100 font-medium">Live Recitation Practice</h4>
-                        <p className="text-night-400 text-sm">Real-time tajweed feedback & word tracking</p>
+                  <GlassPanel tint="sage" blur="md" className="cursor-pointer group">
+                    <div className="relative z-10 p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                            <Mic className="w-5 h-5" aria-hidden="true" />
+                          </div>
+                          <div>
+                            <h4 className="text-night-100 font-medium">Live Recitation Practice</h4>
+                            <p className="text-night-400 text-sm">Real-time tajweed feedback & word tracking</p>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-night-600 group-hover:text-night-400 transition-colors" aria-hidden="true" />
                       </div>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-night-600 group-hover:text-night-400 transition-colors" aria-hidden="true" />
-                  </div>
+                  </GlassPanel>
                 </motion.div>
               </Link>
             </div>
           </motion.section>
-          
+
           {/* Continue Where You Left Off */}
           {quranProgress.versesMemorized > 0 && (
             <motion.section variants={fadeInUp}>
@@ -814,7 +832,7 @@ export default function DashboardPage() {
               />
             </motion.section>
           )}
-          
+
           {/* Up Next / Review Queue */}
           {reviewQueue.length > 0 && (
             <motion.section variants={fadeInUp}>
@@ -824,22 +842,24 @@ export default function DashboardPage() {
                   See all
                 </Link>
               </div>
-              <div className="liquid-card rounded-2xl px-4">
-                {reviewQueue.map((item) => (
-                  <UpNextItem
-                    key={item.number}
-                    number={item.number}
-                    name={item.name}
-                    meta={item.meta}
-                    arabicName={item.arabicName}
-                    status={item.status}
-                    href={`/memorize/${item.number}/1`}
-                  />
-                ))}
-              </div>
+              <GlassPanel tint="neutral" blur="md" className="px-4">
+                <div className="relative z-10">
+                  {reviewQueue.map((item) => (
+                    <UpNextItem
+                      key={item.number}
+                      number={item.number}
+                      name={item.name}
+                      meta={item.meta}
+                      arabicName={item.arabicName}
+                      status={item.status}
+                      href={`/memorize/${item.number}/1`}
+                    />
+                  ))}
+                </div>
+              </GlassPanel>
             </motion.section>
           )}
-          
+
           {/* Recent Activity */}
           <motion.section variants={fadeInUp} role="region" aria-labelledby="activity-heading">
             <h2 id="activity-heading" className="text-night-500 text-xs uppercase tracking-wider mb-3 px-1">Recent Activity</h2>
@@ -847,7 +867,7 @@ export default function DashboardPage() {
               <RecentActivity activities={recentActivity} />
             </div>
           </motion.section>
-          
+
           {/* Ramadan Essentials */}
           {isRamadanNow && (
             <motion.section variants={fadeInUp}>
@@ -863,14 +883,18 @@ export default function DashboardPage() {
                   <Link
                     key={item.surah}
                     href={`/mushaf?surah=${item.surah}`}
-                    className="liquid-card p-3 flex items-center gap-3 hover:bg-white/[0.04] transition-colors"
+                    className="block"
                   >
-                    <span className="w-8 h-8 rounded-lg bg-gold-500/10 flex items-center justify-center text-xs font-medium tabular-nums text-gold-400">{item.surah}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-night-100 text-sm font-medium">{item.name}</p>
-                      <p className="text-night-500 text-xs">{item.desc}</p>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-night-600" />
+                    <GlassPanel tint="neutral" blur="sm" rounded="rounded-xl" className="hover:opacity-90 transition-opacity">
+                      <div className="relative z-10 p-3 flex items-center gap-3">
+                        <span className="w-8 h-8 rounded-lg bg-gold-500/10 flex items-center justify-center text-xs font-medium tabular-nums text-gold-400">{item.surah}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-night-100 text-sm font-medium">{item.name}</p>
+                          <p className="text-night-500 text-xs">{item.desc}</p>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-night-600" />
+                      </div>
+                    </GlassPanel>
                   </Link>
                 ))}
               </div>
@@ -880,31 +904,30 @@ export default function DashboardPage() {
           {/* Quick Actions for New Users */}
           {quranProgress.versesMemorized === 0 && (
             <motion.section variants={fadeInUp} className="mt-6">
-              <div className="liquid-glass-gold-premium rounded-2xl p-6 text-center">
-                <Sparkles className="w-10 h-10 text-gold-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-night-100 mb-2">Begin Your Journey</h3>
-                <p className="text-night-400 mb-5 max-w-sm mx-auto">
-                  Start with Al-Fatihah or pick any surah to begin your memorization journey.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Link 
-                    href="/lessons"
-                    className="liquid-btn inline-flex items-center justify-center gap-2"
-                  >
-                    <BookOpen className="w-4 h-4" />
-                    Start Learning
-                  </Link>
-                  <Link 
-                    href="/surahs"
-                    className="liquid-btn-outline inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl border border-night-600 text-night-200 hover:bg-night-800/50 transition-colors"
-                  >
-                    Browse Surahs
-                  </Link>
+              <GlassPanel tint="gold" blur="lg" glow className="p-6 text-center">
+                <div className="relative z-10">
+                  <Sparkles className="w-10 h-10 text-gold-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-night-100 mb-2">Begin Your Journey</h3>
+                  <p className="text-night-400 mb-5 max-w-sm mx-auto">
+                    Start with Al-Fatihah or pick any surah to begin your memorization journey.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Link href="/lessons">
+                      <LiquidButton variant="primary" size="lg" icon={<BookOpen className="w-4 h-4" />}>
+                        Start Learning
+                      </LiquidButton>
+                    </Link>
+                    <Link href="/surahs">
+                      <LiquidButton variant="secondary" size="lg">
+                        Browse Surahs
+                      </LiquidButton>
+                    </Link>
+                  </div>
                 </div>
-              </div>
+              </GlassPanel>
             </motion.section>
           )}
-          
+
         </motion.div>
       </main>
 
