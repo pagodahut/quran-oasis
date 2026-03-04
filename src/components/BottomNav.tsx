@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { GlassPanel } from '@/components/ui/GlassPanel';
 
 // Custom geometric icons - cohesive Islamic-inspired design
 function HomeIcon({ className = "", strokeWidth = 2 }: { className?: string; strokeWidth?: number }) {
@@ -52,6 +53,8 @@ const navItems = [
   { href: '/profile', Icon: ProfileIcon, label: 'Profile', ariaLabel: 'View Profile' },
 ];
 
+const spring = { type: 'spring' as const, stiffness: 400, damping: 25 };
+
 export default function BottomNav() {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -84,96 +87,44 @@ export default function BottomNav() {
   }, [handleScroll]);
 
   return (
-    <nav 
+    <nav
       role="navigation"
       aria-label="Main navigation"
-      className={`fixed bottom-0 left-0 right-0 z-50 px-4 sm:px-6 transition-all duration-300 ease-out ${
+      className={`fixed bottom-0 left-0 right-0 z-50 transition-all duration-300 ease-out ${
         isHidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'
-      } ${isCollapsed ? 'pb-3' : 'pb-5 sm:pb-6'}`}
-      style={{ paddingBottom: `max(${isCollapsed ? '0.75rem' : '1.25rem'}, env(safe-area-inset-bottom))` }}
+      }`}
+      style={{ padding: `0 16px max(${isCollapsed ? '8px' : '12px'}, env(safe-area-inset-bottom)) 16px` }}
     >
-      {/* ── Premium frosted-glass floating nav ────────────────────────────── */}
-      <motion.div
-        layout
-        className={`relative mx-auto overflow-hidden ${
-          isCollapsed ? 'rounded-full' : 'max-w-sm rounded-2xl'
+      <GlassPanel
+        blur="xl"
+        tint="neutral"
+        glow={false}
+        noise={true}
+        rounded={isCollapsed ? 'rounded-full' : 'rounded-3xl'}
+        className={`mx-auto transition-all duration-300 ease-out ${
+          isCollapsed ? 'max-w-[280px]' : 'max-w-sm'
         }`}
-        style={{
-          maxWidth: isCollapsed
-            ? `${Math.min(4 * 52 + 32, 340)}px`
-            : undefined,
-
-          /* ── Frosted glass base ──────────────────────────── */
-          background:
-            'linear-gradient(180deg, rgba(20,26,34,0.88) 0%, rgba(14,19,26,0.92) 100%)',
-          backdropFilter:       'blur(64px) saturate(200%) brightness(0.95)',
-          WebkitBackdropFilter: 'blur(64px) saturate(200%) brightness(0.95)',
-
-          /* ── Multi-layer shadow ──────────────────────────── */
-          border: '1px solid rgba(255,255,255,0.07)',
-          boxShadow: [
-            '0 -1px 0 rgba(255,255,255,0.06)',
-            '0 -4px 24px rgba(0,0,0,0.22)',
-            '0 4px 32px rgba(0,0,0,0.28)',
-            '0 16px 48px rgba(0,0,0,0.18)',
-            '0 0 60px rgba(201,162,39,0.05)',
-            'inset 0 1px 0 rgba(255,255,255,0.10)',
-            'inset 0 -1px 0 rgba(0,0,0,0.12)',
-          ].join(', '),
-
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        }}
       >
-        {/* ── Prismatic top-edge highlight ─────────────────────────────── */}
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute top-0 left-[5%] right-[5%] h-px z-20"
-          style={{
-            background:
-              'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 15%, rgba(255,255,255,0.18) 35%, rgba(244,212,124,0.20) 50%, rgba(255,255,255,0.18) 65%, rgba(255,255,255,0.06) 85%, transparent 100%)',
-          }}
-        />
-
-        {/* ── Warm amber light-leak ─────────────────────────────────────── */}
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-10"
-          style={{
-            background:
-              'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,162,39,0.07) 0%, transparent 60%)',
-          }}
-        />
-
-        {/* ── SVG noise grain (frosted glass texture) ──────────────────── */}
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-10"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-            opacity:      0.045,
-            mixBlendMode: 'overlay',
-          }}
-        />
-        <div className={`relative flex items-center justify-around ${
-          isCollapsed ? 'px-4 py-2' : 'px-2 sm:px-4 py-2.5 sm:py-3'
-        }`}
-        style={{
-          transition: 'padding 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        }}
+        <div
+          className={`relative flex items-center justify-around ${
+            isCollapsed ? 'px-3 py-1.5' : 'px-2 sm:px-4 py-2 sm:py-2.5'
+          }`}
+          style={{ transition: 'padding 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
         >
           {navItems.map((item) => {
-            // Active matching: exact match or sub-route match
-            // /recite covers /recite, /recite/1, /mushaf, /surahs, /identify etc.
-            // /practice covers /practice, /practice/*
-            // /profile covers /profile, /settings
-            const isActive = pathname === item.href || 
+            const isActive =
+              pathname === item.href ||
               (item.href === '/dashboard' && pathname === '/') ||
-              (item.href === '/mushaf' && ['/surahs', '/browse', '/identify', '/recite'].some(p => pathname.startsWith(p))) ||
+              (item.href === '/mushaf' &&
+                ['/surahs', '/browse', '/identify', '/recite'].some((p) =>
+                  pathname.startsWith(p)
+                )) ||
               (item.href === '/profile' && pathname.startsWith('/settings')) ||
               (item.href === '/practice' && pathname.startsWith('/lessons')) ||
-              (item.href !== '/' && item.href !== '/dashboard' && pathname.startsWith(item.href));
-            
+              (item.href !== '/' &&
+                item.href !== '/dashboard' &&
+                pathname.startsWith(item.href));
+
             return (
               <Link
                 key={item.href}
@@ -181,75 +132,74 @@ export default function BottomNav() {
                 aria-label={item.ariaLabel}
                 aria-current={isActive ? 'page' : undefined}
                 className={`
-                  relative flex flex-col items-center gap-0.5 sm:gap-1 
-                  ${isCollapsed ? 'min-w-[44px] min-h-[40px]' : 'min-w-[52px] min-h-[48px]'}
-                  ${isCollapsed ? 'px-1.5 py-1' : 'px-3 sm:px-4 py-1.5'}
+                  relative flex flex-col items-center gap-0.5
+                  ${isCollapsed ? 'min-w-[40px] min-h-[36px] px-1.5 py-1' : 'min-w-[52px] min-h-[48px] px-3 sm:px-4 py-1.5'}
                   touch-manipulation
-                  focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/50 
+                  focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/50
                   focus-visible:ring-offset-2 focus-visible:ring-offset-night-950
                   rounded-xl
                 `}
-                style={{
-                  WebkitTapHighlightColor: 'transparent',
-                  transition: 'transform 0.15s ease',
-                }}
+                style={{ WebkitTapHighlightColor: 'transparent' }}
               >
-                {/* Active indicator - smooth gradient glow */}
+                {/* Active glow background */}
                 {isActive && (
-                  <motion.div 
+                  <motion.div
                     layoutId="nav-indicator"
                     className="absolute inset-0 -z-10 rounded-xl"
                     style={{
-                      background: 'radial-gradient(ellipse 80% 60% at 50% 40%, rgba(201, 162, 39, 0.12) 0%, transparent 70%)',
+                      background:
+                        'radial-gradient(ellipse 80% 60% at 50% 40%, rgba(201,162,39,0.14) 0%, transparent 70%)',
                     }}
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   />
                 )}
-                
-                {/* Icon container with smooth glass effect */}
-                <motion.div 
-                  className="relative p-2 rounded-xl"
+
+                {/* Icon with spring tap animation */}
+                <motion.div
+                  className="relative p-1.5 rounded-xl"
                   style={{
-                    background: isActive 
-                      ? 'linear-gradient(135deg, rgba(201, 162, 39, 0.12) 0%, rgba(201, 162, 39, 0.06) 100%)'
+                    background: isActive
+                      ? 'linear-gradient(135deg, rgba(201,162,39,0.14) 0%, rgba(201,162,39,0.06) 100%)'
                       : 'transparent',
-                    border: isActive 
-                      ? '1px solid rgba(201, 162, 39, 0.15)'
+                    border: isActive
+                      ? '1px solid rgba(201,162,39,0.18)'
                       : '1px solid transparent',
-                    transition: 'all 0.2s ease',
                   }}
-                  whileTap={{ scale: 0.85 }}
-                  animate={isActive ? { scale: 1.1 } : { scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 20 }}
+                  whileTap={{ scale: 0.82 }}
+                  animate={isActive ? { scale: 1.08 } : { scale: 1 }}
+                  transition={spring}
                 >
-                  <item.Icon 
+                  <item.Icon
                     className={`w-5 h-5 sm:w-[22px] sm:h-[22px] transition-colors duration-200 ${
-                      isActive 
-                        ? 'text-gold-400' 
-                        : 'text-night-400'
+                      isActive ? 'text-gold-400' : 'text-night-400'
                     }`}
                     strokeWidth={isActive ? 2.25 : 1.75}
                   />
                 </motion.div>
-                
+
                 {/* Label - hidden when collapsed */}
-                <span 
-                  className={`text-[10px] sm:text-xs font-medium ${
+                <span
+                  className={`text-[10px] sm:text-xs font-medium transition-all duration-200 ${
                     isCollapsed ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100'
-                  } ${
-                    isActive ? 'text-gold-400' : 'text-night-500'
-                  }`}
-                  style={{
-                    transition: 'opacity 0.2s ease, color 0.2s ease',
-                  }}
+                  } ${isActive ? 'text-gold-400' : 'text-night-500'}`}
                 >
                   {item.label}
                 </span>
+
+                {/* Active bottom dot indicator */}
+                {isActive && !isCollapsed && (
+                  <motion.span
+                    layoutId="nav-dot"
+                    className="absolute -bottom-0.5 w-1 h-1 rounded-full bg-gold-400"
+                    style={{ boxShadow: '0 0 6px rgba(201,162,39,0.6)' }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  />
+                )}
               </Link>
             );
           })}
         </div>
-      </motion.div>
+      </GlassPanel>
     </nav>
   );
 }
