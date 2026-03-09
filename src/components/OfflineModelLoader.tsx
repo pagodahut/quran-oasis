@@ -56,7 +56,11 @@ export function OfflineModelLoader({
       onReady?.();
     } catch (err) {
       console.error('Failed to load offline model:', err);
-      setError(err instanceof Error ? err.message : 'Download failed');
+      const message = err instanceof Error ? err.message : 'Download failed';
+      const userMessage = message.includes('fetch') || message.includes('network') || message.includes('Failed to fetch')
+        ? 'Download failed — please check your internet connection and try again'
+        : message;
+      setError(userMessage);
       setStatus('error');
     }
   }, [onReady]);

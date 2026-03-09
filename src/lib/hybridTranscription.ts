@@ -57,10 +57,29 @@ export async function initOfflineWhisper(
 ): Promise<void> {
   if (offlineWhisperPipeline) return;
   if (offlineModelLoading) {
-    throw new Error('Model already loading');
+    // Allow retry if a previous attempt failed — reset the loading flag
+    console.warn('Model loading flag was stuck, resetting for retry');
   }
   
   offlineModelLoading = true;
+  offlineModelProgress = 0;
+  
+  /**
+   * Safe progress callback — guards against null/undefined data from
+   * @xenova/transformers which can pass malformed progress events
+   * when network errors occur mid-download (the source of the
+   * "undefined is not an object (evaluating 'Object.keys(e)')" crash).
+   */
+  const safeProgressCallback = (data: any) => {
+    try {
+      if (data && typeof data === 'object' && data.status === 'progress' && data.progress !== undefined) {
+        offlineModelProgress = data.progress;
+        onProgress?.(data.progress);
+      }
+    } catch {
+      // Swallow malformed progress events — don't let them crash the loader
+    }
+  };
   
   try {
     // Dynamic import to avoid SSR issues
@@ -83,12 +102,7 @@ export async function initOfflineWhisper(
         modelId,
         {
           quantized: true,
-          progress_callback: (data: any) => {
-            if (data.status === 'progress' && data.progress !== undefined) {
-              offlineModelProgress = data.progress;
-              onProgress?.(data.progress);
-            }
-          },
+          progress_callback: safeProgressCallback,
         }
       );
     } catch (quranModelError) {
@@ -99,15 +113,14 @@ export async function initOfflineWhisper(
         modelId,
         {
           quantized: true,
-          progress_callback: (data: any) => {
-            if (data.status === 'progress' && data.progress !== undefined) {
-              offlineModelProgress = data.progress;
-              onProgress?.(data.progress);
-            }
-          },
+          progress_callback: safeProgressCallback,
         }
       );
     }
+  } catch (error) {
+    // Ensure pipeline is null on failure so retry is possible
+    offlineWhisperPipeline = null;
+    throw error;
   } finally {
     offlineModelLoading = false;
   }
