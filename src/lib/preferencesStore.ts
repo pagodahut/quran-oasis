@@ -113,7 +113,7 @@ export const ARABIC_FONT_STYLE_OPTIONS: {
     label: 'Indo-Pak', 
     arabicSample: 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
     description: 'Nastaliq calligraphy style — familiar to readers from Pakistan, India & Bangladesh',
-    fontFamily: "'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif",
+    fontFamily: "var(--font-indopak)",
   },
 ];
 

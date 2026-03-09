@@ -1,5 +1,5 @@
 /* Fonts loaded via Next.js font optimization in src/lib/fonts.ts */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&display=swap');
+/* Noto Nastaliq Urdu loaded via next/font/google in fonts.ts */
 
 @tailwind base;
 @tailwind components;
@@ -11,9 +11,9 @@
 :root {
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-display: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-arabic: var(--font-kitab), 'Amiri Quran', 'Amiri', serif;
-  --font-quran: var(--font-kitab), 'Amiri Quran', 'Amiri', serif;
-  --font-indopak: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+  --font-arabic: var(--font-amiri), 'Amiri Quran', 'Amiri', serif;
+  --font-quran: var(--font-kitab), 'Scheherazade New', serif;
+  --font-indopak: var(--font-nastaliq), 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
   
   /* Safe Areas */
   --safe-area-top: env(safe-area-inset-top);

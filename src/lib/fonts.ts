@@ -5,7 +5,7 @@ export const amiri = Amiri({
   weight: ['400', '700'],
   subsets: ['arabic', 'latin'],
   display: 'swap',
-  variable: '--font-arabic',
+  variable: '--font-amiri',
   preload: true,
 });
 
@@ -23,7 +23,7 @@ export const notoNastaliqUrdu = Noto_Nastaliq_Urdu({
   weight: ['400', '500', '600', '700'],
   subsets: ['arabic'],
   display: 'swap',
-  variable: '--font-indopak',
+  variable: '--font-nastaliq',
   preload: false, // Only load when selected
 });
 
