@@ -418,21 +418,59 @@ export default function SheikhChat({
           <span aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1]"
             style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.80' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")", opacity: 0.038, mixBlendMode: 'overlay' as const }}
           />
-          {/* Drag handle — tappable close target */}
+          {/* Drag handle — draggable to dismiss */}
           {mode === 'panel' && onClose && (
-            <button
+            <div
+              className="w-full py-2 flex justify-center cursor-grab active:cursor-grabbing touch-none"
+              aria-label="Drag down to close Sheikh chat panel"
+              role="button"
+              tabIndex={0}
               onClick={onClose}
-              className="w-full py-2 flex justify-center cursor-pointer focus:outline-none"
-              aria-label="Close Sheikh chat panel"
+              onTouchStart={(e) => {
+                const startY = e.touches[0].clientY;
+                const panel = (e.currentTarget.closest('[role="dialog"]') as HTMLElement);
+                let currentY = 0;
+                
+                const onTouchMove = (ev: TouchEvent) => {
+                  ev.preventDefault();
+                  currentY = Math.max(0, ev.touches[0].clientY - startY);
+                  if (panel) panel.style.transform = `translateY(${currentY}px)`;
+                };
+                
+                const onTouchEnd = () => {
+                  window.removeEventListener('touchmove', onTouchMove);
+                  window.removeEventListener('touchend', onTouchEnd);
+                  if (currentY > 100) {
+                    onClose();
+                  } else if (panel) {
+                    panel.style.transform = '';
+                  }
+                };
+                
+                window.addEventListener('touchmove', onTouchMove, { passive: false });
+                window.addEventListener('touchend', onTouchEnd);
+              }}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClose(); }}
             >
               <div className="w-10 h-1 bg-white/25 rounded-full" />
-            </button>
+            </div>
           )}
 
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/5">
 
             <div className="flex items-center gap-3">
+              {onClose && (
+                <button
+                  onClick={onClose}
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-night-400 hover:text-white hover:bg-white/10 transition-all focus:ring-2 focus:ring-gold-500/50 focus:outline-none"
+                  aria-label="Go back"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5" aria-hidden="true">
+                    <polyline points="15 18 9 12 15 6" />
+                  </svg>
+                </button>
+              )}
               <div className="w-9 h-9 rounded-full bg-gold-500/15 flex items-center justify-center">
                 <MosqueIcon size={20} aria-hidden="true" />
               </div>
