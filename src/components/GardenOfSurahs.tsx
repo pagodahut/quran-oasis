@@ -2,16 +2,29 @@
 
 /**
  * Garden of Surahs v2 — Fast, responsive, integrated search
- * No per-card scroll tracking. Uniform grid. Verse search inline.
+ * With filter/sort: revelation type, juz, verse count, sort options
  */
 
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, ArrowRight, BookOpen, Sparkles } from 'lucide-react';
+import { Search, X, ArrowRight, BookOpen, Sparkles, SlidersHorizontal, ChevronDown, ArrowUpDown } from 'lucide-react';
 import { SURAHS, type SurahData } from '@/components/SurahBrowser';
 import { getSurahProgress } from '@/lib/progressStore';
 import { searchQuran, type Ayah } from '@/lib/quranData';
+
+// ─── Sort & Filter Types ─────────────────────────────────────────
+type SortOption = 'number' | 'revelation' | 'verses' | 'alpha';
+type RevelationFilter = 'all' | 'makki' | 'madani';
+
+const SORT_LABELS: Record<SortOption, string> = {
+  number: 'Number',
+  revelation: 'Revelation',
+  verses: 'Verses',
+  alpha: 'A–Z',
+};
+
+const ALL_JUZ = Array.from({ length: 30 }, (_, i) => i + 1);
 
 const EASTERN_DIGITS = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
 function toEastern(n: number): string {
@@ -31,7 +44,6 @@ function SurahRow({
   onSelect: (id: number) => void;
 }) {
   const isMakki = surah.revelation === 'makki';
-  const accent = isMakki ? 'gold' : 'sage';
 
   return (
     <button
@@ -172,6 +184,24 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
   const inputRef = useRef<HTMLInputElement>(null);
   const searchTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
+  // Filter & sort state
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<SortOption>('number');
+  const [revelationFilter, setRevelationFilter] = useState<RevelationFilter>('all');
+  const [juzFilter, setJuzFilter] = useState<number | null>(null);
+  const [verseMin, setVerseMin] = useState('');
+  const [verseMax, setVerseMax] = useState('');
+
+  const hasActiveFilters = revelationFilter !== 'all' || juzFilter !== null || verseMin !== '' || verseMax !== '' || sortBy !== 'number';
+
+  const clearFilters = useCallback(() => {
+    setSortBy('number');
+    setRevelationFilter('all');
+    setJuzFilter(null);
+    setVerseMin('');
+    setVerseMax('');
+  }, []);
+
   // Load progress once
   useEffect(() => {
     try {
@@ -237,17 +267,56 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
     }, 250);
   }, [handleSelect]);
 
-  // Filter surahs by name/meaning/number
+  // Filter & sort surahs
   const filteredSurahs = useMemo(() => {
-    if (!query.trim()) return SURAHS;
-    const q = query.toLowerCase();
-    return SURAHS.filter(s =>
-      s.name.toLowerCase().includes(q) ||
-      s.meaning.toLowerCase().includes(q) ||
-      s.arabic.includes(q) ||
-      s.id.toString() === q
-    );
-  }, [query]);
+    let result = [...SURAHS];
+
+    // Text search
+    if (query.trim()) {
+      const q = query.toLowerCase();
+      result = result.filter(s =>
+        s.name.toLowerCase().includes(q) ||
+        s.meaning.toLowerCase().includes(q) ||
+        s.arabic.includes(q) ||
+        s.id.toString() === q
+      );
+    }
+
+    // Revelation filter
+    if (revelationFilter !== 'all') {
+      result = result.filter(s => s.revelation === revelationFilter);
+    }
+
+    // Juz filter
+    if (juzFilter !== null) {
+      result = result.filter(s => s.juz.includes(juzFilter));
+    }
+
+    // Verse count range
+    const vMin = verseMin ? parseInt(verseMin) : 0;
+    const vMax = verseMax ? parseInt(verseMax) : Infinity;
+    if (vMin > 0 || vMax < Infinity) {
+      result = result.filter(s => s.ayahs >= vMin && s.ayahs <= vMax);
+    }
+
+    // Sort
+    switch (sortBy) {
+      case 'number':
+        result.sort((a, b) => a.id - b.id);
+        break;
+      case 'revelation':
+        result.sort((a, b) => a.order - b.order);
+        break;
+      case 'verses':
+        result.sort((a, b) => b.ayahs - a.ayahs);
+        break;
+      case 'alpha':
+        result.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+    }
+
+    return result;
+  }, [query, sortBy, revelationFilter, juzFilter, verseMin, verseMax]);
 
   const inProgressCount = Object.keys(progressMap).length;
   const totalMemorized = Object.values(progressMap).filter(p => p === 100).length;
@@ -277,32 +346,166 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
         </div>
       )}
 
-      {/* Search */}
+      {/* Search + Filters */}
       <div className="sticky top-0 z-20 px-4 py-3 backdrop-blur-xl bg-night-950/80">
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-night-500" />
-          <input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={e => handleSearch(e.target.value)}
-            placeholder="Search surahs, verses, or jump to 2:255…"
-            className="w-full bg-night-900/60 border border-night-700/30 rounded-xl py-2.5 pl-10 pr-10 text-sm text-night-100 placeholder:text-night-600 focus:outline-none focus:border-gold-500/30 transition-colors"
-          />
-          {query && (
-            <button
-              onClick={() => { setQuery(''); setVerseResults([]); }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-night-500 hover:text-night-300"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-          {isSearching && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              <div className="w-4 h-4 border-2 border-gold-400/30 border-t-gold-400 rounded-full animate-spin" />
-            </div>
-          )}
+        <div className="relative flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-night-500" />
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={e => handleSearch(e.target.value)}
+              placeholder="Search surahs, verses, or jump to 2:255…"
+              className="w-full bg-night-900/60 border border-night-700/30 rounded-xl py-2.5 pl-10 pr-10 text-sm text-night-100 placeholder:text-night-600 focus:outline-none focus:border-gold-500/30 transition-colors"
+            />
+            {query && (
+              <button
+                onClick={() => { setQuery(''); setVerseResults([]); }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-night-500 hover:text-night-300"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+            {isSearching && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                <div className="w-4 h-4 border-2 border-gold-400/30 border-t-gold-400 rounded-full animate-spin" />
+              </div>
+            )}
+          </div>
+          {/* Filter toggle */}
+          <button
+            onClick={() => setFiltersOpen(v => !v)}
+            className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-200 ${
+              hasActiveFilters
+                ? 'bg-gold-500/15 border-gold-500/30 text-gold-400'
+                : 'bg-night-900/60 border-night-700/30 text-night-500 hover:text-night-300'
+            }`}
+          >
+            <SlidersHorizontal className="w-4 h-4" />
+          </button>
         </div>
+
+        {/* Collapsible filter bar */}
+        <AnimatePresence>
+          {filtersOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              className="overflow-hidden"
+            >
+              <div
+                className="mt-3 p-3 rounded-2xl space-y-3"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  backdropFilter: 'blur(12px)',
+                }}
+              >
+                {/* Sort */}
+                <div>
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <ArrowUpDown className="w-3 h-3 text-night-500" />
+                    <span className="text-[11px] uppercase tracking-widest text-night-500 font-medium">Sort</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(Object.keys(SORT_LABELS) as SortOption[]).map(opt => (
+                      <button
+                        key={opt}
+                        onClick={() => setSortBy(opt)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 ${
+                          sortBy === opt
+                            ? 'bg-gold-500/20 text-gold-300 border border-gold-500/30'
+                            : 'bg-night-800/40 text-night-400 border border-night-700/20 hover:text-night-200'
+                        }`}
+                      >
+                        {SORT_LABELS[opt]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Revelation type */}
+                <div>
+                  <span className="text-[11px] uppercase tracking-widest text-night-500 font-medium">Revelation</span>
+                  <div className="flex gap-1.5 mt-2">
+                    {(['all', 'makki', 'madani'] as RevelationFilter[]).map(opt => (
+                      <button
+                        key={opt}
+                        onClick={() => setRevelationFilter(opt)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 ${
+                          revelationFilter === opt
+                            ? opt === 'makki'
+                              ? 'bg-gold-500/20 text-gold-300 border border-gold-500/30'
+                              : opt === 'madani'
+                              ? 'bg-sage-500/20 text-sage-300 border border-sage-500/30'
+                              : 'bg-night-600/30 text-night-200 border border-night-500/30'
+                            : 'bg-night-800/40 text-night-400 border border-night-700/20 hover:text-night-200'
+                        }`}
+                      >
+                        {opt === 'all' ? 'All' : opt === 'makki' ? 'Makki' : 'Madani'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Juz filter */}
+                <div>
+                  <span className="text-[11px] uppercase tracking-widest text-night-500 font-medium">Juz</span>
+                  <div className="mt-2 relative">
+                    <select
+                      value={juzFilter ?? ''}
+                      onChange={e => setJuzFilter(e.target.value ? parseInt(e.target.value) : null)}
+                      className="w-full appearance-none bg-night-800/40 border border-night-700/20 rounded-lg px-3 py-1.5 text-xs text-night-300 focus:outline-none focus:border-gold-500/30 transition-colors"
+                    >
+                      <option value="">All Juz</option>
+                      {ALL_JUZ.map(j => (
+                        <option key={j} value={j}>Juz {j}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-night-500 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* Verse count range */}
+                <div>
+                  <span className="text-[11px] uppercase tracking-widest text-night-500 font-medium">Verses</span>
+                  <div className="flex gap-2 mt-2">
+                    <input
+                      type="number"
+                      value={verseMin}
+                      onChange={e => setVerseMin(e.target.value)}
+                      placeholder="Min"
+                      min={1}
+                      className="flex-1 bg-night-800/40 border border-night-700/20 rounded-lg px-3 py-1.5 text-xs text-night-300 placeholder:text-night-600 focus:outline-none focus:border-gold-500/30 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                    <span className="text-night-600 text-xs self-center">–</span>
+                    <input
+                      type="number"
+                      value={verseMax}
+                      onChange={e => setVerseMax(e.target.value)}
+                      placeholder="Max"
+                      min={1}
+                      className="flex-1 bg-night-800/40 border border-night-700/20 rounded-lg px-3 py-1.5 text-xs text-night-300 placeholder:text-night-600 focus:outline-none focus:border-gold-500/30 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Clear filters */}
+                {hasActiveFilters && (
+                  <button
+                    onClick={clearFilters}
+                    className="w-full py-1.5 text-xs text-night-400 hover:text-night-200 transition-colors"
+                  >
+                    Clear all filters
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <div className="px-4 pb-32 space-y-2">
@@ -317,7 +520,7 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
               <span className="text-[10px] text-night-600">{verseResults.length}+ matches</span>
             </div>
             <div className="space-y-2">
-              {verseResults.slice(0, 8).map((r, i) => (
+              {verseResults.slice(0, 8).map((r) => (
                 <VerseResult
                   key={`${r.surah}-${r.ayah.numberInSurah}`}
                   surah={r.surah}
@@ -339,10 +542,13 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
         {/* Surah list */}
         {filteredSurahs.length > 0 ? (
           <>
-            {query && verseResults.length > 0 && (
-              <div className="flex items-center gap-1.5 px-1 mb-1 mt-2">
-                <BookOpen className="w-3 h-3 text-night-500" />
-                <h3 className="text-xs uppercase tracking-widest text-night-400 font-medium">Surahs</h3>
+            {(query || hasActiveFilters) && (
+              <div className="flex items-center justify-between px-1 mb-1 mt-2">
+                <div className="flex items-center gap-1.5">
+                  <BookOpen className="w-3 h-3 text-night-500" />
+                  <h3 className="text-xs uppercase tracking-widest text-night-400 font-medium">Surahs</h3>
+                </div>
+                <span className="text-[10px] text-night-600">{filteredSurahs.length} result{filteredSurahs.length !== 1 ? 's' : ''}</span>
               </div>
             )}
             <div className="space-y-1.5">
@@ -359,13 +565,15 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
           </>
         ) : (
           <div className="text-center py-16">
-            <p className="text-night-500 text-sm">No surahs match "{query}"</p>
+            <p className="text-night-500 text-sm">
+              {query ? `No surahs match "${query}"` : 'No surahs match current filters'}
+            </p>
             {verseResults.length === 0 && !isSearching && (
               <button
-                onClick={() => { setQuery(''); setVerseResults([]); }}
+                onClick={() => { setQuery(''); setVerseResults([]); clearFilters(); }}
                 className="mt-2 text-gold-400/70 text-sm hover:underline"
               >
-                Clear search
+                Clear {hasActiveFilters ? 'filters' : 'search'}
               </button>
             )}
           </div>
