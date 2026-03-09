@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useCalibrationGuard } from '@/hooks/useCalibrationGuard';
@@ -66,6 +66,16 @@ export default function PracticePage() {
 
   const [isCalibrated, setIsCalibrated] = useState(true);
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
+
+  // Resolve display name: Clerk user → localStorage (onboarding) → fallback
+  const displayName = useMemo(() => {
+    if (user?.firstName) return user.firstName;
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('quranOasis_userName');
+      if (stored) return stored;
+    }
+    return 'Student';
+  }, [user]);
 
   // Load profile and SRS state
   useEffect(() => {
@@ -325,7 +335,7 @@ export default function PracticePage() {
         <div className="px-4 py-3 flex items-center justify-between">
           <div>
             <h1 className="font-display text-xl text-night-100">
-              {getGreeting()}, {user?.firstName || 'Student'}
+              {getGreeting()}, {displayName}
             </h1>
             <p className="text-sm text-night-500">
               {dueCount.total > 0
