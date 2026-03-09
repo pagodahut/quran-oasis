@@ -733,8 +733,8 @@ export default function LessonDetailPage() {
       const line = lines[i];
       
       // Memory Trick blocks - detect and style specially
-      if (line.toLowerCase().includes('memory trick:') || line.toLowerCase().startsWith('**memory trick')) {
-        const trickContent = line.replace(/\*\*memory trick:?\*\*:?/i, '').replace(/memory trick:?/i, '').trim();
+      if (/^(\*\*\s*memory trick:?\s*\*\*|memory trick:)/i.test(line.trim())) {
+        const trickContent = line.replace(/\*\*\s*memory trick:?\s*\*\*:?/i, '').replace(/^memory trick:?/i, '').trim();
         result.push(
           <div key={i} className="my-4 bg-gradient-to-r from-gold-900/20 via-gold-900/10 to-transparent border border-gold-500/20 rounded-xl p-4">
             <div className="flex items-start gap-3">
@@ -804,8 +804,8 @@ export default function LessonDetailPage() {
       }
       
       // Tip blocks  
-      if (line.toLowerCase().includes('tip:') || line.toLowerCase().startsWith('**tip')) {
-        const tipContent = line.replace(/\*\*tip:?\*\*:?/i, '').replace(/tip:?/i, '').trim();
+      if (/^(\*\*\s*tip:?\s*\*\*|tip:)/i.test(line.trim())) {
+        const tipContent = line.replace(/\*\*\s*tip:?\s*\*\*:?/i, '').replace(/^tip:?/i, '').trim();
         result.push(
           <div key={i} className="my-4 bg-sage-900/20 border border-sage-700/30 rounded-xl p-4">
             <div className="flex items-start gap-3">
