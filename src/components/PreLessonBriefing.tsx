@@ -46,8 +46,8 @@ interface AyahInfo {
 interface PreLessonBriefingProps {
   /** Lesson title for display */
   lessonTitle: string;
-  /** Ayahs the student will study */
-  ayahs: AyahInfo[];
+  /** Ayahs the student will study (empty for alphabet/concept lessons) */
+  ayahs?: AyahInfo[];
   /** User's learning level */
   userLevel: 'beginner' | 'intermediate' | 'advanced';
   /** Whether this is a review lesson */
@@ -77,13 +77,13 @@ export default function PreLessonBriefing({
   const [dismissed, setDismissed] = useState(false);
   const [animateIn, setAnimateIn] = useState(false);
 
+  const safeAyahs = ayahs ?? [];
+
   // Generate briefing on mount
   useEffect(() => {
-    if (ayahs.length === 0) return;
-
     const ctx: BriefingContext = {
       lessonTitle,
-      ayahs,
+      ayahs: safeAyahs,
       userLevel,
       isReview,
     };
@@ -123,7 +123,7 @@ export default function PreLessonBriefing({
   };
 
   const handleLearnMore = () => {
-    const question = briefing
+    const question = briefing && safeAyahs.length > 0
       ? `Tell me more about ${lessonTitle} — what makes these ayahs special?`
       : `What should I know about ${lessonTitle} before I start?`;
     openSheikh(question);
@@ -210,8 +210,10 @@ export default function PreLessonBriefing({
       {/* ─── Styles ──────────────────────────────────────────────── */}
       <style jsx>{`
         .sheikh-briefing {
-          background: linear-gradient(135deg, #0c1f1a 0%, #132e25 50%, #1a3a2f 100%);
-          border: 1px solid rgba(45, 212, 150, 0.15);
+          background: rgba(255, 255, 255, 0.06);
+          backdrop-filter: blur(24px) saturate(1.4);
+          -webkit-backdrop-filter: blur(24px) saturate(1.4);
+          border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 16px;
           padding: 20px;
           margin-bottom: 20px;
@@ -220,6 +222,7 @@ export default function PreLessonBriefing({
           transition: opacity 0.4s ease, transform 0.4s ease;
           position: relative;
           overflow: hidden;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
         }
 
         .sheikh-briefing::before {
@@ -228,8 +231,8 @@ export default function PreLessonBriefing({
           top: 0;
           left: 0;
           right: 0;
-          height: 3px;
-          background: linear-gradient(90deg, #2dd496, #28b886, #2dd496);
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
           opacity: 0.8;
         }
 
@@ -242,13 +245,13 @@ export default function PreLessonBriefing({
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          background: rgba(45, 212, 150, 0.1);
-          border: 1px solid rgba(45, 212, 150, 0.2);
+          background: rgba(212, 175, 55, 0.08);
+          border: 1px solid rgba(212, 175, 55, 0.2);
           border-radius: 20px;
           padding: 4px 12px;
           margin-bottom: 14px;
           font-size: 12px;
-          color: #2dd496;
+          color: rgba(212, 175, 55, 0.9);
           letter-spacing: 0.5px;
           text-transform: uppercase;
         }
@@ -268,11 +271,13 @@ export default function PreLessonBriefing({
           width: 40px;
           height: 40px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #2dd496, #1a7a54);
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(212, 175, 55, 0.25);
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
         }
 
         .sheikh-briefing__avatar-emoji {
@@ -288,19 +293,19 @@ export default function PreLessonBriefing({
         .sheikh-briefing__label {
           font-size: 15px;
           font-weight: 600;
-          color: #e8f5f0;
+          color: rgba(255, 255, 255, 0.9);
         }
 
         .sheikh-briefing__subtitle {
           font-size: 12px;
-          color: #6bb89a;
+          color: rgba(255, 255, 255, 0.6);
           margin-top: 1px;
         }
 
         .sheikh-briefing__dismiss {
           background: none;
           border: none;
-          color: #6bb89a;
+          color: rgba(255, 255, 255, 0.5);
           font-size: 16px;
           cursor: pointer;
           padding: 4px 8px;
@@ -310,7 +315,7 @@ export default function PreLessonBriefing({
 
         .sheikh-briefing__dismiss:hover {
           background: rgba(255, 255, 255, 0.05);
-          color: #e8f5f0;
+          color: rgba(255, 255, 255, 0.9);
         }
 
         .sheikh-briefing__body {
@@ -318,7 +323,7 @@ export default function PreLessonBriefing({
         }
 
         .sheikh-briefing__message {
-          color: #c8e6dc;
+          color: rgba(255, 255, 255, 0.8);
           font-size: 14.5px;
           line-height: 1.65;
           margin: 0;
@@ -330,9 +335,9 @@ export default function PreLessonBriefing({
           gap: 8px;
           margin-top: 12px;
           padding: 10px 12px;
-          background: rgba(45, 212, 150, 0.08);
+          background: rgba(255, 255, 255, 0.04);
           border-radius: 10px;
-          border-left: 3px solid #2dd496;
+          border-left: 2px solid rgba(212, 175, 55, 0.4);
         }
 
         .sheikh-briefing__tip-icon {
@@ -342,7 +347,7 @@ export default function PreLessonBriefing({
         }
 
         .sheikh-briefing__tip-text {
-          color: #a8d8c4;
+          color: rgba(255, 255, 255, 0.6);
           font-size: 13.5px;
           line-height: 1.5;
         }
@@ -359,9 +364,9 @@ export default function PreLessonBriefing({
           border-radius: 7px;
           background: linear-gradient(
             90deg,
-            rgba(45, 212, 150, 0.08) 25%,
-            rgba(45, 212, 150, 0.15) 50%,
-            rgba(45, 212, 150, 0.08) 75%
+            rgba(255, 255, 255, 0.04) 25%,
+            rgba(255, 255, 255, 0.08) 50%,
+            rgba(255, 255, 255, 0.04) 75%
           );
           background-size: 200% 100%;
           animation: shimmer 1.5s infinite;
