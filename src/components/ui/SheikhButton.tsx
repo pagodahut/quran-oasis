@@ -78,18 +78,18 @@ export default function SheikhButton({
 
         /* ─── Primary ─── */
         .sheikh-btn--primary {
-          background: #1a7a54;
+          background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.15);
           color: #fff;
           box-shadow:
-            0 0 20px rgba(45, 212, 150, 0.3),
-            0 0 40px rgba(45, 212, 150, 0.1),
+            0 8px 32px rgba(0, 0, 0, 0.25),
+            
             inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
         .sheikh-btn--primary:hover {
-          background: #1f8e62;
+          background: rgba(255, 255, 255, 0.15); border-color: rgba(212, 175, 55, 0.3);
           box-shadow:
-            0 0 30px rgba(45, 212, 150, 0.5),
-            0 0 60px rgba(45, 212, 150, 0.2);
+            0 8px 32px rgba(0, 0, 0, 0.3),
+            0 0 20px rgba(212, 175, 55, 0.1);
           transform: translateY(-2px);
         }
         .sheikh-btn--primary:active {

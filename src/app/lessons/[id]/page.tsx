@@ -979,7 +979,7 @@ export default function LessonDetailPage() {
     // For lessons with ayahs, show the full AI-generated briefing
     if (lessonAyahs.length > 0) {
       return (
-        <div className="min-h-screen px-4 py-8">
+        <div className="min-h-screen px-4 py-4">
           <PreLessonBriefing
             lessonTitle={lesson.title}
             ayahs={lessonAyahs}
@@ -1055,7 +1055,7 @@ export default function LessonDetailPage() {
       </AnimatePresence>
 
       {/* Header - Premium Frosted Glass */}
-      <header className="sticky top-0 z-40 safe-area-top liquid-glass mx-2 mt-2 rounded-2xl">
+      <header className="sticky top-0 z-40 safe-area-top liquid-glass mx-2 rounded-2xl">
         <div className="flex items-center justify-between px-3 py-3">
           <button 
             onClick={() => router.push('/lessons')} 
