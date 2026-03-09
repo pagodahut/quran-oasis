@@ -8,10 +8,23 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, ArrowRight, BookOpen, Sparkles } from 'lucide-react';
+import { Search, X, ArrowRight, BookOpen, Sparkles, SlidersHorizontal, ChevronDown, ArrowUpDown } from 'lucide-react';
 import { SURAHS, type SurahData } from '@/components/SurahBrowser';
 import { getSurahProgress } from '@/lib/progressStore';
 import { searchQuran, type Ayah } from '@/lib/quranData';
+
+// ─── Sort & Filter Types ─────────────────────────────────────────
+type SortOption = 'number' | 'revelation' | 'verses' | 'alpha';
+type RevelationFilter = 'all' | 'makki' | 'madani';
+
+const SORT_LABELS: Record<SortOption, string> = {
+  number: 'Number',
+  revelation: 'Revelation',
+  verses: 'Verses',
+  alpha: 'A\u2013Z',
+};
+
+const ALL_JUZ = Array.from({ length: 30 }, (_, i) => i + 1);
 
 const EASTERN_DIGITS = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
 function toEastern(n: number): string {
@@ -31,7 +44,6 @@ function SurahRow({
   onSelect: (id: number) => void;
 }) {
   const isMakki = surah.revelation === 'makki';
-  const accent = isMakki ? 'gold' : 'sage';
 
   return (
     <button
@@ -172,6 +184,24 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
   const inputRef = useRef<HTMLInputElement>(null);
   const searchTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
+  // Filter & sort state
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<SortOption>('number');
+  const [revelationFilter, setRevelationFilter] = useState<RevelationFilter>('all');
+  const [juzFilter, setJuzFilter] = useState<number | null>(null);
+  const [verseMin, setVerseMin] = useState('');
+  const [verseMax, setVerseMax] = useState('');
+
+  const hasActiveFilters = revelationFilter !== 'all' || juzFilter !== null || verseMin !== '' || verseMax !== '' || sortBy !== 'number';
+
+  const clearFilters = useCallback(() => {
+    setSortBy('number');
+    setRevelationFilter('all');
+    setJuzFilter(null);
+    setVerseMin('');
+    setVerseMax('');
+  }, []);
+
   // Load progress once
   useEffect(() => {
     try {
@@ -237,17 +267,56 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
     }, 250);
   }, [handleSelect]);
 
-  // Filter surahs by name/meaning/number
+  // Filter & sort surahs
   const filteredSurahs = useMemo(() => {
-    if (!query.trim()) return SURAHS;
-    const q = query.toLowerCase();
-    return SURAHS.filter(s =>
-      s.name.toLowerCase().includes(q) ||
-      s.meaning.toLowerCase().includes(q) ||
-      s.arabic.includes(q) ||
-      s.id.toString() === q
-    );
-  }, [query]);
+    let result = [...SURAHS];
+
+    // Text search
+    if (query.trim()) {
+      const q = query.toLowerCase();
+      result = result.filter(s =>
+        s.name.toLowerCase().includes(q) ||
+        s.meaning.toLowerCase().includes(q) ||
+        s.arabic.includes(q) ||
+        s.id.toString() === q
+      );
+    }
+
+    // Revelation filter
+    if (revelationFilter !== 'all') {
+      result = result.filter(s => s.revelation === revelationFilter);
+    }
+
+    // Juz filter
+    if (juzFilter !== null) {
+      result = result.filter(s => s.juz.includes(juzFilter));
+    }
+
+    // Verse count range
+    const vMin = verseMin ? parseInt(verseMin) : 0;
+    const vMax = verseMax ? parseInt(verseMax) : Infinity;
+    if (vMin > 0 || vMax < Infinity) {
+      result = result.filter(s => s.ayahs >= vMin && s.ayahs <= vMax);
+    }
+
+    // Sort
+    switch (sortBy) {
+      case 'number':
+        result.sort((a, b) => a.id - b.id);
+        break;
+      case 'revelation':
+        result.sort((a, b) => a.order - b.order);
+        break;
+      case 'verses':
+        result.sort((a, b) => b.ayahs - a.ayahs);
+        break;
+      case 'alpha':
+        result.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+    }
+
+    return result;
+  }, [query, sortBy, revelationFilter, juzFilter, verseMin, verseMax]);
 
   const inProgressCount = Object.keys(progressMap).length;
   const totalMemorized = Object.values(progressMap).filter(p => p === 100).length;
@@ -339,10 +408,13 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
         {/* Surah list */}
         {filteredSurahs.length > 0 ? (
           <>
-            {query && verseResults.length > 0 && (
-              <div className="flex items-center gap-1.5 px-1 mb-1 mt-2">
-                <BookOpen className="w-3 h-3 text-night-500" />
-                <h3 className="text-xs uppercase tracking-widest text-night-400 font-medium">Surahs</h3>
+            {(query || hasActiveFilters) && (
+              <div className="flex items-center justify-between px-1 mb-1 mt-2">
+                <div className="flex items-center gap-1.5">
+                  <BookOpen className="w-3 h-3 text-night-500" />
+                  <h3 className="text-xs uppercase tracking-widest text-night-400 font-medium">Surahs</h3>
+                </div>
+                <span className="text-[10px] text-night-600">{filteredSurahs.length} result{filteredSurahs.length !== 1 ? 's' : ''}</span>
               </div>
             )}
             <div className="space-y-1.5">
