@@ -408,10 +408,11 @@ export default function SettingsPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
             className="fixed top-20 left-1/2 -translate-x-1/2 z-50 
-                      px-4 py-2 rounded-full bg-sage-500 text-white 
-                      text-sm font-medium flex items-center gap-2 shadow-lg"
+                      px-4 py-3 rounded-xl bg-night-900/90 backdrop-blur-xl border border-gold-500/30
+                      text-sm font-medium text-night-100 flex items-center gap-2 
+                      shadow-lg shadow-black/30"
           >
-            <Check className="w-4 h-4" />
+            <Check className="w-4 h-4 text-gold-400" />
             {successMessage}
           </motion.div>
         )}
