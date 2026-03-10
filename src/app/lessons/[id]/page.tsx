@@ -980,7 +980,7 @@ export default function LessonDetailPage() {
       <div className="min-h-screen px-4 py-8">
         <PreLessonBriefing
           lessonTitle={lesson.title}
-          ayahs={lessonAyahs}
+          ayahs={lessonAyahs.length > 0 ? lessonAyahs : undefined}
           userLevel="beginner"
           isReview={false}
           lessonDescription={lesson.description}
