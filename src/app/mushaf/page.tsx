@@ -436,9 +436,9 @@ export default function MushafPage() {
       {/* Focus mode back button when chrome hidden */}
       {focusMode && !chromeVisible && (
         <button
-          onClick={() => setChromeVisible(true)}
+          onClick={() => router.back()}
           className="fixed top-4 left-4 z-50 liquid-icon-btn !bg-night-900/80"
-          aria-label="Show controls"
+          aria-label="Go back"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>

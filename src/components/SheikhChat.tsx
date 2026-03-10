@@ -26,8 +26,8 @@ import { MosqueIcon, BookReadIcon } from '@/components/icons';
  *   <SheikhChat ayahContext={...} userLevel="intermediate" />
  */
 
-import { useState, useRef, useEffect, type FormEvent, type KeyboardEvent } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useRef, useEffect, useCallback, type FormEvent, type KeyboardEvent } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform, useAnimation, PanInfo } from 'framer-motion';
 import { useSheikhChat, type AyahContext, type ChatMessage } from '@/hooks/useSheikhChat';
 import { useSheikh } from '@/contexts/SheikhContext';
 import { usePremium } from '@/contexts/PremiumContext';
@@ -380,6 +380,14 @@ export default function SheikhChat({
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+        drag={mode === 'panel' ? 'y' : false}
+        dragConstraints={{ top: 0 }}
+        dragElastic={0.2}
+        onDragEnd={(_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+          if (info.offset.y > 100 || info.velocity.y > 500) {
+            onClose?.();
+          }
+        }}
         className={`${
           mode === 'panel' ? 'fixed bottom-0 left-0 right-0 z-50 max-h-[85vh]' :
           mode === 'fullpage' ? 'fixed inset-0 z-50' :
