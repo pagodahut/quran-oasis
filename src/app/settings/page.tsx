@@ -1145,6 +1145,9 @@ Additional Notes:
                 <span className="text-night-400">Version:</span> 1.0.0
               </p>
               <p className="text-night-500">
+                <span className="text-night-400">Reciter:</span> {RECITERS.find(r => r.id === preferences.reciter)?.name || 'Mishary Rashid Alafasy'}
+              </p>
+              <p className="text-night-500">
                 <span className="text-night-400">Audio:</span> EveryAyah.com
               </p>
               <p className="text-night-500">
