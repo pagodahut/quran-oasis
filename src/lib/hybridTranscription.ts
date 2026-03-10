@@ -65,17 +65,25 @@ export async function initOfflineWhisper(
   try {
     // Dynamic import to avoid SSR issues
     const { pipeline, env } = await import('@xenova/transformers');
-    
+
     // Configure for browser
     env.allowLocalModels = false;
     env.useBrowserCache = true;
-    
+
+    // Safe progress callback that guards against undefined data
+    const progressCallback = (data: any) => {
+      if (data && data.status === 'progress' && data.progress !== undefined) {
+        offlineModelProgress = data.progress;
+        onProgress?.(data.progress);
+      }
+    };
+
     // Use the ONNX-converted version of the Tarteel Quran Whisper model
     // The original tarteel-ai/whisper-tiny-ar-quran only has PyTorch weights
     // Falls back to generic Xenova/whisper-tiny if the Quran-specific model fails
     const QURAN_MODEL = 'omartariq612/tarteel-ai-whisper-tiny-ar-quran-onnx';
     const FALLBACK_MODEL = 'Xenova/whisper-tiny';
-    
+
     let modelId = QURAN_MODEL;
     try {
       offlineWhisperPipeline = await pipeline(
@@ -83,31 +91,26 @@ export async function initOfflineWhisper(
         modelId,
         {
           quantized: true,
-          progress_callback: (data: any) => {
-            if (data.status === 'progress' && data.progress !== undefined) {
-              offlineModelProgress = data.progress;
-              onProgress?.(data.progress);
-            }
-          },
+          progress_callback: progressCallback,
         }
       );
     } catch (quranModelError) {
       console.warn('Quran-specific ONNX model failed, falling back to generic Whisper:', quranModelError);
+      offlineWhisperPipeline = null;
       modelId = FALLBACK_MODEL;
       offlineWhisperPipeline = await pipeline(
         'automatic-speech-recognition',
         modelId,
         {
           quantized: true,
-          progress_callback: (data: any) => {
-            if (data.status === 'progress' && data.progress !== undefined) {
-              offlineModelProgress = data.progress;
-              onProgress?.(data.progress);
-            }
-          },
+          progress_callback: progressCallback,
         }
       );
     }
+  } catch (err) {
+    offlineWhisperPipeline = null;
+    offlineModelProgress = 0;
+    throw err;
   } finally {
     offlineModelLoading = false;
   }
@@ -146,18 +149,18 @@ async function transcribeOffline(audioBlob: Blob): Promise<TranscriptionResult> 
     task: 'transcribe',
     return_timestamps: true,
   });
-  
+
   const latencyMs = performance.now() - startTime;
-  
+
   return {
-    text: result.text || '',
+    text: result?.text || '',
     provider: 'browser',
     mode: 'offline',
     latencyMs,
-    words: result.chunks?.map((chunk: any) => ({
+    words: result?.chunks?.map((chunk: any) => ({
       word: chunk.text,
-      start: chunk.timestamp[0],
-      end: chunk.timestamp[1],
+      start: chunk.timestamp?.[0] ?? 0,
+      end: chunk.timestamp?.[1] ?? 0,
       confidence: 1.0, // Whisper doesn't provide confidence
     })),
   };
