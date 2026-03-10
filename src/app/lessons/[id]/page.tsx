@@ -261,13 +261,13 @@ function ArabicDisplay({
       
       <div className="relative p-8 flex flex-col items-center justify-center min-h-[160px]">
         {/* Main Arabic text */}
-        <div 
+        <div
           className={`
             font-arabic text-center
-            ${isSingleLetter 
-              ? 'text-8xl sm:text-9xl text-gold-400 drop-shadow-[0_0_20px_rgba(201,162,39,0.3)] leading-none' 
-              : isWord 
-                ? 'text-5xl sm:text-6xl text-gold-300 leading-tight' 
+            ${isSingleLetter
+              ? 'text-8xl sm:text-9xl text-gold-400 drop-shadow-[0_0_20px_rgba(201,162,39,0.3)] leading-none pb-4'
+              : isWord
+                ? 'text-5xl sm:text-6xl text-gold-300 leading-tight'
                 : 'text-3xl sm:text-4xl text-night-100 leading-relaxed'
             }
           `}
@@ -275,17 +275,17 @@ function ArabicDisplay({
         >
           {content}
         </div>
-        
+
         {/* Letter name and phonetic for single letters */}
         {letterData && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="mt-3 flex flex-col items-center gap-0.5 text-center"
+            className="mt-4 pt-4 flex flex-col items-center gap-1 text-center border-t border-night-700/50"
           >
-            <span className="text-xl font-semibold text-gold-400 leading-tight">{letterData.name}</span>
-            <span className="text-sm font-mono text-night-400 tracking-wide leading-tight">/{letterData.phonetic}/</span>
+            <span className="text-xl font-semibold text-gold-400">{letterData.name}</span>
+            <span className="text-sm font-mono text-night-400 tracking-wide">/{letterData.phonetic}/</span>
           </motion.div>
         )}
         
