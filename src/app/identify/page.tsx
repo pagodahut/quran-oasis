@@ -135,7 +135,7 @@ export default function IdentifyPage() {
   return (
     <div className="min-h-screen min-h-dvh flex flex-col">
       {/* Header */}
-      <header className="px-4 pt-6 pb-4 safe-area-top">
+      <header className="px-4 pb-4 safe-area-top">
         <div className="flex items-center gap-3">
           <button onClick={() => router.push('/practice')} className="p-2 -ml-2 text-night-400 hover:text-night-200">
             <ChevronLeft className="w-5 h-5" />

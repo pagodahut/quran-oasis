@@ -7,7 +7,7 @@ export default function DashboardLoading() {
   return (
     <div className="min-h-screen bg-night-950 pb-20">
       {/* Header skeleton */}
-      <header className="px-4 py-6 safe-area-top">
+      <header className="px-4 pb-6 safe-area-top">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-gradient-to-r from-gold-500/20 to-gold-600/10 animate-pulse" />
