@@ -368,9 +368,9 @@ export default function MushafPage() {
       >
             <div className="flex items-center justify-between px-3 py-3">
               <div className="flex items-center gap-1.5">
-                <Link href="/" className="liquid-icon-btn">
+                <button onClick={() => router.back()} className="liquid-icon-btn">
                   <ChevronLeft className="w-5 h-5" />
-                </Link>
+                </button>
                 <button onClick={() => setShowSurahList(true)} className="liquid-icon-btn">
                   <List className="w-5 h-5" />
                 </button>
