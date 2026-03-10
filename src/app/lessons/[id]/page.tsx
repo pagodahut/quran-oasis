@@ -974,47 +974,19 @@ export default function LessonDetailPage() {
     );
   }
   
-  // Show PreLessonBriefing before lesson starts (all lessons get a brief intro)
+  // Show PreLessonBriefing before lesson starts (all lessons get Sheikh HIFZ briefing)
   if (!lessonStarted) {
-    // For lessons with ayahs, show the full AI-generated briefing
-    if (lessonAyahs.length > 0) {
-      return (
-        <div className="min-h-screen px-4 py-8">
-          <PreLessonBriefing
-            lessonTitle={lesson.title}
-            ayahs={lessonAyahs}
-            userLevel="beginner"
-            isReview={false}
-            onStart={() => setLessonStarted(true)}
-            onDismiss={() => setLessonStarted(true)}
-          />
-        </div>
-      );
-    }
-    // For alphabet/concept lessons without ayahs, show a simple intro card
     return (
-      <div className="min-h-screen px-4 py-8 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-md w-full liquid-glass-gold rounded-2xl p-8 text-center"
-        >
-          <div className="w-14 h-14 rounded-2xl bg-gold-500/20 flex items-center justify-center mx-auto mb-4">
-            <BookOpen className="w-7 h-7 text-gold-400" />
-          </div>
-          <h2 className="text-xl font-bold text-night-100 mb-2">{lesson.title}</h2>
-          <p className="text-night-400 text-sm mb-2">Unit {lesson.unit}: {lesson.unitTitle}</p>
-          <p className="text-night-300 text-sm mb-6 leading-relaxed">{lesson.description}</p>
-          <p className="text-night-500 text-xs mb-6">
-            ⏱ About {lesson.estimatedMinutes} minutes · {lesson.xpReward} XP
-          </p>
-          <button
-            onClick={() => setLessonStarted(true)}
-            className="liquid-btn py-3 px-8 text-lg w-full"
-          >
-            Bismillah, Let's Start
-          </button>
-        </motion.div>
+      <div className="min-h-screen px-4 py-8">
+        <PreLessonBriefing
+          lessonTitle={lesson.title}
+          ayahs={lessonAyahs}
+          userLevel="beginner"
+          isReview={false}
+          lessonDescription={lesson.description}
+          onStart={() => setLessonStarted(true)}
+          onDismiss={() => setLessonStarted(true)}
+        />
       </div>
     );
   }

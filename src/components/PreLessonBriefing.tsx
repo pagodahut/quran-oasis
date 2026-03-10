@@ -52,6 +52,8 @@ interface PreLessonBriefingProps {
   userLevel: 'beginner' | 'intermediate' | 'advanced';
   /** Whether this is a review lesson */
   isReview?: boolean;
+  /** Lesson description for non-ayah lessons */
+  lessonDescription?: string;
   /** Called when user taps "Start" */
   onStart: () => void;
   /** Called when user dismisses without starting */
@@ -62,11 +64,22 @@ interface PreLessonBriefingProps {
 
 // ─── Component ───────────────────────────────────────────────────────
 
+// Static motivational messages for non-ayah lessons (alphabet, concepts, etc.)
+function getStaticBriefing(lessonTitle: string, lessonDescription?: string): BriefingResponse {
+  const desc = lessonDescription || lessonTitle;
+  return {
+    message: `Bismillah! Today we'll be working on "${lessonTitle}." ${desc !== lessonTitle ? desc + ' ' : ''}Every step you take in learning brings you closer to the Quran. Take your time, and remember — consistency is more beloved to Allah than intensity.`,
+    tip: 'Focus on understanding each concept before moving on. Small, steady progress leads to lasting knowledge.',
+    theme: 'Foundations',
+  };
+}
+
 export default function PreLessonBriefing({
   lessonTitle,
   ayahs,
   userLevel,
   isReview = false,
+  lessonDescription,
   onStart,
   onDismiss,
   className = '',
@@ -79,7 +92,12 @@ export default function PreLessonBriefing({
 
   // Generate briefing on mount
   useEffect(() => {
-    if (ayahs.length === 0) return;
+    // For non-ayah lessons, use a static motivational briefing
+    if (ayahs.length === 0) {
+      setBriefing(getStaticBriefing(lessonTitle, lessonDescription));
+      requestAnimationFrame(() => setAnimateIn(true));
+      return;
+    }
 
     const ctx: BriefingContext = {
       lessonTitle,
