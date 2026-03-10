@@ -135,7 +135,7 @@ export default function FlashcardsPage() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-40 safe-area-top liquid-glass mx-2 mt-2 rounded-2xl">
+      <header className="sticky top-0 z-40 safe-area-top liquid-glass mx-2 rounded-2xl">
         <div className="flex items-center justify-between px-3 py-3">
           <Link href="/practice" className="liquid-icon-btn" aria-label="Back">
             <ChevronLeft className="w-5 h-5" />

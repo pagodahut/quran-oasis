@@ -8,7 +8,7 @@ export default function MushafLoading() {
     <div className="min-h-screen">
       {/* Header skeleton - Premium frosted glass style */}
       <header 
-        className="sticky top-0 z-40 safe-area-top mx-2 mt-2 rounded-2xl overflow-hidden"
+        className="sticky top-0 z-40 safe-area-top mx-2 rounded-2xl overflow-hidden"
         style={{
           background: 'rgba(22, 27, 34, 0.72)',
           backdropFilter: 'blur(48px)',

@@ -364,7 +364,7 @@ export default function MushafPage() {
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: -100, opacity: 0 }}
         transition={{ duration: 0.25 }}
-        className="sticky top-0 z-40 safe-area-top liquid-glass glass-noise rounded-b-2xl mx-2 mt-2"
+        className="sticky top-0 z-40 safe-area-top liquid-glass glass-noise rounded-b-2xl mx-2"
       >
             <div className="flex items-center justify-between px-3 py-3">
               <div className="flex items-center gap-1.5">
