@@ -196,8 +196,16 @@ export default function ProfilePage() {
     };
   }, []);
 
-  // Get user info
-  const displayName = user?.firstName || 'Student of Quran';
+  // Get user info — resolve name: Clerk firstName → localStorage userName → fallback
+  const [displayName, setDisplayName] = useState('Student of Quran');
+  useEffect(() => {
+    if (user?.firstName) {
+      setDisplayName(user.firstName);
+    } else if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('quranOasis_userName');
+      if (stored) setDisplayName(stored);
+    }
+  }, [user]);
   const email = user?.emailAddresses?.[0]?.emailAddress;
   const avatarUrl = user?.imageUrl;
   const joinedDate = user?.createdAt 

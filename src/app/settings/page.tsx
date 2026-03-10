@@ -1237,10 +1237,10 @@ Additional Notes:
                 <span className="text-night-400">Reciter:</span> {RECITERS.find(r => r.id === preferences.audio.reciter)?.name || 'Mishary Rashid Alafasy'}
               </p>
               <p className="text-night-500">
-                <span className="text-night-400">Audio:</span> EveryAyah.com
+                <span className="text-night-400">Audio:</span> EveryAyah.com ({RECITERS.find(r => r.id === preferences.audio.reciter)?.name || 'Default'})
               </p>
               <p className="text-night-500">
-                <span className="text-night-400">Text:</span> Tanzil.net
+                <span className="text-night-400">Text:</span> Tanzil.net ({ARABIC_FONT_STYLE_OPTIONS.find(f => f.value === preferences.display.arabicFontStyle)?.label || 'Default'})
               </p>
             </div>
           </GlassPanel>
