@@ -8,7 +8,7 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, ArrowRight, BookOpen, Sparkles, ArrowUpDown } from 'lucide-react';
+import { Search, X, ArrowRight, BookOpen, Sparkles, ArrowUpDown, SlidersHorizontal, ChevronDown } from 'lucide-react';
 import { SURAHS, type SurahData } from '@/components/SurahBrowser';
 import { getSurahProgress } from '@/lib/progressStore';
 import { searchQuran, type Ayah } from '@/lib/quranData';
@@ -172,6 +172,11 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
   const [filter, setFilter] = useState<RevelationFilter>('all');
   const [sort, setSort] = useState<SortOption>('order');
   const [showSortMenu, setShowSortMenu] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [juzFilter, setJuzFilter] = useState<number | null>(null);
+  const [minAyahs, setMinAyahs] = useState<string>('');
+  const [maxAyahs, setMaxAyahs] = useState<string>('');
+  const activeFilterCount = (filter !== 'all' ? 1 : 0) + (juzFilter !== null ? 1 : 0) + (minAyahs || maxAyahs ? 1 : 0);
   const [progressMap, setProgressMap] = useState<Record<number, number>>({});
   const [verseResults, setVerseResults] = useState<{ surah: number; surahName: string; ayah: Ayah }[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -276,6 +281,21 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
       result = result.filter(s => s.revelation === filter);
     }
 
+    // Juz filter
+    if (juzFilter !== null) {
+      result = result.filter(s => s.juz.includes(juzFilter));
+    }
+
+    // Verse count range filter
+    const minV = minAyahs ? parseInt(minAyahs) : null;
+    const maxV = maxAyahs ? parseInt(maxAyahs) : null;
+    if (minV !== null && !isNaN(minV)) {
+      result = result.filter(s => s.ayahs >= minV);
+    }
+    if (maxV !== null && !isNaN(maxV)) {
+      result = result.filter(s => s.ayahs <= maxV);
+    }
+
     // Sort
     switch (sort) {
       case 'alpha':
@@ -291,7 +311,7 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
     }
 
     return result;
-  }, [query, filter, sort]);
+  }, [query, filter, sort, juzFilter, minAyahs, maxAyahs]);
 
   const inProgressCount = Object.keys(progressMap).length;
   const totalMemorized = Object.values(progressMap).filter(p => p === 100).length;
@@ -348,7 +368,7 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
           )}
         </div>
 
-        {/* Filter chips + Sort */}
+        {/* Filter chips + Sort + Filter toggle */}
         <div className="flex items-center justify-between mt-2.5 gap-2">
           <div className="flex items-center gap-1.5">
             {([
@@ -374,54 +394,156 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
             ))}
           </div>
 
-          {/* Sort dropdown */}
-          <div className="relative" ref={sortMenuRef}>
+          <div className="flex items-center gap-1.5">
+            {/* Filter toggle */}
             <button
-              onClick={() => setShowSortMenu(v => !v)}
+              onClick={() => setShowFilters(v => !v)}
               className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                sort !== 'order'
+                activeFilterCount > 0
                   ? 'bg-gold-500/15 text-gold-300 border border-gold-500/25'
                   : 'bg-night-900/40 text-night-400 border border-night-800/30 hover:bg-night-800/40 hover:text-night-300'
               }`}
             >
-              <ArrowUpDown className="w-3 h-3" />
-              <span className="hidden sm:inline">
-                {{ order: 'Surah Order', alpha: 'A-Z', ayahs: 'Ayahs', revelation: 'Revelation' }[sort]}
-              </span>
-            </button>
-            <AnimatePresence>
-              {showSortMenu && (
-                <motion.div
-                  initial={{ opacity: 0, y: -4, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -4, scale: 0.95 }}
-                  transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-1.5 w-44 rounded-xl overflow-hidden border border-night-700/40 shadow-xl"
-                  style={{ background: 'rgba(18,18,28,0.95)', backdropFilter: 'blur(20px)' }}
-                >
-                  {([
-                    { key: 'order' as const, label: 'Surah Order' },
-                    { key: 'alpha' as const, label: 'Alphabetical' },
-                    { key: 'ayahs' as const, label: 'Number of Ayahs' },
-                    { key: 'revelation' as const, label: 'Revelation Order' },
-                  ]).map(({ key, label }) => (
-                    <button
-                      key={key}
-                      onClick={() => { setSort(key); setShowSortMenu(false); }}
-                      className={`w-full text-left px-4 py-2.5 text-xs transition-colors ${
-                        sort === key
-                          ? 'text-gold-300 bg-gold-500/10'
-                          : 'text-night-300 hover:bg-night-800/50'
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </motion.div>
+              <SlidersHorizontal className="w-3 h-3" />
+              {activeFilterCount > 0 && (
+                <span className="w-4 h-4 rounded-full bg-gold-500/30 text-gold-200 text-[10px] flex items-center justify-center">{activeFilterCount}</span>
               )}
-            </AnimatePresence>
+              <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${showFilters ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Sort dropdown */}
+            <div className="relative" ref={sortMenuRef}>
+              <button
+                onClick={() => setShowSortMenu(v => !v)}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                  sort !== 'order'
+                    ? 'bg-gold-500/15 text-gold-300 border border-gold-500/25'
+                    : 'bg-night-900/40 text-night-400 border border-night-800/30 hover:bg-night-800/40 hover:text-night-300'
+                }`}
+              >
+                <ArrowUpDown className="w-3 h-3" />
+                <span className="hidden sm:inline">
+                  {{ order: 'Surah Order', alpha: 'A-Z', ayahs: 'Ayahs', revelation: 'Revelation' }[sort]}
+                </span>
+              </button>
+              <AnimatePresence>
+                {showSortMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -4, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 top-full mt-1.5 w-44 rounded-xl overflow-hidden border border-night-700/40 shadow-xl"
+                    style={{ background: 'rgba(18,18,28,0.95)', backdropFilter: 'blur(20px)' }}
+                  >
+                    {([
+                      { key: 'order' as const, label: 'Surah Order' },
+                      { key: 'alpha' as const, label: 'Alphabetical' },
+                      { key: 'ayahs' as const, label: 'Number of Ayahs' },
+                      { key: 'revelation' as const, label: 'Revelation Order' },
+                    ]).map(({ key, label }) => (
+                      <button
+                        key={key}
+                        onClick={() => { setSort(key); setShowSortMenu(false); }}
+                        className={`w-full text-left px-4 py-2.5 text-xs transition-colors ${
+                          sort === key
+                            ? 'text-gold-300 bg-gold-500/10'
+                            : 'text-night-300 hover:bg-night-800/50'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
+
+        {/* Collapsible advanced filters */}
+        <AnimatePresence>
+          {showFilters && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden"
+            >
+              <div
+                className="mt-2.5 p-3 rounded-xl border border-night-700/30 space-y-3"
+                style={{ background: 'rgba(15,15,25,0.6)', backdropFilter: 'blur(12px)' }}
+              >
+                {/* Juz filter */}
+                <div>
+                  <label className="text-[10px] uppercase tracking-widest text-night-500 font-medium mb-1.5 block">Juz</label>
+                  <div className="flex flex-wrap gap-1">
+                    <button
+                      onClick={() => setJuzFilter(null)}
+                      className={`px-2 py-1 rounded-md text-[10px] font-medium transition-all ${
+                        juzFilter === null
+                          ? 'bg-night-700/50 text-night-100 border border-night-600/40'
+                          : 'bg-night-900/40 text-night-500 border border-night-800/20 hover:text-night-300'
+                      }`}
+                    >
+                      All
+                    </button>
+                    {Array.from({ length: 30 }, (_, i) => i + 1).map(j => (
+                      <button
+                        key={j}
+                        onClick={() => setJuzFilter(juzFilter === j ? null : j)}
+                        className={`w-7 h-7 rounded-md text-[10px] font-medium transition-all ${
+                          juzFilter === j
+                            ? 'bg-gold-500/20 text-gold-300 border border-gold-500/30'
+                            : 'bg-night-900/40 text-night-500 border border-night-800/20 hover:text-night-300'
+                        }`}
+                      >
+                        {j}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Verse count range */}
+                <div>
+                  <label className="text-[10px] uppercase tracking-widest text-night-500 font-medium mb-1.5 block">Verse Count</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={minAyahs}
+                      onChange={e => setMinAyahs(e.target.value)}
+                      placeholder="Min"
+                      min={1}
+                      max={286}
+                      className="w-20 bg-night-900/60 border border-night-700/30 rounded-lg px-2.5 py-1.5 text-xs text-night-200 placeholder:text-night-600 focus:outline-none focus:border-gold-500/30"
+                    />
+                    <span className="text-night-600 text-xs">–</span>
+                    <input
+                      type="number"
+                      value={maxAyahs}
+                      onChange={e => setMaxAyahs(e.target.value)}
+                      placeholder="Max"
+                      min={1}
+                      max={286}
+                      className="w-20 bg-night-900/60 border border-night-700/30 rounded-lg px-2.5 py-1.5 text-xs text-night-200 placeholder:text-night-600 focus:outline-none focus:border-gold-500/30"
+                    />
+                  </div>
+                </div>
+
+                {/* Clear all filters */}
+                {activeFilterCount > 0 && (
+                  <button
+                    onClick={() => { setFilter('all'); setJuzFilter(null); setMinAyahs(''); setMaxAyahs(''); }}
+                    className="text-[10px] text-gold-400/70 hover:text-gold-300 transition-colors"
+                  >
+                    Clear all filters
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <div className="px-4 pb-32 space-y-2">
