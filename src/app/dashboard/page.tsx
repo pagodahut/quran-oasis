@@ -1,5 +1,6 @@
 'use client';
 
+import { useStudyTracker } from '@/lib/studyTracker';
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -415,6 +416,7 @@ function RecentActivity({
 
 export default function DashboardPage() {
   const { user, isLoaded, isSignedIn } = useAuth();
+  useStudyTracker('dashboard');
   const { learning: learningPrefs } = useLearningPreferences();
   const { isChecking } = useCalibrationGuard();
 

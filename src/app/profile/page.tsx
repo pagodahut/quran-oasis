@@ -3,6 +3,8 @@
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 import Image from 'next/image';
+import StudyProfile from '@/components/StudyProfile';
+import { useStudyTracker } from '@/lib/studyTracker';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { 
@@ -112,6 +114,7 @@ function SettingsRow({ icon: Icon, label, href, onClick }: {
 }
 
 export default function ProfilePage() {
+  useStudyTracker('profile');
   const { user, isLoaded, isSignedIn, isGuest, isClerkConfigured } = useAuth();
   // Safely get Clerk utilities — noop when Clerk isn't configured
   let openUserProfile = () => {};
@@ -389,6 +392,12 @@ export default function ProfilePage() {
                 color="text-rose-400"
               />
             </div>
+          </motion.div>
+
+          {/* Study Insights */}
+          <motion.div variants={fadeInUp}>
+            <h3 className="text-white/50 text-xs uppercase tracking-wider mb-3 px-1">Study Insights</h3>
+            <StudyProfile />
           </motion.div>
 
           {/* Recent Surahs */}

@@ -1,5 +1,6 @@
 'use client';
 
+import { useStudyTracker } from '@/lib/studyTracker';
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -32,6 +33,7 @@ type ViewState = 'decks' | 'session' | 'complete';
 
 export default function FlashcardsPage() {
   const router = useRouter();
+  useStudyTracker('flashcards');
   const { isChecking: isCheckingCalibration } = useCalibrationGuard();
   const searchParams = useSearchParams();
   const deckIdParam = searchParams.get('deck');

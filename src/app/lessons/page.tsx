@@ -1,5 +1,6 @@
 'use client';
 
+import { useStudyTracker } from '@/lib/studyTracker';
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useCalibrationGuard } from '@/hooks/useCalibrationGuard';
@@ -757,6 +758,7 @@ function LessonsContent() {
 
 // Export with Suspense wrapper for useSearchParams
 export default function LessonsPage() {
+  useStudyTracker('lessons');
   return (
     <Suspense fallback={<div className="min-h-screen" />}>
       <LessonsContent />

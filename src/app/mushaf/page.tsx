@@ -1,5 +1,6 @@
 'use client';
 
+import { useStudyTracker } from '@/lib/studyTracker';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -55,6 +56,7 @@ import FeedbackFooterLink from '@/components/FeedbackFooterLink';
 
 export default function MushafPage() {
   const router = useRouter();
+  useStudyTracker('mushaf');
   const searchParams = useSearchParams();
   const { toggle: toggleBookmark, check: isBookmarked } = useBookmarks();
   const { setPageContext, setAyahContext } = useSheikh();

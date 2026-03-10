@@ -1,5 +1,6 @@
 'use client';
 
+import { useStudyTracker } from '@/lib/studyTracker';
 import React, { useState, useEffect, useMemo, useCallback, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -363,6 +364,7 @@ function AyahRangeSelector({
 // ============ Main Page ============
 
 export default function RecitePage() {
+  useStudyTracker('recite');
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">

@@ -1,5 +1,6 @@
 'use client';
 
+import { useStudyTracker } from '@/lib/studyTracker';
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
@@ -42,6 +43,7 @@ type ViewState = 'dashboard' | 'review' | 'add-ayahs';
 
 export default function PracticePage() {
   const { user } = useAuth();
+  useStudyTracker('practice');
   const router = useRouter();
   const { setPageContext, userLevel, setUserLevel } = useSheikh();
   const { isChecking: isCheckingCalibration } = useCalibrationGuard();
