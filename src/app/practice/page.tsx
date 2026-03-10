@@ -1,7 +1,7 @@
 'use client';
 
 import { useStudyTracker } from '@/lib/studyTracker';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useCalibrationGuard } from '@/hooks/useCalibrationGuard';
@@ -43,6 +43,14 @@ type ViewState = 'dashboard' | 'review' | 'add-ayahs';
 
 export default function PracticePage() {
   const { user } = useAuth();
+  const displayName = useMemo(() => {
+    if (user?.firstName) return user.firstName;
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('quranOasis_userName');
+      if (stored) return stored;
+    }
+    return 'Student';
+  }, [user?.firstName]);
   useStudyTracker('practice');
   const router = useRouter();
   const { setPageContext, userLevel, setUserLevel } = useSheikh();
@@ -192,7 +200,7 @@ export default function PracticePage() {
         sabqiAyahs={reviewAyahs.sabqi}
         manzilAyahs={reviewAyahs.manzil}
         userLevel={userLevel}
-        userName={user?.firstName || undefined}
+        userName={displayName}
         onComplete={handleReviewComplete}
         onExit={handleReviewExit}
       />
@@ -327,7 +335,7 @@ export default function PracticePage() {
         <div className="px-4 py-3 flex items-center justify-between">
           <div>
             <h1 className="font-display text-xl text-night-100">
-              {getGreeting()}, {user?.firstName || 'Student'}
+              {getGreeting()}, {displayName}
             </h1>
             <p className="text-sm text-night-500">
               {dueCount.total > 0
