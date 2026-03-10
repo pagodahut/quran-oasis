@@ -56,7 +56,15 @@ export function OfflineModelLoader({
       onReady?.();
     } catch (err) {
       console.error('Failed to load offline model:', err);
-      setError(err instanceof Error ? err.message : 'Download failed');
+      const message = err instanceof Error ? err.message : 'Download failed';
+      // Provide user-friendly error messages for common network failures
+      if (message.includes('fetch') || message.includes('network') || message.includes('Failed to fetch') || !navigator.onLine) {
+        setError('Network error — check your internet connection and try again');
+      } else if (message.includes('Object.keys') || message.includes('undefined is not an object')) {
+        setError('Download interrupted — please try again');
+      } else {
+        setError(message);
+      }
       setStatus('error');
     }
   }, [onReady]);
