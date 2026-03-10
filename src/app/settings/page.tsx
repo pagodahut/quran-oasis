@@ -64,6 +64,7 @@ import { OfflineModelLoader } from '@/components/OfflineModelLoader';
 import GlassPanel from '@/components/ui/GlassPanel';
 import LiquidToggle from '@/components/ui/LiquidToggle';
 import LiquidButton from '@/components/ui/LiquidButton';
+import { useToast } from '@/components/Toast';
 
 // ============================================
 // Components
@@ -275,7 +276,7 @@ export default function SettingsPage() {
   const { themeId, theme: currentTheme, setTheme: setAppTheme, isLoaded: themeLoaded } = useAppTheme();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showClearDataConfirm, setShowClearDataConfirm] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const { success: showSuccess, reciterChanged } = useToast();
   const [storageUsage, setStorageUsage] = useState({ used: 0, total: 0, percentage: 0 });
   const [emailNotifications, setEmailNotifications] = useState(true);
 
@@ -307,14 +308,10 @@ export default function SettingsPage() {
     }
   };
 
-  const showSuccess = (message: string) => {
-    setSuccessMessage(message);
-    setTimeout(() => setSuccessMessage(null), 2000);
-  };
-
   const handleReciterChange = (reciterId: string) => {
     update('audio', { reciter: reciterId });
-    showSuccess('Reciter updated');
+    const reciter = RECITERS.find(r => r.id === reciterId);
+    reciterChanged(reciter?.name ?? 'Reciter');
   };
 
   const handleTranslationChange = (translationId: 'sahih' | 'asad') => {
@@ -400,23 +397,6 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Success Toast */}
-      <AnimatePresence>
-        {successMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 
-                      px-4 py-2 rounded-full bg-sage-500 text-white 
-                      text-sm font-medium flex items-center gap-2 shadow-lg"
-          >
-            <Check className="w-4 h-4" />
-            {successMessage}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Header */}
       <header className="liquid-glass sticky top-0 z-40 safe-area-top">
         <div className="px-4 py-3">
