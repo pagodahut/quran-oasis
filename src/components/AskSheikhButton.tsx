@@ -216,16 +216,16 @@ export default function AskSheikhButton({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.95 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className="backdrop-blur-2xl bg-amber-500/10 border border-amber-400/20
+            className="backdrop-blur-2xl bg-white/[0.06] border border-white/[0.15]
                        rounded-2xl px-4 py-3 max-w-[200px]
-                       shadow-lg shadow-amber-500/10"
+                       shadow-[0_8px_32px_rgba(0,0,0,0.25)]"
           >
-            <p className="text-xs text-amber-200/90 leading-relaxed">
+            <p className="text-xs text-white/[0.8] leading-relaxed">
               Need help? Sheikh can guide you step by step.
             </p>
             <button
               onClick={() => dismissStuckPrompt()}
-              className="text-[10px] text-night-500 hover:text-night-400 mt-1"
+              className="text-[10px] text-white/[0.4] hover:text-gold-400 mt-1"
             >
               Dismiss
             </button>
@@ -292,45 +292,34 @@ export default function AskSheikhButton({
           width: 64px;
           height: 64px;
           border-radius: 50%;
-          background: linear-gradient(
-            145deg,
-            rgba(30, 25, 15, 0.85) 0%,
-            rgba(20, 18, 12, 0.92) 50%,
-            rgba(35, 28, 12, 0.88) 100%
-          );
-          backdrop-filter: blur(32px) saturate(1.6);
-          -webkit-backdrop-filter: blur(32px) saturate(1.6);
-          border: 1.5px solid rgba(212, 175, 55, 0.3);
+          background: rgba(255, 255, 255, 0.06);
+          backdrop-filter: blur(48px) saturate(1.8);
+          -webkit-backdrop-filter: blur(48px) saturate(1.8);
+          border: 1px solid rgba(255, 255, 255, 0.15);
           box-shadow:
-            0 0 24px rgba(212, 175, 55, 0.2),
-            0 6px 20px rgba(0, 0, 0, 0.35),
-            inset 0 1px 0 rgba(212, 175, 55, 0.15),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+            0 8px 32px rgba(0, 0, 0, 0.25),
+            0 0 24px rgba(212, 175, 55, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
           color: rgba(212, 175, 55, 0.95);
           transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
         .sheikh-fab:hover .sheikh-fab__surface {
-          border-color: rgba(212, 175, 55, 0.55);
+          border-color: rgba(212, 175, 55, 0.4);
           box-shadow:
-            0 0 40px rgba(212, 175, 55, 0.35),
-            0 0 80px rgba(212, 175, 55, 0.12),
-            0 8px 24px rgba(0, 0, 0, 0.4),
-            inset 0 1px 0 rgba(212, 175, 55, 0.25);
+            0 8px 32px rgba(0, 0, 0, 0.3),
+            0 0 40px rgba(212, 175, 55, 0.25),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15);
           color: rgba(245, 214, 128, 1);
-          background: linear-gradient(
-            145deg,
-            rgba(40, 32, 15, 0.9) 0%,
-            rgba(25, 22, 12, 0.95) 50%,
-            rgba(45, 35, 15, 0.9) 100%
-          );
+          background: rgba(255, 255, 255, 0.1);
         }
 
         .sheikh-fab:active .sheikh-fab__surface {
+          background: rgba(255, 255, 255, 0.08);
           box-shadow:
-            0 0 20px rgba(212, 175, 55, 0.25),
-            0 2px 10px rgba(0, 0, 0, 0.4),
-            inset 0 1px 0 rgba(212, 175, 55, 0.1);
+            0 4px 16px rgba(0, 0, 0, 0.25),
+            0 0 16px rgba(212, 175, 55, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
         }
 
         @keyframes sheikhBreathe {
