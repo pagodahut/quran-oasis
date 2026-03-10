@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -19,6 +19,7 @@ import {
   Type,
   Volume2,
   Play,
+  Pause,
   Clock,
   Bell,
   Download,
@@ -147,43 +148,79 @@ function OfflineModelSection() {
   );
 }
 
-function ReciterOption({ 
-  reciter, 
-  selected, 
-  onSelect 
-}: { 
+function ReciterOption({
+  reciter,
+  selected,
+  onSelect,
+  playingId,
+  onPlayPreview,
+}: {
   reciter: typeof RECITERS[0];
   selected: boolean;
   onSelect: () => void;
+  playingId: string | null;
+  onPlayPreview: (reciterId: string) => void;
 }) {
+  const isPlaying = playingId === reciter.id;
+  const previewUrl = `https://everyayah.com/data/${reciter.folder}/001001.mp3`;
+
   return (
     <button
       onClick={onSelect}
       className={`w-full p-4 rounded-xl text-left transition-all ${
-        selected 
-          ? 'bg-gold-500/10 border-2 border-gold-500/50' 
+        selected
+          ? 'bg-gold-500/10 border-2 border-gold-500/50'
           : 'bg-night-800/50 border-2 border-transparent hover:border-night-700'
       }`}
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="font-medium text-night-100">{reciter.name}</p>
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="font-medium text-night-100">{reciter.name}</p>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide uppercase bg-gold-500/15 text-gold-400 border border-gold-500/20">
+              {reciter.style}
+            </span>
+          </div>
           <p className="text-sm text-night-500 mt-0.5">
-            <span 
+            <span
               className="text-gold-400/70"
               style={{ fontFamily: 'var(--font-arabic)' }}
             >
               {reciter.arabicName}
             </span>
-            <span className="mx-2">•</span>
-            {reciter.style}
           </p>
+          <p className="text-xs text-night-500 mt-1 line-clamp-2">{reciter.description}</p>
         </div>
-        {selected && (
-          <div className="w-6 h-6 rounded-full bg-gold-500 flex items-center justify-center flex-shrink-0">
-            <Check className="w-4 h-4 text-night-950" />
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={(e) => {
+              e.stopPropagation();
+              onPlayPreview(reciter.id);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.stopPropagation();
+                e.preventDefault();
+                onPlayPreview(reciter.id);
+              }
+            }}
+            className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+              isPlaying
+                ? 'bg-gold-500/20 text-gold-400'
+                : 'bg-night-700/50 text-night-400 hover:text-night-200 hover:bg-night-700'
+            }`}
+            aria-label={isPlaying ? `Pause ${reciter.name} preview` : `Play ${reciter.name} preview`}
+          >
+            {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 ml-0.5" />}
           </div>
-        )}
+          {selected && (
+            <div className="w-6 h-6 rounded-full bg-gold-500 flex items-center justify-center">
+              <Check className="w-4 h-4 text-night-950" />
+            </div>
+          )}
+        </div>
       </div>
     </button>
   );
@@ -279,6 +316,56 @@ export default function SettingsPage() {
   const { success: showSuccess, reciterChanged } = useToast();
   const [storageUsage, setStorageUsage] = useState({ used: 0, total: 0, percentage: 0 });
   const [emailNotifications, setEmailNotifications] = useState(true);
+  const [previewPlayingId, setPreviewPlayingId] = useState<string | null>(null);
+  const previewAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  const handlePlayPreview = useCallback((reciterId: string) => {
+    // If same reciter, toggle pause/play
+    if (previewPlayingId === reciterId && previewAudioRef.current) {
+      previewAudioRef.current.pause();
+      previewAudioRef.current = null;
+      setPreviewPlayingId(null);
+      return;
+    }
+    // Stop any current preview
+    if (previewAudioRef.current) {
+      previewAudioRef.current.pause();
+      previewAudioRef.current = null;
+    }
+    const reciter = RECITERS.find(r => r.id === reciterId);
+    if (!reciter) return;
+    const audio = new Audio(`https://everyayah.com/data/${reciter.folder}/001001.mp3`);
+    previewAudioRef.current = audio;
+    setPreviewPlayingId(reciterId);
+    // Stop after ~5 seconds
+    const timer = setTimeout(() => {
+      audio.pause();
+      if (previewAudioRef.current === audio) {
+        previewAudioRef.current = null;
+        setPreviewPlayingId(null);
+      }
+    }, 5000);
+    audio.addEventListener('ended', () => {
+      clearTimeout(timer);
+      if (previewAudioRef.current === audio) {
+        previewAudioRef.current = null;
+        setPreviewPlayingId(null);
+      }
+    });
+    audio.play().catch(() => {
+      clearTimeout(timer);
+      setPreviewPlayingId(null);
+    });
+  }, [previewPlayingId]);
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (previewAudioRef.current) {
+        previewAudioRef.current.pause();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     setStorageUsage(getStorageUsage());
@@ -429,6 +516,8 @@ export default function SettingsPage() {
                     reciter={reciter}
                     selected={preferences.audio.reciter === reciter.id}
                     onSelect={() => handleReciterChange(reciter.id)}
+                    playingId={previewPlayingId}
+                    onPlayPreview={handlePlayPreview}
                   />
                 ))}
               </div>
