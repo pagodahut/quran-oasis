@@ -7,7 +7,7 @@ export default function MemorizeLoading() {
   return (
     <div className="min-h-screen bg-night-950">
       {/* Header skeleton */}
-      <header className="sticky top-0 z-40 safe-area-top liquid-glass rounded-b-2xl mx-2 mt-2">
+      <header className="sticky top-0 z-40 safe-area-top liquid-glass rounded-b-2xl mx-2">
         <div className="px-3 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

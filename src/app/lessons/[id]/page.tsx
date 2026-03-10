@@ -977,7 +977,7 @@ export default function LessonDetailPage() {
   // Show PreLessonBriefing before lesson starts (all lessons get Sheikh HIFZ briefing)
   if (!lessonStarted) {
     return (
-      <div className="min-h-screen px-4 py-8">
+      <div className="min-h-screen px-4 py-4">
         <PreLessonBriefing
           lessonTitle={lesson.title}
           ayahs={lessonAyahs}
@@ -1027,7 +1027,7 @@ export default function LessonDetailPage() {
       </AnimatePresence>
 
       {/* Header - Premium Frosted Glass */}
-      <header className="sticky top-0 z-40 safe-area-top liquid-glass mx-2 mt-2 rounded-2xl">
+      <header className="sticky top-0 z-40 safe-area-top liquid-glass mx-2 rounded-2xl">
         <div className="flex items-center justify-between px-3 py-3">
           <button 
             onClick={() => router.push('/lessons')} 
