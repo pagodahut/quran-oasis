@@ -8,10 +8,13 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, ArrowRight, BookOpen, Sparkles } from 'lucide-react';
+import { Search, X, ArrowRight, BookOpen, Sparkles, ArrowUpDown } from 'lucide-react';
 import { SURAHS, type SurahData } from '@/components/SurahBrowser';
 import { getSurahProgress } from '@/lib/progressStore';
 import { searchQuran, type Ayah } from '@/lib/quranData';
+
+type RevelationFilter = 'all' | 'makki' | 'madani';
+type SortOption = 'order' | 'alpha' | 'ayahs' | 'revelation';
 
 const EASTERN_DIGITS = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
 function toEastern(n: number): string {
@@ -166,11 +169,15 @@ interface GardenOfSurahsProps {
 export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: GardenOfSurahsProps) {
   const router = useRouter();
   const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState<RevelationFilter>('all');
+  const [sort, setSort] = useState<SortOption>('order');
+  const [showSortMenu, setShowSortMenu] = useState(false);
   const [progressMap, setProgressMap] = useState<Record<number, number>>({});
   const [verseResults, setVerseResults] = useState<{ surah: number; surahName: string; ayah: Ayah }[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const searchTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const sortMenuRef = useRef<HTMLDivElement>(null);
 
   // Load progress once
   useEffect(() => {
@@ -237,17 +244,54 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
     }, 250);
   }, [handleSelect]);
 
-  // Filter surahs by name/meaning/number
+  // Close sort menu on outside click
+  useEffect(() => {
+    if (!showSortMenu) return;
+    const handleClick = (e: MouseEvent) => {
+      if (sortMenuRef.current && !sortMenuRef.current.contains(e.target as Node)) {
+        setShowSortMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [showSortMenu]);
+
+  // Filter surahs by name/meaning/number + revelation filter + sort
   const filteredSurahs = useMemo(() => {
-    if (!query.trim()) return SURAHS;
-    const q = query.toLowerCase();
-    return SURAHS.filter(s =>
-      s.name.toLowerCase().includes(q) ||
-      s.meaning.toLowerCase().includes(q) ||
-      s.arabic.includes(q) ||
-      s.id.toString() === q
-    );
-  }, [query]);
+    let result = [...SURAHS];
+
+    // Text search
+    if (query.trim()) {
+      const q = query.toLowerCase();
+      result = result.filter(s =>
+        s.name.toLowerCase().includes(q) ||
+        s.meaning.toLowerCase().includes(q) ||
+        s.arabic.includes(q) ||
+        s.id.toString() === q
+      );
+    }
+
+    // Revelation type filter
+    if (filter !== 'all') {
+      result = result.filter(s => s.revelation === filter);
+    }
+
+    // Sort
+    switch (sort) {
+      case 'alpha':
+        result.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'ayahs':
+        result.sort((a, b) => b.ayahs - a.ayahs);
+        break;
+      case 'revelation':
+        result.sort((a, b) => a.order - b.order);
+        break;
+      // 'order' is default (by surah number / id)
+    }
+
+    return result;
+  }, [query, filter, sort]);
 
   const inProgressCount = Object.keys(progressMap).length;
   const totalMemorized = Object.values(progressMap).filter(p => p === 100).length;
@@ -277,7 +321,7 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
         </div>
       )}
 
-      {/* Search */}
+      {/* Search + Filters */}
       <div className="sticky top-0 z-20 px-4 py-3 backdrop-blur-xl bg-night-950/80">
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-night-500" />
@@ -302,6 +346,81 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
               <div className="w-4 h-4 border-2 border-gold-400/30 border-t-gold-400 rounded-full animate-spin" />
             </div>
           )}
+        </div>
+
+        {/* Filter chips + Sort */}
+        <div className="flex items-center justify-between mt-2.5 gap-2">
+          <div className="flex items-center gap-1.5">
+            {([
+              { key: 'all' as const, label: 'All' },
+              { key: 'makki' as const, label: 'Meccan' },
+              { key: 'madani' as const, label: 'Medinan' },
+            ]).map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => setFilter(key)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                  filter === key
+                    ? key === 'makki'
+                      ? 'bg-gold-500/20 text-gold-300 border border-gold-500/30'
+                      : key === 'madani'
+                        ? 'bg-sage-500/20 text-sage-300 border border-sage-500/30'
+                        : 'bg-night-700/50 text-night-100 border border-night-600/40'
+                    : 'bg-night-900/40 text-night-400 border border-night-800/30 hover:bg-night-800/40 hover:text-night-300'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* Sort dropdown */}
+          <div className="relative" ref={sortMenuRef}>
+            <button
+              onClick={() => setShowSortMenu(v => !v)}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                sort !== 'order'
+                  ? 'bg-gold-500/15 text-gold-300 border border-gold-500/25'
+                  : 'bg-night-900/40 text-night-400 border border-night-800/30 hover:bg-night-800/40 hover:text-night-300'
+              }`}
+            >
+              <ArrowUpDown className="w-3 h-3" />
+              <span className="hidden sm:inline">
+                {{ order: 'Surah Order', alpha: 'A-Z', ayahs: 'Ayahs', revelation: 'Revelation' }[sort]}
+              </span>
+            </button>
+            <AnimatePresence>
+              {showSortMenu && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -4, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute right-0 top-full mt-1.5 w-44 rounded-xl overflow-hidden border border-night-700/40 shadow-xl"
+                  style={{ background: 'rgba(18,18,28,0.95)', backdropFilter: 'blur(20px)' }}
+                >
+                  {([
+                    { key: 'order' as const, label: 'Surah Order' },
+                    { key: 'alpha' as const, label: 'Alphabetical' },
+                    { key: 'ayahs' as const, label: 'Number of Ayahs' },
+                    { key: 'revelation' as const, label: 'Revelation Order' },
+                  ]).map(({ key, label }) => (
+                    <button
+                      key={key}
+                      onClick={() => { setSort(key); setShowSortMenu(false); }}
+                      className={`w-full text-left px-4 py-2.5 text-xs transition-colors ${
+                        sort === key
+                          ? 'text-gold-300 bg-gold-500/10'
+                          : 'text-night-300 hover:bg-night-800/50'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
 
