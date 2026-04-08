@@ -61,6 +61,7 @@ export function trackVisitForPrompt(): void {
 
 /** Dismiss the permission prompt */
 export function dismissPermissionPrompt(): void {
+  if (typeof window === 'undefined') return;
   localStorage.setItem(PERMISSION_DISMISSED_KEY, Date.now().toString());
 }
 

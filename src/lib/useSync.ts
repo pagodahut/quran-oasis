@@ -1,33 +1,27 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useUser } from '@clerk/nextjs';
 import { getProgress, saveProgress, UserProgress } from './progressStore';
 import { getBookmarks, Bookmark } from './bookmarks';
 
 const SYNC_DEBOUNCE_MS = 5000; // Wait 5 seconds after last change before syncing
 const LAST_SYNC_KEY = 'quranOasis_lastSync';
 
-// Safely get Clerk user - returns null values if Clerk is not available or not in context
-function useClerkUser() {
-  // Check if we're on server or if Clerk key is not set
-  if (typeof window === 'undefined') {
-    return { user: null, isSignedIn: false, isLoaded: true };
-  }
-  
-  // Check for Clerk publishable key
-  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-  if (!clerkKey) {
-    return { user: null, isSignedIn: false, isLoaded: true };
-  }
+const isClerkConfigured = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
-  try {
-    // Dynamic import to avoid errors when Clerk isn't configured
-    const { useUser } = require('@clerk/nextjs');
-    return useUser();
-  } catch {
-    return { user: null, isSignedIn: false, isLoaded: true };
-  }
+// Hook that calls useUser — only used when Clerk is configured
+function useClerkUserReal() {
+  return useUser();
 }
+
+// Stub hook — stable shape, never calls useUser
+function useClerkUserStub() {
+  return { user: null, isSignedIn: false as const, isLoaded: true as const };
+}
+
+// Pick at module level so we never call hooks conditionally
+const useClerkUser = isClerkConfigured ? useClerkUserReal : useClerkUserStub;
 
 export interface SyncState {
   isSyncing: boolean;
@@ -44,7 +38,7 @@ export function useSync() {
     error: null,
     isOnline: true,
   });
-  
+
   const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hasSyncedRef = useRef(false);
 
@@ -57,28 +51,28 @@ export function useSync() {
       if (!res.ok) throw new Error('Failed to load from server');
 
       const data = await res.json();
-      
+
       // Get current local data
       const localProgress = getProgress();
       const localBookmarks = getBookmarks();
-      
+
       // Merge strategy: keep whichever has more data or is more recent
       const serverUpdatedAt = data.user?.createdAt ? new Date(data.user.createdAt) : new Date(0);
       const localUpdatedAt = localProgress.updatedAt ? new Date(localProgress.updatedAt) : new Date(0);
-      
+
       // Merge verses - keep verse with more reviews or higher confidence
       const mergedVerses = { ...localProgress.verses };
       if (data.progress?.verses) {
         for (const [key, serverVerse] of Object.entries(data.progress.verses) as [string, any][]) {
           const localVerse = mergedVerses[key];
-          if (!localVerse || 
+          if (!localVerse ||
               (serverVerse.totalReviews || 0) > (localVerse.totalReviews || 0) ||
               (serverVerse.confidence || 0) > (localVerse.confidence || 0)) {
             mergedVerses[key] = serverVerse;
           }
         }
       }
-      
+
       // Merge bookmarks - combine both sets
       const bookmarkSet = new Map<string, Bookmark>();
       for (const b of localBookmarks) {
@@ -92,7 +86,7 @@ export function useSync() {
           }
         }
       }
-      
+
       // Save merged data locally
       const mergedProgress: UserProgress = {
         ...localProgress,
@@ -100,7 +94,7 @@ export function useSync() {
         settings: data.progress?.settings || localProgress.settings,
       };
       saveProgress(mergedProgress);
-      
+
       // Save merged bookmarks
       if (typeof window !== 'undefined') {
         localStorage.setItem('quran-oasis-bookmarks', JSON.stringify(Array.from(bookmarkSet.values())));
@@ -182,7 +176,7 @@ export function useSync() {
     if (!isLoaded || !isSignedIn || hasSyncedRef.current) return;
 
     hasSyncedRef.current = true;
-    
+
     const doInitialSync = async () => {
       setSyncState((s: SyncState) => ({ ...s, isSyncing: true }));
       // Pull SRS state from Clerk metadata first (cross-device sync)

@@ -363,7 +363,7 @@ export default function VerseContext({
                               </span>
                             </div>
                             <p className="text-night-300 text-sm leading-relaxed italic mb-2">
-                              "{cv.text}"
+                              &ldquo;{cv.text}&rdquo;
                             </p>
                             <p className="text-night-500 text-xs">
                               {cv.connection}
@@ -380,7 +380,7 @@ export default function VerseContext({
                             No connections found for this verse yet.
                           </p>
                           <p className="text-night-600 text-xs mt-1">
-                            We're expanding our verse connection database.
+                            We&apos;re expanding our verse connection database.
                           </p>
                         </div>
                       )}

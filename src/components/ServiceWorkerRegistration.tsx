@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { RefreshCw, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import logger from '@/lib/logger';
@@ -8,6 +8,7 @@ import logger from '@/lib/logger';
 export default function ServiceWorkerRegistration() {
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
+  const cleanupRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
@@ -39,14 +40,21 @@ export default function ServiceWorkerRegistration() {
         });
 
         // Check for updates periodically (every hour)
-        setInterval(() => {
+        const intervalId = setInterval(() => {
           reg.update().catch(console.error);
         }, 60 * 60 * 1000);
 
         // Check for updates when coming back online
-        window.addEventListener('online', () => {
+        const handleOnline = () => {
           reg.update().catch(console.error);
-        });
+        };
+        window.addEventListener('online', handleOnline);
+
+        // Cleanup on unmount
+        cleanupRef.current = () => {
+          clearInterval(intervalId);
+          window.removeEventListener('online', handleOnline);
+        };
 
       } catch (error) {
         console.error('[App] Service Worker registration failed:', error);
@@ -54,12 +62,17 @@ export default function ServiceWorkerRegistration() {
     };
 
     // Listen for controller change (means SW took over)
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      // Reload to get new version
+    const handleControllerChange = () => {
       window.location.reload();
-    });
+    };
+    navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
 
     registerSW();
+
+    return () => {
+      cleanupRef.current?.();
+      navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
+    };
   }, []);
 
   const handleUpdate = useCallback(() => {

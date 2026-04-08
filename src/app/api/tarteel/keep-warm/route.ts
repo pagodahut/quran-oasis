@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
     console.error('[Keep-Warm] Error:', error);
     return NextResponse.json({
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Keep-warm check failed',
       warm: false,
     }, { status: 503 });
   }

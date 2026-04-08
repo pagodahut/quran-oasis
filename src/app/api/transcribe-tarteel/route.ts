@@ -174,7 +174,7 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json(
       { 
-        error: error instanceof Error ? error.message : 'Transcription failed',
+        error: 'Transcription failed',
         provider: 'error',
       },
       { status: 500 }

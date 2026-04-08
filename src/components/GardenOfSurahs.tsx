@@ -176,7 +176,7 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
   const [verseResults, setVerseResults] = useState<{ surah: number; surahName: string; ayah: Ayah }[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const searchTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const sortMenuRef = useRef<HTMLDivElement>(null);
 
   // Load progress once
