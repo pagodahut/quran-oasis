@@ -57,9 +57,20 @@ export default function FeedbackPanel({
         page: currentPage,
         createdAt: new Date().toISOString(),
       };
-      const stored = JSON.parse(localStorage.getItem('qo_feedback') || '[]');
-      stored.push(entry);
-      localStorage.setItem('qo_feedback', JSON.stringify(stored));
+
+      // Try server-side storage first, fall back to localStorage
+      try {
+        const res = await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ category, message: message.trim(), page: currentPage }),
+        });
+        if (!res.ok) throw new Error('Server save failed');
+      } catch {
+        const stored = JSON.parse(localStorage.getItem('qo_feedback') || '[]');
+        stored.push(entry);
+        localStorage.setItem('qo_feedback', JSON.stringify(stored));
+      }
 
       setSubmitted(true);
       setTimeout(() => {

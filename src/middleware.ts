@@ -40,6 +40,12 @@ if (clerkPubKey) {
     '/api/progress(.*)',
     '/api/sheikh(.*)',
     '/api/tajweed(.*)',
+    '/api/push(.*)',
+    '/api/goals(.*)',
+    '/api/difficulty(.*)',
+    '/api/feedback(.*)',
+    '/api/recitation(.*)',
+    '/api/email(.*)',
   ]);
 
   clerkMiddlewareHandler = clerkMiddleware(async (auth: any, req: NextRequest) => {

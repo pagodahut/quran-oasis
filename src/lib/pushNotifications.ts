@@ -79,8 +79,16 @@ export async function subscribeToPush(): Promise<PushSubscription | null> {
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
     } as PushSubscriptionOptionsInit);
 
-    // Server-side subscription storage is not yet implemented.
-    // The browser-side subscription is still active for future use.
+    // Persist subscription to server for sending notifications later
+    try {
+      await fetch('/api/push/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscription: subscription.toJSON() }),
+      });
+    } catch {
+      // Non-blocking — browser subscription is still active
+    }
 
     return subscription;
   } catch (error) {
@@ -96,7 +104,19 @@ export async function unsubscribeFromPush(): Promise<boolean> {
     const subscription = await registration.pushManager.getSubscription();
     if (!subscription) return true;
 
+    const endpoint = subscription.endpoint;
     await subscription.unsubscribe();
+
+    try {
+      await fetch('/api/push/subscribe', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ endpoint }),
+      });
+    } catch {
+      // Non-blocking
+    }
+
     return true;
   } catch (error) {
     console.error('[Push] Unsubscribe failed:', error);
