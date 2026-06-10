@@ -1,19 +1,20 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronLeft,
   TrendingUp,
   BookOpen,
-  Loader2,
+  Mic,
+  Clock,
+  Target,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@clerk/nextjs';
 import BottomNav from '@/components/BottomNav';
+import { GlassPanel } from '@/components/ui/GlassPanel';
 import { SURAH_METADATA } from '@/lib/surahMetadata';
-
-// ============ Types ============
 
 interface LocalSession {
   surahNumber: number;
@@ -26,7 +27,14 @@ interface LocalSession {
   createdAt: string;
 }
 
-// ============ Helpers ============
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
+};
+
+const stagger = {
+  visible: { transition: { staggerChildren: 0.06 } },
+};
 
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -55,78 +63,128 @@ function getAccuracyBg(accuracy: number): string {
   return 'bg-red-500/15 border-red-500/30';
 }
 
-// ============ CSS Chart ============
+function getAccuracyBarColor(accuracy: number): string {
+  if (accuracy >= 90) return 'bg-sage-500';
+  if (accuracy >= 70) return 'bg-gold-500';
+  return 'bg-red-500';
+}
 
 function AccuracyChart({ sessions }: { sessions: { overallAccuracy: number; createdAt: string }[] }) {
   if (sessions.length < 2) return null;
 
-  // Show last 10 sessions
   const data = sessions.slice(0, 10).reverse();
-  const max = 100;
 
   return (
-    <div className="mt-4">
-      <h4 className="text-xs text-night-400 mb-2">Accuracy Trend</h4>
-      <div className="flex items-end gap-1 h-20">
+    <div className="mt-3">
+      <div className="flex items-end gap-1.5 h-24">
         {data.map((s, i) => {
-          const height = Math.max(4, (s.overallAccuracy / max) * 100);
+          const height = Math.max(8, (s.overallAccuracy / 100) * 100);
           return (
-            <div key={i} className="flex-1 flex flex-col items-center gap-1">
-              <span className="text-[9px] text-night-500">{s.overallAccuracy}%</span>
+            <motion.div
+              key={i}
+              className="flex-1 flex flex-col items-center gap-1"
+              initial={{ scaleY: 0 }}
+              animate={{ scaleY: 1 }}
+              transition={{ delay: i * 0.05, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              style={{ originY: 1 }}
+            >
+              <span className={`text-[10px] font-medium ${getAccuracyColor(s.overallAccuracy)}`}>
+                {s.overallAccuracy}%
+              </span>
               <div
-                className={`w-full rounded-t transition-all ${
-                  s.overallAccuracy >= 90
-                    ? 'bg-sage-500/60'
-                    : s.overallAccuracy >= 70
-                    ? 'bg-gold-500/60'
-                    : 'bg-red-500/60'
-                }`}
+                className={`w-full rounded-t-md transition-all ${getAccuracyBarColor(s.overallAccuracy)}/60`}
                 style={{ height: `${height}%` }}
               />
-            </div>
+            </motion.div>
           );
         })}
       </div>
-    </div>
-  );
-}
-
-// ============ Session Card ============
-
-function SessionCard({ session }: { session: LocalSession }) {
-  return (
-    <div className="bg-night-900/40 border border-night-800/50 rounded-xl overflow-hidden">
-      <div className="w-full px-4 py-3 flex items-center gap-3 text-left">
-        {/* Accuracy badge */}
-        <div
-          className={`flex-shrink-0 w-12 h-12 rounded-lg border flex items-center justify-center ${getAccuracyBg(
-            session.overallAccuracy
-          )}`}
-        >
-          <span className={`text-sm font-bold ${getAccuracyColor(session.overallAccuracy)}`}>
-            {session.overallAccuracy}%
-          </span>
-        </div>
-
-        {/* Info */}
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-night-100 truncate">
-            {getSurahName(session.surahNumber)}
-          </h3>
-          <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-xs text-night-500">
-              Ayah {session.startAyah}--{session.endAyah}
-            </span>
-            <span className="text-night-700">·</span>
-            <span className="text-xs text-night-500">{formatTime(session.duration)}</span>
-          </div>
-        </div>
+      <div className="flex justify-between mt-2">
+        <span className="text-[10px] text-night-600">Oldest</span>
+        <span className="text-[10px] text-night-600">Latest</span>
       </div>
     </div>
   );
 }
 
-// ============ Main Page ============
+function SessionCard({ session, index }: { session: LocalSession; index: number }) {
+  return (
+    <motion.div variants={fadeInUp}>
+      <GlassPanel tint="neutral" blur="sm" className="p-4">
+        <div className="flex items-center gap-3">
+          <div
+            className={`flex-shrink-0 w-12 h-12 rounded-xl border flex items-center justify-center ${getAccuracyBg(
+              session.overallAccuracy
+            )}`}
+          >
+            <span className={`text-sm font-bold ${getAccuracyColor(session.overallAccuracy)}`}>
+              {session.overallAccuracy}%
+            </span>
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm font-semibold text-night-100 truncate">
+              {getSurahName(session.surahNumber)}
+            </h3>
+            <div className="flex items-center gap-3 mt-1">
+              <span className="text-xs text-night-500 flex items-center gap-1">
+                <Target className="w-3 h-3" />
+                Ayah {session.startAyah}–{session.endAyah}
+              </span>
+              <span className="text-xs text-night-500 flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                {formatTime(session.duration)}
+              </span>
+            </div>
+          </div>
+
+          <div className="w-16">
+            <div className="h-1.5 bg-night-800/60 rounded-full overflow-hidden">
+              <motion.div
+                className={`h-full rounded-full ${getAccuracyBarColor(session.overallAccuracy)}`}
+                initial={{ width: 0 }}
+                animate={{ width: `${session.overallAccuracy}%` }}
+                transition={{ delay: 0.2 + index * 0.05, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              />
+            </div>
+          </div>
+        </div>
+      </GlassPanel>
+    </motion.div>
+  );
+}
+
+function StatCard({ icon, value, label, color }: { icon: React.ReactNode; value: string; label: string; color: string }) {
+  return (
+    <GlassPanel tint="neutral" blur="sm" className="p-3 text-center">
+      <div className={`w-8 h-8 rounded-lg ${color} flex items-center justify-center mx-auto mb-2`}>
+        {icon}
+      </div>
+      <p className="text-lg font-bold text-night-100">{value}</p>
+      <p className="text-[11px] text-night-500">{label}</p>
+    </GlassPanel>
+  );
+}
+
+function LoadingSkeleton() {
+  return (
+    <div className="space-y-4 px-4 py-6">
+      {[...Array(3)].map((_, i) => (
+        <div key={i} className="animate-pulse">
+          <GlassPanel tint="neutral" blur="sm" className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-night-800/60" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-night-800/60 rounded w-32" />
+                <div className="h-3 bg-night-800/40 rounded w-48" />
+              </div>
+            </div>
+          </GlassPanel>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function RecitationHistoryPage() {
   const router = useRouter();
@@ -134,7 +192,6 @@ export default function RecitationHistoryPage() {
   const [loading, setLoading] = useState(true);
   const [localSessions, setLocalSessions] = useState<LocalSession[]>([]);
 
-  // Load from localStorage
   useEffect(() => {
     if (!isLoaded) return;
 
@@ -149,7 +206,6 @@ export default function RecitationHistoryPage() {
     setLoading(false);
   }, [isLoaded]);
 
-  // Group sessions by date
   const groupedSessions = useMemo(() => {
     const groups: Record<string, LocalSession[]> = {};
     for (const s of localSessions) {
@@ -160,88 +216,136 @@ export default function RecitationHistoryPage() {
     return groups;
   }, [localSessions]);
 
-  const allSessions = localSessions;
+  const stats = useMemo(() => {
+    if (localSessions.length === 0) return null;
+    const avgAccuracy = Math.round(localSessions.reduce((sum, s) => sum + s.overallAccuracy, 0) / localSessions.length);
+    const totalTime = localSessions.reduce((sum, s) => sum + s.duration, 0);
+    const totalWords = localSessions.reduce((sum, s) => sum + s.matchedWords, 0);
+    return { avgAccuracy, totalTime, totalWords, sessions: localSessions.length };
+  }, [localSessions]);
 
   return (
     <div className="min-h-screen pb-32">
-      {/* Header */}
-      <header className="sticky top-0 z-20 bg-[var(--theme-surface)]/90 backdrop-blur-xl border-b border-night-800/30">
-        <div className="px-4 pt-safe-top">
-          <div className="flex items-center gap-3 py-4">
+      <header className="liquid-glass sticky top-0 z-40 safe-area-top">
+        <div className="px-4 py-3">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => router.push('/recite')}
-              className="text-night-400 hover:text-night-200 transition"
+              className="p-1 rounded-lg hover:bg-white/5 transition-colors text-night-400 hover:text-night-200"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-xl font-bold text-night-100">Recitation History</h1>
-              <p className="text-xs text-night-500 mt-0.5">
-                {allSessions.length} session{allSessions.length !== 1 ? 's' : ''} recorded
+              <h1 className="font-display text-xl text-night-100">Recitation History</h1>
+              <p className="text-xs text-night-500">
+                {localSessions.length} session{localSessions.length !== 1 ? 's' : ''} recorded
               </p>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="px-4 py-4">
+      <div className="px-4 py-6">
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-6 h-6 text-night-500 animate-spin" />
-          </div>
-        ) : allSessions.length === 0 ? (
-          <div className="text-center py-20">
-            <BookOpen className="w-10 h-10 text-night-600 mx-auto mb-3" />
-            <h2 className="text-lg font-semibold text-night-300 mb-1">No sessions yet</h2>
-            <p className="text-sm text-night-500 mb-6">
-              Complete a recitation to see your history here
-            </p>
-            <button
-              onClick={() => router.push('/recite')}
-              className="px-6 py-2.5 rounded-xl bg-gold-500/15 text-gold-400 border border-gold-500/30 
-                text-sm font-medium hover:bg-gold-500/25 transition"
-            >
-              Start Reciting
-            </button>
-          </div>
-        ) : (
-          <>
-            {/* Accuracy chart */}
-            {allSessions.length >= 2 && (
-              <section className="mb-6 bg-night-900/40 border border-night-800/50 rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <TrendingUp className="w-4 h-4 text-gold-500" />
-                  <h3 className="text-sm font-semibold text-night-200">Progress</h3>
-                </div>
-                <AccuracyChart sessions={allSessions} />
-              </section>
-            )}
-
-            {/* Grouped sessions */}
-            <div className="space-y-6">
-              {Object.entries(groupedSessions).map(([date, dateSessions]) => (
-                <section key={date}>
-                  <h2 className="text-xs font-semibold text-night-500 uppercase tracking-wider mb-2">
-                    {date}
-                  </h2>
-                  <div className="space-y-2">
-                    {dateSessions.map((s, i) => (
-                      <SessionCard key={`local-${i}`} session={s} />
-                    ))}
-                  </div>
-                </section>
-              ))}
-            </div>
-
-            {/* Sign-in notice */}
-            {!isSignedIn && (
-              <div className="mt-6 p-4 rounded-xl bg-night-900/40 border border-night-800/50 text-center">
-                <p className="text-xs text-night-400">
-                  Sign in to save your history across devices and track long-term progress.
-                </p>
+          <LoadingSkeleton />
+        ) : localSessions.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-16"
+          >
+            <GlassPanel tint="neutral" blur="md" className="inline-block p-8 max-w-sm mx-auto">
+              <div className="w-16 h-16 rounded-2xl bg-gold-500/10 flex items-center justify-center mx-auto mb-5">
+                <Mic className="w-8 h-8 text-gold-400" />
               </div>
+              <h2 className="text-lg font-semibold text-night-200 mb-2">No sessions yet</h2>
+              <p className="text-sm text-night-500 mb-6 leading-relaxed">
+                Complete a recitation to see your history and track your progress over time
+              </p>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => router.push('/recite')}
+                className="px-6 py-3 rounded-xl bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600
+                  text-night-950 font-semibold text-sm shadow-[0_2px_12px_rgba(201,162,39,0.3)]"
+              >
+                Start Reciting
+              </motion.button>
+            </GlassPanel>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={stagger}
+            className="space-y-6"
+          >
+            {stats && (
+              <motion.div variants={fadeInUp} className="grid grid-cols-4 gap-2">
+                <StatCard
+                  icon={<Target className="w-4 h-4 text-sage-400" />}
+                  value={`${stats.avgAccuracy}%`}
+                  label="Avg Accuracy"
+                  color="bg-sage-500/15"
+                />
+                <StatCard
+                  icon={<Mic className="w-4 h-4 text-gold-400" />}
+                  value={`${stats.sessions}`}
+                  label="Sessions"
+                  color="bg-gold-500/15"
+                />
+                <StatCard
+                  icon={<Clock className="w-4 h-4 text-blue-400" />}
+                  value={formatTime(stats.totalTime)}
+                  label="Total Time"
+                  color="bg-blue-500/15"
+                />
+                <StatCard
+                  icon={<BookOpen className="w-4 h-4 text-purple-400" />}
+                  value={`${stats.totalWords}`}
+                  label="Words"
+                  color="bg-purple-500/15"
+                />
+              </motion.div>
             )}
-          </>
+
+            {localSessions.length >= 2 && (
+              <motion.div variants={fadeInUp}>
+                <GlassPanel tint="neutral" blur="md" className="p-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-6 h-6 rounded-lg bg-gold-500/15 flex items-center justify-center">
+                      <TrendingUp className="w-3.5 h-3.5 text-gold-400" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-night-200">Accuracy Trend</h3>
+                  </div>
+                  <AccuracyChart sessions={localSessions} />
+                </GlassPanel>
+              </motion.div>
+            )}
+
+            {Object.entries(groupedSessions).map(([date, dateSessions]) => (
+              <motion.section key={date} variants={fadeInUp}>
+                <h2 className="text-xs font-semibold text-night-500 uppercase tracking-wider mb-3 px-1">
+                  {date}
+                </h2>
+                <div className="space-y-2">
+                  {dateSessions.map((s, i) => (
+                    <SessionCard key={`local-${i}`} session={s} index={i} />
+                  ))}
+                </div>
+              </motion.section>
+            ))}
+
+            {!isSignedIn && (
+              <motion.div variants={fadeInUp}>
+                <GlassPanel tint="gold" blur="sm" className="p-4 text-center">
+                  <p className="text-xs text-night-300">
+                    Sign in to save your history across devices and track long-term progress.
+                  </p>
+                </GlassPanel>
+              </motion.div>
+            )}
+          </motion.div>
         )}
       </div>
 

@@ -178,7 +178,7 @@ export default function InstallPrompt() {
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="fixed bottom-0 left-0 right-0 z-50 safe-area-bottom"
           >
-            <div className="mx-4 mb-4 bg-night-900/95 backdrop-blur-xl rounded-2xl border border-night-700 overflow-hidden shadow-2xl">
+            <div className="mx-4 mb-4 bg-night-900/95 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_4px_24px_rgba(0,0,0,0.4),0_16px_48px_rgba(0,0,0,0.3)]">
               {/* iOS Instructions View */}
               {showIOSInstructions ? (
                 <div className="p-6">
