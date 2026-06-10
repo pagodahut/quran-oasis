@@ -1,9 +1,12 @@
 /**
- * Complete Quran Data Utility
- * Uses offline JSON for fast, reliable access
+ * Quran Data Utility — Code-split per surah
+ *
+ * Metadata (17 KB) is loaded synchronously.
+ * Individual surah data is loaded on demand via dynamic import.
  */
 
-import quranData from '@/data/complete_quran.json';
+import metadataJson from '@/data/quran-metadata.json';
+import pageIndexJson from '@/data/page-index.json';
 
 // ============ TYPES ============
 
@@ -48,92 +51,128 @@ export interface Surah {
   ayahs: Ayah[];
 }
 
+export type SurahMeta = Omit<Surah, 'ayahs'>;
+
 export interface QuranData {
   metadata: QuranMetadata;
   surahs: Surah[];
 }
 
+// ============ METADATA (sync, 17 KB) ============
+
+const metadata = metadataJson as { metadata: QuranMetadata; surahs: SurahMeta[] };
+const pageIndex = pageIndexJson as Record<string, number[]>;
+
+// ============ SURAH CACHE ============
+
+const surahCache = new Map<number, Surah>();
+
+async function loadSurah(surahNumber: number): Promise<Surah | undefined> {
+  if (surahNumber < 1 || surahNumber > 114) return undefined;
+  const cached = surahCache.get(surahNumber);
+  if (cached) return cached;
+
+  try {
+    const mod = await import(`@/data/surahs/${surahNumber}.json`);
+    const surah = mod.default as Surah;
+    surahCache.set(surahNumber, surah);
+    return surah;
+  } catch {
+    return undefined;
+  }
+}
+
 // ============ DATA ACCESS ============
 
-const data = quranData as QuranData;
-
 /**
- * Get all surahs (metadata only, no ayahs)
+ * Get all surahs (metadata only, no ayahs) — synchronous
  */
-export function getAllSurahs(): Omit<Surah, 'ayahs'>[] {
-  return data.surahs.map(({ ayahs, ...surah }) => surah);
+export function getAllSurahs(): SurahMeta[] {
+  return metadata.surahs;
 }
 
 /**
- * Get a specific surah with all ayahs
+ * Get a specific surah with all ayahs — async (dynamic import)
  */
-export function getSurah(surahNumber: number): Surah | undefined {
-  return data.surahs.find(s => s.number === surahNumber);
+export async function getSurah(surahNumber: number): Promise<Surah | undefined> {
+  return loadSurah(surahNumber);
 }
 
 /**
- * Get a specific ayah
+ * Get a specific ayah — async
  */
-export function getAyah(surahNumber: number, ayahNumber: number): Ayah | undefined {
-  const surah = getSurah(surahNumber);
+export async function getAyah(surahNumber: number, ayahNumber: number): Promise<Ayah | undefined> {
+  const surah = await getSurah(surahNumber);
   return surah?.ayahs.find(a => a.numberInSurah === ayahNumber);
 }
 
 /**
- * Get ayahs by juz
+ * Get ayahs by juz — async, loads only relevant surahs
  */
-export function getAyahsByJuz(juzNumber: number): { surah: number; ayah: Ayah }[] {
+export async function getAyahsByJuz(juzNumber: number): Promise<{ surah: number; ayah: Ayah }[]> {
   const results: { surah: number; ayah: Ayah }[] = [];
-  
-  for (const surah of data.surahs) {
+  const surahs = await Promise.all(
+    metadata.surahs.map(m => loadSurah(m.number))
+  );
+
+  for (const surah of surahs) {
+    if (!surah) continue;
     for (const ayah of surah.ayahs) {
       if (ayah.juz === juzNumber) {
         results.push({ surah: surah.number, ayah });
       }
     }
   }
-  
+
   return results;
 }
 
 /**
- * Get ayahs by page
+ * Get ayahs by page — async, uses page index to load only relevant surahs
  */
-export function getAyahsByPage(pageNumber: number): { surah: Surah; ayah: Ayah }[] {
+export async function getAyahsByPage(pageNumber: number): Promise<{ surah: Surah; ayah: Ayah }[]> {
+  const surahNumbers = pageIndex[String(pageNumber)] || [];
+  const surahs = await Promise.all(surahNumbers.map(n => loadSurah(n)));
   const results: { surah: Surah; ayah: Ayah }[] = [];
-  
-  for (const surah of data.surahs) {
+
+  for (const surah of surahs) {
+    if (!surah) continue;
     for (const ayah of surah.ayahs) {
       if (ayah.page === pageNumber) {
         results.push({ surah, ayah });
       }
     }
   }
-  
+
   return results;
 }
 
 /**
- * Search in Arabic text or translation
+ * Search in Arabic text or translation — async, loads all surahs on first call
  */
-export function searchQuran(query: string, searchIn: 'arabic' | 'translation' | 'both' = 'both'): {
+export async function searchQuran(query: string, searchIn: 'arabic' | 'translation' | 'both' = 'both'): Promise<{
   surah: number;
   surahName: string;
   ayah: Ayah;
-}[] {
+}[]> {
   const results: { surah: number; surahName: string; ayah: Ayah }[] = [];
   const lowerQuery = query.toLowerCase();
-  
-  for (const surah of data.surahs) {
+
+  const surahs = await Promise.all(
+    metadata.surahs.map(m => loadSurah(m.number))
+  );
+
+  for (const surah of surahs) {
+    if (!surah) continue;
     for (const ayah of surah.ayahs) {
       let match = false;
-      
+
       if (searchIn === 'arabic' || searchIn === 'both') {
         if (ayah.text.arabic.includes(query)) {
           match = true;
         }
       }
-      
+
       if (searchIn === 'translation' || searchIn === 'both') {
         if (
           ayah.text.translations.sahih.toLowerCase().includes(lowerQuery) ||
@@ -142,7 +181,7 @@ export function searchQuran(query: string, searchIn: 'arabic' | 'translation' | 
           match = true;
         }
       }
-      
+
       if (match) {
         results.push({
           surah: surah.number,
@@ -152,17 +191,17 @@ export function searchQuran(query: string, searchIn: 'arabic' | 'translation' | 
       }
     }
   }
-  
+
   return results;
 }
 
 /**
- * Get total statistics
+ * Get total statistics — synchronous (metadata only)
  */
 export function getQuranStats() {
   return {
-    totalSurahs: data.metadata.total_surahs,
-    totalVerses: data.metadata.total_verses,
+    totalSurahs: metadata.metadata.total_surahs,
+    totalVerses: metadata.metadata.total_verses,
     totalJuz: 30,
     totalPages: 604,
     totalManzil: 7,
@@ -268,28 +307,17 @@ export const RECITERS: Reciter[] = [
   },
 ];
 
-// Default reciter for fallback when listen-only reciter can't be used
 export const DEFAULT_RECITER_ID = 'alafasy';
 
-/**
- * Check if a reciter supports per-ayah audio
- */
 export function supportsPerAyah(reciterId: string): boolean {
   const reciter = RECITERS.find(r => r.id === reciterId);
   return reciter ? !reciter.listenOnly : true;
 }
 
-/**
- * Get the effective reciter ID for per-ayah playback.
- * Falls back to DEFAULT_RECITER_ID for listen-only reciters.
- */
 export function getEffectiveReciterForPerAyah(reciterId: string): string {
   return supportsPerAyah(reciterId) ? reciterId : DEFAULT_RECITER_ID;
 }
 
-/**
- * Get full surah audio URL for listen-only reciters
- */
 export function getSurahAudioUrl(surah: number, reciterId: string): string | null {
   const reciter = RECITERS.find(r => r.id === reciterId);
   if (!reciter?.surahAudioUrl) return null;
@@ -297,10 +325,6 @@ export function getSurahAudioUrl(surah: number, reciterId: string): string | nul
   return reciter.surahAudioUrl.replace('{surah}', surahStr);
 }
 
-/**
- * Get audio URL for an ayah.
- * Automatically falls back to DEFAULT_RECITER_ID for listen-only reciters.
- */
 export function getAudioUrl(surah: number, ayah: number, reciterId: string = 'alafasy'): string {
   const effectiveId = getEffectiveReciterForPerAyah(reciterId);
   const reciter = RECITERS.find(r => r.id === effectiveId) || RECITERS[0];
@@ -309,52 +333,33 @@ export function getAudioUrl(surah: number, ayah: number, reciterId: string = 'al
   return `https://everyayah.com/data/${reciter.folder}/${surahStr}${ayahStr}.mp3`;
 }
 
-/**
- * Get preview audio URLs (first 3 verses of Al-Fatiha)
- */
 export function getReciterPreview(reciterId: string): string[] {
   return [1, 2, 3].map(ayah => getAudioUrl(1, ayah, reciterId));
 }
 
 // ============ HELPERS ============
 
-/**
- * Juz Amma surahs (78-114)
- */
 export const JUZ_AMMA = Array.from({ length: 37 }, (_, i) => 78 + i);
 
-/**
- * Short surahs for beginners (sorted by length)
- */
 export const SHORT_SURAHS = [108, 112, 110, 113, 114, 103, 101, 107, 106, 111, 105, 109, 104, 102, 100, 99, 97, 95, 94, 93];
 
-/**
- * Get surah difficulty level based on length
- */
-export function getSurahDifficulty(surahNumber: number): 'beginner' | 'intermediate' | 'advanced' {
-  const surah = getSurah(surahNumber);
+export async function getSurahDifficulty(surahNumber: number): Promise<'beginner' | 'intermediate' | 'advanced'> {
+  const surah = await getSurah(surahNumber);
   if (!surah) return 'advanced';
-  
+
   if (surah.numberOfAyahs <= 10) return 'beginner';
   if (surah.numberOfAyahs <= 50) return 'intermediate';
   return 'advanced';
 }
 
-/**
- * Format verse reference
- */
-export function formatVerseRef(surah: number, ayah: number): string {
-  const surahData = getSurah(surah);
+export async function formatVerseRef(surah: number, ayah: number): Promise<string> {
+  const surahData = await getSurah(surah);
   if (!surahData) return `${surah}:${ayah}`;
   return `${surahData.englishName} ${surah}:${ayah}`;
 }
 
-/**
- * Get Bismillah (except for Surah 9)
- */
 export const BISMILLAH = 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ';
 
-// Various Bismillah text patterns that might appear in data
 const BISMILLAH_PATTERNS = [
   'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
   'بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ',
@@ -366,39 +371,24 @@ export function shouldShowBismillah(surahNumber: number): boolean {
   return surahNumber !== 1 && surahNumber !== 9;
 }
 
-/**
- * Clean ayah text by removing Bismillah prefix if present
- * Bismillah is only counted as part of ayah 1 in Al-Fatiha (surah 1)
- * For all other surahs, Bismillah is separate and should not be in ayah 1 text
- * This ensures audio sync with EveryAyah.com which doesn't include Bismillah in ayah 1 audio
- */
 export function cleanAyahText(text: string, surahNumber: number, ayahNumber: number): string {
-  // Only clean ayah 1 of non-Fatiha surahs
   if (surahNumber === 1 || ayahNumber !== 1) {
     return text;
   }
-  
-  // Remove Bismillah prefix if present
-  // Use Unicode NFC normalization to handle combining mark ordering differences
+
   let cleaned = text.trim();
   const normalizedCleaned = cleaned.normalize('NFC');
   for (const pattern of BISMILLAH_PATTERNS) {
     const normalizedPattern = pattern.normalize('NFC');
     if (normalizedCleaned.startsWith(normalizedPattern)) {
-      // Find the actual length to slice by matching normalized positions
-      // Since NFC normalization preserves string length for Arabic text,
-      // we can safely use the pattern length
       cleaned = normalizedCleaned.slice(normalizedPattern.length).trim();
       break;
     }
   }
-  
+
   return cleaned;
 }
 
-/**
- * Get ayah text with Bismillah handling
- */
 export function getAyahTextForDisplay(ayah: Ayah, surahNumber: number): string {
   return cleanAyahText(ayah.text.arabic, surahNumber, ayah.numberInSurah);
 }

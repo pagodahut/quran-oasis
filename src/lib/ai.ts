@@ -7,7 +7,7 @@
 
 export const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
-export const ANTHROPIC_MODEL = 'claude-sonnet-4-20250514';
+export const ANTHROPIC_MODEL = 'claude-sonnet-4-6';
 
 export const ANTHROPIC_VERSION = '2023-06-01';
 

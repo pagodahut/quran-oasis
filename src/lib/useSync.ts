@@ -56,24 +56,25 @@ export function useSync() {
       const localProgress = getProgress();
       const localBookmarks = getBookmarks();
 
-      // Merge strategy: keep whichever has more data or is more recent
-      const serverUpdatedAt = data.user?.createdAt ? new Date(data.user.createdAt) : new Date(0);
-      const localUpdatedAt = localProgress.updatedAt ? new Date(localProgress.updatedAt) : new Date(0);
-
-      // Merge verses - keep verse with more reviews or higher confidence
+      // Merge verses — keep the version with more reviews; break ties by confidence
       const mergedVerses = { ...localProgress.verses };
       if (data.progress?.verses) {
         for (const [key, serverVerse] of Object.entries(data.progress.verses) as [string, any][]) {
           const localVerse = mergedVerses[key];
-          if (!localVerse ||
-              (serverVerse.totalReviews || 0) > (localVerse.totalReviews || 0) ||
-              (serverVerse.confidence || 0) > (localVerse.confidence || 0)) {
+          if (!localVerse) {
             mergedVerses[key] = serverVerse;
+          } else {
+            const serverReviews = serverVerse.totalReviews || 0;
+            const localReviews = localVerse.totalReviews || 0;
+            if (serverReviews > localReviews ||
+                (serverReviews === localReviews && (serverVerse.confidence || 0) > (localVerse.confidence || 0))) {
+              mergedVerses[key] = serverVerse;
+            }
           }
         }
       }
 
-      // Merge bookmarks - combine both sets
+      // Merge bookmarks — union both sets, prefer the newer entry on conflicts
       const bookmarkSet = new Map<string, Bookmark>();
       for (const b of localBookmarks) {
         bookmarkSet.set(`${b.surah}:${b.ayah}`, b);
@@ -81,17 +82,27 @@ export function useSync() {
       if (data.bookmarks) {
         for (const b of data.bookmarks) {
           const key = `${b.surah}:${b.ayah}`;
-          if (!bookmarkSet.has(key) || b.createdAt > (bookmarkSet.get(key)?.createdAt || 0)) {
+          const existing = bookmarkSet.get(key);
+          if (!existing || (b.createdAt || 0) > (existing.createdAt || 0)) {
             bookmarkSet.set(key, b);
           }
         }
       }
 
+      // Settings: prefer local when the user has customized them on this device.
+      // Detect fresh local store by comparing createdAt ≈ updatedAt (within 10s).
+      const localCreated = new Date(localProgress.createdAt || 0).getTime();
+      const localUpdated = new Date(localProgress.updatedAt || 0).getTime();
+      const isNewLocalStore = Math.abs(localUpdated - localCreated) < 10_000;
+      const mergedSettings = (isNewLocalStore && data.progress?.settings)
+        ? { ...localProgress.settings, ...data.progress.settings }
+        : localProgress.settings;
+
       // Save merged data locally
       const mergedProgress: UserProgress = {
         ...localProgress,
         verses: mergedVerses,
-        settings: data.progress?.settings || localProgress.settings,
+        settings: mergedSettings,
       };
       saveProgress(mergedProgress);
 

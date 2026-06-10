@@ -125,9 +125,10 @@ export default function QuranSearch({ isOpen, onClose, onSelectResult }: QuranSe
     
     setIsSearching(true);
     const timer = setTimeout(() => {
-      const searchResults = searchQuran(query, searchIn);
-      setResults(searchResults.slice(0, 50));
-      setIsSearching(false);
+      searchQuran(query, searchIn).then(searchResults => {
+        setResults(searchResults.slice(0, 50));
+        setIsSearching(false);
+      });
     }, 300);
     
     return () => clearTimeout(timer);

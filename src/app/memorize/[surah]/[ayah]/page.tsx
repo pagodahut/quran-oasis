@@ -467,25 +467,26 @@ export default function MemorizePage() {
 
   // Load data
   useEffect(() => {
-    const surah = getSurah(surahNum);
-    if (surah) {
-      const foundVerse = surah.ayahs.find(a => a.numberInSurah === ayahNum);
-      if (foundVerse) {
-        setVerse(foundVerse);
-        setSurahName(surah.englishName);
-        
-        // Get previous verses for stacking (if not the first verse)
-        if (ayahNum > 1) {
-          const prevVerses = surah.ayahs
-            .filter(a => a.numberInSurah < ayahNum)
-            .slice(-3); // Last 3 verses for stacking
-          setPreviousVerses(prevVerses);
+    getSurah(surahNum).then(surah => {
+      if (surah) {
+        const foundVerse = surah.ayahs.find(a => a.numberInSurah === ayahNum);
+        if (foundVerse) {
+          setVerse(foundVerse);
+          setSurahName(surah.englishName);
+
+          // Get previous verses for stacking (if not the first verse)
+          if (ayahNum > 1) {
+            const prevVerses = surah.ayahs
+              .filter(a => a.numberInSurah < ayahNum)
+              .slice(-3); // Last 3 verses for stacking
+            setPreviousVerses(prevVerses);
+          }
+
+          // Start memorizing
+          startMemorizingVerse(surahNum, ayahNum);
         }
-        
-        // Start memorizing
-        startMemorizingVerse(surahNum, ayahNum);
       }
-    }
+    });
   }, [surahNum, ayahNum]);
 
   // Handle audio repeat for listen phase
@@ -644,8 +645,8 @@ export default function MemorizePage() {
     }
   }, [tarteelAvailable, isRecording, stopRecallRecording, handleRepComplete, showText]);
 
-  const goToNextVerse = () => {
-    const surah = getSurah(surahNum);
+  const goToNextVerse = async () => {
+    const surah = await getSurah(surahNum);
     const fromSuffix = fromOrigin === 'mushaf' ? `?from=mushaf&surah=${originSurah}` : '';
     if (surah && ayahNum < surah.numberOfAyahs) {
       router.push(`/memorize/${surahNum}/${ayahNum + 1}${fromSuffix}`);

@@ -238,9 +238,10 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
     // Debounced verse search
     setIsSearching(true);
     searchTimerRef.current = setTimeout(() => {
-      const results = searchQuran(q, 'both');
-      setVerseResults(results.slice(0, 30));
-      setIsSearching(false);
+      searchQuran(q, 'both').then(results => {
+        setVerseResults(results.slice(0, 30));
+        setIsSearching(false);
+      });
     }, 250);
   }, [handleSelect]);
 

@@ -18,6 +18,7 @@
  */
 
 import { NextRequest } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { buildFullSystemPrompt, type PageContext, type TajweedResult } from '@/lib/sheikh-prompt';
 import { ANTHROPIC_API_KEY, callClaudeStream } from '@/lib/ai';
 
@@ -61,6 +62,14 @@ interface SheikhRequest {
 
 export async function POST(request: NextRequest) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required', code: 'AUTH_REQUIRED' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     if (!ANTHROPIC_API_KEY) {
       return new Response(
         JSON.stringify({

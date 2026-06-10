@@ -38,6 +38,8 @@ if (clerkPubKey) {
   const isProtectedApiRoute = createRouteMatcher([
     '/api/user(.*)',
     '/api/progress(.*)',
+    '/api/sheikh(.*)',
+    '/api/tajweed(.*)',
   ]);
 
   clerkMiddlewareHandler = clerkMiddleware(async (auth: any, req: NextRequest) => {
