@@ -50,17 +50,16 @@ export default function FeedbackPanel({
     setIsSubmitting(true);
 
     try {
-      await fetch('/api/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          category,
-          message: message.trim(),
-          pageUrl,
-          page: currentPage,
-          userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
-        }),
-      });
+      const entry = {
+        category,
+        message: message.trim(),
+        pageUrl,
+        page: currentPage,
+        createdAt: new Date().toISOString(),
+      };
+      const stored = JSON.parse(localStorage.getItem('qo_feedback') || '[]');
+      stored.push(entry);
+      localStorage.setItem('qo_feedback', JSON.stringify(stored));
 
       setSubmitted(true);
       setTimeout(() => {

@@ -1,5 +1,3 @@
-// import { prisma } from './prisma';
-
 export type NudgeType =
   | 'streak'
   | 'milestone'
@@ -56,9 +54,6 @@ const NUDGE_VARIANTS: Record<NudgeType, Nudge[]> = {
   ],
 };
 
-// TODO: verify if still needed - cooldown not implemented yet
-// const NUDGE_COOLDOWN_MS = 4 * 60 * 60 * 1000; // 4 hours between nudges
-
 interface NudgeContext {
   streakDays: number;
   totalVerses: number;
@@ -74,16 +69,6 @@ function selectNudgeType(ctx: NudgeContext): NudgeType {
   if (ctx.totalVerses > 0 && ctx.totalVerses % 10 === 0) return 'milestone';
   return 'encouragement';
 }
-
-// TODO: verify if still needed - async nudge function not currently used
-// export async function getNudge(
-//   _userId: string,
-//   context: NudgeContext
-// ): Promise<Nudge | null> {
-//   // TODO: Re-enable DB tracking when nudgeHistory model is added
-//   // For now, just use the client-side fallback
-//   return getClientNudge(context);
-// }
 
 /** Get nudge without DB (client-side fallback) */
 export function getClientNudge(context: NudgeContext): Nudge {

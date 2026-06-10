@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from "@clerk/nextjs/server";
 import logger from "@/lib/logger";
+import { ANTHROPIC_API_KEY, callClaude } from "@/lib/ai";
 
 /**
  * Tajweed Analysis API Route
  * Uses Claude to analyze Quran recitation transcription against expected text
  * This is a PREMIUM feature
  */
-
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
 interface AnalyzeRequest {
   transcription: string;
@@ -128,30 +127,12 @@ If the recitation is very close to correct, give a high accuracy score and posit
 Focus on the most important improvements, not every tiny detail.`;
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': ANTHROPIC_API_KEY!,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1024,
-        system: systemPrompt,
-        messages: [
-          { role: 'user', content: userPrompt }
-        ],
-      }),
+    const data = await callClaude({
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }],
+      max_tokens: 1024,
     });
 
-    if (!response.ok) {
-      const error = await response.text();
-      console.error('Claude API error:', error);
-      throw new Error(`Claude API error: ${response.status}`);
-    }
-
-    const data = await response.json();
     const content = data.content[0]?.text;
 
     if (!content) {

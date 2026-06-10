@@ -21,6 +21,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
+import { ANTHROPIC_API_KEY, callClaude } from '@/lib/ai';
 
 // ─── Types ───────────────────────────────────────────────────────────
 
@@ -297,8 +298,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
+    if (!ANTHROPIC_API_KEY) {
       return NextResponse.json(
         { error: 'AI teacher is not configured.', code: 'NO_API_KEY' },
         { status: 503 }
@@ -337,30 +337,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Call Claude API (non-streaming for short content)
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 512,
+    let data;
+    try {
+      data = await callClaude({
         messages: [{ role: 'user', content: prompt }],
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Anthropic API error:', response.status, errorText);
+        max_tokens: 512,
+      });
+    } catch (error) {
+      console.error('Anthropic API error:', error);
       return NextResponse.json(
         { error: 'The sheikh encountered an issue.', code: 'API_ERROR' },
         { status: 502 }
       );
     }
 
-    const data = await response.json();
     const rawText = data.content?.[0]?.text || '';
 
     // Parse JSON from response (handle markdown code blocks)

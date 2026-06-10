@@ -1,17 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   ChevronLeft,
-  ChevronDown,
-  ChevronUp,
-  Clock,
-  Target,
   TrendingUp,
   BookOpen,
   Loader2,
-  Star,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@clerk/nextjs';
@@ -19,34 +14,6 @@ import BottomNav from '@/components/BottomNav';
 import { SURAH_METADATA } from '@/lib/surahMetadata';
 
 // ============ Types ============
-
-interface RecitationWord {
-  id: string;
-  wordIndex: number;
-  expectedWord: string;
-  transcribedWord: string | null;
-  confidence: number;
-  isCorrect: boolean;
-}
-
-interface RecitationSession {
-  id: string;
-  surahNumber: number;
-  startAyah: number;
-  endAyah: number;
-  overallAccuracy: number;
-  duration: number;
-  totalWords: number;
-  matchedWords: number;
-  createdAt: string;
-  words: RecitationWord[];
-}
-
-interface BestScore {
-  surahNumber: number;
-  bestAccuracy: number;
-  sessionCount: number;
-}
 
 interface LocalSession {
   surahNumber: number;
@@ -126,19 +93,10 @@ function AccuracyChart({ sessions }: { sessions: { overallAccuracy: number; crea
 
 // ============ Session Card ============
 
-function SessionCard({ session }: { session: RecitationSession | LocalSession }) {
-  const [expanded, setExpanded] = useState(false);
-  const hasWords = 'words' in session && session.words?.length > 0;
-
+function SessionCard({ session }: { session: LocalSession }) {
   return (
-    <motion.div
-      layout
-      className="bg-night-900/40 border border-night-800/50 rounded-xl overflow-hidden"
-    >
-      <button
-        onClick={() => hasWords && setExpanded(!expanded)}
-        className="w-full px-4 py-3 flex items-center gap-3 text-left"
-      >
+    <div className="bg-night-900/40 border border-night-800/50 rounded-xl overflow-hidden">
+      <div className="w-full px-4 py-3 flex items-center gap-3 text-left">
         {/* Accuracy badge */}
         <div
           className={`flex-shrink-0 w-12 h-12 rounded-lg border flex items-center justify-center ${getAccuracyBg(
@@ -157,84 +115,14 @@ function SessionCard({ session }: { session: RecitationSession | LocalSession })
           </h3>
           <div className="flex items-center gap-2 mt-0.5">
             <span className="text-xs text-night-500">
-              Ayah {session.startAyah}–{session.endAyah}
+              Ayah {session.startAyah}--{session.endAyah}
             </span>
             <span className="text-night-700">·</span>
             <span className="text-xs text-night-500">{formatTime(session.duration)}</span>
           </div>
         </div>
-
-        {hasWords && (
-          expanded ? (
-            <ChevronUp className="w-4 h-4 text-night-500 flex-shrink-0" />
-          ) : (
-            <ChevronDown className="w-4 h-4 text-night-500 flex-shrink-0" />
-          )
-        )}
-      </button>
-
-      {/* Word details */}
-      <AnimatePresence>
-        {expanded && hasWords && 'words' in session && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="border-t border-night-800/30"
-          >
-            <div className="px-4 py-3 flex flex-wrap gap-1.5" dir="rtl">
-              {session.words.map((w) => (
-                <span
-                  key={w.id}
-                  className={`inline-block px-1.5 py-0.5 rounded text-sm font-arabic ${
-                    w.isCorrect
-                      ? 'bg-sage-500/10 text-sage-300'
-                      : 'bg-red-500/10 text-red-300'
-                  }`}
-                  title={w.transcribedWord ? `Heard: ${w.transcribedWord}` : 'Not detected'}
-                >
-                  {w.expectedWord}
-                </span>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-}
-
-// ============ Most Practiced ============
-
-function MostPracticed({ bestScores }: { bestScores: BestScore[] }) {
-  if (bestScores.length === 0) return null;
-
-  const sorted = [...bestScores].sort((a, b) => b.sessionCount - a.sessionCount).slice(0, 5);
-
-  return (
-    <section className="mb-6">
-      <h2 className="text-xs font-semibold text-night-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-        <Star className="w-3.5 h-3.5" />
-        Your Most Practiced
-      </h2>
-      <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-        {sorted.map((s) => (
-          <div
-            key={s.surahNumber}
-            className="flex-shrink-0 px-4 py-3 rounded-xl bg-night-900/50 border border-night-800/40 min-w-[140px]"
-          >
-            <div className="text-sm font-medium text-night-200">{getSurahName(s.surahNumber)}</div>
-            <div className="flex items-center gap-2 mt-1">
-              <span className={`text-xs font-bold ${getAccuracyColor(s.bestAccuracy)}`}>
-                Best: {s.bestAccuracy}%
-              </span>
-              <span className="text-night-600">·</span>
-              <span className="text-xs text-night-500">{s.sessionCount}×</span>
-            </div>
-          </div>
-        ))}
       </div>
-    </section>
+    </div>
   );
 }
 
@@ -243,64 +131,36 @@ function MostPracticed({ bestScores }: { bestScores: BestScore[] }) {
 export default function RecitationHistoryPage() {
   const router = useRouter();
   const { isSignedIn, isLoaded } = useAuth();
-  const [sessions, setSessions] = useState<RecitationSession[]>([]);
-  const [bestScores, setBestScores] = useState<BestScore[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [localSessions, setLocalSessions] = useState<LocalSession[]>([]);
 
-  // Load from API or localStorage
+  // Load from localStorage
   useEffect(() => {
     if (!isLoaded) return;
 
-    if (isSignedIn) {
-      fetchHistory(1);
-    } else {
-      // Guest: load from localStorage
-      try {
-        const stored = localStorage.getItem('recitation-history');
-        if (stored) {
-          setLocalSessions(JSON.parse(stored));
-        }
-      } catch {
-        // ignore
-      }
-      setLoading(false);
-    }
-  }, [isLoaded, isSignedIn]);
-
-  async function fetchHistory(p: number) {
-    setLoading(true);
     try {
-      const res = await fetch(`/api/recitation?page=${p}&limit=20`);
-      if (res.ok) {
-        const data = await res.json();
-        setSessions(data.sessions);
-        setBestScores(data.bestScores || []);
-        setPage(data.page);
-        setTotalPages(data.totalPages);
+      const stored = localStorage.getItem('recitation-history');
+      if (stored) {
+        setLocalSessions(JSON.parse(stored));
       }
-    } catch (err) {
-      console.error('Failed to fetch history:', err);
-    } finally {
-      setLoading(false);
+    } catch {
+      // ignore
     }
-  }
+    setLoading(false);
+  }, [isLoaded]);
 
   // Group sessions by date
   const groupedSessions = useMemo(() => {
-    const items = isSignedIn ? sessions : localSessions;
-    const groups: Record<string, (RecitationSession | LocalSession)[]> = {};
-    for (const s of items) {
+    const groups: Record<string, LocalSession[]> = {};
+    for (const s of localSessions) {
       const dateKey = formatDate(s.createdAt);
       if (!groups[dateKey]) groups[dateKey] = [];
       groups[dateKey].push(s);
     }
     return groups;
-  }, [sessions, localSessions, isSignedIn]);
+  }, [localSessions]);
 
-  const allSessions = isSignedIn ? sessions : localSessions;
+  const allSessions = localSessions;
 
   return (
     <div className="min-h-screen pb-32">
@@ -346,9 +206,6 @@ export default function RecitationHistoryPage() {
           </div>
         ) : (
           <>
-            {/* Most practiced */}
-            {isSignedIn && <MostPracticed bestScores={bestScores} />}
-
             {/* Accuracy chart */}
             {allSessions.length >= 2 && (
               <section className="mb-6 bg-night-900/40 border border-night-800/50 rounded-xl p-4">
@@ -369,37 +226,14 @@ export default function RecitationHistoryPage() {
                   </h2>
                   <div className="space-y-2">
                     {dateSessions.map((s, i) => (
-                      <SessionCard key={'id' in s ? s.id : `local-${i}`} session={s} />
+                      <SessionCard key={`local-${i}`} session={s} />
                     ))}
                   </div>
                 </section>
               ))}
             </div>
 
-            {/* Pagination */}
-            {isSignedIn && totalPages > 1 && (
-              <div className="flex justify-center gap-3 mt-6">
-                <button
-                  disabled={page <= 1}
-                  onClick={() => fetchHistory(page - 1)}
-                  className="px-4 py-2 rounded-lg bg-night-800 text-night-300 text-sm disabled:opacity-30"
-                >
-                  Previous
-                </button>
-                <span className="px-4 py-2 text-sm text-night-500">
-                  {page} / {totalPages}
-                </span>
-                <button
-                  disabled={page >= totalPages}
-                  onClick={() => fetchHistory(page + 1)}
-                  className="px-4 py-2 rounded-lg bg-night-800 text-night-300 text-sm disabled:opacity-30"
-                >
-                  Next
-                </button>
-              </div>
-            )}
-
-            {/* Guest notice */}
+            {/* Sign-in notice */}
             {!isSignedIn && (
               <div className="mt-6 p-4 rounded-xl bg-night-900/40 border border-night-800/50 text-center">
                 <p className="text-xs text-night-400">
