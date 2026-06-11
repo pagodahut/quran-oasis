@@ -7,7 +7,6 @@ const clerkPubKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 let clerkMiddlewareHandler: ((req: NextRequest) => Promise<NextResponse>) | null = null;
 
 if (clerkPubKey) {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { clerkMiddleware, createRouteMatcher } = require('@clerk/nextjs/server');
 
   const isPublicRoute = createRouteMatcher([

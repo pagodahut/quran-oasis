@@ -39,7 +39,6 @@ export interface WebSpeechSessionResult {
 export class WebSpeechService {
   private config: WebSpeechConfig;
   private expectedWords: string[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private recognition: any = null;
   private mediaStream: MediaStream | null = null;
   private audioContext: AudioContext | null = null;

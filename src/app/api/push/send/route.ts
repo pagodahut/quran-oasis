@@ -54,7 +54,6 @@ export async function POST(request: NextRequest) {
       data: { url: url || '/' },
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let webpush: any;
     try {
       webpush = require('web-push');
