@@ -799,8 +799,7 @@ export default function SettingsPage() {
                   >
                     {/* Mini preview */}
                     <div className="flex items-center gap-2 mb-3">
-                      <span className="text-lg">{t.emoji}</span>
-                      <span 
+                      <span
                         className="font-semibold text-sm"
                         style={{ color: t.colors.text }}
                       >

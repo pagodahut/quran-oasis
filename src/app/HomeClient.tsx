@@ -2,376 +2,36 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
-import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
-import { 
-  BookOpen, 
-  Sparkles, 
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import {
+  BookOpen,
+  Sparkles,
   ChevronRight,
   Heart,
   Headphones,
   Brain,
-  Flame,
   ArrowRight,
-  Quote,
-  User,
 } from 'lucide-react';
-import { HifzLogo, HifzIcon, HifzIconSimple } from '@/components/brand/HifzLogo';
-import AnimatedBackground from '@/components/AnimatedBackground';
+import { HifzLogo, HifzIconSimple } from '@/components/brand/HifzLogo';
 import { SignInButton, SignUpButton, UserButton, SignedIn, SignedOut } from '@clerk/nextjs';
 
-// Animation variants
-const fadeInUp = {
-  hidden: { opacity: 0, y: 40 },
-  visible: { 
-    opacity: 1, 
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
     y: 0,
     transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
   }
 };
 
-const staggerContainer = {
+const stagger = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2
-    }
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 }
   }
 };
 
-const scaleIn = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: { 
-    opacity: 1, 
-    scale: 1,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
-  }
-};
-
-// Geometric diamond accent - subtle Islamic-inspired motif with animation
-function GeometricAccent({ className = "", size = 8, animated = false }: { className?: string; size?: number; animated?: boolean }) {
-  if (animated) {
-    return (
-      <motion.svg 
-        viewBox="0 0 12 12" 
-        width={size} 
-        height={size} 
-        className={className}
-        fill="currentColor"
-        animate={{ 
-          rotate: [0, 90, 180, 270, 360],
-          scale: [1, 1.15, 1, 0.9, 1],
-          opacity: [0.4, 0.7, 0.4, 0.6, 0.4]
-        }}
-        transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-      >
-        <path d="M6 0L12 6L6 12L0 6Z" />
-      </motion.svg>
-    );
-  }
-  return (
-    <svg 
-      viewBox="0 0 12 12" 
-      width={size} 
-      height={size} 
-      className={className}
-      fill="currentColor"
-    >
-      <path d="M6 0L12 6L6 12L0 6Z" />
-    </svg>
-  );
-}
-
-// Large animated Islamic geometric pattern (arabesque/zellige) behind hero
-function IslamicGeometricBackground() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* Large slowly rotating 8-pointed star pattern */}
-      <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
-        style={{ willChange: 'transform' }}
-      >
-        <svg viewBox="0 0 600 600" width={800} height={800} className="opacity-[0.04]">
-          <defs>
-            <pattern id="islamicTile" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
-              {/* 8-pointed star */}
-              <path d="M50 10l8 24h25l-20 15 8 24-21-15-21 15 8-24-20-15h25z" fill="#c9a227"/>
-              {/* Connecting hexagonal lines */}
-              <path d="M0 0L25 25M75 25L100 0M0 100L25 75M75 75L100 100" stroke="#c9a227" strokeWidth="0.5" fill="none"/>
-              <rect x="45" y="45" width="10" height="10" transform="rotate(45 50 50)" fill="#c9a227" opacity="0.5"/>
-            </pattern>
-          </defs>
-          <rect width="600" height="600" fill="url(#islamicTile)"/>
-        </svg>
-      </motion.div>
-
-      {/* Pulsing 8-pointed stars scattered */}
-      {[
-        { x: '15%', y: '20%', size: 28, delay: 0, duration: 9 },
-        { x: '75%', y: '65%', size: 24, delay: 3, duration: 10 },
-      ].map((star, i) => (
-        <motion.div
-          key={`star-${i}`}
-          className="absolute"
-          style={{ left: star.x, top: star.y }}
-          animate={{
-            rotate: [0, 180, 360],
-            opacity: [0.03, 0.08, 0.03],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            duration: star.duration,
-            repeat: Infinity,
-            delay: star.delay,
-            ease: "easeInOut",
-          }}
-        >
-          <svg viewBox="0 0 24 24" width={star.size} height={star.size} fill="#c9a227">
-            <path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8Z"/>
-          </svg>
-        </motion.div>
-      ))}
-    </div>
-  );
-}
-
-// Elegant gold divider with Islamic-inspired center ornament
-function GeometricDivider({ className = "" }: { className?: string }) {
-  return (
-    <div className={`flex items-center gap-4 ${className}`}>
-      <div 
-        className="flex-1 h-px"
-        style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(201, 162, 39, 0.4) 100%)'
-        }}
-      />
-      <svg 
-        viewBox="0 0 24 24" 
-        width={20} 
-        height={20} 
-        className="text-gold-500"
-      >
-        {/* 8-pointed star (Islamic geometric motif) */}
-        <path 
-          d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z" 
-          fill="currentColor" 
-          opacity="0.6"
-        />
-        <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.8" />
-      </svg>
-      <div 
-        className="flex-1 h-px"
-        style={{
-          background: 'linear-gradient(90deg, rgba(201, 162, 39, 0.4) 0%, transparent 100%)'
-        }}
-      />
-    </div>
-  );
-}
-
-// Scroll-animated golden star with circle forming around it
-function ScrollAnimatedStar() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"]
-  });
-  
-  // Circle draws as you scroll (0 to 1)
-  const circleProgress = useTransform(scrollYProgress, [0.2, 0.6], [0, 1]);
-  // Star grows slightly
-  const starScale = useTransform(scrollYProgress, [0.2, 0.6], [1, 1.15]);
-  const starGlow = useTransform(scrollYProgress, [0.2, 0.6], [0.3, 0.8]);
-  
-  return (
-    <motion.div 
-      ref={ref}
-      className="flex items-center justify-center my-8"
-    >
-      <div className="relative w-24 h-24">
-        {/* Glow effect - positioned outside container to avoid clipping */}
-        <motion.div
-          className="absolute -inset-8 rounded-full pointer-events-none"
-          style={{ 
-            opacity: starGlow,
-            background: 'radial-gradient(circle, rgba(201, 162, 39, 0.35) 0%, rgba(201, 162, 39, 0.15) 30%, transparent 60%)',
-            filter: 'blur(16px)',
-          }}
-        />
-        
-        {/* Animated circle forming around star */}
-        <svg 
-          viewBox="0 0 100 100" 
-          className="absolute inset-0 w-full h-full"
-        >
-          <motion.circle
-            cx="50"
-            cy="50"
-            r="45"
-            fill="none"
-            stroke="url(#goldGradient)"
-            strokeWidth="2"
-            strokeLinecap="round"
-            style={{
-              pathLength: circleProgress,
-              rotate: -90,
-            }}
-            strokeDasharray="1"
-            strokeDashoffset="0"
-          />
-          <defs>
-            <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#f4d47c" />
-              <stop offset="100%" stopColor="#c9a227" />
-            </linearGradient>
-          </defs>
-        </svg>
-        
-        {/* Growing golden star */}
-        <motion.div 
-          className="absolute inset-0 flex items-center justify-center"
-          style={{ scale: starScale }}
-        >
-          <svg 
-            viewBox="0 0 24 24" 
-            width={40} 
-            height={40}
-            className="text-gold-500 relative z-10"
-          >
-            {/* 8-pointed star */}
-            <path 
-              d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z" 
-              fill="currentColor"
-            />
-            <circle cx="12" cy="12" r="3" fill="#0a0a0f" opacity="0.6" />
-          </svg>
-        </motion.div>
-      </div>
-    </motion.div>
-  );
-}
-
-// Subtle floating geometric particles - minimal, elegant
-// Uses seeded positions to avoid hydration mismatch
-function FloatingParticles() {
-  const [mounted, setMounted] = useState(false);
-  
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Fixed positions to avoid hydration mismatch (server/client must match)
-  const particles = useMemo(() => [
-    { id: 0, x: 12, y: 18, size: 4, duration: 10, delay: 0 },
-    { id: 1, x: 85, y: 25, size: 5, duration: 12, delay: 1 },
-    { id: 3, x: 28, y: 45, size: 6, duration: 11, delay: 0.5 },
-    { id: 5, x: 92, y: 55, size: 3, duration: 8, delay: 3 },
-    { id: 6, x: 18, y: 82, size: 5.5, duration: 10, delay: 2.5 },
-    { id: 9, x: 78, y: 38, size: 3.5, duration: 11, delay: 3.5 },
-    { id: 10, x: 8, y: 62, size: 5, duration: 12, delay: 0.3 },
-    { id: 14, x: 48, y: 65, size: 4, duration: 11, delay: 2.2 },
-  ], []);
-
-  if (!mounted) {
-    return <div className="absolute inset-0 overflow-hidden pointer-events-none" />;
-  }
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {particles.map((particle) => (
-        <motion.div
-          key={particle.id}
-          className="absolute"
-          style={{
-            left: `${particle.x}%`,
-            top: `${particle.y}%`,
-          }}
-          animate={{
-            y: [-15, 15, -15],
-            rotate: particle.id % 3 === 0 ? [0, 180, 360] : [0, 0, 0],
-            opacity: [0.1, 0.3, 0.1],
-          }}
-          transition={{
-            duration: particle.duration,
-            repeat: Infinity,
-            delay: particle.delay,
-            ease: "easeInOut"
-          }}
-        >
-          {particle.id % 5 === 0 ? (
-            // 8-pointed star
-            <svg viewBox="0 0 24 24" width={particle.size * 2.5} height={particle.size * 2.5} fill="currentColor" className="text-gold-400/20">
-              <path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8Z"/>
-            </svg>
-          ) : particle.id % 3 === 0 ? (
-            // Diamond
-            <svg viewBox="0 0 12 12" width={particle.size * 2} height={particle.size * 2} fill="currentColor" className="text-gold-400/20">
-              <path d="M6 0L12 6L6 12L0 6Z"/>
-            </svg>
-          ) : (
-            // Circle
-            <div 
-              className="rounded-full bg-gold-400/20"
-              style={{ width: particle.size, height: particle.size }}
-            />
-          )}
-        </motion.div>
-      ))}
-    </div>
-  );
-}
-
-// Traditional door plaque style Bismillah - simple, elegant, authoritative
-function BismillahPlacard() {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className="relative mb-10 inline-block"
-    >
-      {/* Subtle glow */}
-      <div 
-        className="absolute inset-0 -m-4 blur-2xl opacity-30"
-        style={{
-          background: 'radial-gradient(ellipse at center, rgba(201, 162, 39, 0.4) 0%, transparent 70%)'
-        }}
-      />
-      
-      {/* Door plaque style frame - minimal and elegant */}
-      <div 
-        className="relative px-8 py-3 rounded-lg"
-        style={{
-          background: 'linear-gradient(135deg, rgba(201, 162, 39, 0.08) 0%, rgba(201, 162, 39, 0.03) 100%)',
-          border: '1px solid rgba(201, 162, 39, 0.25)',
-          boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 8px rgba(0, 0, 0, 0.2)',
-        }}
-      >
-        {/* Simple line accents at edges */}
-        <div className="absolute top-1/2 left-2 -translate-y-1/2 w-3 h-px bg-gold-500/40" />
-        <div className="absolute top-1/2 right-2 -translate-y-1/2 w-3 h-px bg-gold-500/40" />
-        
-        {/* Bismillah text - Arabic only */}
-        <p 
-          className="relative text-xl md:text-2xl text-gold-400 text-center"
-          style={{ 
-            fontFamily: 'var(--font-quran)',
-            direction: 'rtl',
-            textShadow: '0 0 20px rgba(201, 162, 39, 0.3)',
-            letterSpacing: '0.02em',
-          }}
-        >
-          بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-        </p>
-      </div>
-    </motion.div>
-  );
-}
-
-// Animated counter
 function AnimatedCounter({ value, suffix = '' }: { value: number; suffix?: string }) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
@@ -388,7 +48,6 @@ function AnimatedCounter({ value, suffix = '' }: { value: number; suffix?: strin
 
   useEffect(() => {
     if (!isVisible) return;
-    const duration = 2000;
     const steps = 60;
     const increment = value / steps;
     let current = 0;
@@ -400,656 +59,471 @@ function AnimatedCounter({ value, suffix = '' }: { value: number; suffix?: strin
       } else {
         setCount(Math.floor(current));
       }
-    }, duration / steps);
+    }, 2000 / steps);
     return () => clearInterval(timer);
   }, [isVisible, value]);
 
   return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
 }
 
-// Arabic calligraphy icon - reusable for feature cards
-const arabicIconStyle = { 
-  fontFamily: 'var(--font-arabic)', 
-  direction: 'rtl' as const,
-  textShadow: '0 0 20px rgba(201, 162, 39, 0.5), 0 2px 4px rgba(0,0,0,0.3)'
-};
-
-function ArabicIcon({ text, className = "" }: { text: string; className?: string }) {
-  return (
-    <div className={`${className} flex items-center justify-center`}>
-      <span className="text-3xl font-bold leading-none text-gold-400" style={arabicIconStyle}>
-        {text}
-      </span>
-    </div>
-  );
-}
-
-const PersonalizedIcon = ({ className }: { className?: string }) => <ArabicIcon text="تَعَلُّم" className={className} />;
-const SpacedRepIcon = ({ className }: { className?: string }) => <ArabicIcon text="تَكرار" className={className} />;
-const ProgressIcon = ({ className }: { className?: string }) => <ArabicIcon text="تَقَدُّم" className={className} />;
-
-// Feature card with custom icon - CENTERED layout
-function FeatureCard({ 
-  iconComponent: IconComponent,
-  title, 
-  description, 
-  gradient,
-}: { 
-  iconComponent: React.ComponentType<{ className?: string }>;
-  title: string;
-  description: string;
-  gradient: string;
-}) {
-  return (
-    <motion.div
-      variants={scaleIn}
-      whileHover={{ y: -6, scale: 1.01 }}
-      transition={{ type: "spring", stiffness: 300 }}
-      className="liquid-card-interactive glass-noise p-6 group text-center"
-    >
-      {/* Golden Arabic calligraphy icon with subtle glow - CENTERED */}
-      <div className="relative w-20 h-20 rounded-2xl bg-night-900/60 border border-gold-500/30 flex items-center justify-center mb-5 group-hover:border-gold-500/50 transition-colors mx-auto">
-        <IconComponent className="" />
-        {/* Golden glow on hover */}
-        <div className="absolute inset-0 rounded-2xl bg-gold-500/20 blur-xl opacity-0 group-hover:opacity-60 transition-opacity" />
-      </div>
-      
-      <h3 className="font-semibold text-night-100 text-lg mb-2">{title}</h3>
-      <p className="text-night-400 leading-relaxed text-sm">{description}</p>
-    </motion.div>
-  );
-}
-
-// Method card with number badge
-function MethodCard({ 
-  number, 
-  title, 
-  description,
-  isArabic = false
-}: { 
-  number: string;
-  title: string;
-  description: string;
-  isArabic?: boolean;
-}) {
-  return (
-    <motion.div
-      variants={fadeInUp}
-      className="flex gap-5 p-5 liquid-card glass-noise"
-    >
-      <div 
-        className="flex-shrink-0 w-20 h-20 rounded-2xl liquid-glass-gold flex items-center justify-center relative overflow-hidden"
-      >
-        <span className={`text-gold-400 font-display text-xl font-bold ${isArabic ? 'font-arabic' : ''}`}>
-          {number}
-        </span>
-      </div>
-      <div>
-        <h3 className="font-semibold text-night-100 text-lg mb-2">{title}</h3>
-        <p className="text-night-400 text-sm leading-relaxed">{description}</p>
-      </div>
-    </motion.div>
-  );
-}
-
 export default function HomePage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: containerRef });
-  
-  // Parallax transforms
-  const heroY = useTransform(scrollYProgress, [0, 0.3], [0, -100]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
-  const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.2]);
-  
-  // Smooth spring animations
-  const smoothY = useSpring(heroY, { stiffness: 50, damping: 20 });
+  const heroY = useSpring(useTransform(scrollYProgress, [0, 0.3], [0, -60]), { stiffness: 50, damping: 20 });
 
   return (
-    <div ref={containerRef} className="min-h-screen relative overflow-x-hidden">
-      {/* Enhanced Animated Background — gradient mesh */}
-      <motion.div
-        className="fixed inset-0 mesh-bg-warm"
-        style={{ scale: bgScale }}
-      />
-      
-      {/* Islamic geometric canvas animation */}
-      <AnimatedBackground opacity={0.2} speed={0.5} />
-      
-      {/* Pattern overlay */}
-      <div className="fixed inset-0 pattern-arabesque opacity-30" />
-      <div className="fixed inset-0 pattern-overlay" />
-      
-      {/* Subtle floating particles */}
-      <FloatingParticles />
-      
-      {/* Stunning Islamic geometric background */}
-      <IslamicGeometricBackground />
-      
-      {/* Decorative orbs with parallax */}
-      <motion.div 
-        className="fixed top-10 left-5 w-[600px] h-[600px] rounded-full blur-[120px]"
-        style={{ 
-          y: smoothY,
-          background: 'radial-gradient(circle, rgba(201, 162, 39, 0.08) 0%, transparent 70%)'
-        }}
-      />
-      <motion.div 
-        className="fixed bottom-20 right-5 w-[700px] h-[700px] rounded-full blur-[140px]"
-        style={{ 
-          y: useTransform(scrollYProgress, [0, 1], [0, 150]),
-          background: 'radial-gradient(circle, rgba(78, 122, 81, 0.06) 0%, transparent 70%)'
-        }}
-      />
-      <motion.div 
-        className="fixed top-1/3 left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full blur-[180px]"
+    <div ref={containerRef} className="min-h-screen" style={{ background: 'var(--theme-surface)' }}>
+
+      {/* Header — quiet, typographic */}
+      <header
+        className="fixed top-0 left-0 right-0 z-50"
         style={{
-          background: 'radial-gradient(circle, rgba(30, 58, 95, 0.08) 0%, transparent 60%)'
+          background: 'var(--theme-surface)',
+          borderBottom: '1px solid var(--theme-border-subtle)',
         }}
-      />
-      
-      {/* Content */}
-      <div className="relative z-10">
-        {/* Header - Premium Frosted Glass */}
-        <header className="fixed top-0 left-0 right-0 z-50 safe-area-top">
-          <div className="mx-3 mt-3">
-            <div className="liquid-glass glass-noise rounded-2xl">
-              <div className="px-4 sm:px-6 py-3 sm:py-4 max-w-7xl mx-auto">
-                <div className="flex items-center justify-between">
-                  <HifzLogo iconSize={32} animated={true} />
-                  
-                  <motion.nav
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="flex items-center gap-2 sm:gap-4"
-                  >
-                    <Link 
-                      href="/mushaf" 
-                      className="text-night-400 hover:text-gold-400 transition-colors text-sm font-medium hidden sm:block px-2 py-1.5 rounded-lg hover:bg-white/5 focus-visible-ring"
-                    >
-                      Quran
-                    </Link>
-                    <Link 
-                      href="/techniques" 
-                      className="text-night-400 hover:text-gold-400 transition-colors text-sm font-medium hidden sm:block px-2 py-1.5 rounded-lg hover:bg-white/5 focus-visible-ring"
-                    >
-                      Methods
-                    </Link>
-                    <Link 
-                      href="/lessons"
-                      className="liquid-pill text-sm font-medium text-night-100 flex items-center gap-2 focus-visible-ring"
-                    >
-                      <Sparkles className="w-4 h-4 text-gold-400" />
-                      <span className="hidden sm:inline">My Lessons</span>
-                      <span className="sm:hidden">Lessons</span>
-                    </Link>
-                    
-                    {/* Auth Buttons */}
-                    <SignedOut>
-                      <SignInButton mode="modal">
-                        <button className="text-night-400 hover:text-gold-400 transition-colors text-sm font-medium flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-white/5 min-h-[36px]">
-                          <User className="w-4 h-4" />
-                          <span className="hidden sm:inline">Sign In</span>
-                        </button>
-                      </SignInButton>
-                    </SignedOut>
-                    <SignedIn>
-                      <UserButton 
-                        afterSignOutUrl="/"
-                        appearance={{
-                          elements: {
-                            avatarBox: "w-9 h-9"
-                          }
-                        }}
-                      />
-                    </SignedIn>
-                  </motion.nav>
-                </div>
-              </div>
-            </div>
-          </div>
-        </header>
+      >
+        <div className="px-6 py-3 max-w-5xl mx-auto flex items-center justify-between">
+          <HifzLogo iconSize={28} animated={false} />
 
-        {/* Hero Section */}
-        <section className="min-h-screen flex flex-col items-center justify-center px-6 pt-28 pb-16">
-          <motion.div
-            style={{ y: smoothY, opacity: heroOpacity }}
-            className="text-center max-w-4xl"
-          >
-            {/* Bismillah - door plaque style */}
-            <BismillahPlacard />
-            
-            {/* Main Headline */}
-            <motion.h1 
-              variants={staggerContainer}
-              initial="hidden"
-              animate="visible"
-              className="font-display text-5xl md:text-7xl lg:text-8xl text-night-100 mb-8 leading-tight"
+          <nav className="flex items-center gap-4">
+            <Link
+              href="/mushaf"
+              className="text-sm font-medium hidden sm:block px-2 py-1.5 rounded-lg transition-colors"
+              style={{ color: 'var(--theme-text-secondary)' }}
             >
-              <motion.span variants={fadeInUp} className="block">Your Journey to</motion.span>
-              <motion.span variants={fadeInUp} className="block mt-2">
-                <span className="relative inline-block">
-                  <span className="liquid-shimmer-text tracking-wider font-bold">HIFZ</span>
-                  <motion.span
-                    className="absolute -inset-8 bg-gold-500/15 rounded-full -z-10 blur-2xl"
-                    animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
-                    transition={{ duration: 4, repeat: Infinity }}
-                  />
-                </span>
-                <span className="text-night-100"> Starts Here</span>
-              </motion.span>
-            </motion.h1>
-            
-            {/* Subheadline */}
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="text-night-300 text-lg md:text-xl mb-12 max-w-2xl mx-auto leading-relaxed"
+              Quran
+            </Link>
+            <Link
+              href="/techniques"
+              className="text-sm font-medium hidden sm:block px-2 py-1.5 rounded-lg transition-colors"
+              style={{ color: 'var(--theme-text-secondary)' }}
             >
-              Memorize the Quran with AI-powered personalized lessons, 
-              beautiful recitations, and time-tested techniques from traditional Tahfiz schools.
-            </motion.p>
-
-            {/* CTA Buttons */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center mb-8"
-            >
-              <SignedIn>
-                <Link href="/dashboard" className="group relative">
-                  <motion.div
-                    className="absolute -inset-1 bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-70 transition-opacity"
-                    animate={{ scale: [1, 1.02, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  />
-                  <span className="relative liquid-btn text-base px-10 py-4 flex items-center gap-3">
-                    <Sparkles className="w-5 h-5" />
-                    Continue Learning
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                </Link>
-              </SignedIn>
-              <SignedOut>
-                <SignUpButton mode="modal">
-                  <button className="group relative">
-                    <motion.div
-                      className="absolute -inset-1 bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-70 transition-opacity"
-                      animate={{ scale: [1, 1.02, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                    <span className="relative liquid-btn text-base px-10 py-4 flex items-center gap-3">
-                      <Sparkles className="w-5 h-5" />
-                      Begin Your Journey
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </span>
-                  </button>
-                </SignUpButton>
-              </SignedOut>
-              <Link href="/mushaf" className="liquid-btn-outline text-base px-10 py-4 flex items-center gap-3">
-                <BookOpen className="w-5 h-5" />
-                Explore the Quran
-              </Link>
-            </motion.div>
-            
-            {/* Browse Surahs - Garden Entry */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1 }}
-              className="mb-16"
-            >
-              <Link 
-                href="/surahs" 
-                className="inline-flex items-center gap-2 text-night-400 hover:text-gold-400 transition-colors text-sm group"
-              >
-                <span className="w-8 h-8 rounded-lg bg-night-800/50 flex items-center justify-center group-hover:bg-gold-500/10 transition-colors">
-                  <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4" stroke="currentColor" strokeWidth={1.5}>
-                    <rect x="3" y="3" width="7" height="7" rx="1.5" />
-                    <rect x="14" y="3" width="7" height="7" rx="1.5" />
-                    <rect x="3" y="14" width="7" height="7" rx="1.5" />
-                    <rect x="14" y="14" width="7" height="7" rx="1.5" />
-                  </svg>
-                </span>
-                Browse all 114 Surahs
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </motion.div>
-
-            {/* Stats Row with Islamic star separators */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
-              className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-sm"
-            >
-              {[
-                { icon: BookOpen, label: 'Complete Quran', color: 'text-sage-400' },
-                { icon: Headphones, label: 'Multiple Reciters', color: 'text-gold-400' },
-                { icon: Brain, label: 'AI-Powered', color: 'text-purple-400' },
-                { icon: Sparkles, label: 'Personalized Learning', color: 'text-rose-400' },
-              ].map((stat, i, arr) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.2 + i * 0.1 }}
-                  className="flex items-center gap-2"
-                >
-                  <div className="flex items-center gap-2 text-night-300">
-                    <stat.icon className={`w-4 h-4 ${stat.color}`} />
-                    <span>{stat.label}</span>
-                  </div>
-                  {i < arr.length - 1 && (
-                    <GeometricAccent size={6} className="text-gold-500/40 ml-4 hidden md:block" />
-                  )}
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
-          
-        </section>
-
-        {/* Features Section - Islamic Manuscript Box */}
-        <section className="px-6 py-24 relative">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-            className="max-w-6xl mx-auto"
-          >
-            {/* Islamic Manuscript-style Container */}
-            <div 
-              className="relative p-8 md:p-12 rounded-3xl"
+              Methods
+            </Link>
+            <Link
+              href="/lessons"
+              className="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors"
               style={{
-                background: 'linear-gradient(135deg, rgba(139, 105, 20, 0.08) 0%, rgba(201, 162, 39, 0.04) 50%, rgba(139, 105, 20, 0.08) 100%)',
-                border: '2px solid rgba(201, 162, 39, 0.2)',
-                boxShadow: 'inset 0 0 60px rgba(139, 105, 20, 0.05), 0 8px 32px rgba(0, 0, 0, 0.2)',
+                background: 'var(--ambient-gold-subtle)',
+                color: 'var(--ambient-gold)',
               }}
             >
-              {/* Animated corner ornaments - draw themselves in */}
-              {[
-                { pos: 'top-3 left-3', d: 'M0 32L0 4Q0 0 4 0L32 0' },
-                { pos: 'top-3 right-3', d: 'M32 32L32 4Q32 0 28 0L0 0' },
-                { pos: 'bottom-3 left-3', d: 'M0 0L0 28Q0 32 4 32L32 32' },
-                { pos: 'bottom-3 right-3', d: 'M32 0L32 28Q32 32 28 32L0 32' },
-              ].map((corner, i) => (
-                <motion.svg
-                  key={i}
-                  className={`absolute ${corner.pos} w-8 h-8`}
-                  viewBox="0 0 32 32"
-                  fill="none"
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                >
-                  <motion.path
-                    d={corner.d}
-                    stroke="#c9a227"
-                    strokeWidth="2"
-                    strokeOpacity="0.4"
-                    strokeLinecap="round"
-                    variants={{
-                      hidden: { pathLength: 0, opacity: 0 },
-                      visible: { 
-                        pathLength: 1, 
-                        opacity: 1, 
-                        transition: { duration: 0.8, delay: 0.3 + i * 0.15, ease: "easeOut" }
-                      }
-                    }}
-                  />
-                </motion.svg>
-              ))}
-              
-              {/* Scroll-Triggered Divider */}
-              <GeometricDivider className="mb-8" />
+              Lessons
+            </Link>
 
-              <motion.div variants={fadeInUp} className="text-center mb-12">
-                <h2 id="features" className="font-display text-3xl md:text-5xl text-night-100 mb-4 heading-illuminated">
-                  The Path to Memorization
-                </h2>
-                <p className="text-night-400 max-w-xl mx-auto text-lg">
-                  Everything you need for a successful <span className="text-gold-400 font-semibold">HIFZ</span> journey
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button
+                  className="text-sm font-medium px-2 py-1.5 rounded-lg transition-colors"
+                  style={{ color: 'var(--theme-text-secondary)' }}
+                >
+                  Sign In
+                </button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton
+                afterSignOutUrl="/"
+                appearance={{ elements: { avatarBox: "w-8 h-8" } }}
+              />
+            </SignedIn>
+          </nav>
+        </div>
+      </header>
+
+      {/* Hero — manuscript-style, verse-first */}
+      <section className="min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-20">
+        <motion.div
+          style={{ y: heroY, opacity: heroOpacity }}
+          className="text-center max-w-3xl"
+        >
+          {/* Bismillah — gold leaf, generous size */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+            className="mb-10"
+          >
+            <div
+              className="inline-block px-8 py-3 rounded-lg"
+              style={{
+                border: '1px solid var(--panel-border-gold)',
+                background: 'var(--ambient-gold-subtle)',
+              }}
+            >
+              <p
+                className="text-2xl md:text-3xl"
+                style={{
+                  fontFamily: 'var(--font-quran)',
+                  direction: 'rtl',
+                  color: 'var(--ambient-gold)',
+                }}
+              >
+                بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Headline — editorial, serif-forward */}
+          <motion.h1
+            variants={stagger}
+            initial="hidden"
+            animate="visible"
+            className="text-4xl md:text-6xl lg:text-7xl mb-8 leading-tight"
+            style={{ fontFamily: 'var(--font-display), var(--font-serif), Georgia, serif', color: 'var(--theme-text)' }}
+          >
+            <motion.span variants={fadeIn} className="block">Your Journey to</motion.span>
+            <motion.span variants={fadeIn} className="block mt-2">
+              <span style={{ color: 'var(--ambient-gold)', fontWeight: 700, letterSpacing: '0.05em' }}>HIFZ</span>
+              {' '}Starts Here
+            </motion.span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="text-lg md:text-xl mb-12 max-w-2xl mx-auto leading-relaxed"
+            style={{ color: 'var(--theme-text-secondary)' }}
+          >
+            Memorize the Quran with personalized lessons,
+            beautiful recitations, and time-tested techniques from traditional Tahfiz schools.
+          </motion.p>
+
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center mb-10"
+          >
+            <SignedIn>
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-3 px-8 py-4 rounded-xl text-base font-medium transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                style={{ background: 'var(--ambient-gold)', color: '#fff' }}
+              >
+                Continue Learning <ArrowRight className="w-4 h-4" />
+              </Link>
+            </SignedIn>
+            <SignedOut>
+              <SignUpButton mode="modal">
+                <button
+                  className="inline-flex items-center gap-3 px-8 py-4 rounded-xl text-base font-medium transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                  style={{ background: 'var(--ambient-gold)', color: '#fff' }}
+                >
+                  <Sparkles className="w-5 h-5" />
+                  Begin Your Journey
+                </button>
+              </SignUpButton>
+            </SignedOut>
+            <Link
+              href="/mushaf"
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-xl text-base font-medium transition-colors"
+              style={{
+                border: '1px solid var(--theme-border)',
+                color: 'var(--theme-text-secondary)',
+              }}
+            >
+              <BookOpen className="w-5 h-5" />
+              Explore the Quran
+            </Link>
+          </motion.div>
+
+          {/* Subtle feature badges */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+            className="flex flex-wrap items-center justify-center gap-6 text-sm"
+            style={{ color: 'var(--theme-text-muted)' }}
+          >
+            {[
+              { icon: BookOpen, label: '6,236 Verses' },
+              { icon: Headphones, label: 'Multiple Reciters' },
+              { icon: Brain, label: 'AI-Powered' },
+            ].map((item) => (
+              <div key={item.label} className="flex items-center gap-1.5">
+                <item.icon className="w-4 h-4" style={{ color: 'var(--ambient-gold)' }} />
+                <span>{item.label}</span>
+              </div>
+            ))}
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* Features — clean cards with subtle borders, no glass */}
+      <section className="px-6 py-24">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={stagger}
+          className="max-w-5xl mx-auto"
+        >
+          <motion.div variants={fadeIn} className="text-center mb-16">
+            <h2
+              className="text-3xl md:text-5xl mb-4"
+              style={{ fontFamily: 'var(--font-display), Georgia, serif', color: 'var(--theme-text)' }}
+            >
+              The Path to Memorization
+            </h2>
+            <p className="max-w-xl mx-auto text-lg" style={{ color: 'var(--theme-text-secondary)' }}>
+              Everything you need for a successful Hifz journey
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                arabic: 'تَعَلُّم',
+                title: 'Recite & Get Feedback',
+                desc: 'Real-time voice recognition tracks your recitation word-by-word with accuracy scoring.',
+              },
+              {
+                arabic: 'تَكرار',
+                title: 'Recite to Reveal',
+                desc: 'Text stays hidden until you recite correctly — the ultimate memorization test.',
+              },
+              {
+                arabic: 'تَقَدُّم',
+                title: 'Identify Any Verse',
+                desc: 'Like Shazam for Quran — recite any ayah and instantly find which surah it belongs to.',
+              },
+            ].map((feature) => (
+              <motion.div
+                key={feature.title}
+                variants={fadeIn}
+                whileHover={{ y: -4 }}
+                className="p-6 rounded-2xl text-center transition-shadow"
+                style={{
+                  background: 'var(--theme-card)',
+                  border: '1px solid var(--theme-border)',
+                }}
+              >
+                <div
+                  className="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-5"
+                  style={{
+                    background: 'var(--ambient-gold-subtle)',
+                    border: '1px solid var(--panel-border-gold)',
+                  }}
+                >
+                  <span
+                    className="text-2xl font-bold"
+                    style={{
+                      fontFamily: 'var(--font-arabic)',
+                      direction: 'rtl',
+                      color: 'var(--ambient-gold)',
+                    }}
+                  >
+                    {feature.arabic}
+                  </span>
+                </div>
+                <h3 className="font-semibold text-lg mb-2" style={{ color: 'var(--theme-text)' }}>
+                  {feature.title}
+                </h3>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--theme-text-secondary)' }}>
+                  {feature.desc}
                 </p>
               </motion.div>
-
-              {/* Feature Cards */}
-              <div className="relative">
-
-                {/* Feature Cards with staggered animation */}
-                <motion.div 
-                  className="grid md:grid-cols-3 gap-6 relative z-10"
-                  variants={staggerContainer}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                >
-                  <FeatureCard
-                    iconComponent={PersonalizedIcon}
-                    title="Recite & Get Feedback"
-                    description="Real-time voice recognition tracks your recitation word-by-word with accuracy scoring"
-                    gradient="from-gold-500 to-gold-600"
-                  />
-                  <FeatureCard
-                    iconComponent={SpacedRepIcon}
-                    title="Recite to Reveal"
-                    description="Quran text stays hidden until you recite correctly — the ultimate memorization test"
-                    gradient="from-purple-500 to-pink-500"
-                  />
-                  <FeatureCard
-                    iconComponent={ProgressIcon}
-                    title="Identify Any Verse"
-                    description="Like Shazam for Quran — recite any ayah and instantly find which surah it's from"
-                    gradient="from-sage-500 to-emerald-500"
-                  />
-                </motion.div>
-              </div>
-            </div>
-          </motion.div>
-        </section>
-
-        {/* Method Section */}
-        <section className="px-6 py-24 relative overflow-hidden">
-          {/* Subtle pattern background */}
-          <div className="absolute inset-0 pattern-interlace opacity-20" />
-          
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-            className="max-w-5xl mx-auto relative"
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-8">
-              <div className="flex items-center justify-center mb-4">
-                <GeometricDivider className="text-gold-500" />
-              </div>
-              <h2 className="font-display text-3xl md:text-5xl text-night-100 mb-4 heading-illuminated">
-                Traditional Methods, Modern Tools
-              </h2>
-              <p className="text-night-400 max-w-xl mx-auto text-lg">
-                We combine centuries-old Tahfiz methodology with cutting-edge technology
-              </p>
-            </motion.div>
-            
-            {/* Scroll-animated star with circle forming around it */}
-            <ScrollAnimatedStar />
-
-            <div className="grid md:grid-cols-2 gap-6">
-              <MethodCard 
-                number="10-3" 
-                title="The 10-3 Method" 
-                description="Read 10 times while looking, then recite 3 times from memory. Time-tested technique used in Tahfiz schools worldwide."
-              />
-              <MethodCard 
-                number="70/30" 
-                title="Review Balance" 
-                description="70% review of memorized verses, 30% new material. The optimal ratio for long-term retention."
-              />
-              <MethodCard 
-                number="سبق" 
-                title="Sabaq System" 
-                description="Daily structure of Sabaq (new), Sabqi (recent), and Manzil (old) - the traditional three-part revision system."
-                isArabic
-              />
-              <MethodCard 
-                number="AI" 
-                title="Intelligent Assistance" 
-                description="AI listens to your recitation and provides gentle corrections to help perfect your tajweed."
-              />
-            </div>
-          </motion.div>
-        </section>
-
-        {/* Quote Section - Centered, scaled up, no quote symbol */}
-        <section className="px-6 py-24">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="max-w-4xl mx-auto"
-          >
-            <div className="liquid-glass-gold-premium glass-noise rounded-3xl p-10 md:p-16 flex flex-col items-center justify-center min-h-[280px] relative overflow-hidden">
-              {/* Animated corner accents */}
-              <div className="absolute top-4 left-4">
-                <GeometricAccent size={8} className="text-gold-500/25" animated />
-              </div>
-              <div className="absolute top-4 right-4">
-                <GeometricAccent size={8} className="text-gold-500/25" animated />
-              </div>
-              <div className="absolute bottom-4 left-4">
-                <GeometricAccent size={8} className="text-gold-500/25" animated />
-              </div>
-              <div className="absolute bottom-4 right-4">
-                <GeometricAccent size={8} className="text-gold-500/25" animated />
-              </div>
-              
-              {/* No quote symbol - just the text, scaled up and centered */}
-              <p className="text-2xl md:text-4xl text-night-100 italic leading-relaxed mb-8 text-center max-w-2xl">
-                "The best among you are those who learn the Quran and teach it."
-              </p>
-              <p className="text-gold-400 font-semibold text-lg">— Prophet Muhammad ﷺ (Bukhari)</p>
-              
-              {/* Subtle glow effects */}
-              <div className="absolute top-0 right-0 w-48 h-48 bg-gold-500/5 rounded-full blur-3xl" />
-              <div className="absolute bottom-0 left-0 w-40 h-40 bg-sage-500/5 rounded-full blur-2xl" />
-            </div>
-          </motion.div>
-        </section>
-
-        {/* Stats Section */}
-        <section className="px-6 py-24">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="max-w-4xl mx-auto"
-          >
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              {[
-                { value: 6236, label: 'Verses', suffix: '' },
-                { value: 114, label: 'Surahs', suffix: '' },
-                { value: 30, label: 'Juz', suffix: '' },
-                { value: 50, label: 'Lessons', suffix: '+' },
-              ].map((stat, i) => (
-                <motion.div
-                  key={stat.label}
-                  variants={scaleIn}
-                  className="liquid-stat"
-                >
-                  <div className="text-3xl md:text-4xl font-bold text-gold-gradient mb-2">
-                    <AnimatedCounter value={stat.value} suffix={stat.suffix} />
-                  </div>
-                  <p className="text-night-400 text-sm">{stat.label}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </section>
-
-        {/* Final CTA Section */}
-        <section className="px-6 py-24">
-          <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="max-w-2xl mx-auto text-center"
-          >
-            <div className="liquid-glass-gold-premium glass-noise rounded-3xl p-10 md:p-16 relative overflow-hidden">
-              {/* Subtle corner accent */}
-              <div className="absolute top-6 right-6 opacity-15">
-                <GeometricAccent size={20} className="text-gold-400" />
-              </div>
-              
-              {/* Flame icon with glow */}
-              <motion.div
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="relative inline-block mb-6"
-              >
-                <Flame className="w-16 h-16 text-gold-400" />
-                <div className="absolute inset-0 blur-xl bg-gold-500/30" />
-              </motion.div>
-              
-              <h2 className="font-display text-3xl md:text-4xl text-night-100 mb-4 heading-illuminated">
-                Every Hafiz Started with One Verse
-              </h2>
-              <p className="text-night-300 mb-8 max-w-md mx-auto">
-                Join Muslims around the world on the blessed journey of Quran memorization.
-              </p>
-              
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.98 }}
-                className="relative inline-block"
-              >
-                <motion.div
-                  className="absolute -inset-1 bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 rounded-2xl blur-lg opacity-50"
-                  animate={{ scale: [1, 1.02, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-                <SignedIn>
-                  <Link href="/dashboard" className="relative liquid-btn text-lg px-10 py-4 inline-flex items-center gap-3">
-                    Go to Dashboard
-                    <ArrowRight className="w-5 h-5" />
-                  </Link>
-                </SignedIn>
-                <SignedOut>
-                  <SignUpButton mode="modal">
-                    <button className="relative liquid-btn text-lg px-10 py-4 inline-flex items-center gap-3">
-                      Start Today — It&#39;s Free
-                      <Sparkles className="w-5 h-5" />
-                    </button>
-                  </SignUpButton>
-                </SignedOut>
-              </motion.div>
-            </div>
-          </motion.div>
-        </section>
-
-        {/* Footer */}
-        <footer className="p-6 border-t border-night-800/30 safe-area-bottom">
-          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-night-500 text-sm">
-              <HifzIconSimple size={24} />
-              <span className="font-semibold tracking-wider">HIFZ</span>
-            </div>
-            <p className="text-night-500 text-sm flex items-center gap-2">
-              Made with <Heart className="w-4 h-4 text-rose-500 fill-rose-500" /> for the Ummah
-            </p>
-            <div className="flex items-center gap-6 text-sm text-night-500">
-              <Link href="/lessons" className="hover:text-gold-400 transition-colors">Lessons</Link>
-              <Link href="/surahs" className="hover:text-gold-400 transition-colors">Surahs</Link>
-              <Link href="/techniques" className="hover:text-gold-400 transition-colors">Techniques</Link>
-              <Link href="/mushaf" className="hover:text-gold-400 transition-colors">Quran</Link>
-            </div>
+            ))}
           </div>
-        </footer>
-      </div>
+        </motion.div>
+      </section>
+
+      {/* Method Section */}
+      <section className="px-6 py-24">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={stagger}
+          className="max-w-4xl mx-auto"
+        >
+          <motion.div variants={fadeIn} className="text-center mb-12">
+            <h2
+              className="text-3xl md:text-5xl mb-4"
+              style={{ fontFamily: 'var(--font-display), Georgia, serif', color: 'var(--theme-text)' }}
+            >
+              Traditional Methods, Modern Tools
+            </h2>
+            <p className="max-w-xl mx-auto text-lg" style={{ color: 'var(--theme-text-secondary)' }}>
+              Centuries-old Tahfiz methodology with cutting-edge technology
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              { num: '10-3', title: 'The 10-3 Method', desc: 'Read 10 times while looking, then recite 3 times from memory. Time-tested in Tahfiz schools worldwide.' },
+              { num: '70/30', title: 'Review Balance', desc: '70% review of memorized verses, 30% new material. The optimal ratio for long-term retention.' },
+              { num: 'سبق', title: 'Sabaq System', desc: 'Daily Sabaq (new), Sabqi (recent), and Manzil (old) — the traditional three-part revision system.' },
+              { num: 'AI', title: 'Intelligent Assistance', desc: 'AI listens to your recitation and provides gentle corrections to help perfect your tajweed.' },
+            ].map((method) => (
+              <motion.div
+                key={method.title}
+                variants={fadeIn}
+                className="flex gap-4 p-5 rounded-2xl"
+                style={{
+                  background: 'var(--theme-card)',
+                  border: '1px solid var(--theme-border)',
+                }}
+              >
+                <div
+                  className="flex-shrink-0 w-16 h-16 rounded-xl flex items-center justify-center"
+                  style={{
+                    background: 'var(--ambient-gold-subtle)',
+                    border: '1px solid var(--panel-border-gold)',
+                  }}
+                >
+                  <span
+                    className="font-bold text-lg"
+                    style={{
+                      color: 'var(--ambient-gold)',
+                      fontFamily: method.num === 'سبق' ? 'var(--font-arabic)' : 'inherit',
+                    }}
+                  >
+                    {method.num}
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1" style={{ color: 'var(--theme-text)' }}>{method.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: 'var(--theme-text-secondary)' }}>{method.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Pull Quote */}
+      <section className="px-6 py-24">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="max-w-3xl mx-auto text-center"
+        >
+          <div
+            className="py-12 px-8"
+            style={{ borderTop: '1px solid var(--theme-border)', borderBottom: '1px solid var(--theme-border)' }}
+          >
+            <p
+              className="text-2xl md:text-3xl italic leading-relaxed mb-6"
+              style={{ fontFamily: 'var(--font-serif), Georgia, serif', color: 'var(--theme-text)' }}
+            >
+              &ldquo;The best among you are those who learn the Quran and teach it.&rdquo;
+            </p>
+            <p className="text-sm font-medium" style={{ color: 'var(--ambient-gold)' }}>
+              Prophet Muhammad (peace be upon him) — Bukhari
+            </p>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Stats */}
+      <section className="px-6 py-24">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={stagger}
+          className="max-w-3xl mx-auto"
+        >
+          <div
+            className="grid grid-cols-2 md:grid-cols-4 gap-px rounded-xl overflow-hidden"
+            style={{ background: 'var(--theme-border)' }}
+          >
+            {[
+              { value: 6236, label: 'Verses', suffix: '' },
+              { value: 114, label: 'Surahs', suffix: '' },
+              { value: 30, label: 'Juz', suffix: '' },
+              { value: 50, label: 'Lessons', suffix: '+' },
+            ].map((stat) => (
+              <motion.div
+                key={stat.label}
+                variants={fadeIn}
+                className="p-6 text-center"
+                style={{ background: 'var(--theme-card)' }}
+              >
+                <div className="text-3xl font-serif tabular-nums mb-1" style={{ color: 'var(--ambient-gold)' }}>
+                  <AnimatedCounter value={stat.value} suffix={stat.suffix} />
+                </div>
+                <p className="text-sm" style={{ color: 'var(--theme-text-muted)' }}>{stat.label}</p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="px-6 py-24">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="max-w-2xl mx-auto text-center"
+        >
+          <div
+            className="rounded-2xl p-10 md:p-14"
+            style={{
+              background: 'var(--ambient-gold-subtle)',
+              border: '1px solid var(--panel-border-gold)',
+            }}
+          >
+            <h2
+              className="text-3xl md:text-4xl mb-4"
+              style={{ fontFamily: 'var(--font-display), Georgia, serif', color: 'var(--theme-text)' }}
+            >
+              Every Hafiz Started with One Verse
+            </h2>
+            <p className="mb-8 max-w-md mx-auto" style={{ color: 'var(--theme-text-secondary)' }}>
+              Join Muslims around the world on the blessed journey of Quran memorization.
+            </p>
+
+            <SignedIn>
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-3 px-8 py-4 rounded-xl text-base font-medium transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                style={{ background: 'var(--ambient-gold)', color: '#fff' }}
+              >
+                Go to Dashboard <ArrowRight className="w-5 h-5" />
+              </Link>
+            </SignedIn>
+            <SignedOut>
+              <SignUpButton mode="modal">
+                <button
+                  className="inline-flex items-center gap-3 px-8 py-4 rounded-xl text-base font-medium transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                  style={{ background: 'var(--ambient-gold)', color: '#fff' }}
+                >
+                  Start Today — Free <Sparkles className="w-5 h-5" />
+                </button>
+              </SignUpButton>
+            </SignedOut>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Footer */}
+      <footer
+        className="px-6 py-8"
+        style={{ borderTop: '1px solid var(--theme-border-subtle)' }}
+      >
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--theme-text-muted)' }}>
+            <HifzIconSimple size={20} />
+            <span className="font-semibold tracking-wider">HIFZ</span>
+          </div>
+          <p className="text-sm flex items-center gap-1.5" style={{ color: 'var(--theme-text-muted)' }}>
+            Made with <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" /> for the Ummah
+          </p>
+          <div className="flex items-center gap-6 text-sm" style={{ color: 'var(--theme-text-muted)' }}>
+            <Link href="/lessons" className="hover:opacity-70 transition-opacity">Lessons</Link>
+            <Link href="/surahs" className="hover:opacity-70 transition-opacity">Surahs</Link>
+            <Link href="/mushaf" className="hover:opacity-70 transition-opacity">Quran</Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
