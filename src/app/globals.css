@@ -59,6 +59,21 @@
   --panel-border-gold: rgba(184, 151, 58, 0.20);
   --panel-border-sage: rgba(78, 122, 81, 0.15);
   --panel-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+
+  /* Night color scale — light (manuscript) mode: inverted semantic mapping
+     night-950 = lightest bg, night-100 = darkest text
+     Values are space-separated RGB channels for Tailwind opacity support */
+  --c-night-50: 45 42 36;
+  --c-night-100: 58 54 48;
+  --c-night-200: 80 75 66;
+  --c-night-300: 107 99 86;
+  --c-night-400: 138 128 112;
+  --c-night-500: 160 151 136;
+  --c-night-600: 196 186 168;
+  --c-night-700: 224 216 200;
+  --c-night-800: 240 235 224;
+  --c-night-900: 245 240 230;
+  --c-night-950: 250 246 237;
 }
 
 /* Night mode (isha / manuscript-dark) */
@@ -76,6 +91,19 @@
   --panel-border-gold: rgba(212, 176, 80, 0.18);
   --panel-border-sage: rgba(78, 122, 81, 0.12);
   --panel-shadow: 0 1px 3px rgba(0,0,0,0.20), 0 8px 24px rgba(0,0,0,0.18);
+
+  /* Night color scale — dark mode: original dark values (RGB channels) */
+  --c-night-50: 245 246 248;
+  --c-night-100: 229 231 236;
+  --c-night-200: 200 203 213;
+  --c-night-300: 164 169 184;
+  --c-night-400: 120 130 148;
+  --c-night-500: 93 101 121;
+  --c-night-600: 74 81 100;
+  --c-night-700: 62 67 84;
+  --c-night-800: 42 47 61;
+  --c-night-900: 26 31 42;
+  --c-night-950: 15 20 25;
 }
 
 /* ============================================
