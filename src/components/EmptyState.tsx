@@ -59,8 +59,8 @@ const configs: Record<string, EmptyStateConfig> = {
   search: {
     icon: Search,
     iconColor: 'text-night-500',
-    iconBg: 'rgba(255,255,255,0.05)',
-    iconBorder: 'rgba(255,255,255,0.08)',
+    iconBg: 'var(--theme-border-subtle, rgba(0,0,0,0.04))',
+    iconBorder: 'var(--theme-border, rgba(0,0,0,0.08))',
     defaultTitle: 'No results found',
     defaultDescription: 'Try different keywords or check your spelling.',
     encouragement: 'The Quran contains guidance for everything you seek.',
@@ -90,8 +90,8 @@ const configs: Record<string, EmptyStateConfig> = {
   generic: {
     icon: Sparkles,
     iconColor: 'text-night-400',
-    iconBg: 'rgba(255,255,255,0.05)',
-    iconBorder: 'rgba(255,255,255,0.08)',
+    iconBg: 'var(--theme-border-subtle, rgba(0,0,0,0.04))',
+    iconBorder: 'var(--theme-border, rgba(0,0,0,0.08))',
     defaultTitle: 'Nothing here yet',
     defaultDescription: 'Content will appear here once available.',
   },
@@ -190,9 +190,8 @@ export default function EmptyState({
               whileTap={{ scale: 0.98 }}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all"
               style={{
-                background: 'linear-gradient(135deg, rgba(201,162,39,0.9) 0%, rgba(180,140,30,1) 100%)',
-                boxShadow: '0 4px 16px rgba(201,162,39,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
-                color: '#0a0a0f',
+                background: 'var(--ambient-gold, #c9a227)',
+                color: '#fff',
               }}
             >
               <Icon className="w-4 h-4" />
