@@ -86,7 +86,7 @@ export class WebSpeechService {
   async start(): Promise<void> {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      throw new Error('Speech Recognition not supported in this browser. Please use Chrome or Edge.');
+      throw new Error('Speech recognition is not available in this browser. You can continue in manual mode.');
     }
 
     // Get mic for audio visualization

@@ -139,7 +139,7 @@ export const RECITERS: AudioReciter[] = [
     arabicName: 'سعود الشريم',
     style: 'murattal',
     description: 'Imam of Masjid Al-Haram - clear and measured',
-    everyAyahFolder: 'Shuraim_128kbps',
+    everyAyahFolder: 'Saood_ash-Shuraym_128kbps',
     quranComId: 3,
     qualities: ['high', 'medium'],
   },
@@ -183,9 +183,9 @@ const QUALITY_FOLDERS: Record<string, Record<AudioQuality, string>> = {
     low: 'Minshawi_Murattal_32kbps',
   },
   shuraim: {
-    high: 'Shuraim_128kbps',
-    medium: 'Shuraim_64kbps',
-    low: 'Shuraim_32kbps',
+    high: 'Saood_ash-Shuraym_128kbps',
+    medium: 'Saood_ash-Shuraym_64kbps',
+    low: 'Saood_ash-Shuraym_64kbps',
   },
   ghamadi: {
     high: 'Ghamadi_40kbps',
