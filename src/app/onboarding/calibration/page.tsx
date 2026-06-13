@@ -16,7 +16,11 @@ export default function CalibrationPage() {
     router.push('/dashboard');
   };
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
+    // Mark calibration complete on skip too — otherwise the dashboard guard
+    // bounces the user straight back here, making "Skip" a dead loop.
+    setUserLevel('beginner');
+    await markCalibrationComplete('beginner');
     router.push('/dashboard');
   };
 

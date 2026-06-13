@@ -41,6 +41,7 @@ import {
 import LessonCompletionOverlay from '@/components/LessonCompletionOverlay';
 import BottomNav from '@/components/BottomNav';
 import { DailyWisdom } from '@/components/JourneyMap';
+import { getStreakInfo } from '@/lib/motivationStore';
 
 // ============================================
 // Unit Section Component - Liquid Glass
@@ -513,9 +514,11 @@ function LessonsContent() {
       setTotalXP(xp);
     }
 
-    const streakData = localStorage.getItem('quranOasis_streak');
-    if (streakData) {
-      setCurrentStreak(JSON.parse(streakData).current || 0);
+    // Streak lives in the motivation store, not a standalone key.
+    try {
+      setCurrentStreak(getStreakInfo().current || 0);
+    } catch {
+      setCurrentStreak(0);
     }
   }, []);
 

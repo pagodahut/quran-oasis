@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { markCalibrationComplete, type UserLevel } from '@/lib/user-profile-sync';
+import { updatePreferences } from '@/lib/preferencesStore';
 import { ChevronRight, Sparkles, Loader2, BookOpen, Target, Clock, Check } from 'lucide-react';
 import { SeedlingIcon, LettersIcon, BookReadIcon, BooksIcon, SparkleIcon, MosqueIcon, CrescentIcon, StarIcon, DuaHandsIcon } from '@/components/icons';
 type Step = 'name' | 'journey' | 'arabic' | 'goal' | 'time' | 'welcome';
@@ -103,10 +104,12 @@ export default function OnboardingPage() {
       };
       localStorage.setItem('quranOasis_onboarding', JSON.stringify(onboardingData));
       localStorage.setItem('quranOasis_onboardingComplete', 'true');
-      localStorage.setItem('quranOasis_preferences', JSON.stringify({
-        reciter: 'alafasy',
-        dailyMinutes: data.dailyTime,
-      }));
+      // Translate the chosen daily time into a concrete verse goal the
+      // dashboard and review system actually read.
+      const goalByTime: Record<number, number> = { 5: 1, 15: 3, 30: 5, 60: 10 };
+      updatePreferences('learning', {
+        dailyGoalVerses: goalByTime[data.dailyTime] ?? 3,
+      });
       // Mark calibration complete so practice/memorize guards pass
       const levelMap: Record<string, UserLevel> = {
         none: 'beginner', letters: 'beginner', basic: 'beginner',
