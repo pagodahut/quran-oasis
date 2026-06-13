@@ -3,11 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useUser } from '@clerk/nextjs';
 import {
-  RefreshCw,
   Play,
-  Star,
   ArrowLeft,
   Clock,
   AlertTriangle,
@@ -51,36 +48,17 @@ function getSurahName(num: number): string {
 }
 
 export default function ReviewQueuePage() {
-  const { isSignedIn } = useUser();
   const { isChecking: isCheckingCalibration } = useCalibrationGuard();
   const [queue, setQueue] = useState<ReviewItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadQueue() {
-      try {
-        if (isSignedIn) {
-          const res = await fetch('/api/review/queue?limit=20');
-          if (res.ok) {
-            const data = await res.json();
-            setQueue(data.queue.map((item: ReviewItem & { nextReviewAt: string }) => ({
-              ...item,
-              nextReviewAt: new Date(item.nextReviewAt),
-            })));
-            setLoading(false);
-            return;
-          }
-        }
-      } catch {
-        // Fall through to local
-      }
-
-      // Guest fallback
       setQueue(getReviewQueueLocal(20));
       setLoading(false);
     }
     loadQueue();
-  }, [isSignedIn]);
+  }, []);
 
   if (isCheckingCalibration) {
     return (

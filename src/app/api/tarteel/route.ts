@@ -54,9 +54,9 @@ export async function POST(request: NextRequest) {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Tarteel API error:', errorText);
+        console.error('Tarteel API error:', response.status, errorText);
         return NextResponse.json(
-          { error: 'Transcription failed', details: errorText },
+          { error: 'Transcription failed' },
           { status: response.status }
         );
       }

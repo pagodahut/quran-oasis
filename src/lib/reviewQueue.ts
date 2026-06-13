@@ -1,4 +1,3 @@
-// import { prisma } from '@/lib/prisma';
 import { getDifficultyLabel } from '@/lib/adaptiveDifficulty';
 
 export type ReviewReason = 'overdue' | 'struggling' | 'due for review';
@@ -20,12 +19,6 @@ function classifyReason(difficulty: number, overdueFactor: number): ReviewReason
   if (difficulty > 0.66) return 'struggling';
   return 'due for review';
 }
-
-// TODO: verify if still needed - async review queue not currently used
-// export async function getReviewQueue(_userId: string, _limit: number = 10): Promise<ReviewItem[]> {
-//   // TODO: Re-enable when verseDifficulty model exists
-//   return [];
-// }
 
 /**
  * Client-side localStorage fallback for guest users.

@@ -135,11 +135,16 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { progress, bookmarks, settings, emailNotifications } = body as {
+    const { progress, bookmarks, settings } = body as {
       progress?: { verses?: Record<string, SyncVerse> };
       bookmarks?: SyncBookmark[];
-      settings?: { preferredReciter?: string; showTranslation?: boolean };
-      emailNotifications?: boolean;
+      settings?: {
+        preferredReciter?: string;
+        showTranslation?: boolean;
+        emailNotifications?: boolean;
+        dailyGoalVerses?: number;
+        dailyGoalMinutes?: number;
+      };
     };
 
     // Find or create user
@@ -244,15 +249,19 @@ export async function POST(request: NextRequest) {
           userId: user.id,
           reciter: settings.preferredReciter || 'alafasy',
           showTranslation: settings.showTranslation ?? true,
+          emailNotifications: settings.emailNotifications ?? false,
+          dailyGoalVerses: settings.dailyGoalVerses ?? 3,
+          dailyGoalMinutes: settings.dailyGoalMinutes ?? 15,
         },
         update: {
           reciter: settings.preferredReciter,
           showTranslation: settings.showTranslation,
+          ...(settings.emailNotifications !== undefined && { emailNotifications: settings.emailNotifications }),
+          ...(settings.dailyGoalVerses !== undefined && { dailyGoalVerses: settings.dailyGoalVerses }),
+          ...(settings.dailyGoalMinutes !== undefined && { dailyGoalMinutes: settings.dailyGoalMinutes }),
         },
       });
     }
-
-    // TODO: Add emailNotifications field to UserPreferences schema when email feature ships
 
     return NextResponse.json({ success: true, syncedAt: new Date().toISOString() });
   } catch (error) {

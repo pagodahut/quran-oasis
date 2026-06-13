@@ -75,13 +75,13 @@ export default function TafsirDrawer({ isOpen, onClose, surahNumber, ayahNumber 
   useEffect(() => {
     if (isOpen) {
       setLoading(true);
-      const ayah = getAyah(surahNumber, ayahNumber);
-      const surah = getSurah(surahNumber);
-      setAyahData(ayah || null);
-      setSurahName(surah?.englishName || '');
-      setShowDetailedTafsir(false);
-      setLoading(false);
-      
+      Promise.all([getAyah(surahNumber, ayahNumber), getSurah(surahNumber)]).then(([ayah, surah]) => {
+        setAyahData(ayah || null);
+        setSurahName(surah?.englishName || '');
+        setShowDetailedTafsir(false);
+        setLoading(false);
+      });
+
       // Fetch tafsir
       loadTafsir(selectedTafsir);
     }

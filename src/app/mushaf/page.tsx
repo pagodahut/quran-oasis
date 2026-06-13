@@ -161,10 +161,11 @@ export default function MushafPage() {
   // Load surah
   useEffect(() => {
     setLoading(true);
-    const surah = getSurah(surahNumber);
-    setCurrentSurah(surah || null);
-    setCurrentAyah(1);
-    setLoading(false);
+    getSurah(surahNumber).then(surah => {
+      setCurrentSurah(surah || null);
+      setCurrentAyah(1);
+      setLoading(false);
+    });
   }, [surahNumber]);
 
   // Save reading position when surah changes

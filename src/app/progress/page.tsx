@@ -19,6 +19,7 @@ import {
   Clock,
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
+import NightSkyProgress from '@/components/NightSkyProgress';
 import { StreakDisplay, GoalProgressRing } from '@/components/Celebrations';
 import {
   getStreakInfo,
@@ -487,6 +488,15 @@ export default function ProgressPage() {
           variants={stagger}
           className="space-y-4"
         >
+          {/* Night Sky — every memorized verse is a star */}
+          <motion.div variants={fadeInUp}>
+            <NightSkyProgress
+              surahs={surahProgress}
+              streak={streakInfo.current}
+              versesMemorized={quranProgress.versesMemorized}
+            />
+          </motion.div>
+
           {/* Top Stats Row */}
           <motion.div variants={fadeInUp} className="grid grid-cols-2 gap-3">
             {/* Streak Card */}

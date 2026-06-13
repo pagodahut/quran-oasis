@@ -32,6 +32,8 @@ model User {
   recitationAttempts RecitationAttempt[]
   studySessions  StudySession[]
   calibration    UserCalibration?
+  pushSubscriptions PushSubscription[]
+  feedback       UserFeedback[]
 }
 
 // User preferences
@@ -39,14 +41,17 @@ model UserPreferences {
   id           String  @id @default(cuid())
   userId       String  @unique
   user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  reciter      String  @default("alafasy")  // mishary_alafasy, husary, sudais, abdul_basit, ghamadi
-  translation  String  @default("sahih")    // sahih, asad
-  theme        String  @default("dark")     // dark, light
-  fontSize     Int     @default(24)         // Arabic text size
+
+  reciter      String  @default("alafasy")
+  translation  String  @default("sahih")
+  theme        String  @default("dark")
+  fontSize     Int     @default(24)
   showTranslation Boolean @default(true)
   autoPlayNext Boolean @default(false)
-  repeatCount  Int     @default(3)          // Default repeat for memorization
+  repeatCount  Int     @default(3)
+  emailNotifications Boolean @default(false)
+  dailyGoalVerses  Int @default(3)
+  dailyGoalMinutes Int @default(15)
 }
 
 // Onboarding responses
@@ -202,6 +207,33 @@ model StudySession {
   versesReviewed Int     @default(0)
   lessonId      String?  // which lesson was studied
   sessionType   String   @default("memorization") // memorization, review, recitation, flashcards
+}
+
+// Web push subscriptions
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  endpoint  String
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, endpoint])
+}
+
+// User feedback
+model UserFeedback {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  category  String   // bug, feature, general
+  message   String
+  page      String?  // which page the feedback was submitted from
+  resolved  Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
 
 // Persist calibration from Sheikh onboarding

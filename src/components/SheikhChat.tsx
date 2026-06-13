@@ -53,13 +53,13 @@ function containsArabic(text: string): boolean {
 }
 
 // ─── Simple Markdown-lite Renderer ───────────────────────────────────
-function renderMessageContent(content: string): JSX.Element[] {
+function renderMessageContent(content: string): React.JSX.Element[] {
   const lines = content.split('\n');
 
   return lines.map((line, i) => {
     if (!line.trim()) return <br key={i} />;
 
-    const parts: JSX.Element[] = [];
+    const parts: React.JSX.Element[] = [];
     let remaining = line;
     let keyIdx = 0;
 

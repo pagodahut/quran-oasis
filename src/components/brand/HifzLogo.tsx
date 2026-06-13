@@ -138,7 +138,7 @@ export function StageIcon({
 }) {
   const fillColor = active ? '#c9a227' : '#374151';
 
-  const phases: Record<number, JSX.Element> = {
+  const phases: Record<number, React.JSX.Element> = {
     1: <circle cx="12" cy="12" r="8" fill={fillColor} opacity="0.3" />,
     2: <path d="M 16 6 C 10 6, 6 12, 6 18 C 12 16, 14 12, 16 6" fill={fillColor} />,
     3: <path d="M 12 4 A 8 8 0 0 1 12 20 L 12 4" fill={fillColor} />,

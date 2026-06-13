@@ -7,7 +7,6 @@ const clerkPubKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 let clerkMiddlewareHandler: ((req: NextRequest) => Promise<NextResponse>) | null = null;
 
 if (clerkPubKey) {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { clerkMiddleware, createRouteMatcher } = require('@clerk/nextjs/server');
 
   const isPublicRoute = createRouteMatcher([
@@ -38,7 +37,14 @@ if (clerkPubKey) {
   const isProtectedApiRoute = createRouteMatcher([
     '/api/user(.*)',
     '/api/progress(.*)',
+    '/api/sheikh(.*)',
+    '/api/tajweed(.*)',
+    '/api/push(.*)',
+    '/api/goals(.*)',
+    '/api/difficulty(.*)',
     '/api/feedback(.*)',
+    '/api/recitation(.*)',
+    '/api/email(.*)',
   ]);
 
   clerkMiddlewareHandler = clerkMiddleware(async (auth: any, req: NextRequest) => {

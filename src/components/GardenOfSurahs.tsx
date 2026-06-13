@@ -176,7 +176,7 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
   const [verseResults, setVerseResults] = useState<{ surah: number; surahName: string; ayah: Ayah }[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const searchTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const sortMenuRef = useRef<HTMLDivElement>(null);
 
   // Load progress once
@@ -238,9 +238,10 @@ export default function GardenOfSurahs({ onSelectSurah, showHeader = true }: Gar
     // Debounced verse search
     setIsSearching(true);
     searchTimerRef.current = setTimeout(() => {
-      const results = searchQuran(q, 'both');
-      setVerseResults(results.slice(0, 30));
-      setIsSearching(false);
+      searchQuran(q, 'both').then(results => {
+        setVerseResults(results.slice(0, 30));
+        setIsSearching(false);
+      });
     }, 250);
   }, [handleSelect]);
 

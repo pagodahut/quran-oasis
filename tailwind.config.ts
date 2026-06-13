@@ -11,19 +11,19 @@ const config: Config = {
     extend: {
       // Custom Colors - Islamic Design Palette
       colors: {
-        // Night Sky - Primary Background
+        // Night — semantic surface/text scale, remapped by theme via RGB channels
         night: {
-          50: '#f5f6f8',
-          100: '#e5e7ec',
-          200: '#c8cbd5',
-          300: '#a4a9b8',
-          400: '#788294',
-          500: '#5d6579',
-          600: '#4a5164',
-          700: '#3e4354',
-          800: '#2a2f3d',
-          900: '#1a1f2a',
-          950: '#0f1419',
+          50: 'rgb(var(--c-night-50) / <alpha-value>)',
+          100: 'rgb(var(--c-night-100) / <alpha-value>)',
+          200: 'rgb(var(--c-night-200) / <alpha-value>)',
+          300: 'rgb(var(--c-night-300) / <alpha-value>)',
+          400: 'rgb(var(--c-night-400) / <alpha-value>)',
+          500: 'rgb(var(--c-night-500) / <alpha-value>)',
+          600: 'rgb(var(--c-night-600) / <alpha-value>)',
+          700: 'rgb(var(--c-night-700) / <alpha-value>)',
+          800: 'rgb(var(--c-night-800) / <alpha-value>)',
+          900: 'rgb(var(--c-night-900) / <alpha-value>)',
+          950: 'rgb(var(--c-night-950) / <alpha-value>)',
         },
         // Gold/Amber - Accent & Highlights
         gold: {
@@ -110,7 +110,7 @@ const config: Config = {
         serif: ['DM Serif Display', 'Cormorant Garamond', 'Georgia', 'serif'],
         script: ['Pinyon Script', 'cursive'],
         arabic: ['Amiri', 'Traditional Arabic', 'serif'],
-        quran: ['KFGQPC Hafs Uthmani', 'Amiri Quran', 'Amiri', 'serif'],
+        quran: ['var(--font-hafs)', 'var(--font-kitab)', 'Amiri Quran', 'Amiri', 'serif'],
       },
       fontSize: {
         'quran-sm': ['1.5rem', { lineHeight: '2.5' }],

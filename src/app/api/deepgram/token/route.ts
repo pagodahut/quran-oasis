@@ -18,10 +18,8 @@ import { NextRequest, NextResponse } from 'next/server';
  *   NEXT_PUBLIC_DEEPGRAM_API_KEY — also accessible server-side (fallback)
  */
 
-// Accept both key names so the app works even if only the NEXT_PUBLIC_ variant is set
-const DEEPGRAM_API_KEY =
-  process.env.DEEPGRAM_API_KEY ||
-  process.env.NEXT_PUBLIC_DEEPGRAM_API_KEY;
+// Only use server-side API key — never use NEXT_PUBLIC_ for secrets
+const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY;
 
 export async function GET(_request: NextRequest) {
   try {
@@ -46,16 +44,10 @@ export async function GET(_request: NextRequest) {
     if (!response.ok) {
       const errText = await response.text();
       console.error('[Deepgram token] Request failed:', response.status, errText);
-
-      // If the token endpoint fails but we have the raw key, return it directly
-      // (some Deepgram plan levels don't support the token endpoint)
-      return NextResponse.json({
-        apiKey: DEEPGRAM_API_KEY,
-        configured: true,
-        scoped: false,
-        expiresIn: null,
-        note: 'Using raw API key — token endpoint unavailable',
-      });
+      return NextResponse.json(
+        { error: 'Failed to generate Deepgram token', configured: true },
+        { status: 502 }
+      );
     }
 
     const data = await response.json();
@@ -68,15 +60,6 @@ export async function GET(_request: NextRequest) {
     });
   } catch (error) {
     console.error('[Deepgram token] Error:', error);
-    // Last resort: return raw key so the client can still attempt connection
-    if (DEEPGRAM_API_KEY) {
-      return NextResponse.json({
-        apiKey: DEEPGRAM_API_KEY,
-        configured: true,
-        scoped: false,
-        note: 'Returned raw key due to token endpoint error',
-      });
-    }
     return NextResponse.json(
       { error: 'Internal server error', configured: false },
       { status: 500 }

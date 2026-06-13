@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/hooks/useAuth';
+import { useClerk } from '@clerk/nextjs';
 import Link from 'next/link';
 import Image from 'next/image';
 import StudyProfile from '@/components/StudyProfile';
@@ -116,15 +117,9 @@ function SettingsRow({ icon: Icon, label, href, onClick }: {
 export default function ProfilePage() {
   useStudyTracker('profile');
   const { user, isLoaded, isSignedIn, isGuest, isClerkConfigured } = useAuth();
-  // Safely get Clerk utilities — noop when Clerk isn't configured
-  let openUserProfile = () => {};
-  if (isClerkConfigured) {
-    try {
-      const { useClerk } = require('@clerk/nextjs');
-      const clerk = useClerk();
-      openUserProfile = clerk.openUserProfile;
-    } catch {}
-  }
+  // Always call the hook (Rules of Hooks), but only use its result when Clerk is configured
+  const clerk = useClerk();
+  const openUserProfile = isClerkConfigured ? clerk.openUserProfile : () => {};
   const { learning: learningPrefs } = useLearningPreferences();
   const [stats, setStats] = useState({
     versesMemorized: 0,

@@ -13,6 +13,7 @@
  */
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import SheikhChat from '@/components/SheikhChat';
 import type { AyahContext } from '@/hooks/useSheikhChat';
@@ -77,7 +78,7 @@ export default function SheikhPage() {
       <header className="border-b border-white/5 bg-night-900/60 backdrop-blur-xl sticky top-0 z-30">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <a href="/" className="text-lg font-semibold text-gold-400">H</a>
+            <Link href="/" className="text-lg font-semibold text-gold-400">H</Link>
             <div>
               <h1 className="text-sm font-semibold">Sheikh HIFZ</h1>
               <p className="text-[11px] text-night-500">AI Quran Teacher</p>

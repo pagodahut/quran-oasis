@@ -6,78 +6,104 @@
 @tailwind utilities;
 
 /* ============================================
-   CSS Variables
+   CSS Variables — Manuscript Design System
    ============================================ */
 :root {
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-display: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-arabic: var(--font-amiri), 'Amiri Quran', 'Amiri', serif;
-  --font-quran: var(--font-kitab), 'Scheherazade New', serif;
+  --font-quran: var(--font-hafs), var(--font-kitab), 'Scheherazade New', serif;
   --font-indopak: var(--font-nastaliq), 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
-  
-  /* Safe Areas */
+
   --safe-area-top: env(safe-area-inset-top);
   --safe-area-bottom: env(safe-area-inset-bottom);
-  
-  /* Gold Leaf Colors - Inspired by manuscript gilding */
-  --gold-leaf-light: #f4d47c;
-  --gold-leaf: #c9a227;
+
+  /* Gold Leaf — real manuscript gilding tones */
+  --gold-leaf-light: #dcc06a;
+  --gold-leaf: #b8973a;
   --gold-leaf-dark: #8b6914;
   --gold-leaf-shadow: #5a4410;
-  
-  /* Islamic Illumination Colors */
-  --illumination-blue: #1e3a5f;
-  --illumination-green: #2d4a3e;
-  --illumination-red: #8b3a3a;
-  
-  /* HIFZ Brand Colors */
-  --hifz-night-deep: #0f1419;
-  --hifz-night: #1a1f25;
-  --hifz-gold: #c9a227;
-  --hifz-gold-light: #d4af37;
-  --hifz-teal: #1a6b6b;
-  --hifz-teal-light: #2d9191;
-  --hifz-cream: #f5f0e1;
-  
-  /* Theme Variables (defaults = Dark Luxury) */
-  --theme-surface: #0f1419;
-  --theme-surface-alt: #1a1f2a;
-  --theme-card: rgba(22, 27, 34, 0.72);
-  --theme-card-hover: rgba(30, 35, 42, 0.80);
-  --theme-text: #E8E8E8;
-  --theme-text-secondary: #a4a9b8;
-  --theme-text-muted: #5d6579;
-  --theme-accent: #D4A342;
-  --theme-accent-light: #f4d47c;
+
+  /* Ambient defaults (overridden by ThemeProvider at runtime) */
+  --ambient-bg: #faf6ed;
+  --ambient-bg-alt: #f3ede0;
+  --ambient-surface: #fffcf5;
+  --ambient-warmth: rgba(201, 162, 39, 0.04);
+  --ambient-accent: #8b7a5e;
+  --ambient-accent-subtle: rgba(139, 122, 94, 0.10);
+  --ambient-gold: #c9a227;
+  --ambient-gold-subtle: rgba(201, 162, 39, 0.10);
+
+  /* Theme surface defaults (manuscript light) */
+  --theme-surface: #faf6ed;
+  --theme-surface-alt: #f3ede0;
+  --theme-card: #fffcf5;
+  --theme-card-hover: rgba(0, 0, 0, 0.02);
+  --theme-text: #2d2a24;
+  --theme-text-secondary: #6b6356;
+  --theme-text-muted: #a09788;
+  --theme-accent: #b8973a;
+  --theme-accent-light: rgba(184, 151, 58, 0.10);
   --theme-accent-dark: #8b6914;
-  --theme-border: rgba(255, 255, 255, 0.08);
-  --theme-border-subtle: rgba(255, 255, 255, 0.04);
-  --theme-glass-base: rgba(22, 27, 34, 0.72);
-  --theme-glass-border: rgba(255, 255, 255, 0.06);
+  --theme-border: rgba(180, 160, 120, 0.15);
+  --theme-border-subtle: rgba(180, 160, 120, 0.08);
+  --theme-glass-base: #fffcf5;
+  --theme-glass-border: rgba(180, 160, 120, 0.15);
+
+  /* Panel component variables — manuscript light */
+  --panel-neutral: var(--ambient-surface);
+  --panel-gold: linear-gradient(135deg, rgba(184,151,58,0.06) 0%, var(--ambient-surface) 100%);
+  --panel-sage: linear-gradient(135deg, rgba(78,122,81,0.05) 0%, var(--ambient-surface) 100%);
+  --panel-deep: var(--ambient-bg-alt);
+  --panel-border-neutral: var(--theme-border);
+  --panel-border-gold: rgba(184, 151, 58, 0.20);
+  --panel-border-sage: rgba(78, 122, 81, 0.15);
+  --panel-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+
+  /* Night color scale — light (manuscript) mode: inverted semantic mapping
+     night-950 = lightest bg, night-100 = darkest text
+     Values are space-separated RGB channels for Tailwind opacity support */
+  --c-night-50: 45 42 36;
+  --c-night-100: 58 54 48;
+  --c-night-200: 80 75 66;
+  --c-night-300: 107 99 86;
+  --c-night-400: 138 128 112;
+  --c-night-500: 160 151 136;
+  --c-night-600: 196 186 168;
+  --c-night-700: 224 216 200;
+  --c-night-800: 240 235 224;
+  --c-night-900: 245 240 230;
+  --c-night-950: 250 246 237;
 }
 
-/* ============================================
-   Theme-specific Gold Leaf Overrides
-   ============================================ */
-[data-theme="light-cream"] {
-  --gold-leaf-light: #E07A5F;
-  --gold-leaf: #C85A3C;
-  --gold-leaf-dark: #9E4530;
-  --gold-leaf-shadow: #7A3525;
-}
+/* Night mode (isha / manuscript-dark) */
+.dark {
+  --gold-leaf-light: #dcc06a;
+  --gold-leaf: #d4b050;
+  --gold-leaf-dark: #a88a30;
+  --gold-leaf-shadow: #6b5a20;
 
-[data-theme="olive-earth"] {
-  --gold-leaf-light: #5A7038;
-  --gold-leaf: #3F4F28;
-  --gold-leaf-dark: #2A3518;
-  --gold-leaf-shadow: #1C2410;
-}
+  --panel-neutral: rgba(38, 36, 48, 0.90);
+  --panel-gold: linear-gradient(135deg, rgba(212,176,80,0.08) 0%, rgba(38,36,48,0.88) 100%);
+  --panel-sage: linear-gradient(135deg, rgba(78,122,81,0.06) 0%, rgba(38,36,48,0.88) 100%);
+  --panel-deep: rgba(22, 20, 30, 0.95);
+  --panel-border-neutral: rgba(168, 152, 120, 0.12);
+  --panel-border-gold: rgba(212, 176, 80, 0.18);
+  --panel-border-sage: rgba(78, 122, 81, 0.12);
+  --panel-shadow: 0 1px 3px rgba(0,0,0,0.20), 0 8px 24px rgba(0,0,0,0.18);
 
-[data-theme="pure-white"] {
-  --gold-leaf-light: #60A5FA;
-  --gold-leaf: #2563EB;
-  --gold-leaf-dark: #1D4ED8;
-  --gold-leaf-shadow: #1E40AF;
+  /* Night color scale — dark mode: original dark values (RGB channels) */
+  --c-night-50: 245 246 248;
+  --c-night-100: 229 231 236;
+  --c-night-200: 200 203 213;
+  --c-night-300: 164 169 184;
+  --c-night-400: 120 130 148;
+  --c-night-500: 93 101 121;
+  --c-night-600: 74 81 100;
+  --c-night-700: 62 67 84;
+  --c-night-800: 42 47 61;
+  --c-night-900: 26 31 42;
+  --c-night-950: 15 20 25;
 }
 
 /* ============================================
@@ -87,48 +113,45 @@
   * {
     @apply box-border;
   }
-  
+
   html {
     @apply antialiased scroll-smooth;
     -webkit-tap-highlight-color: transparent;
     text-size-adjust: 100%;
   }
-  
+
   body {
     background-color: var(--theme-surface);
     color: var(--theme-text);
     @apply min-h-screen;
     font-family: var(--font-sans);
+    transition: background-color 1.2s ease, color 0.8s ease;
   }
-  
-  /* Arabic Text Direction */
+
   [lang="ar"],
   .arabic-text,
   .quran-text {
     direction: rtl;
     font-family: var(--font-arabic);
   }
-  
-  /* Selection */
+
   ::selection {
-    @apply bg-gold-500/30 text-night-100;
+    background: var(--ambient-gold-subtle);
+    color: var(--theme-text);
   }
-  
-  /* Scrollbar */
+
   ::-webkit-scrollbar {
-    @apply w-1.5;
+    @apply w-1;
   }
-  
   ::-webkit-scrollbar-track {
-    @apply bg-night-900;
+    background: var(--theme-surface-alt);
   }
-  
   ::-webkit-scrollbar-thumb {
-    @apply bg-night-700 rounded-full;
+    background: var(--theme-border);
+    @apply rounded-full;
   }
-  
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-night-600;
+    background: var(--theme-text-muted);
   }
 }
 

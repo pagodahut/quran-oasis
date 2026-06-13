@@ -18,7 +18,9 @@
  */
 
 import { NextRequest } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import { buildFullSystemPrompt, type PageContext, type TajweedResult } from '@/lib/sheikh-prompt';
+import { ANTHROPIC_API_KEY, callClaudeStream } from '@/lib/ai';
 
 // ─── Types ───────────────────────────────────────────────────────────
 
@@ -60,8 +62,15 @@ interface SheikhRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
+    const { userId } = await auth();
+    if (!userId) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required', code: 'AUTH_REQUIRED' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!ANTHROPIC_API_KEY) {
       return new Response(
         JSON.stringify({
           error: 'AI teacher is not configured. Please add your Anthropic API key.',
@@ -94,31 +103,23 @@ export async function POST(request: NextRequest) {
     });
 
     // Call Claude API with streaming
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2048,
-        temperature: 0.7,
+    let response: Response;
+    try {
+      response = await callClaudeStream({
         system: systemPrompt,
         messages: trimmedMessages.map((msg) => ({
           role: msg.role,
           content: msg.content,
         })),
+        max_tokens: 2048,
+        temperature: 0.7,
         stream: true,
-      }),
-    });
+      });
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error('Anthropic API error:', errorMsg);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Anthropic API error:', response.status, errorText);
-
-      if (response.status === 429) {
+      if (errorMsg.includes('429')) {
         return new Response(
           JSON.stringify({
             error: 'The sheikh is resting. Please try again in a moment.',
@@ -128,7 +129,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      if (response.status === 401) {
+      if (errorMsg.includes('401')) {
         return new Response(
           JSON.stringify({
             error: 'AI teacher authentication failed. Please check your API key.',

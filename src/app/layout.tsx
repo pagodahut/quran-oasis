@@ -169,7 +169,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const content = (
-    <html lang="en" dir="ltr" className={`dark ${fontVariables}`} data-scroll-behavior="smooth">
+    <html lang="en" dir="ltr" className={fontVariables} data-scroll-behavior="smooth">
       <head>
         {/* Prevent auto-translation of Arabic text */}
         <meta name="google" content="notranslate" />

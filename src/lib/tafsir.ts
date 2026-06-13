@@ -80,11 +80,11 @@ export async function getTafsir(
 /**
  * Get English translation for a verse
  */
-export function getTranslation(surahNumber: number, ayahNumber: number): string {
+export async function getTranslation(surahNumber: number, ayahNumber: number): Promise<string> {
   const key = cacheKey(surahNumber, ayahNumber);
   if (translationCache.has(key)) return translationCache.get(key)!;
-  
-  const ayah = getAyah(surahNumber, ayahNumber);
+
+  const ayah = await getAyah(surahNumber, ayahNumber);
   const translation = ayah?.text.translations.sahih || '';
   translationCache.set(key, translation);
   return translation;
@@ -141,7 +141,7 @@ export async function getVerseContext(
   return {
     surah: surahNumber,
     ayah: ayahNumber,
-    meaning: getTranslation(surahNumber, ayahNumber),
+    meaning: await getTranslation(surahNumber, ayahNumber),
     tafsir,
     revelationContext: getRevelationContext(surahNumber),
     connectedVerses: getConnectedVerses(surahNumber, ayahNumber),

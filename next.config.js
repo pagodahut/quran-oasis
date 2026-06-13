@@ -46,7 +46,7 @@ const nextConfig = {
   
   // Compiler optimizations
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
+    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
   
   // Headers for caching and security
@@ -66,7 +66,7 @@ const nextConfig = {
           },
           {
             key: 'X-XSS-Protection',
-            value: '1; mode=block',
+            value: '0',
           },
           {
             key: 'Referrer-Policy',
@@ -102,13 +102,13 @@ const nextConfig = {
           },
         ],
       },
-      // Medium cache for API routes
+      // API routes must not be cached publicly (user-specific data)
       {
         source: '/api/:path*',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, s-maxage=60, stale-while-revalidate=300',
+            value: 'private, no-store',
           },
         ],
       },
