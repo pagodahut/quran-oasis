@@ -102,7 +102,14 @@ export async function POST(request: NextRequest) {
     }
 
     const MAX_MESSAGES = 20;
-    const trimmedMessages = messages.slice(-MAX_MESSAGES);
+    const MAX_MSG_CHARS = 4000;
+    // Cap message size to bound token cost and limit prompt-injection surface.
+    const trimmedMessages = messages
+      .slice(-MAX_MESSAGES)
+      .map((m) => ({
+        ...m,
+        content: typeof m.content === 'string' ? m.content.slice(0, MAX_MSG_CHARS) : '',
+      }));
 
     // Build the full context-aware system prompt
     const systemPrompt = buildFullSystemPrompt({

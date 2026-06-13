@@ -457,7 +457,7 @@ export default function LiveRecitation({
 
     // If no providers are available, show detailed error
     if (!useTarteel && !webSpeechAvailable && !deepgramKey) {
-      const detailedError = `Speech recognition is not available. Tried providers:\n${providerErrors.map(e => `• ${e}`).join('\n')}\n\nRecommendations:\n• Use Chrome or Edge browser for built-in speech recognition\n• Check your internet connection\n• Contact support if the issue persists`;
+      const detailedError = `Speech recognition is not available. Tried providers:\n${providerErrors.map(e => `• ${e}`).join('\n')}\n\nWhat you can do:\n• Make sure microphone access is allowed\n• Check your internet connection\n• You can still continue in manual mode (tap to mark each recitation)`;
       setErrorMessage(detailedError);
       setPhase('error');
       return;
@@ -635,7 +635,7 @@ export default function LiveRecitation({
       console.error('[LiveRecitation] Failed to start recording:', err);
       setErrorMessage(
         err instanceof Error
-          ? `Failed to start recording: ${err.message}\n\nPlease ensure:\n• Microphone access is allowed\n• You're using a supported browser (Chrome/Edge recommended)\n• Your internet connection is stable`
+          ? `Failed to start recording: ${err.message}\n\nPlease ensure:\n• Microphone access is allowed\n• Your browser allows microphone access\n• Your internet connection is stable`
           : 'Failed to start recording. Please allow microphone access and try again.'
       );
       setPhase('error');
@@ -681,6 +681,27 @@ export default function LiveRecitation({
           errorWords,
           duration: elapsedTime,
         });
+
+        // Persist the session to local recitation history (was never written,
+        // so the history page always showed "No sessions yet").
+        try {
+          const record = {
+            surahNumber,
+            startAyah,
+            endAyah: endAyah ?? startAyah,
+            overallAccuracy: accuracy,
+            duration: elapsedTime,
+            totalWords,
+            matchedWords,
+            createdAt: new Date().toISOString(),
+          };
+          const existing = JSON.parse(localStorage.getItem('recitation-history') || '[]');
+          const list = Array.isArray(existing) ? existing : [];
+          list.unshift(record);
+          localStorage.setItem('recitation-history', JSON.stringify(list.slice(0, 100)));
+        } catch {
+          /* ignore persistence errors */
+        }
 
         return finalStates;
       });

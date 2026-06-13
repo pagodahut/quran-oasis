@@ -277,17 +277,17 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-6">
             {[
               {
-                arabic: 'تَعَلُّم',
+                arabic: 'تِلَاوَة',
                 title: 'Recite & Get Feedback',
                 desc: 'Real-time voice recognition tracks your recitation word-by-word with accuracy scoring.',
               },
               {
-                arabic: 'تَكرار',
+                arabic: 'كَشْف',
                 title: 'Recite to Reveal',
                 desc: 'Text stays hidden until you recite correctly — the ultimate memorization test.',
               },
               {
-                arabic: 'تَقَدُّم',
+                arabic: 'تَمْيِيز',
                 title: 'Identify Any Verse',
                 desc: 'Like Shazam for Quran — recite any ayah and instantly find which surah it belongs to.',
               },

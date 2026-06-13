@@ -175,14 +175,22 @@ function createDefaultState(): MotivationState {
 
 // ============ HELPERS ============
 
+function localDateKey(d: Date = new Date()): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+// Local calendar date so the streak day flips at the user's local midnight.
 function getTodayKey(): string {
-  return new Date().toISOString().split('T')[0];
+  return localDateKey();
 }
 
 function getYesterdayKey(): string {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
-  return yesterday.toISOString().split('T')[0];
+  return localDateKey(yesterday);
 }
 
 function getWeekKey(date: Date = new Date()): string {
@@ -231,45 +239,74 @@ export function saveMotivationState(state: MotivationState): void {
 
 // ============ STREAK OPERATIONS ============
 
+function daysBetweenKeys(a: string, b: string): number {
+  // Difference in whole local days between two YYYY-MM-DD keys.
+  const [ay, am, ad] = a.split('-').map(Number);
+  const [by, bm, bd] = b.split('-').map(Number);
+  const da = new Date(ay, am - 1, ad).getTime();
+  const db = new Date(by, bm - 1, bd).getTime();
+  return Math.round((db - da) / 86_400_000);
+}
+
+// Unlock every streak milestone at or below `current` that isn't yet unlocked,
+// so a streak that jumps past a milestone (e.g. via cross-device sync) still
+// awards it. Returns the highest newly-unlocked milestone, if any.
+function unlockStreakMilestones(current: number, state: MotivationState): number | null {
+  let highest: number | null = null;
+  for (const m of STREAK_MILESTONES) {
+    if (current >= m) {
+      const before = state.achievements.find(a => a.id === `streak_${m}`)?.unlockedAt;
+      unlockAchievement(`streak_${m}`, state);
+      const after = state.achievements.find(a => a.id === `streak_${m}`)?.unlockedAt;
+      if (!before && after) highest = m;
+    }
+  }
+  return highest;
+}
+
 export function updateStreak(): { streakUpdated: boolean; newMilestone: number | null; streakBroken: boolean } {
   const state = getMotivationState();
   const today = getTodayKey();
   const yesterday = getYesterdayKey();
-  
-  let result = { streakUpdated: false, newMilestone: null as number | null, streakBroken: false };
-  
+
+  const result = { streakUpdated: false, newMilestone: null as number | null, streakBroken: false };
+
   // Already active today
   if (state.streak.lastActiveDate === today) {
     return result;
   }
-  
-  // Consecutive day - increase streak
-  if (state.streak.lastActiveDate === yesterday) {
+
+  const gap = state.streak.lastActiveDate
+    ? daysBetweenKeys(state.streak.lastActiveDate, today)
+    : Infinity;
+
+  if (state.streak.lastActiveDate === yesterday || gap === 1) {
+    // Consecutive day — increase streak
     state.streak.current += 1;
     state.streak.longest = Math.max(state.streak.longest, state.streak.current);
     result.streakUpdated = true;
-    
-    // Check for milestone
-    if (STREAK_MILESTONES.includes(state.streak.current)) {
-      result.newMilestone = state.streak.current;
-      unlockAchievement(`streak_${state.streak.current}`, state);
-    }
-  } else if (state.streak.lastActiveDate !== today) {
-    // Streak broken - check if freeze available
-    if (state.streak.freezesAvailable > 0 && state.streak.current > 0) {
-      // Auto-use freeze (or prompt user)
-      // For now, we reset but could add freeze logic
-    }
-    
+    result.newMilestone = unlockStreakMilestones(state.streak.current, state);
+  } else if (gap === 2 && state.streak.freezesAvailable > 0 && state.streak.current > 0) {
+    // Exactly one day missed and a freeze is available — consume it to bridge
+    // the gap and keep the streak alive (this is what the "freezes" UI promised).
+    state.streak.freezesAvailable -= 1;
+    state.streak.freezesUsed += 1;
+    state.streak.freezeLastUsedDate = today;
+    state.streak.current += 1;
+    state.streak.longest = Math.max(state.streak.longest, state.streak.current);
+    result.streakUpdated = true;
+    result.newMilestone = unlockStreakMilestones(state.streak.current, state);
+  } else {
+    // Streak broken
     if (state.streak.current > 0) {
       result.streakBroken = true;
     }
     state.streak.current = 1;
   }
-  
+
   state.streak.lastActiveDate = today;
   saveMotivationState(state);
-  
+
   return result;
 }
 

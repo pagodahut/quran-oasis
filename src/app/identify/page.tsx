@@ -35,7 +35,7 @@ export default function IdentifyPage() {
   const startListening = useCallback(async () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      setErrorMsg('Speech recognition not supported. Please use Chrome or Edge.');
+      setErrorMsg('Voice input is not available on this device. On iPhone/iPad, try opening the app in Safari, or use a desktop browser.');
       setPhase('error');
       return;
     }

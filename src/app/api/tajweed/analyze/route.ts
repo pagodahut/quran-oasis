@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from "@clerk/nextjs/server";
 import logger from "@/lib/logger";
 import { ANTHROPIC_API_KEY, callClaude } from "@/lib/ai";
+import { rateLimit, clientKey } from "@/lib/rateLimit";
 
 /**
  * Tajweed Analysis API Route
@@ -38,6 +39,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
+      );
+    }
+
+    // Rate limit — these calls hit a paid model.
+    const rl = rateLimit(clientKey(request, userId), 40, 10 * 60_000);
+    if (!rl.ok) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please slow down.' },
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfterSec) } }
       );
     }
 

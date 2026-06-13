@@ -86,7 +86,7 @@ export class WebSpeechService {
   async start(): Promise<void> {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      throw new Error('Speech Recognition not supported in this browser. Please use Chrome or Edge.');
+      throw new Error('Speech recognition is not available in this browser. You can continue in manual mode.');
     }
 
     // Get mic for audio visualization
@@ -142,13 +142,35 @@ export class WebSpeechService {
 
     this.recognition.onerror = (event: any) => {
       if (this.stopped) return;
+      // Transient — ignore and let onend auto-restart.
       if (event.error === 'no-speech' || event.error === 'aborted') return;
+
+      // Fatal errors (mic denied / unavailable / unsupported-in-this-context):
+      // stop the session and surface a clear error instead of hanging on
+      // "Listening…" forever. This is also the iOS/WKWebView failure mode.
+      const FATAL = ['not-allowed', 'service-not-allowed', 'audio-capture', 'network'];
+      if (FATAL.includes(event.error)) {
+        this.stopped = true;
+        this.state.isRecording = false;
+        try { this.recognition?.stop(); } catch { /* ignore */ }
+        this.emitStateChange();
+        const message =
+          event.error === 'not-allowed' || event.error === 'service-not-allowed'
+            ? 'Microphone access was denied or is unavailable. Please enable it in your browser settings.'
+            : event.error === 'audio-capture'
+            ? 'No microphone was found. Please check your device.'
+            : 'Speech recognition is unavailable. You can continue in manual mode.';
+        this.config.onError?.(message);
+        return;
+      }
+
       console.error('Speech recognition error:', event.error);
       this.config.onError?.(event.error);
     };
 
     this.recognition.onend = () => {
-      // Auto-restart if not manually stopped (recognition can timeout)
+      // Auto-restart if not manually stopped (recognition can timeout).
+      // `stopped` is now set on fatal errors, so this won't spin on iOS.
       if (!this.stopped && this.state.isRecording) {
         try {
           this.recognition?.start();

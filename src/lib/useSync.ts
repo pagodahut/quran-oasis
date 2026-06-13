@@ -41,6 +41,9 @@ export function useSync() {
 
   const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hasSyncedRef = useRef(false);
+  // True only after an initial server pull has completed. Pushing before this
+  // can overwrite/delete server data with an empty, not-yet-hydrated local state.
+  const hasHydratedRef = useRef(false);
 
   // Load data from server
   const loadFromServer = useCallback(async (): Promise<boolean> => {
@@ -117,6 +120,7 @@ export function useSync() {
         localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
       }
 
+      hasHydratedRef.current = true; // safe to push from here on
       return true;
     } catch (error) {
       console.error('Load from server failed:', error);
@@ -127,6 +131,9 @@ export function useSync() {
   // Save data to server
   const saveToServer = useCallback(async (): Promise<boolean> => {
     if (!isSignedIn) return false;
+    // Never push before the initial pull has hydrated local state — otherwise
+    // an empty fresh device would overwrite/delete the user's server data.
+    if (!hasHydratedRef.current) return false;
 
     setSyncState((s: SyncState) => ({ ...s, isSyncing: true, error: null }));
 

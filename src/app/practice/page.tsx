@@ -31,6 +31,7 @@ import { useSheikh } from '@/contexts/SheikhContext';
 import { loadUserProfile, isCalibrationComplete } from '@/lib/user-profile-sync';
 import { srs, srsStateToDueRefs, type ReviewQuality } from '@/lib/spaced-repetition';
 import { enrichSRSRefs } from '@/lib/ayah-service';
+import { SURAH_METADATA } from '@/lib/surahMetadata';
 import BottomNav from '@/components/BottomNav';
 import type { ReviewType, SessionResult, ReviewAyah } from '@/hooks/useSheikhReview';
 import { ALL_LESSONS, getLessonById } from '@/lib/lesson-content';
@@ -154,9 +155,17 @@ export default function PracticePage() {
   const handleAddAyahs = () => {
     const surah = parseInt(addSurah);
     const start = parseInt(addStart);
-    const end = parseInt(addEnd || addStart);
+    let end = parseInt(addEnd || addStart);
 
     if (!surah || !start || surah < 1 || surah > 114 || start < 1) return;
+
+    // Clamp to the surah's real ayah count so we never create "ghost" verses
+    // past the end of the surah (which then sit due forever with no way to remove).
+    const meta = SURAH_METADATA.find((s) => s.number === surah);
+    const maxAyah = meta?.numberOfAyahs ?? start;
+    if (start > maxAyah) return;
+    if (isNaN(end) || end < start) end = start;
+    if (end > maxAyah) end = maxAyah;
 
     srs.addAyahs(surah, start, end);
     setAddSurah('');
@@ -313,14 +322,8 @@ export default function PracticePage() {
 
   return (
     <div className="min-h-screen">
-      {/* Calibration Banner */}
-      {!isCalibrated && (
-        <Link href="/onboarding" className="liquid-card mx-4 mt-3 p-3 flex items-center gap-3 bg-gold-500/5 border-gold-500/20">
-          <Sparkles className="w-4 h-4 text-gold-400 flex-shrink-0" />
-          <span className="text-sm text-night-300">Personalize your experience</span>
-          <ArrowRight className="w-4 h-4 text-night-500 ml-auto flex-shrink-0" />
-        </Link>
-      )}
+      {/* (Calibration banner removed — the guard already redirects uncalibrated
+          users to onboarding, so this was unreachable dead UI.) */}
 
       {/* Header */}
       <header className="liquid-glass sticky top-0 z-40 safe-area-top">

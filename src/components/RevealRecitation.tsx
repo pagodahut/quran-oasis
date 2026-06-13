@@ -644,7 +644,7 @@ export default function RevealRecitation({
 
     // 3. If no providers are available, show detailed error
     if (!useTarteel && !webSpeechAvailable) {
-      const detailedError = `Speech recognition is not available. Tried providers:\n${providerErrors.map(e => `• ${e}`).join('\n')}\n\nRecommendations:\n• Use Chrome or Edge browser for built-in speech recognition\n• Check your internet connection\n• Contact support if the issue persists`;
+      const detailedError = `Speech recognition is not available. Tried providers:\n${providerErrors.map(e => `• ${e}`).join('\n')}\n\nWhat you can do:\n• Make sure microphone access is allowed\n• Check your internet connection\n• You can still continue in manual mode (tap to mark each recitation)`;
       setErrorMessage(detailedError);
       setPhase('error');
       return;
@@ -718,7 +718,7 @@ export default function RevealRecitation({
       console.error('[RevealRecitation] Failed to start recording:', err);
       setErrorMessage(
         err instanceof Error
-          ? `Failed to start recording: ${err.message}\n\nPlease ensure:\n• Microphone access is allowed\n• You're using a supported browser (Chrome/Edge recommended)\n• Your internet connection is stable`
+          ? `Failed to start recording: ${err.message}\n\nPlease ensure:\n• Microphone access is allowed\n• Your browser allows microphone access\n• Your internet connection is stable`
           : 'Failed to start recording. Please allow microphone access and try again.'
       );
       setPhase('error');

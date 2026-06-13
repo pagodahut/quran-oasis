@@ -57,8 +57,9 @@ export function AudioPlayer({
   onAyahChange
 }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { settings, update } = useSettings();
-  
+
   // Use prop reciter or settings, with listen-only fallback
   const selectedReciter = propReciter || settings.reciter;
   const isListenOnly = !supportsPerAyah(selectedReciter);
@@ -155,9 +156,10 @@ export function AudioPlayer({
     setIsPlaying(false);
     setIsLoading(false);
     if (retryCount < MAX_RETRIES) {
-      // Auto-retry with a small delay
+      // Auto-retry with a small delay (tracked so it can be cleared on unmount)
       const delay = (retryCount + 1) * 1000;
-      setTimeout(() => {
+      if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current);
+      retryTimeoutRef.current = setTimeout(() => {
         if (audioRef.current) {
           setRetryCount(prev => prev + 1);
           audioRef.current.load();

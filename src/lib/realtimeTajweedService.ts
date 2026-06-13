@@ -212,8 +212,12 @@ export function detectTajweedRules(text: string): TajweedRuleInstance[] {
  */
 export function normalizeArabic(text: string): string {
   return text
-    // Remove diacritics (tashkeel)
-    .replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED]/g, '')
+    // The dagger/superscript alef (U+0670) is a REAL long-A vowel in Uthmani
+    // script (e.g. the alef in Allah / ar-Rahman) \u2014 map it to a full alef
+    // instead of deleting it, so spelled-out transcriptions still match.
+    .replace(/\u0670/g, '\u0627')
+    // Remove the remaining diacritics (tashkeel), NOT including U+0670.
+    .replace(/[\u0610-\u061A\u064B-\u065F\u06D6-\u06ED]/g, '')
     // Normalize alef variants
     .replace(/[أإآٱ]/g, 'ا')
     // Normalize teh marbuta

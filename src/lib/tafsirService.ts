@@ -78,7 +78,7 @@ export async function fetchTafsir(
 export async function fetchMultipleTafsirs(
   surah: number, 
   ayah: number,
-  tafsirIds: number[] = [169, 168] // Ibn Kathir and Jalalayn
+  tafsirIds: number[] = [169, 168] // Ibn Kathir and Ma'arif al-Qur'an
 ): Promise<TafsirContent[]> {
   const results = await Promise.all(
     tafsirIds.map(id => fetchTafsir(surah, ayah, id))

@@ -8,6 +8,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
+import { rateLimit, clientKey } from '@/lib/rateLimit';
 
 // Modal endpoint URL (set after deployment)
 const MODAL_WHISPER_URL = process.env.MODAL_WHISPER_URL || '';
@@ -116,8 +118,22 @@ async function transcribeWithHuggingFace(audioBuffer: ArrayBuffer): Promise<Tran
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
-  
+
   try {
+    // Require auth — this proxies to a paid GPU endpoint and was previously
+    // an open, unauthenticated transcription proxy (cost-abuse vector).
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+    const rl = rateLimit(clientKey(request, userId), 120, 10 * 60_000);
+    if (!rl.ok) {
+      return NextResponse.json(
+        { error: 'Too many requests.' },
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfterSec) } }
+      );
+    }
+
     // Parse audio from request
     const contentType = request.headers.get('content-type') || '';
     let audioBuffer: ArrayBuffer;

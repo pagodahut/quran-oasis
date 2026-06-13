@@ -361,20 +361,37 @@ export function importPreferences(json: string): boolean {
  */
 export function clearAllLocalData(): void {
   if (typeof window === 'undefined') return;
-  
-  // Clear preferences
-  localStorage.removeItem(STORAGE_KEY);
-  
-  // Clear progress data
-  localStorage.removeItem('quranOasis_progress');
-  localStorage.removeItem('quranOasis_currentSession');
-  localStorage.removeItem('quran-oasis-settings');
-  localStorage.removeItem('quran-oasis-bookmarks');
-  localStorage.removeItem('quran-oasis-motivation');
-  
-  // Dispatch events
+
+  // Every app-owned key, across all the historical prefixes the app has used.
+  const keys = [
+    STORAGE_KEY,
+    'quranOasis_progress',
+    'quranOasis_currentSession',
+    'quranOasis_motivation',      // correct key (was 'quran-oasis-motivation')
+    'quranOasis_userName',
+    'quranOasis_onboarding',
+    'quranOasis_onboardingComplete',
+    'quranOasis_completedLessons',
+    'quranOasis_flashcardProgress',
+    'quran-oasis-settings',
+    'quran-oasis-bookmarks',
+    'qo_srs_state',
+    'qo_user_profile',
+    'qo_calibration_complete',
+    'verse_difficulty',
+    'recitation-history',
+    'hifz_study_data',
+    'hifz_early_access',
+    'hifz_premium_interactions',
+    'sheikh_fab_position',
+  ];
+  for (const k of keys) {
+    try { localStorage.removeItem(k); } catch { /* ignore */ }
+  }
+
   window.dispatchEvent(new CustomEvent('preferences-updated', { detail: DEFAULT_PREFERENCES }));
   window.dispatchEvent(new CustomEvent('progress-cleared'));
+  window.dispatchEvent(new CustomEvent('motivation-updated'));
 }
 
 /**

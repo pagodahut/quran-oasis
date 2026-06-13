@@ -20,6 +20,7 @@ import {
   Mic,
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
+import GuestBanner from '@/components/GuestBanner';
 import { GlassPanel } from '@/components/ui/GlassPanel';
 import {
   getStreakInfo,
@@ -91,7 +92,7 @@ function formatLastActive(dateStr: string | null): string {
 }
 
 export default function DashboardPage() {
-  const { user, isLoaded, isSignedIn } = useAuth();
+  const { user, isLoaded, isSignedIn, isGuest } = useAuth();
   useStudyTracker('dashboard');
   const { learning: learningPrefs } = useLearningPreferences();
   const { isChecking } = useCalibrationGuard();
@@ -224,6 +225,13 @@ export default function DashboardPage() {
               )}
             </div>
           </motion.header>
+
+          {/* Guest mode banner — invites account creation for sync (was never rendered) */}
+          {isGuest && (
+            <motion.div variants={fadeIn}>
+              <GuestBanner />
+            </motion.div>
+          )}
 
           {/* Ramadan / Jummah — thin banner, not a card */}
           {(isRamadanNow || isJummahToday) && (

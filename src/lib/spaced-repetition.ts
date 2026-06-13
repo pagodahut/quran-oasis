@@ -109,8 +109,17 @@ function makeKey(surah: number, ayah: number): string {
   return `${surah}:${ayah}`;
 }
 
+/** Local calendar date as YYYY-MM-DD (NOT UTC — the day must flip at the
+ *  user's local midnight, or streaks double-count/break for non-UTC users). */
+function localDateKey(d: Date = new Date()): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 function today(): string {
-  return new Date().toISOString().split('T')[0];
+  return localDateKey();
 }
 
 function daysBetween(date1: string, date2: string): number {
@@ -162,7 +171,7 @@ function calculateNextReview(
     easeFactor: newEase,
     interval: newInterval,
     repetitions: newReps,
-    nextReviewDate: nextDate.toISOString().split('T')[0],
+    nextReviewDate: localDateKey(nextDate),
     lastReviewDate: now,
     lastAccuracy: q >= 4 ? 1 : q === 3 ? 0.7 : 0.3,
     totalReviews: state.totalReviews + 1,

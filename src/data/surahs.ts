@@ -17,7 +17,7 @@ export interface Surah {
 
 export const surahs: Surah[] = [
   { number: 1, name: "Al-Fatiha", arabicName: "الفاتحة", meaning: "The Opening", verses: 7, revelationType: "Meccan", juz: 1, rukus: 1, sajdas: 0 },
-  { number: 2, name: "Al-Baqarah", arabicName: "البقرة", meaning: "The Cow", verses: 286, revelationType: "Medinan", juz: 1, rukus: 40, sajdas: 1 },
+  { number: 2, name: "Al-Baqarah", arabicName: "البقرة", meaning: "The Cow", verses: 286, revelationType: "Medinan", juz: 1, rukus: 40, sajdas: 0 },
   { number: 3, name: "Aal-i-Imran", arabicName: "آل عمران", meaning: "The Family of Imran", verses: 200, revelationType: "Medinan", juz: 3, rukus: 20, sajdas: 0 },
   { number: 4, name: "An-Nisa", arabicName: "النساء", meaning: "The Women", verses: 176, revelationType: "Medinan", juz: 4, rukus: 24, sajdas: 0 },
   { number: 5, name: "Al-Ma'idah", arabicName: "المائدة", meaning: "The Table Spread", verses: 120, revelationType: "Medinan", juz: 6, rukus: 16, sajdas: 0 },

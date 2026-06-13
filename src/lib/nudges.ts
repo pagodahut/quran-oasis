@@ -49,7 +49,7 @@ const NUDGE_VARIANTS: Record<NudgeType, Nudge[]> = {
     { type: 'celebration', key: 'celebrate-2', message: "MashaAllah! Today's goal is done. Rest knowing your effort is recorded." },
     { type: 'celebration', key: 'celebrate-3', message: 'SubhanAllah, another day of dedication! The angels are recording your every word.' },
     { type: 'celebration', key: 'celebrate-4', message: "🌟 Goal achieved! You're writing a beautiful story with the Quran." },
-    { type: 'celebration', key: 'celebrate-5', message: 'AlhamdulillAh! You completed your daily goal. Consistency like this changes lives.' },
+    { type: 'celebration', key: 'celebrate-5', message: 'Alhamdulillah! You completed your daily goal. Consistency like this changes lives.' },
     { type: 'celebration', key: 'celebrate-6', message: "Today's mission: accomplished. Tomorrow's reward: multiplied. Keep shining!" },
   ],
 };

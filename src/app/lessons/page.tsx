@@ -41,6 +41,7 @@ import {
 import LessonCompletionOverlay from '@/components/LessonCompletionOverlay';
 import BottomNav from '@/components/BottomNav';
 import { DailyWisdom } from '@/components/JourneyMap';
+import { getStreakInfo } from '@/lib/motivationStore';
 
 // ============================================
 // Unit Section Component - Liquid Glass
@@ -501,21 +502,27 @@ function LessonsContent() {
   const completedLesson = completedLessonId ? getLessonById(completedLessonId) : null;
 
   useEffect(() => {
-    const saved = localStorage.getItem('quranOasis_completedLessons');
-    if (saved) {
-      const completed = JSON.parse(saved);
-      setCompletedLessons(completed);
-      
-      const xp = completed.reduce((sum: number, id: string) => {
-        const lesson = getLessonById(id);
-        return sum + (lesson?.xpReward || 0);
-      }, 0);
-      setTotalXP(xp);
+    try {
+      const saved = localStorage.getItem('quranOasis_completedLessons');
+      const completed = saved ? JSON.parse(saved) : [];
+      if (Array.isArray(completed)) {
+        setCompletedLessons(completed);
+        const xp = completed.reduce((sum: number, id: string) => {
+          const lesson = getLessonById(id);
+          return sum + (lesson?.xpReward || 0);
+        }, 0);
+        setTotalXP(xp);
+      }
+    } catch {
+      // Corrupt data — start clean rather than crash the page on mount.
+      setCompletedLessons([]);
     }
 
-    const streakData = localStorage.getItem('quranOasis_streak');
-    if (streakData) {
-      setCurrentStreak(JSON.parse(streakData).current || 0);
+    // Streak lives in the motivation store, not a standalone key.
+    try {
+      setCurrentStreak(getStreakInfo().current || 0);
+    } catch {
+      setCurrentStreak(0);
     }
   }, []);
 

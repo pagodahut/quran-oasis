@@ -89,11 +89,20 @@ export function getProgress(): UserProgress {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return createDefaultProgress();
     
-    const parsed = JSON.parse(stored) as UserProgress;
-    // Ensure all required fields exist
+    const parsed = JSON.parse(stored);
+    const defaults = createDefaultProgress();
+    if (!parsed || typeof parsed !== 'object') return defaults;
+
+    // Defensive merge: a malformed value (e.g. {"streak":null}) must not
+    // override a required nested object with null and crash callers.
     return {
-      ...createDefaultProgress(),
+      ...defaults,
       ...parsed,
+      verses: (parsed.verses && typeof parsed.verses === 'object') ? parsed.verses : defaults.verses,
+      streak: (parsed.streak && typeof parsed.streak === 'object')
+        ? { ...defaults.streak, ...parsed.streak }
+        : defaults.streak,
+      dailyActivity: Array.isArray(parsed.dailyActivity) ? parsed.dailyActivity : defaults.dailyActivity,
     };
   } catch {
     return createDefaultProgress();
@@ -318,8 +327,17 @@ export function markVerseMemorized(surah: number, ayah: number): VerseProgress {
 
 // ============ DAILY ACTIVITY ============
 
+function localDateKey(d: Date = new Date()): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+// Local calendar date — the streak/activity day must flip at the user's local
+// midnight, not UTC (otherwise streaks double-count or break for non-UTC users).
 function getTodayKey(): string {
-  return new Date().toISOString().split('T')[0];
+  return localDateKey();
 }
 
 function updateDailyActivity(
@@ -365,8 +383,8 @@ function updateStreak(progress: UserProgress): void {
   const today = getTodayKey();
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayKey = yesterday.toISOString().split('T')[0];
-  
+  const yesterdayKey = localDateKey(yesterday);
+
   if (progress.streak.lastActiveDate === today) {
     // Already active today, no change needed
     return;
@@ -603,34 +621,30 @@ export function getProgressStats() {
  */
 export function getSurahProgressList(): Record<string, { name: string; progress: number }> {
   const progress = getProgress();
-  const surahNames: Record<number, string> = {
-    1: 'Al-Fatihah',
-    2: 'Al-Baqarah',
-    112: 'Al-Ikhlas',
-    113: 'Al-Falaq',
-    114: 'An-Nas',
-    103: 'Al-Asr',
-    108: 'Al-Kawthar',
-    110: 'An-Nasr',
-    111: 'Al-Masad',
-  };
-  
-  const surahProgress: Record<string, { name: string; progress: number }> = {};
-  
+
+  // Count memorized verses per surah, then compute the percentage against the
+  // surah's real ayah count (was a flat +10% per verse with a 9-surah name map).
+  const memorizedCounts: Record<number, number> = {};
   Object.entries(progress.verses).forEach(([key, verse]) => {
     const surah = parseInt(key.split(':')[0], 10);
     if (isNaN(surah)) return;
-    if (!surahProgress[surah]) {
-      surahProgress[surah] = {
-        name: surahNames[surah] || `Surah ${surah}`,
-        progress: 0,
-      };
-    }
-    if (verse.status === 'memorized' || verse.status === 'reviewing') {
-      surahProgress[surah].progress = Math.min(100, surahProgress[surah].progress + 10);
+    memorizedCounts[surah] = memorizedCounts[surah] || 0;
+    if (verse.status === 'memorized' || verse.status === 'reviewing' || verse.status === 'learning') {
+      memorizedCounts[surah] += 1;
     }
   });
-  
+
+  const surahProgress: Record<string, { name: string; progress: number }> = {};
+  for (const [surahStr, count] of Object.entries(memorizedCounts)) {
+    const surah = Number(surahStr);
+    const meta = SURAH_METADATA.find(s => s.number === surah);
+    const total = meta?.numberOfAyahs || count;
+    surahProgress[surah] = {
+      name: meta?.englishName || `Surah ${surah}`,
+      progress: Math.min(100, Math.round((count / total) * 100)),
+    };
+  }
+
   return surahProgress;
 }
 
@@ -654,18 +668,21 @@ export function getSurahProgress(surah: number): {
   const surahVerses = Object.entries(progress.verses)
     .filter(([key]) => key.startsWith(`${surah}:`))
     .map(([, v]) => v);
-  
-  // We need to get total verses from quran data
-  // For now return based on what we have
-  const memorized = surahVerses.filter(v => 
+
+  const memorized = surahVerses.filter(v =>
     v.status === 'memorized' || v.status === 'reviewing'
   ).length;
-  
+
+  // Use the surah's actual ayah count as the denominator, not the number of
+  // verses the user happens to have touched.
+  const meta = SURAH_METADATA.find(s => s.number === surah);
+  const totalVerses = meta?.numberOfAyahs || surahVerses.length || 1;
+
   return {
     versesMemorized: memorized,
-    totalVerses: surahVerses.length || 1,
-    percentage: surahVerses.length > 0 
-      ? Math.round((memorized / surahVerses.length) * 100) 
+    totalVerses,
+    percentage: totalVerses > 0
+      ? Math.round((memorized / totalVerses) * 100)
       : 0,
   };
 }

@@ -56,9 +56,14 @@ export default function PremiumPage() {
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
-    const stored = JSON.parse(localStorage.getItem('hifz_early_access') || '[]');
-    stored.push({ email: email.trim(), date: new Date().toISOString() });
-    localStorage.setItem('hifz_early_access', JSON.stringify(stored));
+    try {
+      const raw = JSON.parse(localStorage.getItem('hifz_early_access') || '[]');
+      const stored = Array.isArray(raw) ? raw : [];
+      stored.push({ email: email.trim(), date: new Date().toISOString() });
+      localStorage.setItem('hifz_early_access', JSON.stringify(stored));
+    } catch {
+      localStorage.setItem('hifz_early_access', JSON.stringify([{ email: email.trim(), date: new Date().toISOString() }]));
+    }
     setSubmitted(true);
   };
 
