@@ -517,10 +517,12 @@ export default function HomePage() {
           <p className="text-sm flex items-center gap-1.5" style={{ color: 'var(--theme-text-muted)' }}>
             Made with <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" /> for the Ummah
           </p>
-          <div className="flex items-center gap-6 text-sm" style={{ color: 'var(--theme-text-muted)' }}>
+          <div className="flex items-center gap-5 text-sm flex-wrap justify-center" style={{ color: 'var(--theme-text-muted)' }}>
             <Link href="/lessons" className="hover:opacity-70 transition-opacity">Lessons</Link>
             <Link href="/surahs" className="hover:opacity-70 transition-opacity">Surahs</Link>
-            <Link href="/mushaf" className="hover:opacity-70 transition-opacity">Quran</Link>
+            <Link href="/privacy" className="hover:opacity-70 transition-opacity">Privacy</Link>
+            <Link href="/terms" className="hover:opacity-70 transition-opacity">Terms</Link>
+            <Link href="/support" className="hover:opacity-70 transition-opacity">Support</Link>
           </div>
         </div>
       </footer>
