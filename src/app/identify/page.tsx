@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, Square, Loader2, BookOpen, ChevronLeft, Sparkles, Volume2, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
@@ -84,6 +84,27 @@ export default function IdentifyPage() {
     setMatches([]);
     setTranscript('');
   }, [updateAudioLevel]);
+
+  // Release the microphone, audio graph, and animation loop if the user
+  // navigates away mid-listen (otherwise the mic stays live — battery drain
+  // and an App Store reviewer red flag).
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        try { recognitionRef.current.stop(); } catch {}
+        recognitionRef.current = null;
+      }
+      cancelAnimationFrame(animFrameRef.current);
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach(t => t.stop());
+        mediaStreamRef.current = null;
+      }
+      if (audioContextRef.current) {
+        try { audioContextRef.current.close(); } catch {}
+        audioContextRef.current = null;
+      }
+    };
+  }, []);
 
   const stopAndIdentify = useCallback(async () => {
     // Stop recognition
