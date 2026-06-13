@@ -1,4 +1,14 @@
 import { Amiri, Noto_Naskh_Arabic, Noto_Nastaliq_Urdu, Scheherazade_New, DM_Sans, DM_Serif_Display, Cormorant_Garamond } from 'next/font/google';
+import localFont from 'next/font/local';
+
+// Official KFGQPC Hafs Uthmani — the actual Madinah mushaf typeface
+// (King Fahd Glorious Quran Printing Complex, v18). Self-hosted.
+export const kfgqpcHafs = localFont({
+  src: '../fonts/UthmanicHafs1Ver18.woff2',
+  display: 'swap',
+  variable: '--font-hafs',
+  preload: true,
+});
 
 // Primary Arabic font for Quran text (Uthmani style)
 export const amiri = Amiri({
@@ -62,6 +72,7 @@ export const cormorantGaramond = Cormorant_Garamond({
 
 // Combined font variables for className
 export const fontVariables = [
+  kfgqpcHafs.variable,
   amiri.variable,
   notoNaskhArabic.variable,
   notoNastaliqUrdu.variable,

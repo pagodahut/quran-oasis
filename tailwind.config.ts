@@ -110,7 +110,7 @@ const config: Config = {
         serif: ['DM Serif Display', 'Cormorant Garamond', 'Georgia', 'serif'],
         script: ['Pinyon Script', 'cursive'],
         arabic: ['Amiri', 'Traditional Arabic', 'serif'],
-        quran: ['KFGQPC Hafs Uthmani', 'Amiri Quran', 'Amiri', 'serif'],
+        quran: ['var(--font-hafs)', 'var(--font-kitab)', 'Amiri Quran', 'Amiri', 'serif'],
       },
       fontSize: {
         'quran-sm': ['1.5rem', { lineHeight: '2.5' }],

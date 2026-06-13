@@ -205,29 +205,15 @@ function VerseDisplay({
 }) {
   // Clean the verse text to remove Bismillah prefix (for audio sync)
   const displayText = cleanAyahText(verse.text.arabic, surahNumber, verse.numberInSurah);
+  // Verse-first: the page IS the mushaf — large type, no card chrome
   const sizeClasses = {
-    small: 'text-2xl',
-    medium: 'text-3xl md:text-4xl',
-    large: 'text-4xl md:text-5xl',
+    small: 'text-3xl',
+    medium: 'text-4xl md:text-5xl',
+    large: 'text-5xl md:text-6xl',
   };
 
   return (
-    <motion.div
-      layout
-      className={`relative p-8 rounded-3xl transition-all duration-300 ${
-        highlight 
-          ? 'bg-gradient-to-br from-gold-900/30 to-night-900 border-2 border-gold-500/50 shadow-glow-gold' 
-          : 'bg-gradient-to-br from-night-800/80 to-night-900 border border-night-700/50'
-      }`}
-    >
-      {/* Decorative pattern */}
-      <div className="absolute inset-0 opacity-5 rounded-3xl overflow-hidden">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 2px 2px, rgba(201, 162, 39, 0.5) 1px, transparent 0)`,
-          backgroundSize: '20px 20px',
-        }} />
-      </div>
-
+    <motion.div layout className="relative px-2 py-6 md:py-10">
       <AnimatePresence mode="wait">
         {showText ? (
           wordByWord ? (
@@ -251,10 +237,11 @@ function VerseDisplay({
               initial={{ opacity: 0, filter: 'blur(10px)' }}
               animate={{ opacity: 1, filter: 'blur(0px)' }}
               exit={{ opacity: 0, filter: 'blur(10px)' }}
-              className={`font-quran ${sizeClasses[size]} leading-loose text-center ${
-                highlight ? 'text-gold-300' : 'text-night-100'
-              }`}
-              style={{ direction: 'rtl' }}
+              className={`font-quran ${sizeClasses[size]} leading-[2.1] text-center transition-colors duration-500`}
+              style={{
+                direction: 'rtl',
+                color: highlight ? 'var(--gold-leaf)' : 'var(--theme-text)',
+              }}
             >
               {displayText}
             </motion.p>
@@ -265,11 +252,12 @@ function VerseDisplay({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="flex flex-col items-center justify-center py-12"
+            className="flex flex-col items-center justify-center py-14 rounded-3xl"
+            style={{ border: '1px dashed var(--theme-border)' }}
           >
-            <EyeOff className="w-16 h-16 text-night-600 mb-4" />
-            <p className="text-night-500 text-lg">Recite from memory</p>
-            <p className="text-night-600 text-sm mt-1">Tap to reveal if needed</p>
+            <EyeOff className="w-12 h-12 mb-4" style={{ color: 'var(--theme-text-muted)' }} />
+            <p className="text-lg" style={{ color: 'var(--theme-text-secondary)' }}>Recite from memory</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--theme-text-muted)' }}>Tap to reveal if needed</p>
           </motion.div>
         )}
       </AnimatePresence>

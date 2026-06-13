@@ -202,6 +202,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       setPeriod(prev => {
         if (prev !== newP) {
           applyThemeToDOM(id, newP);
+          window.dispatchEvent(new CustomEvent('prayerPeriodChanged', { detail: newP }));
           return newP;
         }
         return prev;

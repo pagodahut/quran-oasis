@@ -58,6 +58,14 @@ function getGreeting(): string {
   return 'As-Salamu Alaykum';
 }
 
+const PRAYER_LABELS: Record<string, { en: string; ar: string }> = {
+  fajr:    { en: 'Fajr',    ar: 'الفجر' },
+  dhuhr:   { en: 'Dhuhr',   ar: 'الظهر' },
+  asr:     { en: 'Asr',     ar: 'العصر' },
+  maghrib: { en: 'Maghrib', ar: 'المغرب' },
+  isha:    { en: 'Isha',    ar: 'العشاء' },
+};
+
 const HADITH_MESSAGES = [
   { text: 'Whoever recites a letter from the Book of Allah will receive a good deed, and each good deed is multiplied by ten.', source: 'Tirmidhi' },
   { text: 'The best among you are those who learn the Quran and teach it.', source: 'Bukhari' },
@@ -183,8 +191,16 @@ export default function DashboardPage() {
           <motion.header variants={fadeIn} className="pt-safe-top">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium mb-1" style={{ color: 'var(--theme-text-muted)' }}>
+                <p className="text-sm font-medium mb-1 flex items-center gap-2" style={{ color: 'var(--theme-text-muted)' }}>
                   {getGreeting()}
+                  <span
+                    className="inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded-md"
+                    style={{ background: 'var(--ambient-accent-subtle)', color: 'var(--ambient-accent)' }}
+                    title="The app's colors follow the rhythm of the day"
+                  >
+                    {PRAYER_LABELS[prayerPeriod]?.en}
+                    <span className="font-arabic" dir="rtl">{PRAYER_LABELS[prayerPeriod]?.ar}</span>
+                  </span>
                 </p>
                 <h1 className="text-2xl font-serif font-semibold" style={{ color: 'var(--theme-text)' }}>
                   {displayName}

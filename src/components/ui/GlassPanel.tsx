@@ -61,6 +61,8 @@ export const GlassPanel = forwardRef<HTMLDivElement, GlassPanelProps>(
       boxShadow: glow
         ? 'var(--panel-shadow), 0 0 32px var(--ambient-gold-subtle, rgba(201,162,39,0.1))'
         : 'var(--panel-shadow)',
+      // Drift gently when the prayer-time palette shifts
+      transition: 'background-color 1.2s ease, border-color 1.2s ease, box-shadow 1.2s ease, color 0.8s ease',
       ...style,
     };
 

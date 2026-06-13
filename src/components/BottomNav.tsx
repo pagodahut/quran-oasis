@@ -90,6 +90,7 @@ export default function BottomNav() {
           boxShadow: '0 -1px 20px rgba(0,0,0,0.06), 0 4px 20px rgba(0,0,0,0.08)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
+          transition: 'background-color 1.2s ease, border-color 1.2s ease',
         }}
       >
         <div className="flex items-center justify-around px-2 py-2">

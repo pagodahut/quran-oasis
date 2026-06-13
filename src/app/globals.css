@@ -12,7 +12,7 @@
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-display: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-arabic: var(--font-amiri), 'Amiri Quran', 'Amiri', serif;
-  --font-quran: var(--font-kitab), 'Scheherazade New', serif;
+  --font-quran: var(--font-hafs), var(--font-kitab), 'Scheherazade New', serif;
   --font-indopak: var(--font-nastaliq), 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
 
   --safe-area-top: env(safe-area-inset-top);
