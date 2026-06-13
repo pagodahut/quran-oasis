@@ -79,11 +79,15 @@ function useAudio(src: string) {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState(false);
+  // Counts NATURAL completions only (the 'ended' event) — never manual pauses,
+  // so the listen-phase counter can't be inflated by tapping pause.
+  const [playbacksCompleted, setPlaybacksCompleted] = useState(0);
 
   useEffect(() => {
     const audio = new Audio(src);
     audioRef.current = audio;
     setError(false);
+    setPlaybacksCompleted(0);
 
     const onLoadStart = () => { setIsLoading(true); setError(false); };
     const onCanPlay = () => { setIsLoading(false); setError(false); };
@@ -92,6 +96,7 @@ function useAudio(src: string) {
     const onEnded = () => {
       setIsPlaying(false);
       setProgress(0);
+      setPlaybacksCompleted((c) => c + 1);
     };
     const onTimeUpdate = () => {
       setProgress((audio.currentTime / audio.duration) * 100 || 0);
@@ -155,7 +160,7 @@ function useAudio(src: string) {
     }
   }, [play]);
 
-  return { isPlaying, isLoading, error, progress, duration, play, pause, toggle, reset, retry, audioRef };
+  return { isPlaying, isLoading, error, progress, duration, playbacksCompleted, play, pause, toggle, reset, retry, audioRef };
 }
 
 // ============ CELEBRATION COMPONENT ============
@@ -430,6 +435,8 @@ export default function MemorizePage() {
   const [verse, setVerse] = useState<Ayah | null>(null);
   const [surahName, setSurahName] = useState('');
   const [previousVerses, setPreviousVerses] = useState<Ayah[]>([]);
+  const [notFound, setNotFound] = useState(false);
+  const [isLastAyah, setIsLastAyah] = useState(false);
   
   // Memorization state
   const [repetitions, setRepetitions] = useState(0);
@@ -456,7 +463,7 @@ export default function MemorizePage() {
   
   // Audio - use reciter from preferences
   const audioUrl = getAudioUrl(surahNum, ayahNum, prefs.reciter);
-  const { isPlaying, isLoading, error: audioError, progress, play, pause, toggle, reset, retry } = useAudio(audioUrl);
+  const { isPlaying, isLoading, error: audioError, progress, playbacksCompleted, play, pause, toggle, reset, retry } = useAudio(audioUrl);
   
   const autoPlayRef = useRef(false);
   const repeatCountRef = useRef(0);
@@ -478,12 +485,19 @@ export default function MemorizePage() {
   // Load data
   useEffect(() => {
     completedRef.current = false; // reset completion guard for the new verse
+    setNotFound(false);
+    // Reject out-of-range references up front (surah 1–114, ayah ≥ 1).
+    if (!Number.isInteger(surahNum) || surahNum < 1 || surahNum > 114 || !Number.isInteger(ayahNum) || ayahNum < 1) {
+      setNotFound(true);
+      return;
+    }
     getSurah(surahNum).then(surah => {
       if (surah) {
         const foundVerse = surah.ayahs.find(a => a.numberInSurah === ayahNum);
         if (foundVerse) {
           setVerse(foundVerse);
           setSurahName(surah.englishName);
+          setIsLastAyah(ayahNum >= surah.numberOfAyahs);
 
           // Get previous verses for stacking (if not the first verse)
           if (ayahNum > 1) {
@@ -495,29 +509,35 @@ export default function MemorizePage() {
 
           // Start memorizing
           startMemorizingVerse(surahNum, ayahNum);
+        } else {
+          setNotFound(true); // ayah out of range for this surah
         }
+      } else {
+        setNotFound(true); // surah failed to load
       }
-    });
+    }).catch(() => setNotFound(true));
   }, [surahNum, ayahNum]);
 
-  // Handle audio repeat for listen phase
+  // Listen phase: auto-replay until 5 NATURAL completions, then stop and show
+  // the "ready to continue" prompt. Keyed on completed playbacks (not pause),
+  // so manually pausing no longer counts as a play.
+  const LISTEN_TARGET = 5;
   useEffect(() => {
-    if (!isPlaying && autoPlayRef.current && phase === 'listen') {
-      repeatCountRef.current += 1;
-      setListenCount(repeatCountRef.current);
-      
-      if (repeatCountRef.current < 5) {
-        // Auto-replay
-        setTimeout(() => {
-          reset();
-          play();
-        }, 500);
-      } else {
-        // Move to next phase
-        autoPlayRef.current = false;
-      }
+    if (phase !== 'listen' || !autoPlayRef.current) return;
+    if (playbacksCompleted === 0) return;
+
+    setListenCount(playbacksCompleted);
+
+    if (playbacksCompleted < LISTEN_TARGET) {
+      const t = setTimeout(() => {
+        reset();
+        play();
+      }, 500);
+      return () => clearTimeout(t);
+    } else {
+      autoPlayRef.current = false; // done looping; user taps Continue
     }
-  }, [isPlaying, phase, play, reset]);
+  }, [playbacksCompleted, phase, play, reset]);
 
   const currentPhaseIndex = PHASES.findIndex(p => p.phase === phase);
   const phaseProgress = ((currentPhaseIndex + 1) / PHASES.length) * 100;
@@ -697,6 +717,26 @@ export default function MemorizePage() {
       router.push('/practice');
     }
   };
+
+  if (notFound) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: 'var(--theme-surface)' }}>
+        <AlertCircle className="w-12 h-12 mb-4" style={{ color: 'var(--theme-text-muted)' }} />
+        <h1 className="text-xl font-serif mb-2" style={{ color: 'var(--theme-text)' }}>Verse not found</h1>
+        <p className="text-sm mb-6 max-w-xs" style={{ color: 'var(--theme-text-secondary)' }}>
+          That surah and ayah doesn&apos;t exist. The Quran has 114 surahs, each with a fixed number of verses.
+        </p>
+        <div className="flex gap-3">
+          <button onClick={() => router.push('/surahs')} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ background: 'var(--ambient-gold)', color: '#fff' }}>
+            Browse Surahs
+          </button>
+          <button onClick={() => router.push('/dashboard')} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ background: 'var(--theme-surface-alt)', color: 'var(--theme-text)' }}>
+            Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (isCheckingCalibration || !verse) {
     return (
@@ -1355,7 +1395,7 @@ export default function MemorizePage() {
                 whileTap={{ scale: 0.98 }}
                 className="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl bg-gold-500 hover:bg-gold-400 text-night-950 font-semibold transition-colors shadow-glow-gold"
               >
-                Next Verse
+                {isLastAyah ? 'Finish Surah' : 'Next Verse'}
                 <ArrowRight className="w-5 h-5" />
               </motion.button>
             </div>

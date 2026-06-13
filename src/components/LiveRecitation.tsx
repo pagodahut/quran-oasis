@@ -682,6 +682,27 @@ export default function LiveRecitation({
           duration: elapsedTime,
         });
 
+        // Persist the session to local recitation history (was never written,
+        // so the history page always showed "No sessions yet").
+        try {
+          const record = {
+            surahNumber,
+            startAyah,
+            endAyah: endAyah ?? startAyah,
+            overallAccuracy: accuracy,
+            duration: elapsedTime,
+            totalWords,
+            matchedWords,
+            createdAt: new Date().toISOString(),
+          };
+          const existing = JSON.parse(localStorage.getItem('recitation-history') || '[]');
+          const list = Array.isArray(existing) ? existing : [];
+          list.unshift(record);
+          localStorage.setItem('recitation-history', JSON.stringify(list.slice(0, 100)));
+        } catch {
+          /* ignore persistence errors */
+        }
+
         return finalStates;
       });
 
