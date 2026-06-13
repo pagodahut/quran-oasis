@@ -21,6 +21,7 @@ import { NextRequest } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { buildFullSystemPrompt, type PageContext, type TajweedResult } from '@/lib/sheikh-prompt';
 import { ANTHROPIC_API_KEY, callClaudeStream } from '@/lib/ai';
+import { rateLimit, clientKey } from '@/lib/rateLimit';
 
 // ─── Types ───────────────────────────────────────────────────────────
 
@@ -67,6 +68,16 @@ export async function POST(request: NextRequest) {
       return new Response(
         JSON.stringify({ error: 'Authentication required', code: 'AUTH_REQUIRED' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Server-side rate limit — protects against AI cost abuse (the prior limit
+    // was client-side only). 30 AI messages per user per 10 minutes.
+    const rl = rateLimit(clientKey(request, userId), 30, 10 * 60_000);
+    if (!rl.ok) {
+      return new Response(
+        JSON.stringify({ error: 'Too many requests. Please slow down.', code: 'RATE_LIMITED' }),
+        { status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': String(rl.retryAfterSec) } }
       );
     }
 

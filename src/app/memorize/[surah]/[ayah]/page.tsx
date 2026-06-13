@@ -32,13 +32,11 @@ import {
 import WordByWordInline from '@/components/WordByWordInline';
 import VerseContext, { WhyThisMatters } from '@/components/VerseContext';
 import { getSurah, getAudioUrl, RECITERS, cleanAyahText, getEffectiveReciterForPerAyah, supportsPerAyah, type Ayah } from '@/lib/quranData';
-import { 
-  startMemorizingVerse, 
-  markVerseMemorized, 
-  completeVerseSession,
-  getProgress,
-  saveProgress,
+import {
+  startMemorizingVerse,
+  markVerseMemorized,
 } from '@/lib/progressStore';
+import { srs, type ReviewQuality } from '@/lib/spaced-repetition';
 import { useReadingPreferences } from '@/hooks/useAppliedPreferences';
 import { TarteelService, checkBrowserSupport, type TarteelSessionResult } from '@/lib/tarteelService';
 import { WebSpeechService, type WebSpeechSessionResult } from '@/lib/webSpeechService';
@@ -80,13 +78,15 @@ function useAudio(src: string) {
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const audio = new Audio(src);
     audioRef.current = audio;
+    setError(false);
 
-    const onLoadStart = () => setIsLoading(true);
-    const onCanPlay = () => setIsLoading(false);
+    const onLoadStart = () => { setIsLoading(true); setError(false); };
+    const onCanPlay = () => { setIsLoading(false); setError(false); };
     const onPlay = () => setIsPlaying(true);
     const onPause = () => setIsPlaying(false);
     const onEnded = () => {
@@ -99,6 +99,12 @@ function useAudio(src: string) {
     const onLoadedMetadata = () => {
       setDuration(audio.duration);
     };
+    // Surface load/network failures instead of hanging on a spinner forever.
+    const onError = () => {
+      setIsLoading(false);
+      setIsPlaying(false);
+      setError(true);
+    };
 
     audio.addEventListener('loadstart', onLoadStart);
     audio.addEventListener('canplay', onCanPlay);
@@ -107,6 +113,8 @@ function useAudio(src: string) {
     audio.addEventListener('ended', onEnded);
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('loadedmetadata', onLoadedMetadata);
+    audio.addEventListener('error', onError);
+    audio.addEventListener('stalled', onError);
 
     return () => {
       audio.removeEventListener('loadstart', onLoadStart);
@@ -116,12 +124,19 @@ function useAudio(src: string) {
       audio.removeEventListener('ended', onEnded);
       audio.removeEventListener('timeupdate', onTimeUpdate);
       audio.removeEventListener('loadedmetadata', onLoadedMetadata);
+      audio.removeEventListener('error', onError);
+      audio.removeEventListener('stalled', onError);
       audio.pause();
-      audio.src = '';
+      audio.removeAttribute('src');
+      audio.load(); // abort any in-flight network fetch
     };
   }, [src]);
 
-  const play = useCallback(() => audioRef.current?.play(), []);
+  // Catch autoplay-policy rejections so a blocked play() doesn't freeze state.
+  const play = useCallback(() => {
+    const p = audioRef.current?.play();
+    if (p) p.catch(() => { setIsPlaying(false); });
+  }, []);
   const pause = useCallback(() => audioRef.current?.pause(), []);
   const toggle = useCallback(() => {
     if (isPlaying) pause();
@@ -132,8 +147,15 @@ function useAudio(src: string) {
       audioRef.current.currentTime = 0;
     }
   }, []);
+  const retry = useCallback(() => {
+    if (audioRef.current) {
+      setError(false);
+      audioRef.current.load();
+      play();
+    }
+  }, [play]);
 
-  return { isPlaying, isLoading, progress, duration, play, pause, toggle, reset, audioRef };
+  return { isPlaying, isLoading, error, progress, duration, play, pause, toggle, reset, retry, audioRef };
 }
 
 // ============ CELEBRATION COMPONENT ============
@@ -434,7 +456,7 @@ export default function MemorizePage() {
   
   // Audio - use reciter from preferences
   const audioUrl = getAudioUrl(surahNum, ayahNum, prefs.reciter);
-  const { isPlaying, isLoading, progress, play, pause, toggle, reset } = useAudio(audioUrl);
+  const { isPlaying, isLoading, error: audioError, progress, play, pause, toggle, reset, retry } = useAudio(audioUrl);
   
   const autoPlayRef = useRef(false);
   const repeatCountRef = useRef(0);
@@ -455,6 +477,7 @@ export default function MemorizePage() {
 
   // Load data
   useEffect(() => {
+    completedRef.current = false; // reset completion guard for the new verse
     getSurah(surahNum).then(surah => {
       if (surah) {
         const foundVerse = surah.ayahs.find(a => a.numberInSurah === ayahNum);
@@ -517,7 +540,15 @@ export default function MemorizePage() {
         handleComplete();
         return;
       }
-      
+
+      // Persist + schedule whenever we actually enter the complete phase
+      // (the normal stack→complete path must save too, not just the skip path)
+      if (nextPhase === 'complete') {
+        setPhase('complete');
+        handleComplete();
+        return;
+      }
+
       setPhase(nextPhase);
       
       // Auto-start audio for listen phase
@@ -533,10 +564,32 @@ export default function MemorizePage() {
     }
   };
 
+  const completedRef = useRef(false);
   const handleComplete = () => {
+    // Guard against double-fire (skip path + effect, or rapid taps)
+    if (completedRef.current) return;
+    completedRef.current = true;
+
     setShowCelebration(true);
+
+    // 1. Persist to the progress store (XP, streak, motivation)
     markVerseMemorized(surahNum, ayahNum);
-    
+
+    // 2. Schedule the verse in the spaced-repetition queue the Practice
+    //    hub reads — without this, memorized verses never come up for review.
+    //    Grade the first review from the recall accuracy we measured.
+    const meanAccuracy = recallAccuracy.length > 0
+      ? recallAccuracy.reduce((a, b) => a + b, 0) / recallAccuracy.length
+      : null;
+    const quality: ReviewQuality =
+      meanAccuracy === null ? 'good'
+      : meanAccuracy >= 90 ? 'easy'
+      : meanAccuracy >= 75 ? 'good'
+      : meanAccuracy >= 50 ? 'hard'
+      : 'again';
+    srs.addAyah(surahNum, ayahNum);
+    srs.recordReview(surahNum, ayahNum, quality);
+
     setTimeout(() => {
       setShowCelebration(false);
     }, 2500);
@@ -718,6 +771,22 @@ export default function MemorizePage() {
           </div>
         </div>
       </header>
+
+      {/* Audio load/network error — actionable instead of a frozen spinner */}
+      {audioError && (
+        <div className="mx-4 mt-2 flex items-center gap-2 px-3 py-2 rounded-xl bg-rose-500/10 border border-rose-500/20">
+          <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+          <p className="text-xs text-rose-300/90 flex-1">
+            Audio couldn&apos;t load — check your connection.
+          </p>
+          <button
+            onClick={retry}
+            className="text-xs font-medium text-rose-200 underline underline-offset-2"
+          >
+            Retry
+          </button>
+        </div>
+      )}
 
       {/* Listen-only reciter fallback notice */}
       {!supportsPerAyah(prefs.reciter) && (

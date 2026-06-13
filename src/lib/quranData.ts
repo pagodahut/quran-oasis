@@ -371,22 +371,65 @@ export function shouldShowBismillah(surahNumber: number): boolean {
   return surahNumber !== 1 && surahNumber !== 9;
 }
 
+// Arabic tashkeel/marks, tatweel, and the BOM — removed for diacritic-insensitive
+// matching of the Basmala (some Uthmani editions carry stray marks, e.g. the
+// extra shadda on the ba in surahs 95 & 97).
+const ARABIC_MARKS = /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u0640\uFEFF]/g;
+
+function stripMarks(s: string): string {
+  return s
+    .normalize('NFC')
+    .replace(ARABIC_MARKS, '')
+    .replace(/[آأإٱ]/g, 'ا'); // alef variants → bare alef
+}
+
+// Bare (diacritic-free, space-free) Basmala letters: بسم الله الرحمن الرحيم
+const BARE_BASMALA = stripMarks('بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ').replace(/\s+/g, '');
+
+const SINGLE_MARK = /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u0640\uFEFF]/;
+
+/** Strip a leading Basmala from ayah-1 text regardless of diacritic noise. */
+function stripLeadingBasmala(text: string): string | null {
+  const norm = text.normalize('NFC');
+  let bare = '';
+  for (let i = 0; i < norm.length; i++) {
+    if (/\s/.test(norm[i])) continue; // ignore spaces while accumulating
+    bare += stripMarks(norm[i]);
+    if (bare.length === BARE_BASMALA.length) {
+      if (bare !== BARE_BASMALA) return null;
+      // Skip any diacritics trailing the Basmala's final letter before slicing.
+      let j = i + 1;
+      while (j < norm.length && SINGLE_MARK.test(norm[j])) j++;
+      return norm.slice(j).trim();
+    }
+    if (bare.length > BARE_BASMALA.length) return null;
+  }
+  return null;
+}
+
 export function cleanAyahText(text: string, surahNumber: number, ayahNumber: number): string {
+  // Always strip the invisible BOM that leaks from some data sources (e.g. 1:1).
+  const base = text.replace(/\uFEFF/g, '');
+
+  // Surah 1: Basmala IS ayah 1 — keep it. Non-first ayahs: nothing to strip.
   if (surahNumber === 1 || ayahNumber !== 1) {
-    return text;
+    return base;
   }
 
-  let cleaned = text.trim();
-  const normalizedCleaned = cleaned.normalize('NFC');
+  const trimmed = base.trim();
+
+  // Fast path: exact known patterns.
+  const normalizedCleaned = trimmed.normalize('NFC');
   for (const pattern of BISMILLAH_PATTERNS) {
     const normalizedPattern = pattern.normalize('NFC');
     if (normalizedCleaned.startsWith(normalizedPattern)) {
-      cleaned = normalizedCleaned.slice(normalizedPattern.length).trim();
-      break;
+      return normalizedCleaned.slice(normalizedPattern.length).trim();
     }
   }
 
-  return cleaned;
+  // Robust path: diacritic-insensitive match (handles malformed editions).
+  const stripped = stripLeadingBasmala(trimmed);
+  return stripped !== null ? stripped : trimmed;
 }
 
 export function getAyahTextForDisplay(ayah: Ayah, surahNumber: number): string {

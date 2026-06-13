@@ -166,6 +166,18 @@ export async function POST(request: NextRequest) {
         const ayah = Number(parts[1]);
 
         if (!surah || !ayah || isNaN(surah) || isNaN(ayah)) continue;
+        if (surah < 1 || surah > 114 || ayah < 1 || ayah > 286) continue;
+
+        // Clamp/validate client-supplied values so a tampered client can't
+        // persist out-of-range progress that becomes cross-device "truth".
+        const clamp = (v: number | undefined, lo: number, hi: number, dflt: number) =>
+          typeof v === 'number' && isFinite(v) ? Math.min(hi, Math.max(lo, v)) : dflt;
+        const safeStatus = ['learning', 'reviewing', 'memorized', 'mastered'].includes(verse.status || '')
+          ? verse.status! : 'learning';
+        const safeEase = clamp(verse.easeFactor, 1.3, 3.0, 2.5);
+        const safeInterval = clamp(verse.interval, 0, 3650, 1);
+        const safeReps = clamp(verse.totalReviews, 0, 100000, 0);
+        const safeConfidence = clamp(verse.confidence, 0, 100, 0);
 
         await prisma.memorizationProgress.upsert({
           where: {
@@ -179,23 +191,23 @@ export async function POST(request: NextRequest) {
             userId: user.id,
             surahNumber: surah,
             ayahNumber: ayah,
-            easeFactor: verse.easeFactor || 2.5,
-            interval: verse.interval || 1,
-            repetitions: verse.totalReviews || 0,
+            easeFactor: safeEase,
+            interval: safeInterval,
+            repetitions: safeReps,
             nextReview: verse.nextReview ? new Date(verse.nextReview) : new Date(),
             lastReview: verse.lastReview ? new Date(verse.lastReview) : null,
-            status: verse.status || 'learning',
-            confidence: verse.confidence ?? 0,
+            status: safeStatus,
+            confidence: safeConfidence,
             category: verse.category || 'sabaq',
           },
           update: {
-            easeFactor: verse.easeFactor || 2.5,
-            interval: verse.interval || 1,
-            repetitions: verse.totalReviews || 0,
+            easeFactor: safeEase,
+            interval: safeInterval,
+            repetitions: safeReps,
             nextReview: verse.nextReview ? new Date(verse.nextReview) : new Date(),
             lastReview: verse.lastReview ? new Date(verse.lastReview) : null,
-            status: verse.status || 'learning',
-            confidence: verse.confidence ?? 0,
+            status: safeStatus,
+            confidence: safeConfidence,
             category: verse.category || 'sabaq',
           },
         });
@@ -208,13 +220,17 @@ export async function POST(request: NextRequest) {
       const existingBookmarks = await prisma.bookmark.findMany({
         where: { userId: user.id },
       });
-      const existingKeys = new Set(existingBookmarks.map((b: typeof existingBookmarks[number]) => `${b.surahNumber}:${b.ayahNumber}`));
       const newKeys = new Set(bookmarks.map((b: SyncBookmark) => `${b.surah}:${b.ayah}`));
 
-      // Delete removed bookmarks
-      for (const eb of existingBookmarks) {
-        if (!newKeys.has(`${eb.surahNumber}:${eb.ayahNumber}`)) {
-          await prisma.bookmark.delete({ where: { id: eb.id } });
+      // Delete removed bookmarks — but ONLY when the client actually sent a
+      // non-empty set. An empty array is ambiguous (often a fresh/unhydrated
+      // device pushing before the initial pull) and must never wipe the
+      // server's bookmarks. This was a real data-loss path.
+      if (bookmarks.length > 0) {
+        for (const eb of existingBookmarks) {
+          if (!newKeys.has(`${eb.surahNumber}:${eb.ayahNumber}`)) {
+            await prisma.bookmark.delete({ where: { id: eb.id } });
+          }
         }
       }
 

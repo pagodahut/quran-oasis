@@ -3,7 +3,7 @@
  * Enhanced offline functionality and caching
  */
 
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const STATIC_CACHE = `hifz-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `hifz-dynamic-${CACHE_VERSION}`;
 const QURAN_DATA_CACHE = `hifz-quran-${CACHE_VERSION}`;
@@ -154,33 +154,19 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Strategy: Navigation - Network first with offline fallback
+  // Strategy: Navigation - Network only, with a PUBLIC offline fallback.
+  // We deliberately do NOT cache navigation HTML: pages can be personalized
+  // (profile, dashboard) and a cached page must never be served to a different
+  // user on a shared device. Page data is loaded client-side, so the offline
+  // shell degrades gracefully.
   if (isNavigationRequest(request)) {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
-          if (response.ok) {
-            const responseClone = response.clone();
-            caches.open(DYNAMIC_CACHE).then((cache) => {
-              cache.put(request, responseClone);
-            });
-          }
-          return response;
-        })
-        .catch(async () => {
-          // Try cached version first
-          const cachedResponse = await caches.match(request);
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          // Fall back to offline page
-          const offlineResponse = await caches.match('/offline');
-          if (offlineResponse) {
-            return offlineResponse;
-          }
-          // Last resort: cached home page
-          return caches.match('/');
-        })
+      fetch(request).catch(async () => {
+        const offlineResponse = await caches.match('/offline');
+        if (offlineResponse) return offlineResponse;
+        // Last resort: the public landing page (no personalized data).
+        return caches.match('/');
+      })
     );
     return;
   }

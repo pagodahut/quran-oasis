@@ -83,27 +83,27 @@
   --gold-leaf-dark: #a88a30;
   --gold-leaf-shadow: #6b5a20;
 
-  --panel-neutral: rgba(38, 36, 48, 0.90);
-  --panel-gold: linear-gradient(135deg, rgba(212,176,80,0.08) 0%, rgba(38,36,48,0.88) 100%);
-  --panel-sage: linear-gradient(135deg, rgba(78,122,81,0.06) 0%, rgba(38,36,48,0.88) 100%);
-  --panel-deep: rgba(22, 20, 30, 0.95);
-  --panel-border-neutral: rgba(168, 152, 120, 0.12);
-  --panel-border-gold: rgba(212, 176, 80, 0.18);
-  --panel-border-sage: rgba(78, 122, 81, 0.12);
-  --panel-shadow: 0 1px 3px rgba(0,0,0,0.20), 0 8px 24px rgba(0,0,0,0.18);
+  --panel-neutral: rgba(40, 33, 24, 0.92);
+  --panel-gold: linear-gradient(135deg, rgba(220,184,99,0.09) 0%, rgba(40,33,24,0.90) 100%);
+  --panel-sage: linear-gradient(135deg, rgba(110,140,90,0.07) 0%, rgba(40,33,24,0.90) 100%);
+  --panel-deep: rgba(24, 19, 13, 0.96);
+  --panel-border-neutral: rgba(201, 170, 106, 0.14);
+  --panel-border-gold: rgba(220, 184, 99, 0.20);
+  --panel-border-sage: rgba(110, 140, 90, 0.14);
+  --panel-shadow: 0 1px 3px rgba(0,0,0,0.28), 0 8px 24px rgba(0,0,0,0.22);
 
-  /* Night color scale — dark mode: original dark values (RGB channels) */
-  --c-night-50: 245 246 248;
-  --c-night-100: 229 231 236;
-  --c-night-200: 200 203 213;
-  --c-night-300: 164 169 184;
-  --c-night-400: 120 130 148;
-  --c-night-500: 93 101 121;
-  --c-night-600: 74 81 100;
-  --c-night-700: 62 67 84;
-  --c-night-800: 42 47 61;
-  --c-night-900: 26 31 42;
-  --c-night-950: 15 20 25;
+  /* Night color scale — dark mode: warm candlelit espresso (RGB channels) */
+  --c-night-50: 239 231 214;
+  --c-night-100: 224 214 194;
+  --c-night-200: 198 186 162;
+  --c-night-300: 168 154 128;
+  --c-night-400: 138 124 100;
+  --c-night-500: 122 112 96;
+  --c-night-600: 74 64 50;
+  --c-night-700: 56 47 35;
+  --c-night-800: 40 33 24;
+  --c-night-900: 27 23 18;
+  --c-night-950: 19 16 11;
 }
 
 /* ============================================
@@ -699,17 +699,11 @@
   /* Subtle variant for cards - smooth, no harsh edges */
   .liquid-glass-subtle {
     @apply relative overflow-hidden;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.028) 0%,
-      rgba(255, 255, 255, 0.012) 100%
-    );
-    backdrop-filter: blur(20px) saturate(150%);
-    -webkit-backdrop-filter: blur(20px) saturate(150%);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    box-shadow: 
-      0 2px 8px rgba(0, 0, 0, 0.08),
-      0 4px 16px rgba(0, 0, 0, 0.06);
+    background: var(--panel-neutral);
+    backdrop-filter: blur(20px) saturate(120%);
+    -webkit-backdrop-filter: blur(20px) saturate(120%);
+    border: 1px solid var(--theme-border-subtle);
+    box-shadow: var(--panel-shadow);
     transition: all 0.25s ease;
   }
   
@@ -729,17 +723,11 @@
   /* Strong variant for modals, floating elements - smooth depth */
   .liquid-glass-strong {
     @apply relative overflow-hidden;
-    background: linear-gradient(
-      180deg,
-      rgba(28, 33, 40, 0.92) 0%,
-      rgba(22, 27, 34, 0.96) 100%
-    );
-    backdrop-filter: blur(48px) saturate(180%);
-    -webkit-backdrop-filter: blur(48px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 
-      0 4px 16px rgba(0, 0, 0, 0.15),
-      0 12px 40px rgba(0, 0, 0, 0.2);
+    background: var(--theme-card);
+    backdrop-filter: blur(48px) saturate(140%);
+    -webkit-backdrop-filter: blur(48px) saturate(140%);
+    border: 1px solid var(--theme-border);
+    box-shadow: var(--panel-shadow);
   }
   
   .liquid-glass-strong::before {
@@ -761,35 +749,21 @@
   /* Dark variant for dark mode accents - smooth */
   .liquid-glass-dark {
     @apply relative overflow-hidden;
-    background: linear-gradient(
-      135deg,
-      rgba(12, 15, 20, 0.85) 0%,
-      rgba(8, 10, 14, 0.9) 100%
-    );
-    backdrop-filter: blur(24px) saturate(160%);
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    box-shadow: 
-      0 2px 12px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    background: var(--panel-deep);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid var(--theme-border-subtle);
+    box-shadow: var(--panel-shadow);
   }
   
   /* Gold tinted glass for special elements - smooth, warm glow */
   .liquid-glass-gold {
     @apply relative overflow-hidden;
-    background: linear-gradient(
-      135deg,
-      rgba(201, 162, 39, 0.10) 0%,
-      rgba(22, 27, 34, 0.55) 50%,
-      rgba(201, 162, 39, 0.06) 100%
-    );
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border: 1px solid rgba(201, 162, 39, 0.18);
-    box-shadow: 
-      0 2px 12px rgba(0, 0, 0, 0.12),
-      0 8px 32px rgba(0, 0, 0, 0.14),
-      0 0 1px rgba(201, 162, 39, 0.25);
+    background: var(--panel-gold);
+    backdrop-filter: blur(40px) saturate(140%);
+    -webkit-backdrop-filter: blur(40px) saturate(140%);
+    border: 1px solid var(--panel-border-gold);
+    box-shadow: var(--panel-shadow);
     transition: all 0.3s ease;
   }
   
@@ -825,22 +799,13 @@
   /* Premium gold glass with elegant illumination - smooth depth */
   .liquid-glass-gold-premium {
     @apply relative overflow-hidden;
-    background: 
-      radial-gradient(ellipse 60% 40% at 30% 0%, rgba(244, 212, 124, 0.12) 0%, transparent 50%),
-      radial-gradient(ellipse 60% 40% at 70% 100%, rgba(201, 162, 39, 0.08) 0%, transparent 50%),
-      linear-gradient(
-        135deg,
-        rgba(201, 162, 39, 0.1) 0%,
-        rgba(139, 105, 20, 0.05) 50%,
-        rgba(201, 162, 39, 0.08) 100%
-      );
-    backdrop-filter: blur(32px) saturate(180%);
-    -webkit-backdrop-filter: blur(32px) saturate(180%);
-    border: 1px solid rgba(201, 162, 39, 0.18);
-    box-shadow: 
-      0 4px 20px rgba(0, 0, 0, 0.15),
-      0 12px 48px rgba(0, 0, 0, 0.12),
-      0 0 2px rgba(201, 162, 39, 0.15);
+    background:
+      radial-gradient(ellipse 60% 40% at 30% 0%, var(--ambient-gold-subtle) 0%, transparent 55%),
+      var(--panel-gold);
+    backdrop-filter: blur(32px) saturate(140%);
+    -webkit-backdrop-filter: blur(32px) saturate(140%);
+    border: 1px solid var(--panel-border-gold);
+    box-shadow: var(--panel-shadow), 0 0 32px var(--ambient-gold-subtle);
   }
   
   .liquid-glass-gold-premium::before {
@@ -862,29 +827,17 @@
   /* Floating pill button (like iOS action buttons) */
   .liquid-pill {
     @apply px-5 py-2.5 rounded-full;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.1) 0%,
-      rgba(255, 255, 255, 0.05) 100%
-    );
+    background: var(--theme-card);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 
-      0 4px 16px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    border: 1px solid var(--theme-border);
+    box-shadow: var(--panel-shadow);
     transition: all 0.2s ease;
   }
-  
+
   .liquid-pill:hover {
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.15) 0%,
-      rgba(255, 255, 255, 0.08) 100%
-    );
-    box-shadow: 
-      0 6px 20px rgba(0, 0, 0, 0.25),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    background: var(--theme-surface-alt);
+    border-color: var(--panel-border-gold);
   }
   
   .liquid-pill:active {
@@ -894,17 +847,11 @@
   /* Floating bottom sheet - smooth, no harsh edges */
   .liquid-sheet {
     @apply rounded-t-3xl;
-    background: linear-gradient(
-      180deg,
-      rgba(26, 31, 38, 0.97) 0%,
-      rgba(20, 25, 32, 0.99) 100%
-    );
-    backdrop-filter: blur(48px) saturate(180%);
-    -webkit-backdrop-filter: blur(48px) saturate(180%);
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: 
-      0 -4px 24px rgba(0, 0, 0, 0.25),
-      0 -12px 48px rgba(0, 0, 0, 0.15);
+    background: var(--theme-card);
+    backdrop-filter: blur(48px) saturate(140%);
+    -webkit-backdrop-filter: blur(48px) saturate(140%);
+    border-top: 1px solid var(--theme-border);
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12), 0 -12px 48px rgba(0, 0, 0, 0.08);
   }
   
   .liquid-sheet::before {
@@ -926,13 +873,11 @@
   /* Floating nav bar - smooth frosted glass */
   .liquid-nav {
     @apply rounded-2xl mx-4 mb-4;
-    background: rgba(26, 31, 38, 0.85);
-    backdrop-filter: blur(48px) saturate(180%);
-    -webkit-backdrop-filter: blur(48px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: 
-      0 4px 20px rgba(0, 0, 0, 0.2),
-      0 8px 32px rgba(0, 0, 0, 0.15);
+    background: var(--theme-card);
+    backdrop-filter: blur(48px) saturate(140%);
+    -webkit-backdrop-filter: blur(48px) saturate(140%);
+    border: 1px solid var(--theme-border);
+    box-shadow: var(--panel-shadow);
   }
   
   .liquid-nav::before {
@@ -955,18 +900,11 @@
   /* Liquid card for content */
   .liquid-card {
     @apply rounded-2xl p-4 relative;
-    background: linear-gradient(
-      135deg,
-      rgba(22, 27, 34, 0.60) 0%,
-      rgba(255, 255, 255, 0.02) 100%
-    );
-    backdrop-filter: blur(24px) saturate(160%);
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    box-shadow: 
-      0 4px 16px rgba(0, 0, 0, 0.18),
-      0 1px 3px rgba(0, 0, 0, 0.10),
-      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    background: var(--theme-card);
+    backdrop-filter: blur(24px) saturate(120%);
+    -webkit-backdrop-filter: blur(24px) saturate(120%);
+    border: 1px solid var(--theme-border);
+    box-shadow: var(--panel-shadow);
   }
   
   /* Interactive liquid card with smooth hover state */
@@ -1003,16 +941,10 @@
     }
     
     .liquid-card-interactive:hover {
-      background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.06) 0%,
-        rgba(255, 255, 255, 0.02) 100%
-      );
-      border-color: rgba(255, 255, 255, 0.1);
+      background: var(--theme-surface-alt);
+      border-color: var(--panel-border-gold);
       transform: translateY(-3px);
-      box-shadow: 
-        0 8px 24px rgba(0, 0, 0, 0.18),
-        0 16px 48px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--panel-shadow), 0 16px 40px rgba(0, 0, 0, 0.10);
     }
   }
   
@@ -1027,18 +959,10 @@
     @apply relative inline-flex items-center justify-center gap-2 
            px-6 py-3 rounded-2xl font-semibold text-sm
            cursor-pointer overflow-hidden;
-    background: linear-gradient(
-      135deg,
-      rgba(212, 175, 55, 1) 0%,
-      rgba(201, 162, 39, 1) 50%,
-      rgba(180, 140, 30, 1) 100%
-    );
-    color: #0a0a0f;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 
-      0 2px 8px rgba(201, 162, 39, 0.25),
-      0 8px 24px rgba(201, 162, 39, 0.2);
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.15);
+    background: var(--ambient-gold);
+    color: #fffdf7;
+    border: 1px solid var(--panel-border-gold);
+    box-shadow: 0 2px 8px var(--ambient-gold-subtle), 0 8px 20px var(--ambient-gold-subtle);
     transition: 
       transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
       box-shadow 0.2s ease,
@@ -1091,19 +1015,13 @@
     @apply relative inline-flex items-center justify-center gap-2 
            px-6 py-3 rounded-2xl font-semibold text-sm
            cursor-pointer;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.06) 0%,
-      rgba(255, 255, 255, 0.02) 100%
-    );
-    color: #e5e5e5;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--theme-card);
+    color: var(--theme-text);
+    border: 1px solid var(--theme-border);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    box-shadow: 
-      0 2px 8px rgba(0, 0, 0, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.06);
-    transition: 
+    box-shadow: var(--panel-shadow);
+    transition:
       background 0.2s ease,
       border-color 0.2s ease,
       box-shadow 0.2s ease,
@@ -1130,15 +1048,9 @@
   /* Desktop hover */
   @media (hover: hover) and (pointer: fine) {
     .liquid-btn-outline:hover {
-      background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.09) 0%,
-        rgba(255, 255, 255, 0.04) 100%
-      );
-      border-color: rgba(255, 255, 255, 0.15);
-      box-shadow: 
-        0 4px 16px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      background: var(--theme-surface-alt);
+      border-color: var(--panel-border-gold);
+      box-shadow: var(--panel-shadow);
     }
   }
   
@@ -1266,18 +1178,11 @@
   /* Liquid Glass Modal/Drawer */
   .liquid-modal {
     @apply rounded-3xl overflow-hidden;
-    background: linear-gradient(
-      180deg,
-      rgba(25, 25, 30, 0.95) 0%,
-      rgba(20, 20, 25, 0.98) 100%
-    );
-    backdrop-filter: blur(40px) saturate(200%);
-    -webkit-backdrop-filter: blur(40px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 
-      0 24px 80px rgba(0, 0, 0, 0.5),
-      0 8px 32px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    background: var(--theme-card);
+    backdrop-filter: blur(40px) saturate(140%);
+    -webkit-backdrop-filter: blur(40px) saturate(140%);
+    border: 1px solid var(--theme-border);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28), 0 8px 32px rgba(0, 0, 0, 0.18);
   }
   
   .liquid-modal::before {
@@ -3076,505 +2981,6 @@ html.light {
   --gold-leaf-shadow: #5a4410;
 }
 
-/* Base light mode styles */
-html.light body {
-  @apply bg-night-50 text-night-800;
-}
-
-/* Selection in light mode */
-html.light ::selection {
-  @apply bg-gold-300/50 text-night-900;
-}
-
-/* Scrollbar in light mode */
-html.light ::-webkit-scrollbar-track {
-  @apply bg-night-100;
-}
-
-html.light ::-webkit-scrollbar-thumb {
-  @apply bg-night-300;
-}
-
-html.light ::-webkit-scrollbar-thumb:hover {
-  @apply bg-night-400;
-}
-
-/* Light mode typography overrides */
-html.light .quran-text {
-  @apply text-night-900;
-}
-
-html.light .bismillah {
-  @apply text-gold-600;
-}
-
-html.light .surah-header {
-  @apply text-gold-600;
-}
-
-html.light .verse-number {
-  @apply bg-gold-200/40 text-gold-700;
-}
-
-html.light .gold-accent {
-  @apply text-gold-600;
-}
-
-/* Light mode gradient text */
-html.light .text-gold-gradient {
-  background: linear-gradient(
-    135deg,
-    var(--gold-leaf) 0%,
-    var(--gold-leaf-dark) 50%,
-    var(--gold-leaf) 100%
-  );
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Light mode buttons */
-html.light .btn-primary {
-  @apply bg-gold-500 text-white hover:bg-gold-600;
-}
-
-html.light .btn-outline {
-  @apply border-night-300 text-night-700 hover:border-night-400 hover:bg-night-100;
-}
-
-html.light .btn-ghost {
-  @apply text-night-600 hover:text-night-800 hover:bg-night-100;
-}
-
-html.light .btn-icon {
-  @apply text-night-500 hover:text-night-700 hover:bg-night-100;
-}
-
-/* Light mode cards */
-html.light .card,
-html.light .verse-card {
-  @apply bg-white/80 border-night-200/50;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-html.light .verse-card:hover {
-  @apply border-gold-300/50 bg-white/90;
-}
-
-html.light .verse-card.active {
-  @apply border-gold-400/60;
-  background: linear-gradient(135deg, rgba(201,162,39,0.08) 0%, rgba(201,162,39,0.02) 100%);
-}
-
-html.light .card-gold {
-  @apply border-gold-300/40;
-  background: linear-gradient(135deg, rgba(201,162,39,0.08) 0%, rgba(255,255,255,0.9) 100%);
-}
-
-/* Light mode liquid glass */
-html.light .liquid-glass {
-  background: rgba(255, 255, 255, 0.85);
-  border-color: rgba(0, 0, 0, 0.06);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 16px rgba(0, 0, 0, 0.06);
-}
-
-html.light .liquid-glass::before {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(0, 0, 0, 0.03) 30%,
-    rgba(0, 0, 0, 0.05) 50%,
-    rgba(0, 0, 0, 0.03) 70%,
-    transparent 100%
-  );
-}
-
-html.light .liquid-glass-subtle {
-  background: rgba(255, 255, 255, 0.6);
-  border-color: rgba(0, 0, 0, 0.04);
-}
-
-html.light .liquid-glass-strong {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 12px 40px rgba(0, 0, 0, 0.06);
-}
-
-html.light .liquid-glass-gold {
-  background: linear-gradient(
-    135deg,
-    rgba(201, 162, 39, 0.1) 0%,
-    rgba(255, 255, 255, 0.85) 50%,
-    rgba(201, 162, 39, 0.06) 100%
-  );
-  border-color: rgba(201, 162, 39, 0.2);
-}
-
-html.light .liquid-glass-gold-premium {
-  background: 
-    radial-gradient(ellipse 60% 40% at 30% 0%, rgba(201, 162, 39, 0.12) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 40% at 70% 100%, rgba(201, 162, 39, 0.08) 0%, transparent 50%),
-    rgba(255, 255, 255, 0.9);
-  border-color: rgba(201, 162, 39, 0.25);
-}
-
-/* Light mode liquid card */
-html.light .liquid-card {
-  background: rgba(255, 255, 255, 0.8);
-  border-color: rgba(0, 0, 0, 0.06);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.04);
-}
-
-html.light .liquid-card-interactive:hover {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(0, 0, 0, 0.1);
-}
-
-/* Light mode buttons */
-html.light .liquid-btn {
-  background: linear-gradient(135deg, #c9a227 0%, #a68220 100%);
-  color: white;
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 2px 8px rgba(166, 130, 32, 0.3);
-}
-
-html.light .liquid-btn:hover {
-  box-shadow: 0 4px 16px rgba(166, 130, 32, 0.4);
-}
-
-html.light .liquid-btn-outline {
-  background: rgba(0, 0, 0, 0.02);
-  color: #3e4354;
-  border-color: rgba(0, 0, 0, 0.12);
-}
-
-html.light .liquid-btn-outline:hover {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.2);
-}
-
-/* Light mode icon button */
-html.light .liquid-icon-btn {
-  background: rgba(0, 0, 0, 0.03);
-  border-color: rgba(0, 0, 0, 0.06);
-  color: #5d6579;
-}
-
-html.light .liquid-icon-btn:hover {
-  background: rgba(0, 0, 0, 0.06);
-  border-color: rgba(0, 0, 0, 0.1);
-  color: #2a2f3d;
-}
-
-html.light .liquid-icon-btn.active {
-  background: rgba(201, 162, 39, 0.12);
-  border-color: rgba(201, 162, 39, 0.25);
-  color: #a68220;
-}
-
-/* Light mode inputs */
-html.light .liquid-input {
-  background: rgba(0, 0, 0, 0.02);
-  border-color: rgba(0, 0, 0, 0.1);
-  color: #2a2f3d;
-}
-
-html.light .liquid-input::placeholder {
-  color: #788294;
-}
-
-html.light .liquid-input:focus {
-  border-color: rgba(201, 162, 39, 0.5);
-  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.12);
-}
-
-/* Light mode progress bar */
-html.light .liquid-progress {
-  background: rgba(0, 0, 0, 0.06);
-  border-color: rgba(0, 0, 0, 0.04);
-}
-
-html.light .liquid-progress-fill {
-  background: linear-gradient(90deg, #c9a227 0%, #d4af37 100%);
-  box-shadow: 0 0 8px rgba(201, 162, 39, 0.4);
-}
-
-/* Light mode badges */
-html.light .liquid-badge {
-  background: rgba(201, 162, 39, 0.15);
-  color: #845c1a;
-  border-color: rgba(201, 162, 39, 0.25);
-}
-
-/* Light mode divider */
-html.light .liquid-divider {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(0, 0, 0, 0.1) 50%,
-    transparent 100%
-  );
-}
-
-/* Light mode modal */
-html.light .liquid-modal {
-  background: rgba(255, 255, 255, 0.98);
-  border-color: rgba(0, 0, 0, 0.1);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.15);
-}
-
-/* Light mode sheet */
-html.light .liquid-sheet {
-  background: rgba(255, 255, 255, 0.98);
-  border-top-color: rgba(0, 0, 0, 0.06);
-  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.08);
-}
-
-html.light .sheet-handle {
-  @apply bg-night-300;
-}
-
-/* Light mode tabs */
-html.light .liquid-tabs {
-  background: rgba(0, 0, 0, 0.03);
-  border-color: rgba(0, 0, 0, 0.06);
-}
-
-html.light .liquid-tab {
-  @apply text-night-500;
-}
-
-html.light .liquid-tab:hover {
-  @apply text-night-700;
-}
-
-html.light .liquid-tab.active {
-  @apply text-night-900;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
-/* Light mode chips */
-html.light .liquid-chip {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.08);
-  color: #5d6579;
-}
-
-html.light .liquid-chip:hover {
-  background: rgba(0, 0, 0, 0.06);
-  color: #2a2f3d;
-}
-
-html.light .liquid-chip.selected {
-  background: rgba(201, 162, 39, 0.15);
-  border-color: rgba(201, 162, 39, 0.3);
-  color: #845c1a;
-}
-
-/* Light mode stat card */
-html.light .liquid-stat {
-  background: rgba(255, 255, 255, 0.8);
-  border-color: rgba(0, 0, 0, 0.06);
-}
-
-html.light .liquid-stat-value {
-  @apply text-night-800;
-}
-
-html.light .liquid-stat-label {
-  @apply text-night-500;
-}
-
-/* Light mode backgrounds */
-html.light .bg-gradient-divine {
-  background: 
-    radial-gradient(ellipse at 20% 0%, rgba(201, 162, 39, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 100%, rgba(78, 122, 81, 0.06) 0%, transparent 50%),
-    linear-gradient(180deg, #f5f6f8 0%, #e5e7ec 100%);
-}
-
-html.light .bg-gradient-divine-warm {
-  background: 
-    radial-gradient(ellipse at 30% 0%, rgba(201, 162, 39, 0.08) 0%, transparent 50%),
-    linear-gradient(180deg, #fefdfb 0%, #f5f0e1 100%);
-}
-
-/* Light mode text colors - use direct color values to avoid circular @apply */
-html.light .text-night-100 {
-  color: #2a2f3d; /* night-800 */
-}
-
-html.light .text-night-200 {
-  color: #3e4354; /* night-700 */
-}
-
-html.light .text-night-300 {
-  color: #4a5164; /* night-600 */
-}
-
-html.light .text-night-400 {
-  color: #5d6579; /* night-500 */
-}
-
-html.light .text-gold-400 {
-  color: #a68220; /* gold-600 */
-}
-
-html.light .text-gold-300 {
-  color: #c9a227; /* gold-500 */
-}
-
-html.light .text-sage-400 {
-  color: #3a6140; /* sage-600 */
-}
-
-/* Light mode background colors */
-html.light .bg-night-800 {
-  background-color: #e5e7ec; /* night-100 */
-}
-
-html.light .bg-night-800\/50,
-html.light .bg-night-800\/60 {
-  background-color: rgba(200, 203, 213, 0.5);
-}
-
-html.light .bg-night-900 {
-  background-color: #f5f6f8; /* night-50 */
-}
-
-html.light .bg-night-900\/50,
-html.light .bg-night-900\/60 {
-  background-color: rgba(229, 231, 236, 0.6);
-}
-
-html.light .bg-night-950 {
-  background-color: #ffffff; /* white */
-}
-
-/* Light mode border colors */
-html.light .border-night-700 {
-  border-color: #c8cbd5; /* night-200 */
-}
-
-html.light .border-night-800 {
-  border-color: #c8cbd5; /* night-200 */
-}
-
-html.light .border-night-800\/50 {
-  border-color: rgba(200, 203, 213, 0.5);
-}
-
-/* Light mode patterns - subtle */
-html.light .pattern-arabesque {
-  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23a68220' stroke-width='0.4' opacity='0.1'%3E%3Ccircle cx='40' cy='40' r='30'/%3E%3Ccircle cx='40' cy='40' r='20'/%3E%3Ccircle cx='40' cy='40' r='10'/%3E%3Cpath d='M10 40 Q25 25 40 40 Q55 55 70 40'/%3E%3Cpath d='M40 10 Q25 25 40 40 Q55 55 40 70'/%3E%3C/g%3E%3C/svg%3E");
-}
-
-/* Light mode range input */
-html.light input[type="range"] {
-  @apply bg-night-200;
-}
-
-html.light input[type="range"]::-webkit-slider-thumb {
-  @apply bg-gold-500;
-}
-
-html.light input[type="range"]::-moz-range-thumb {
-  @apply bg-gold-500;
-}
-
-/* Light mode focus states */
-html.light .focus-visible-ring:focus-visible {
-  outline-color: rgba(166, 130, 32, 0.8);
-  box-shadow: 0 0 0 4px rgba(166, 130, 32, 0.15);
-}
-
-html.light button:focus-visible,
-html.light a:focus-visible,
-html.light [role="button"]:focus-visible,
-html.light [tabindex]:focus-visible,
-html.light input:focus-visible,
-html.light textarea:focus-visible,
-html.light select:focus-visible {
-  outline-color: rgba(166, 130, 32, 0.8);
-}
-
-/* Light mode glow effects - more subtle */
-html.light .shadow-glow-gold {
-  box-shadow: 0 0 15px rgba(166, 130, 32, 0.15);
-}
-
-html.light .text-glow-gold {
-  text-shadow: 0 0 10px rgba(166, 130, 32, 0.2);
-}
-
-/* Light mode specific component overrides */
-html.light .verse-card p.text-night-400 {
-  @apply text-night-500;
-}
-
-/* Light mode reciter preview */
-html.light .reciter-preview {
-  @apply bg-white border-night-200;
-}
-
-html.light .reciter-preview.selected {
-  @apply border-gold-400 bg-gold-50;
-}
-
-/* Light mode option cards */
-html.light .option-card {
-  @apply bg-white border-night-200;
-}
-
-html.light .option-card.selected {
-  @apply border-gold-400 bg-gold-50;
-}
-
-html.light .option-card:hover {
-  @apply border-night-300 bg-night-50;
-}
-
-/* Light mode lesson cards */
-html.light .lesson-card {
-  @apply bg-white border-night-200;
-}
-
-html.light .lesson-card.completed {
-  @apply border-sage-300 bg-sage-50;
-}
-
-/* Light mode exercise options */
-html.light .exercise-option {
-  @apply bg-white border-night-200;
-}
-
-html.light .exercise-option.selected {
-  @apply border-gold-400 bg-gold-50;
-}
-
-html.light .exercise-option.correct {
-  @apply border-green-400 bg-green-50;
-}
-
-html.light .exercise-option.incorrect {
-  @apply border-red-400 bg-red-50;
-}
-
-/* Light mode offline indicator */
-html.light .offline-badge {
-  @apply bg-amber-100 text-amber-700;
-}
-
-/* Light mode onboarding */
-html.light .onboarding-option {
-  @apply bg-white border-night-200;
-}
-
-html.light .onboarding-option.selected {
-  @apply border-gold-400 bg-gold-50;
-}
-
 /* Transition for theme switching */
 html {
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -3587,310 +2993,6 @@ html * {
 /* Disable transition on page load */
 html.no-transitions * {
   transition: none !important;
-}
-
-/* ============================================
-   OLIVE EARTH THEME OVERRIDES
-   Earthy, grounded, vintage manuscript feel
-   ============================================ */
-
-[data-theme="olive-earth"] body {
-  background-color: #E8DCCA;
-  color: #2D2D2D;
-}
-
-[data-theme="olive-earth"] .text-gold-400,
-[data-theme="olive-earth"] .text-gold-300 {
-  color: #3F4F28;
-}
-
-[data-theme="olive-earth"] .bg-gold-500 {
-  background-color: #3F4F28;
-}
-
-[data-theme="olive-earth"] .bg-gold-500\/10 {
-  background-color: rgba(63, 79, 40, 0.10);
-}
-
-[data-theme="olive-earth"] .border-gold-500\/50 {
-  border-color: rgba(63, 79, 40, 0.50);
-}
-
-[data-theme="olive-earth"] .border-gold-500\/20 {
-  border-color: rgba(63, 79, 40, 0.20);
-}
-
-[data-theme="olive-earth"] .bismillah,
-[data-theme="olive-earth"] .surah-header {
-  color: #3F4F28;
-}
-
-[data-theme="olive-earth"] .verse-number {
-  background-color: rgba(63, 79, 40, 0.10);
-  color: #3F4F28;
-}
-
-[data-theme="olive-earth"] .text-gold-gradient {
-  background: linear-gradient(135deg, #5A7038 0%, #3F4F28 50%, #2A3518 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-[data-theme="olive-earth"] .liquid-btn {
-  background: linear-gradient(135deg, #5A7038 0%, #3F4F28 100%);
-  color: #FFFFFF;
-}
-
-[data-theme="olive-earth"] .shadow-glow-gold {
-  box-shadow: 0 0 20px rgba(63, 79, 40, 0.15);
-}
-
-/* ============================================
-   PURE WHITE THEME OVERRIDES
-   Clean, minimal, distraction-free
-   ============================================ */
-
-[data-theme="pure-white"] body {
-  background-color: #FFFFFF;
-  color: #1A1A1A;
-}
-
-[data-theme="pure-white"] .text-gold-400,
-[data-theme="pure-white"] .text-gold-300 {
-  color: #2563EB;
-}
-
-[data-theme="pure-white"] .bg-gold-500 {
-  background-color: #2563EB;
-}
-
-[data-theme="pure-white"] .bg-gold-500\/10 {
-  background-color: rgba(37, 99, 235, 0.10);
-}
-
-[data-theme="pure-white"] .border-gold-500\/50 {
-  border-color: rgba(37, 99, 235, 0.50);
-}
-
-[data-theme="pure-white"] .border-gold-500\/20 {
-  border-color: rgba(37, 99, 235, 0.20);
-}
-
-[data-theme="pure-white"] .bismillah,
-[data-theme="pure-white"] .surah-header {
-  color: #2563EB;
-}
-
-[data-theme="pure-white"] .verse-number {
-  background-color: rgba(37, 99, 235, 0.10);
-  color: #2563EB;
-}
-
-[data-theme="pure-white"] .text-gold-gradient {
-  background: linear-gradient(135deg, #60A5FA 0%, #2563EB 50%, #1D4ED8 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-[data-theme="pure-white"] .liquid-btn {
-  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
-  color: #FFFFFF;
-}
-
-[data-theme="pure-white"] .shadow-glow-gold {
-  box-shadow: 0 0 20px rgba(37, 99, 235, 0.15);
-}
-
-/* ============================================
-   LIGHT CREAM THEME OVERRIDES
-   Warm terracotta accents on cream
-   ============================================ */
-
-[data-theme="light-cream"] .text-gold-400,
-[data-theme="light-cream"] .text-gold-300 {
-  color: #C85A3C;
-}
-
-[data-theme="light-cream"] .bg-gold-500 {
-  background-color: #C85A3C;
-}
-
-[data-theme="light-cream"] .bg-gold-500\/10 {
-  background-color: rgba(200, 90, 60, 0.10);
-}
-
-[data-theme="light-cream"] .border-gold-500\/50 {
-  border-color: rgba(200, 90, 60, 0.50);
-}
-
-[data-theme="light-cream"] .border-gold-500\/20 {
-  border-color: rgba(200, 90, 60, 0.20);
-}
-
-[data-theme="light-cream"] body {
-  background-color: #F9F6F1;
-  color: #2D2D2D;
-}
-
-[data-theme="light-cream"] .bismillah,
-[data-theme="light-cream"] .surah-header {
-  color: #C85A3C;
-}
-
-[data-theme="light-cream"] .verse-number {
-  background-color: rgba(200, 90, 60, 0.10);
-  color: #C85A3C;
-}
-
-[data-theme="light-cream"] .text-gold-gradient {
-  background: linear-gradient(135deg, #E07A5F 0%, #C85A3C 50%, #9E4530 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-[data-theme="light-cream"] .liquid-btn {
-  background: linear-gradient(135deg, #D96B4F 0%, #C85A3C 100%);
-  color: #FFFFFF;
-}
-
-[data-theme="light-cream"] .shadow-glow-gold {
-  box-shadow: 0 0 20px rgba(200, 90, 60, 0.15);
-}
-
-/* ============================================
-   SHARED LIGHT THEME OVERRIDES
-   Fix legibility: dark text on light backgrounds
-   Applies to: olive-earth, light-cream, pure-white
-   ============================================ */
-
-/* --- Surface/background: dark → light --- */
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-950 { background-color: var(--theme-surface); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-950\/80 { background-color: var(--theme-surface); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-950\/90 { background-color: var(--theme-surface); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-950\/95 { background-color: var(--theme-surface); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-900 { background-color: var(--theme-surface-alt); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-900\/30 { background-color: rgba(0,0,0,0.03); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-900\/40 { background-color: rgba(0,0,0,0.04); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-900\/50 { background-color: rgba(0,0,0,0.05); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-900\/60 { background-color: rgba(0,0,0,0.06); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-900\/70 { background-color: rgba(0,0,0,0.07); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-900\/80 { background-color: rgba(0,0,0,0.08); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-900\/90 { background-color: var(--theme-surface-alt); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-900\/95 { background-color: var(--theme-surface-alt); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-800 { background-color: rgba(0,0,0,0.05); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-800\/20 { background-color: rgba(0,0,0,0.02); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-800\/30 { background-color: rgba(0,0,0,0.03); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-800\/40 { background-color: rgba(0,0,0,0.04); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-800\/50 { background-color: rgba(0,0,0,0.05); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-800\/60 { background-color: rgba(0,0,0,0.06); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-800\/80 { background-color: rgba(0,0,0,0.08); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-700 { background-color: rgba(0,0,0,0.06); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-700\/50 { background-color: rgba(0,0,0,0.04); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-700\/60 { background-color: rgba(0,0,0,0.05); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-600 { background-color: rgba(0,0,0,0.08); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-600\/50 { background-color: rgba(0,0,0,0.05); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-500 { background-color: rgba(0,0,0,0.10); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-400 { background-color: rgba(0,0,0,0.12); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-300 { background-color: rgba(0,0,0,0.15); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-200 { background-color: rgba(0,0,0,0.18); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-100 { background-color: rgba(0,0,0,0.20); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-night-50 { background-color: rgba(0,0,0,0.25); }
-
-/* --- Text: light → dark --- */
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .text-night-100 { color: var(--theme-text); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .text-night-200 { color: var(--theme-text); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .text-night-300 { color: var(--theme-text-secondary); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .text-night-400 { color: var(--theme-text-secondary); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .text-night-500 { color: var(--theme-text-muted); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .text-night-600 { color: var(--theme-text-muted); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .text-night-700 { color: rgba(0,0,0,0.20); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .text-night-800 { color: rgba(0,0,0,0.15); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .text-night-900 { color: rgba(0,0,0,0.10); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .text-night-950 { color: #FFFFFF; }
-
-/* --- Borders --- */
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .border-night-200 { border-color: rgba(0,0,0,0.12); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .border-night-200\/50 { border-color: rgba(0,0,0,0.06); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .border-night-300 { border-color: rgba(0,0,0,0.10); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .border-night-400 { border-color: rgba(0,0,0,0.08); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .border-night-600 { border-color: rgba(0,0,0,0.08); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .border-night-600\/50 { border-color: rgba(0,0,0,0.05); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .border-night-700 { border-color: rgba(0,0,0,0.08); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .border-night-700\/20 { border-color: rgba(0,0,0,0.02); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .border-night-700\/30 { border-color: rgba(0,0,0,0.03); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .border-night-700\/40 { border-color: rgba(0,0,0,0.04); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .border-night-700\/50 { border-color: rgba(0,0,0,0.05); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .border-night-800 { border-color: rgba(0,0,0,0.06); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .border-night-800\/20 { border-color: rgba(0,0,0,0.02); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .border-night-800\/30 { border-color: rgba(0,0,0,0.03); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .border-night-800\/40 { border-color: rgba(0,0,0,0.04); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .border-night-800\/50 { border-color: rgba(0,0,0,0.05); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .border-night-800\/80 { border-color: rgba(0,0,0,0.06); }
-
-/* --- White/glass opacity inversions --- */
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-white\/5 { background-color: rgba(0,0,0,0.03); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .bg-white\/10 { background-color: rgba(0,0,0,0.05); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .border-white\/5 { border-color: rgba(0,0,0,0.05); }
-
-/* --- Selection --- */
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) ::selection {
-  background-color: rgba(0,0,0,0.12);
-  color: var(--theme-text);
-}
-
-/* --- Scrollbar --- */
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) ::-webkit-scrollbar-track { background-color: var(--theme-surface-alt); }
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) ::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.12); }
-
-/* --- Component-level overrides --- */
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .liquid-glass,
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .liquid-glass-strong {
-  background: var(--theme-glass-base);
-  border-color: var(--theme-glass-border);
-}
-
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .liquid-icon-btn {
-  color: var(--theme-text-secondary);
-}
-
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .verse-card {
-  background: var(--theme-card);
-  border-color: var(--theme-border);
-}
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .verse-card.active {
-  border-color: var(--theme-accent);
-}
-
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .sheet {
-  background: var(--theme-surface);
-  border-color: var(--theme-border);
-}
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .sheet-handle {
-  background-color: rgba(0,0,0,0.15);
-}
-
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) select,
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) input[type="text"],
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) input[type="search"] {
-  background-color: var(--theme-surface-alt);
-  color: var(--theme-text);
-  border-color: var(--theme-border);
-}
-
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .shadow-card {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
-}
-
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .btn-icon {
-  color: var(--theme-text-secondary);
-}
-
-:is([data-theme="light-cream"], [data-theme="olive-earth"], [data-theme="pure-white"]) .reciter-preview {
-  background: var(--theme-card);
-  border-color: var(--theme-border);
 }
 
 /* ============================================

@@ -53,7 +53,9 @@ export default function SignUpPage() {
 
       {/* Footer */}
       <p className="mt-8 text-night-400 text-sm text-center">
-        By continuing, you agree to our Terms of Service
+        By continuing, you agree to our{' '}
+        <a href="/terms" className="text-gold-400 hover:underline">Terms of Service</a> and{' '}
+        <a href="/privacy" className="text-gold-400 hover:underline">Privacy Policy</a>
       </p>
     </div>
   );

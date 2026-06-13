@@ -21,19 +21,20 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, body: messageBody, url, targetUserId } = body as {
+    const { title, body: messageBody, url } = body as {
       title: string;
       body: string;
       url?: string;
-      targetUserId?: string;
     };
 
     if (!title || !messageBody) {
       return NextResponse.json({ error: 'title and body are required' }, { status: 400 });
     }
 
-    const targetClerkId = targetUserId || userId;
-    const user = await prisma.user.findUnique({ where: { clerkId: targetClerkId } });
+    // Always notify the authenticated caller only. Previously a client-supplied
+    // targetUserId allowed any user to push arbitrary notifications to any other
+    // user (IDOR). Self-notification only.
+    const user = await prisma.user.findUnique({ where: { clerkId: userId } });
     if (!user) {
       return NextResponse.json({ error: 'Target user not found' }, { status: 404 });
     }

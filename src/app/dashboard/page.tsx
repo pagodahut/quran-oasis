@@ -71,7 +71,7 @@ const HADITH_MESSAGES = [
   { text: 'The best among you are those who learn the Quran and teach it.', source: 'Bukhari' },
   { text: 'Read the Quran, for it will come as an intercessor for its reciters on the Day of Resurrection.', source: 'Muslim' },
   { text: 'The one who is proficient in the recitation of the Quran will be with the honourable and obedient scribes.', source: 'Bukhari & Muslim' },
-  { text: 'It will be said to the companion of the Quran: Read and ascend, and beautify your voice as you used to in the world.', source: 'Abu Dawud & Tirmidhi' },
+  { text: 'It will be said to the companion of the Quran: Recite and ascend, and recite with measured tones (tartil) as you used to recite in the world, for your rank will be at the last verse you recite.', source: 'Abu Dawud & Tirmidhi' },
 ];
 
 function getDailyHadith() {
@@ -162,7 +162,9 @@ export default function DashboardPage() {
       .slice(0, 3);
   }, [surahProgress]);
 
-  const goalTarget = learningPrefs.dailyGoalVerses || goalStatus.target;
+  // Always express the dashboard goal in verses so the label matches the unit
+  // (the legacy goalStatus default is in minutes, which mislabeled as "verses").
+  const goalTarget = learningPrefs.dailyGoalVerses || 3;
   const goalProgress = Math.min(100, Math.round((goalStatus.progress / goalTarget) * 100));
   const hadith = getDailyHadith();
   const isRamadanNow = isRamadan();

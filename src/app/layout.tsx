@@ -92,8 +92,8 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true, // WCAG 2.1 AA: Allow zooming up to 200%+
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#0f1419' },
-    { media: '(prefers-color-scheme: dark)', color: '#0f1419' },
+    { media: '(prefers-color-scheme: light)', color: '#faf6ed' },
+    { media: '(prefers-color-scheme: dark)', color: '#1b1712' },
   ],
 };
 
@@ -174,9 +174,9 @@ export default function RootLayout({
         {/* Prevent auto-translation of Arabic text */}
         <meta name="google" content="notranslate" />
         
-        {/* Favicon */}
-        <link rel="icon" href="/favicon.png" type="image/png" />
-        <link rel="icon" href="/hifz-logo.png" type="image/png" sizes="668x669" />
+        {/* Favicon — manuscript khatam mark (app/icon.svg auto-registers too) */}
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         
         {/* Preconnect to external resources */}

@@ -34,9 +34,11 @@ import {
   Zap,
   Mic,
   Sparkles,
+  FileText,
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 import AgentPanel from '@/components/AgentPanel';
+import DeleteAccount from '@/components/DeleteAccount';
 import GlassPanel from '@/components/ui/GlassPanel';
 import LiquidButton from '@/components/ui/LiquidButton';
 import { getProgressStats, getSurahProgressList } from '@/lib/progressStore';
@@ -528,10 +530,19 @@ export default function ProfilePage() {
           <motion.div variants={fadeInUp}>
             <h3 className="text-sm font-medium text-night-400 mb-3 px-1">Support</h3>
             <GlassPanel tint="neutral" className="overflow-hidden">
-              <SettingsRow icon={HelpCircle} label="Help Center" />
-              <SettingsRow icon={Shield} label="Privacy Policy" />
+              <SettingsRow icon={HelpCircle} label="Help & Support" href="/support" />
+              <SettingsRow icon={Shield} label="Privacy Policy" href="/privacy" />
+              <SettingsRow icon={FileText} label="Terms of Service" href="/terms" />
             </GlassPanel>
           </motion.div>
+
+          {/* Account deletion — Data & Privacy */}
+          {isSignedIn && isClerkConfigured && (
+            <motion.div variants={fadeInUp}>
+              <h3 className="text-sm font-medium text-night-400 mb-3 px-1">Data &amp; Privacy</h3>
+              <DeleteAccount />
+            </motion.div>
+          )}
 
           {/* Sign Out - visible at bottom */}
           {isSignedIn && isClerkConfigured && (() => {
