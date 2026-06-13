@@ -239,8 +239,8 @@ function getStaticReflection(surah: number, ayah: number): string {
 const REVELATION_CONTEXTS: Record<number, { period: string; themes: string[] }> = {
   1: { period: 'One of the earliest revelations. The Prophet ﷺ was taught this as the perfect prayer — a conversation between servant and Lord.', themes: ['Prayer', 'Guidance', 'Worship', 'Mercy'] },
   2: { period: 'Revealed in Madinah over several years. The longest surah, serving as a comprehensive guide for the new Muslim community.', themes: ['Law', 'Faith', 'History', 'Community'] },
-  36: { period: 'Revealed in Makkah. Called "the Heart of the Quran" by the Prophet ﷺ for its powerful message about resurrection and divine signs.', themes: ['Resurrection', 'Prophethood', 'Divine Signs'] },
-  55: { period: 'Revealed in Madinah (some say Makkah). Known as "The Bride of the Quran" for its poetic beauty and recurring refrain.', themes: ['Blessings', 'Gratitude', 'Paradise', 'Divine Favors'] },
+  36: { period: 'Revealed in Makkah. Popularly called "the Heart of the Quran" (from a widely-circulated but weakly-graded narration) for its powerful message about resurrection and divine signs.', themes: ['Resurrection', 'Prophethood', 'Divine Signs'] },
+  55: { period: 'Revealed in Makkah (some say Madinah). Known as "The Bride of the Quran" for its poetic beauty and recurring refrain.', themes: ['Blessings', 'Gratitude', 'Paradise', 'Divine Favors'] },
   67: { period: 'Revealed in Makkah. The Prophet ﷺ said it intercedes for its reader until he is forgiven.', themes: ['Divine Power', 'Reflection', 'Accountability'] },
   78: { period: 'Early Meccan revelation. Opens Juz Amma with a powerful description of the Day of Judgment.', themes: ['Day of Judgment', 'Divine Power', 'Accountability'] },
   87: { period: 'Early Meccan revelation. The Prophet ﷺ loved reciting this in Friday and Eid prayers.', themes: ['Divine Glory', 'Reminder', 'Purification'] },

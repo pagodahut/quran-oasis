@@ -2734,7 +2734,7 @@ const UNIT_8_LESSONS: Lesson[] = [
 **The Prophet ﷺ said:**
 "There is a surah in the Quran of thirty verses that intercedes for its reciter until he is forgiven: Tabaarakalladhi biyadihil-mulk." (Tirmidhi, Abu Dawud)
 
-**Another hadith:**
+**Another narration** (graded weak/da'if by many scholars — take as encouragement, not as established proof):
 "It is the protector; it is the savior, delivering from the punishment of the grave." (Tirmidhi)
 
 **Key themes:**
@@ -3194,10 +3194,10 @@ Recite these every Friday for special blessing and protection.`
         id: "int15-intro",
         type: "instruction",
         title: "The Heart of the Quran",
-        content: `**The Prophet ﷺ said:**
-"Everything has a heart, and the heart of the Quran is Ya-Sin." (Tirmidhi)
+        content: `**A well-known narration** (Tirmidhi 2887 — graded gharib/weak by Tirmidhi himself and later scholars; widely circulated, but not established as authentic):
+"Everything has a heart, and the heart of the Quran is Ya-Sin."
 
-"Whoever recites Ya-Sin seeking Allah's pleasure, his past sins will be forgiven." (Bayhaqi)
+"Whoever recites Ya-Sin seeking Allah's pleasure, his past sins will be forgiven." (Bayhaqi — also weak)
 
 **Opening themes (1-12):**
 1. The Wise Quran confirms Muhammad ﷺ (1-6)
