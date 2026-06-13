@@ -143,6 +143,12 @@ export default function TajweedPractice({
       cleanupRecording();
       if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
       if (audioLevelRef.current) clearInterval(audioLevelRef.current);
+      // Revoke the recording ObjectURL so the blob isn't leaked if the modal
+      // is closed without resetting.
+      if (recordingAudioRef.current?.src) {
+        try { URL.revokeObjectURL(recordingAudioRef.current.src); } catch { /* ignore */ }
+        recordingAudioRef.current = null;
+      }
     };
   }, []);
 
