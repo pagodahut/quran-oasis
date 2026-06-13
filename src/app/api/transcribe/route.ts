@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from "@clerk/nextjs/server";
 import logger from "@/lib/logger";
+import { rateLimit, clientKey } from "@/lib/rateLimit";
 
 /**
  * Audio Transcription API Route
@@ -18,6 +19,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
+      );
+    }
+
+    // Rate limit transcription (paid Whisper calls; can be chunked frequently).
+    const rl = rateLimit(clientKey(request, userId), 120, 10 * 60_000);
+    if (!rl.ok) {
+      return NextResponse.json(
+        { error: 'Too many requests.' },
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfterSec) } }
       );
     }
 

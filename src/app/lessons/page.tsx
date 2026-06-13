@@ -502,16 +502,20 @@ function LessonsContent() {
   const completedLesson = completedLessonId ? getLessonById(completedLessonId) : null;
 
   useEffect(() => {
-    const saved = localStorage.getItem('quranOasis_completedLessons');
-    if (saved) {
-      const completed = JSON.parse(saved);
-      setCompletedLessons(completed);
-      
-      const xp = completed.reduce((sum: number, id: string) => {
-        const lesson = getLessonById(id);
-        return sum + (lesson?.xpReward || 0);
-      }, 0);
-      setTotalXP(xp);
+    try {
+      const saved = localStorage.getItem('quranOasis_completedLessons');
+      const completed = saved ? JSON.parse(saved) : [];
+      if (Array.isArray(completed)) {
+        setCompletedLessons(completed);
+        const xp = completed.reduce((sum: number, id: string) => {
+          const lesson = getLessonById(id);
+          return sum + (lesson?.xpReward || 0);
+        }, 0);
+        setTotalXP(xp);
+      }
+    } catch {
+      // Corrupt data — start clean rather than crash the page on mount.
+      setCompletedLessons([]);
     }
 
     // Streak lives in the motivation store, not a standalone key.

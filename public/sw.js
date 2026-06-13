@@ -209,7 +209,7 @@ self.addEventListener('fetch', (event) => {
           const cachedResponse = await caches.match(request);
           return cachedResponse || new Response(
             JSON.stringify({ error: 'Offline', offline: true }),
-            { headers: { 'Content-Type': 'application/json' } }
+            { status: 503, headers: { 'Content-Type': 'application/json' } }
           );
         })
     );
@@ -267,15 +267,23 @@ self.addEventListener('message', (event) => {
       break;
 
     case 'CACHE_AUDIO':
-      // Cache specific audio files
+      // Cache specific audio files — only from our own origin or the known
+      // recitation CDN (prevents a page from poisoning the cache with arbitrary
+      // attacker-controlled URLs).
       if (data?.urls) {
+        const ALLOWED_AUDIO_HOSTS = ['everyayah.com', 'cdn.islamic.network', 'verses.quran.com'];
+        const isAllowed = (u) => {
+          try {
+            const h = new URL(u, self.location.origin).hostname;
+            return h === self.location.hostname || ALLOWED_AUDIO_HOSTS.some((a) => h === a || h.endsWith('.' + a));
+          } catch { return false; }
+        };
         caches.open(AUDIO_CACHE).then((cache) => {
-          data.urls.forEach((url) => {
+          data.urls.filter(isAllowed).forEach((url) => {
             fetch(url)
               .then((response) => {
                 if (response.ok) {
                   cache.put(url, response);
-                  console.log('[SW] Pre-cached audio:', url);
                 }
               })
               .catch((err) => console.warn('[SW] Failed to cache audio:', url, err));
