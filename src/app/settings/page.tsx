@@ -973,19 +973,7 @@ export default function SettingsPage() {
               />
             </SettingRow>
 
-            {/* Notifications (future) */}
-            <div className="opacity-60">
-              <SettingRow
-                label="Practice Reminders"
-                description="Get reminded to practice daily (coming soon)"
-              >
-                <ToggleSwitch 
-                  enabled={false}
-                  onToggle={() => {}}
-                  label="Practice reminders"
-                />
-              </SettingRow>
-            </div>
+            {/* Practice Reminders — hidden until implemented (no placeholder UI) */}
 
             {preferences.learning.practiceReminders && (
               <div className="p-4 rounded-xl bg-night-800/50">
@@ -1042,11 +1030,8 @@ export default function SettingsPage() {
                 <CloudOff className="w-5 h-5 text-night-500" />
                 <div className="flex-1">
                   <p className="text-night-100">Cloud Sync</p>
-                  <p className="text-xs text-night-500">Sign in to sync across devices (coming soon)</p>
+                  <p className="text-xs text-night-500">Sign in to automatically sync your progress across devices</p>
                 </div>
-                <span className="px-3 py-1 rounded-lg bg-night-700 text-night-400 text-sm">
-                  Offline
-                </span>
               </div>
             </div>
 

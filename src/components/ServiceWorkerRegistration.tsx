@@ -9,6 +9,9 @@ export default function ServiceWorkerRegistration() {
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
   const cleanupRef = useRef<(() => void) | null>(null);
+  // True only after the user taps "Update" — gates the auto-reload so a
+  // background SW activation never reloads the tab and discards state.
+  const userAcceptedUpdateRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
@@ -61,8 +64,14 @@ export default function ServiceWorkerRegistration() {
       }
     };
 
-    // Listen for controller change (means SW took over)
+    // Reload when a NEW worker takes over — but only once, and only after the
+    // user has explicitly accepted an update (guards against reload loops and
+    // unexpected reloads that would discard in-flight state).
+    let hasReloaded = false;
     const handleControllerChange = () => {
+      if (hasReloaded) return;
+      if (!userAcceptedUpdateRef.current) return;
+      hasReloaded = true;
       window.location.reload();
     };
     navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
@@ -78,7 +87,8 @@ export default function ServiceWorkerRegistration() {
   const handleUpdate = useCallback(() => {
     if (!registration?.waiting) return;
 
-    // Tell the waiting service worker to skip waiting
+    // User explicitly accepted — allow the post-activation reload.
+    userAcceptedUpdateRef.current = true;
     registration.waiting.postMessage({ type: 'SKIP_WAITING' });
   }, [registration]);
 

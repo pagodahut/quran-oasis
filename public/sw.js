@@ -47,18 +47,20 @@ const CACHEABLE_API_ROUTES = [
 
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing v2...');
+  console.log('[SW] Installing...');
   event.waitUntil(
-    Promise.all([
-      caches.open(STATIC_CACHE).then((cache) => {
-        console.log('[SW] Caching static assets');
-        return cache.addAll([...STATIC_ASSETS, ...ICON_ASSETS]);
-      }),
-    ]).then(() => {
-      console.log('[SW] Install complete');
+    caches.open(STATIC_CACHE).then((cache) => {
+      // Cache assets individually so one missing file can't fail the whole
+      // install (addAll is atomic — a single 404 aborts everything).
+      return Promise.allSettled(
+        [...STATIC_ASSETS, ...ICON_ASSETS].map((u) => cache.add(u))
+      );
     })
   );
-  self.skipWaiting();
+  // NOTE: deliberately NOT calling skipWaiting() here. Auto-activating a new
+  // SW and reloading every tab discards in-flight state (a mid-review session,
+  // un-synced progress). The new worker activates on next load, or immediately
+  // when the user accepts the "Update available" prompt (SKIP_WAITING message).
 });
 
 // Activate event - clean up old caches

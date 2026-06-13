@@ -89,11 +89,20 @@ export function getProgress(): UserProgress {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return createDefaultProgress();
     
-    const parsed = JSON.parse(stored) as UserProgress;
-    // Ensure all required fields exist
+    const parsed = JSON.parse(stored);
+    const defaults = createDefaultProgress();
+    if (!parsed || typeof parsed !== 'object') return defaults;
+
+    // Defensive merge: a malformed value (e.g. {"streak":null}) must not
+    // override a required nested object with null and crash callers.
     return {
-      ...createDefaultProgress(),
+      ...defaults,
       ...parsed,
+      verses: (parsed.verses && typeof parsed.verses === 'object') ? parsed.verses : defaults.verses,
+      streak: (parsed.streak && typeof parsed.streak === 'object')
+        ? { ...defaults.streak, ...parsed.streak }
+        : defaults.streak,
+      dailyActivity: Array.isArray(parsed.dailyActivity) ? parsed.dailyActivity : defaults.dailyActivity,
     };
   } catch {
     return createDefaultProgress();
