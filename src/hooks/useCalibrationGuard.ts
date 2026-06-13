@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { isCalibrationComplete } from '@/lib/user-profile-sync';
 
 /**
- * Hook that redirects uncalibrated users to /onboarding/welcome.
+ * Hook that redirects uncalibrated users straight to /onboarding.
  * Returns { isChecking: true } while verifying, { isChecking: false } once confirmed calibrated.
  */
 export function useCalibrationGuard() {
@@ -16,7 +16,8 @@ export function useCalibrationGuard() {
     async function check() {
       const calibrated = await isCalibrationComplete();
       if (!calibrated) {
-        router.replace('/onboarding/welcome');
+        // Go directly to /onboarding (was /onboarding/welcome → extra redirect hop).
+        router.replace('/onboarding');
         return;
       }
       setIsChecking(false);
