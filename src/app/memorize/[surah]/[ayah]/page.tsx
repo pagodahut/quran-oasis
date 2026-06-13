@@ -32,13 +32,11 @@ import {
 import WordByWordInline from '@/components/WordByWordInline';
 import VerseContext, { WhyThisMatters } from '@/components/VerseContext';
 import { getSurah, getAudioUrl, RECITERS, cleanAyahText, getEffectiveReciterForPerAyah, supportsPerAyah, type Ayah } from '@/lib/quranData';
-import { 
-  startMemorizingVerse, 
-  markVerseMemorized, 
-  completeVerseSession,
-  getProgress,
-  saveProgress,
+import {
+  startMemorizingVerse,
+  markVerseMemorized,
 } from '@/lib/progressStore';
+import { srs, type ReviewQuality } from '@/lib/spaced-repetition';
 import { useReadingPreferences } from '@/hooks/useAppliedPreferences';
 import { TarteelService, checkBrowserSupport, type TarteelSessionResult } from '@/lib/tarteelService';
 import { WebSpeechService, type WebSpeechSessionResult } from '@/lib/webSpeechService';
@@ -455,6 +453,7 @@ export default function MemorizePage() {
 
   // Load data
   useEffect(() => {
+    completedRef.current = false; // reset completion guard for the new verse
     getSurah(surahNum).then(surah => {
       if (surah) {
         const foundVerse = surah.ayahs.find(a => a.numberInSurah === ayahNum);
@@ -517,7 +516,15 @@ export default function MemorizePage() {
         handleComplete();
         return;
       }
-      
+
+      // Persist + schedule whenever we actually enter the complete phase
+      // (the normal stack→complete path must save too, not just the skip path)
+      if (nextPhase === 'complete') {
+        setPhase('complete');
+        handleComplete();
+        return;
+      }
+
       setPhase(nextPhase);
       
       // Auto-start audio for listen phase
@@ -533,10 +540,32 @@ export default function MemorizePage() {
     }
   };
 
+  const completedRef = useRef(false);
   const handleComplete = () => {
+    // Guard against double-fire (skip path + effect, or rapid taps)
+    if (completedRef.current) return;
+    completedRef.current = true;
+
     setShowCelebration(true);
+
+    // 1. Persist to the progress store (XP, streak, motivation)
     markVerseMemorized(surahNum, ayahNum);
-    
+
+    // 2. Schedule the verse in the spaced-repetition queue the Practice
+    //    hub reads — without this, memorized verses never come up for review.
+    //    Grade the first review from the recall accuracy we measured.
+    const meanAccuracy = recallAccuracy.length > 0
+      ? recallAccuracy.reduce((a, b) => a + b, 0) / recallAccuracy.length
+      : null;
+    const quality: ReviewQuality =
+      meanAccuracy === null ? 'good'
+      : meanAccuracy >= 90 ? 'easy'
+      : meanAccuracy >= 75 ? 'good'
+      : meanAccuracy >= 50 ? 'hard'
+      : 'again';
+    srs.addAyah(surahNum, ayahNum);
+    srs.recordReview(surahNum, ayahNum, quality);
+
     setTimeout(() => {
       setShowCelebration(false);
     }, 2500);
