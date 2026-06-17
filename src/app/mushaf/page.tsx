@@ -348,7 +348,7 @@ export default function MushafPage() {
   };
 
   return (
-    <div className={`min-h-screen ${focusMode ? 'bg-black' : 'mushaf-glass-bg'}`} onClick={handleFocusTap}>
+    <div className={`min-h-screen ${focusMode ? 'bg-night-950' : 'mushaf-glass-bg'}`} onClick={handleFocusTap}>
       {/* Audio Element */}
       <audio
         ref={audioRef}
@@ -407,7 +407,7 @@ export default function MushafPage() {
             </div>
 
             {/* Navigation - Smooth divider */}
-            <div className="flex items-center justify-between px-4 py-2.5 border-t border-white/[0.04] text-sm">
+            <div className="flex items-center justify-between px-4 py-2.5 border-t border-night-700/20 text-sm">
               <button
                 onClick={() => surahNumber > 1 && setSurahNumber(surahNumber - 1)}
                 disabled={surahNumber === 1}
@@ -876,7 +876,7 @@ export default function MushafPage() {
                       setPlaybackRate(rate);
                       if (audioRef.current) audioRef.current.playbackRate = rate;
                     }}
-                    className="bg-white/5 text-night-300 text-xs px-2 py-1 rounded-lg border border-white/5 min-h-[28px]"
+                    className="bg-night-800/50 text-night-300 text-xs px-2 py-1 rounded-lg border border-night-700/30 min-h-[28px]"
                   >
                     <option value={0.5}>0.5x</option>
                     <option value={0.75}>0.75x</option>

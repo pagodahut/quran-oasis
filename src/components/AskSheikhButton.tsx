@@ -216,16 +216,16 @@ export default function AskSheikhButton({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.95 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className="backdrop-blur-2xl bg-white/[0.06] border border-white/[0.15]
+            className="backdrop-blur-2xl bg-night-800/80 border border-night-700/30
                        rounded-2xl px-4 py-3 max-w-[200px]
                        shadow-[0_8px_32px_rgba(0,0,0,0.25)]"
           >
-            <p className="text-xs text-white/[0.8] leading-relaxed">
+            <p className="text-xs text-night-200 leading-relaxed">
               Need help? Sheikh can guide you step by step.
             </p>
             <button
               onClick={() => dismissStuckPrompt()}
-              className="text-[10px] text-white/[0.4] hover:text-gold-400 mt-1"
+              className="text-[10px] text-night-500 hover:text-gold-400 mt-1"
             >
               Dismiss
             </button>

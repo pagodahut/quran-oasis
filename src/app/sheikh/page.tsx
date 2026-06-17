@@ -73,9 +73,9 @@ export default function SheikhPage() {
   const ayah = SAMPLE_AYAHS[selectedAyah];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-night-950 via-night-900 to-night-950 text-white">
+    <div className="min-h-screen bg-gradient-to-b from-night-950 via-night-900 to-night-950 text-night-100">
       {/* Header */}
-      <header className="border-b border-white/5 bg-night-900/60 backdrop-blur-xl sticky top-0 z-30">
+      <header className="border-b border-night-700/20 bg-night-900/60 backdrop-blur-xl sticky top-0 z-30">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="text-lg font-semibold text-gold-400">H</Link>
@@ -86,7 +86,7 @@ export default function SheikhPage() {
           </div>
           <a
             href="/mushaf"
-            className="text-xs text-night-400 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
+            className="text-xs text-night-400 hover:text-night-100 px-3 py-1.5 rounded-lg hover:bg-night-700/20 transition-colors"
           >
             Open Mushaf →
           </a>

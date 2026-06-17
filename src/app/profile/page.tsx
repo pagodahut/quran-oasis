@@ -393,7 +393,7 @@ export default function ProfilePage() {
 
           {/* Study Insights */}
           <motion.div variants={fadeInUp}>
-            <h3 className="text-white/50 text-xs uppercase tracking-wider mb-3 px-1">Study Insights</h3>
+            <h3 className="text-night-500 text-xs uppercase tracking-wider mb-3 px-1">Study Insights</h3>
             <StudyProfile />
           </motion.div>
 

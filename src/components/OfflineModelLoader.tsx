@@ -110,7 +110,7 @@ export function OfflineModelLoader({
         
         {/* Content */}
         <div className="flex-1">
-          <h3 className="font-semibold text-white">Offline Mode</h3>
+          <h3 className="font-semibold text-night-100">Offline Mode</h3>
           <p className="text-sm text-night-400 mt-1">
             Download the AI model to practice without internet
           </p>

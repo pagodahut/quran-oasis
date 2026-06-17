@@ -119,11 +119,11 @@ export default function FeedbackButton({
               className={`flex items-center gap-2 
                          rounded-2xl font-medium text-sm
                          shadow-lg transition-all duration-300
-                         bg-white/10 backdrop-blur-xl 
-                         border border-white/20
-                         text-white/90 
+                         bg-night-800/60 backdrop-blur-xl
+                         border border-night-700/30
+                         text-night-100
                          shadow-black/20 hover:shadow-black/30
-                         hover:bg-white/15
+                         hover:bg-night-700/40
                          ${isCompact ? 'p-3' : 'px-4 py-3'}`}
             >
               <span className="text-base">💬</span>

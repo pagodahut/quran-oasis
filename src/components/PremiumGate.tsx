@@ -113,7 +113,7 @@ export function PremiumUpgradeModal({
               >
                 <SparkleIcon size={48} />
               </motion.div>
-              <h2 className="text-2xl font-bold text-white mb-2">
+              <h2 className="text-2xl font-bold text-night-100 mb-2">
                 Upgrade to Premium
               </h2>
               {feature === 'sheikh' && usedCount !== undefined && maxCount !== undefined && (

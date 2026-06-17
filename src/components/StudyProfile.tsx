@@ -19,7 +19,7 @@ export default function StudyProfile() {
   if (!insights || insights.totalVisits === 0) {
     return (
       <div className="liquid-glass rounded-2xl p-6 text-center">
-        <p className="text-white/60 text-sm">
+        <p className="text-night-400 text-sm">
           Start studying to see your personalized insights here. Open the Mushaf, try a lesson, or practice your recitation!
         </p>
       </div>
@@ -37,7 +37,7 @@ export default function StudyProfile() {
               <p className="text-gold-400 font-semibold text-lg">
                 {insights.streakDays} Day Streak
               </p>
-              <p className="text-white/60 text-sm">
+              <p className="text-night-400 text-sm">
                 {insights.streakDays >= 7
                   ? 'MashaAllah, your consistency is beautiful!'
                   : insights.streakDays >= 3
@@ -52,14 +52,14 @@ export default function StudyProfile() {
       {/* Most Used Feature */}
       {insights.mostUsedFeature && (
         <div className="liquid-glass rounded-2xl p-5">
-          <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Your Focus</p>
+          <p className="text-night-500 text-xs uppercase tracking-wider mb-2">Your Focus</p>
           <div className="flex items-center gap-3">
             <span className="text-xl">{PAGE_ICONS[insights.mostUsedFeature.page]}</span>
             <div>
-              <p className="text-white/90 font-medium">
+              <p className="text-night-100 font-medium">
                 {getPageLabel(insights.mostUsedFeature.page)}
               </p>
-              <p className="text-white/50 text-sm">
+              <p className="text-night-500 text-sm">
                 {insights.mostUsedFeature.count} visits · Your most-used study tool
               </p>
             </div>
@@ -70,11 +70,11 @@ export default function StudyProfile() {
       {/* Top Surahs */}
       {insights.topSurahs.length > 0 && (
         <div className="liquid-glass rounded-2xl p-5">
-          <p className="text-white/50 text-xs uppercase tracking-wider mb-3">Most Studied Surahs</p>
+          <p className="text-night-500 text-xs uppercase tracking-wider mb-3">Most Studied Surahs</p>
           <div className="space-y-2">
             {insights.topSurahs.map(({ surah, count }) => (
               <div key={surah} className="flex items-center justify-between">
-                <span className="text-white/80 text-sm">Surah {surah}</span>
+                <span className="text-night-200 text-sm">Surah {surah}</span>
                 <span className="text-gold-400/80 text-xs">{count} sessions</span>
               </div>
             ))}
@@ -84,12 +84,12 @@ export default function StudyProfile() {
 
       {/* Suggestion */}
       <div className="liquid-glass rounded-2xl p-5 border-l-2 border-gold-400/30">
-        <p className="text-white/50 text-xs uppercase tracking-wider mb-1">Suggestion</p>
-        <p className="text-white/70 text-sm">{insights.suggestion}</p>
+        <p className="text-night-500 text-xs uppercase tracking-wider mb-1">Suggestion</p>
+        <p className="text-night-300 text-sm">{insights.suggestion}</p>
       </div>
 
       {/* Stats Footer */}
-      <div className="text-center text-white/30 text-xs">
+      <div className="text-center text-night-500 text-xs">
         {insights.totalVisits} total study sessions tracked
       </div>
     </div>

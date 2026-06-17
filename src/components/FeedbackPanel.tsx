@@ -113,14 +113,14 @@ export default function FeedbackPanel({
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="fixed bottom-0 left-0 right-0 z-50 
                        bg-night-900/95 backdrop-blur-xl 
-                       border-t border-white/10
+                       border-t border-night-700/20
                        rounded-t-3xl
                        max-h-[85vh] overflow-y-auto
                        shadow-2xl shadow-black/50"
           >
             {/* Handle bar */}
             <div className="flex justify-center pt-3 pb-2">
-              <div className="w-10 h-1 bg-white/20 rounded-full" />
+              <div className="w-10 h-1 bg-night-600/40 rounded-full" />
             </div>
 
             <div className="px-6 pb-8">
@@ -139,7 +139,7 @@ export default function FeedbackPanel({
                   >
                     🤲
                   </motion.span>
-                  <h3 className="text-xl font-semibold text-white mb-2">
+                  <h3 className="text-xl font-semibold text-night-100 mb-2">
                     JazakAllah Khair!
                   </h3>
                   <p className="text-night-400 text-center">
@@ -151,7 +151,7 @@ export default function FeedbackPanel({
                   {/* Header */}
                   <div className="flex items-center justify-between mb-6">
                     <div>
-                      <h3 className="text-xl font-semibold text-white">
+                      <h3 className="text-xl font-semibold text-night-100">
                         Share Feedback
                       </h3>
                       <p className="text-sm text-night-400 mt-1">
@@ -160,7 +160,7 @@ export default function FeedbackPanel({
                     </div>
                     <button
                       onClick={handleClose}
-                      className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                      className="p-2 hover:bg-night-700/20 rounded-full transition-colors"
                       aria-label="Close"
                     >
                       <svg className="w-5 h-5 text-night-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -182,7 +182,7 @@ export default function FeedbackPanel({
                                      border transition-all text-sm
                                      ${category === type
                                        ? 'bg-amber-500/20 border-amber-500/50 text-amber-200'
-                                       : 'bg-white/5 border-white/10 text-night-300 hover:bg-white/10'
+                                       : 'bg-night-800/50 border-night-700/30 text-night-300 hover:bg-night-700/30'
                                      }`}
                         >
                           <span>{emoji}</span>
@@ -211,8 +211,8 @@ export default function FeedbackPanel({
                       }
                       rows={4}
                       className="w-full px-4 py-3 rounded-xl
-                                bg-white/5 border border-white/10
-                                text-white placeholder:text-night-500
+                                bg-night-800/50 border border-night-700/30
+                                text-night-100 placeholder:text-night-500
                                 focus:outline-none focus:ring-2 focus:ring-amber-500/50
                                 resize-none"
                       autoFocus

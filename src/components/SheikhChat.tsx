@@ -438,14 +438,14 @@ export default function SheikhChat({
           )}
 
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/5">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-night-700/20">
 
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-gold-500/15 flex items-center justify-center">
                 <MosqueIcon size={20} aria-hidden="true" />
               </div>
               <div>
-                <h3 id="sheikh-chat-title" className="text-sm font-semibold text-white">Sheikh HIFZ</h3>
+                <h3 id="sheikh-chat-title" className="text-sm font-semibold text-night-100">Sheikh HIFZ</h3>
                 <p id="sheikh-chat-subtitle" className="text-[11px] text-gold-400/70">{getSubtitle()}</p>
               </div>
             </div>
@@ -463,7 +463,7 @@ export default function SheikhChat({
               {onClose && (
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-night-400 hover:text-white hover:bg-white/10 transition-all focus:ring-2 focus:ring-gold-500/50 focus:outline-none"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-night-400 hover:text-night-100 hover:bg-night-700/30 transition-all focus:ring-2 focus:ring-gold-500/50 focus:outline-none"
                   aria-label="Close Sheikh chat"
                 >
                   ✕
@@ -475,7 +475,7 @@ export default function SheikhChat({
           {/* Messages Area */}
           <div
             className="flex-1 overflow-y-auto px-4 py-4 space-y-4 min-h-[200px] scroll-smooth"
-            style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}
+            style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgb(var(--c-night-700) / 0.3) transparent' }}
             role="log"
             aria-live="polite"
             aria-label="Chat conversation with Sheikh AI"
@@ -491,7 +491,7 @@ export default function SheikhChat({
                 <div className="w-16 h-16 rounded-2xl bg-gold-500/10 flex items-center justify-center mb-4 border border-gold-500/20">
                   <MosqueIcon size={32} />
                 </div>
-                <h4 className="text-base font-semibold text-white mb-1.5">
+                <h4 className="text-base font-semibold text-night-100 mb-1.5">
                   بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
                 </h4>
                 <p className="text-sm text-night-400 mb-6 max-w-xs">
@@ -541,13 +541,13 @@ export default function SheikhChat({
           </div>
 
           {/* Input Area */}
-          <div className="border-t border-white/[0.06] px-4 py-3" style={{ background: 'rgba(14,18,26,0.80)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)' }}>
+          <div className="border-t border-night-700/20 px-4 py-3" style={{ background: 'var(--panel-neutral)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)' }}>
             {isLoading && (
               <div className="flex justify-center mb-2">
                 <button
                   onClick={stopStreaming}
-                  className="text-[11px] text-night-400 hover:text-white px-3 py-1 rounded-full 
-                             border border-white/10 hover:border-white/20 hover:bg-white/5
+                  className="text-[11px] text-night-400 hover:text-night-100 px-3 py-1 rounded-full
+                             border border-night-700/30 hover:border-night-700/50 hover:bg-night-700/20
                              transition-all duration-200 focus:ring-2 focus:ring-gold-500/50 focus:outline-none"
                   aria-label="Stop AI response generation"
                 >
@@ -575,10 +575,10 @@ export default function SheikhChat({
                       : 'Ask the sheikh anything...'
                   }
                   rows={1}
-                  className="w-full resize-none rounded-xl bg-white/5 border border-white/10 
-                             text-sm text-white placeholder-night-500 
+                  className="w-full resize-none rounded-xl bg-night-800/50 border border-night-700/30
+                             text-sm text-night-100 placeholder-night-500
                              px-4 py-2.5 pr-10
-                             focus:outline-none focus:border-gold-500/40 focus:bg-white/[0.07]
+                             focus:outline-none focus:border-gold-500/40 focus:bg-night-800/70
                              transition-colors duration-200
                              max-h-24 overflow-y-auto"
                   style={{ scrollbarWidth: 'none' }}
