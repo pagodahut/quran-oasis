@@ -40,7 +40,7 @@ export interface UserSettings {
 // Constants
 // ============================================
 
-const STORAGE_KEY = 'quran-oasis-settings';
+const STORAGE_KEY = 'hifz-settings';
 
 export const DEFAULT_SETTINGS: UserSettings = {
   reciter: 'alafasy',
@@ -211,7 +211,7 @@ export function useSettings() {
 // Preferred Reciter per Surah
 // ============================================
 
-const SURAH_RECITER_KEY = 'quran-oasis-surah-reciters';
+const SURAH_RECITER_KEY = 'hifz-surah-reciters';
 
 interface SurahReciterPreferences {
   [surah: string]: string; // surah number -> reciter id

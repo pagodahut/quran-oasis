@@ -56,11 +56,17 @@ export interface PrivacyPreferences {
   lastSyncAt: string | null;
 }
 
+export interface AiSheikhPreferences {
+  enabled: boolean;
+  apiKey: string;
+}
+
 export interface UserPreferences {
   audio: AudioPreferences;
   display: DisplayPreferences;
   learning: LearningPreferences;
   privacy: PrivacyPreferences;
+  aiSheikh: AiSheikhPreferences;
   version: number;
   createdAt: string;
   updatedAt: string;
@@ -70,7 +76,7 @@ export interface UserPreferences {
 // Constants
 // ============================================
 
-const STORAGE_KEY = 'quran-oasis-preferences';
+const STORAGE_KEY = 'hifz-preferences';
 const CURRENT_VERSION = 1;
 
 export const FONT_SIZE_MAP: Record<FontSize, number> = {
@@ -201,10 +207,37 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
     syncEnabled: false,
     lastSyncAt: null,
   },
+  aiSheikh: {
+    enabled: false,
+    apiKey: '',
+  },
   version: CURRENT_VERSION,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };
+
+// ============================================
+// Migration
+// ============================================
+
+function migrateStorageKeys(): void {
+  if (typeof window === 'undefined') return;
+  const migrations: [string, string][] = [
+    ['quran-oasis-preferences', 'hifz-preferences'],
+    ['quran-oasis-bookmarks', 'hifz-bookmarks'],
+    ['quran-oasis-settings', 'hifz-settings'],
+    ['quran-oasis-surah-reciters', 'hifz-surah-reciters'],
+  ];
+  for (const [oldKey, newKey] of migrations) {
+    try {
+      const oldVal = localStorage.getItem(oldKey);
+      if (oldVal && !localStorage.getItem(newKey)) {
+        localStorage.setItem(newKey, oldVal);
+      }
+      if (oldVal) localStorage.removeItem(oldKey);
+    } catch { /* ignore */ }
+  }
+}
 
 // ============================================
 // Core Functions
@@ -215,6 +248,8 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
  */
 export function getPreferences(): UserPreferences {
   if (typeof window === 'undefined') return DEFAULT_PREFERENCES;
+
+  migrateStorageKeys();
   
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -228,6 +263,7 @@ export function getPreferences(): UserPreferences {
       display: { ...DEFAULT_PREFERENCES.display, ...parsed.display },
       learning: { ...DEFAULT_PREFERENCES.learning, ...parsed.learning },
       privacy: { ...DEFAULT_PREFERENCES.privacy, ...parsed.privacy },
+      aiSheikh: { ...DEFAULT_PREFERENCES.aiSheikh, ...parsed.aiSheikh },
       version: parsed.version || CURRENT_VERSION,
       createdAt: parsed.createdAt || new Date().toISOString(),
       updatedAt: parsed.updatedAt || new Date().toISOString(),
@@ -340,6 +376,7 @@ export function importPreferences(json: string): boolean {
       display: { ...DEFAULT_PREFERENCES.display, ...parsed.display },
       learning: { ...DEFAULT_PREFERENCES.learning, ...parsed.learning },
       privacy: { ...DEFAULT_PREFERENCES.privacy, ...parsed.privacy },
+      aiSheikh: { ...DEFAULT_PREFERENCES.aiSheikh, ...parsed.aiSheikh },
       version: CURRENT_VERSION,
       createdAt: parsed.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -365,6 +402,9 @@ export function clearAllLocalData(): void {
   // Every app-owned key, across all the historical prefixes the app has used.
   const keys = [
     STORAGE_KEY,
+    'hifz-settings',
+    'hifz-bookmarks',
+    'hifz-surah-reciters',
     'quranOasis_progress',
     'quranOasis_currentSession',
     'quranOasis_motivation',      // correct key (was 'quran-oasis-motivation')
@@ -373,8 +413,10 @@ export function clearAllLocalData(): void {
     'quranOasis_onboardingComplete',
     'quranOasis_completedLessons',
     'quranOasis_flashcardProgress',
+    'quran-oasis-preferences',
     'quran-oasis-settings',
     'quran-oasis-bookmarks',
+    'quran-oasis-surah-reciters',
     'qo_srs_state',
     'qo_user_profile',
     'qo_calibration_complete',

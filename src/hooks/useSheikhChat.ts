@@ -13,6 +13,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { getSuggestedQuestions, type PageContext, type TajweedResult } from '@/lib/sheikh-prompt';
+import { getPreferences } from '@/lib/preferencesStore';
 
 // ─── Types ───────────────────────────────────────────────────────────
 
@@ -132,9 +133,13 @@ export function useSheikhChat(options: UseSheikhChatOptions = {}): UseSheikhChat
       abortControllerRef.current = new AbortController();
 
       try {
+        const apiKey = getPreferences().aiSheikh?.apiKey;
         const response = await fetch('/api/sheikh', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(apiKey ? { 'x-user-api-key': apiKey } : {}),
+          },
           body: JSON.stringify({
             messages: apiMessages,
             ayahContext,

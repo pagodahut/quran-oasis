@@ -15,7 +15,7 @@ export interface Bookmark {
   createdAt: number;       // Timestamp
 }
 
-const STORAGE_KEY = 'quran-oasis-bookmarks';
+const STORAGE_KEY = 'hifz-bookmarks';
 
 // Get all bookmarks
 export function getBookmarks(): Bookmark[] {

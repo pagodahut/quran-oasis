@@ -81,7 +81,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!ANTHROPIC_API_KEY) {
+    const userApiKey = request.headers.get('x-user-api-key');
+
+    if (!ANTHROPIC_API_KEY && !userApiKey) {
       return new Response(
         JSON.stringify({
           error: 'AI teacher is not configured. Please add your Anthropic API key.',
@@ -132,6 +134,7 @@ export async function POST(request: NextRequest) {
         max_tokens: 2048,
         temperature: 0.7,
         stream: true,
+        ...(userApiKey ? { apiKey: userApiKey } : {}),
       });
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);

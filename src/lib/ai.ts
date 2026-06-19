@@ -27,6 +27,7 @@ interface CallClaudeOptions {
   messages: ClaudeMessage[];
   max_tokens: number;
   temperature?: number;
+  apiKey?: string;
 }
 
 interface ClaudeResponse {
@@ -43,8 +44,9 @@ interface ClaudeResponse {
  * Includes a 30 s timeout via AbortController.
  */
 export async function callClaude(options: CallClaudeOptions): Promise<ClaudeResponse> {
-  if (!ANTHROPIC_API_KEY) {
-    throw new Error('ANTHROPIC_API_KEY is not configured');
+  const key = options.apiKey || ANTHROPIC_API_KEY;
+  if (!key) {
+    throw new Error('No API key available');
   }
 
   const controller = new AbortController();
@@ -69,7 +71,7 @@ export async function callClaude(options: CallClaudeOptions): Promise<ClaudeResp
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': ANTHROPIC_API_KEY,
+        'x-api-key': key,
         'anthropic-version': ANTHROPIC_VERSION,
       },
       body: JSON.stringify(body),
@@ -98,8 +100,9 @@ interface CallClaudeStreamOptions extends CallClaudeOptions {
  * Returns the raw Response so the caller can process the SSE stream.
  */
 export async function callClaudeStream(options: CallClaudeStreamOptions): Promise<Response> {
-  if (!ANTHROPIC_API_KEY) {
-    throw new Error('ANTHROPIC_API_KEY is not configured');
+  const key = options.apiKey || ANTHROPIC_API_KEY;
+  if (!key) {
+    throw new Error('No API key available');
   }
 
   const body: Record<string, unknown> = {
@@ -121,7 +124,7 @@ export async function callClaudeStream(options: CallClaudeStreamOptions): Promis
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': ANTHROPIC_API_KEY,
+      'x-api-key': key,
       'anthropic-version': ANTHROPIC_VERSION,
     },
     body: JSON.stringify(body),

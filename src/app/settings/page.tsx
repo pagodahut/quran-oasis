@@ -315,6 +315,7 @@ export default function SettingsPage() {
   const { success: showSuccess, reciterChanged } = useToast();
   const [storageUsage, setStorageUsage] = useState({ used: 0, total: 0, percentage: 0 });
   const [emailNotifications, setEmailNotifications] = useState(true);
+  const [showApiKey, setShowApiKey] = useState(false);
   const [previewPlayingId, setPreviewPlayingId] = useState<string | null>(null);
   const previewAudioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -1070,6 +1071,62 @@ export default function SettingsPage() {
                 <p className="text-xs opacity-70">Remove all progress, bookmarks, and settings</p>
               </div>
             </button>
+          </div>
+        </SettingSection>
+
+        <div className="liquid-divider" />
+
+        {/* ============ AI FEATURES ============ */}
+        <SettingSection
+          icon={Brain}
+          title="AI Features"
+          description="AI-powered learning assistant"
+          iconColor="text-purple-400"
+          iconBg="bg-purple-500/10"
+        >
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-night-800/50">
+              <div className="flex-1 mr-4">
+                <p className="text-night-100 font-medium">AI Sheikh</p>
+                <p className="text-xs text-night-500">
+                  Enable the AI Quran teacher for guidance on memorization, tajweed, and tafsir
+                </p>
+              </div>
+              <LiquidToggle
+                checked={preferences.aiSheikh?.enabled ?? false}
+                onChange={(checked) => update('aiSheikh', { enabled: checked, apiKey: preferences.aiSheikh?.apiKey || '' })}
+              />
+            </div>
+
+            {preferences.aiSheikh?.enabled && (
+              <div className="p-4 rounded-xl bg-night-800/50 space-y-3">
+                <div>
+                  <p className="text-night-100 font-medium">Anthropic API Key</p>
+                  <p className="text-xs text-night-500 mt-1">
+                    Enter your own API key to use AI features. Get one at anthropic.com. Your key is stored locally and never sent to our servers.
+                  </p>
+                </div>
+                <div className="relative">
+                  <input
+                    type={showApiKey ? 'text' : 'password'}
+                    value={preferences.aiSheikh?.apiKey || ''}
+                    onChange={(e) => update('aiSheikh', { enabled: true, apiKey: e.target.value })}
+                    placeholder="sk-ant-..."
+                    className="w-full px-4 py-3 rounded-xl bg-night-900/50 border border-night-700/30 text-night-100 placeholder:text-night-600 text-sm focus:outline-none focus:border-gold-500/40"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowApiKey(!showApiKey)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-night-500 hover:text-night-300"
+                  >
+                    {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                <p className="text-[10px] text-night-600">
+                  Your key is stored only in this browser&apos;s local storage
+                </p>
+              </div>
+            )}
           </div>
         </SettingSection>
 

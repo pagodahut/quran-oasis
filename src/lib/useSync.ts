@@ -111,7 +111,7 @@ export function useSync() {
 
       // Save merged bookmarks
       if (typeof window !== 'undefined') {
-        localStorage.setItem('quran-oasis-bookmarks', JSON.stringify(Array.from(bookmarkSet.values())));
+        localStorage.setItem('hifz-bookmarks', JSON.stringify(Array.from(bookmarkSet.values())));
         window.dispatchEvent(new CustomEvent('bookmarks-updated', { detail: Array.from(bookmarkSet.values()) }));
       }
 
