@@ -57,7 +57,12 @@ export async function initOfflineWhisper(
 ): Promise<void> {
   if (offlineWhisperPipeline) return;
   if (offlineModelLoading) {
-    throw new Error('Model already loading');
+    // Allow retry if pipeline is null (previous attempt failed but flag got stuck)
+    if (!offlineWhisperPipeline) {
+      offlineModelLoading = false;
+    } else {
+      throw new Error('Model already loading');
+    }
   }
   
   offlineModelLoading = true;
@@ -70,11 +75,16 @@ export async function initOfflineWhisper(
     env.allowLocalModels = false;
     env.useBrowserCache = true;
 
-    // Safe progress callback that guards against undefined data
+    // Safe progress callback that guards against null/undefined data
+    // @xenova/transformers can emit null/undefined during network errors
     const progressCallback = (data: any) => {
-      if (data && data.status === 'progress' && data.progress !== undefined) {
-        offlineModelProgress = data.progress;
-        onProgress?.(data.progress);
+      try {
+        if (data != null && typeof data === 'object' && data.status === 'progress' && typeof data.progress === 'number') {
+          offlineModelProgress = data.progress;
+          onProgress?.(data.progress);
+        }
+      } catch {
+        // Silently ignore malformed progress events
       }
     };
 
