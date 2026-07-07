@@ -50,5 +50,8 @@ coverage/
 /.clerk/
 __pycache__/
 agent-orchestrator.yaml
-.claude/
+# Claude Code: ignore local state, keep versioned skills/settings
+.claude/*
+!.claude/skills/
+!.claude/settings.json
 tmp/
